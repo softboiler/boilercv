@@ -1,5 +1,5 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 9860b10
+_commit: 24c9dc4
 _src_path: gh:blakeNaccarato/copier-python
 actions_runner: ubuntu-latest
 advanced: false
