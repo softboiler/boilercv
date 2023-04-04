@@ -40,7 +40,7 @@ def main():
     cv.destroyAllWindows()
 
 
-def get_roi(image: ArrInt) -> ArrInt:  # noqa: C901
+def get_roi(image: ArrInt) -> ArrInt:
     """Get the region of interest of an image.
 
     See: https://docs.opencv.org/4.6.0/db/d5b/tutorial_py_mouse_handling.html
