@@ -30,7 +30,7 @@ repos:
   # * Changes below should persist in significant template updates.
 
   - repo: "https://github.com/iterative/dvc"
-    rev: "2.46.0"
+    rev: "2.52.0"
     hooks:
       - id: "dvc-pre-commit"
       - id: "dvc-post-checkout"
@@ -50,11 +50,11 @@ repos:
     hooks:
       - id: "markdownlint-cli2-fix"
   - repo: "https://github.com/psf/black"
-    rev: "23.1.0"
+    rev: "23.3.0"
     hooks:
       - id: "black"
   - repo: "https://github.com/charliermarsh/ruff-pre-commit"
-    rev: "v0.0.254"
+    rev: "v0.0.260"
     hooks:
       - id: "ruff"
   - repo: "https://github.com/srstevenson/nb-clean"
@@ -74,7 +74,7 @@ repos:
       - id: "blacken-docs"
         additional_dependencies: ["black==23.1.0"]
   - repo: "https://github.com/nbQA-dev/nbQA"
-    rev: "1.6.3"
+    rev: "1.7.0"
     hooks:
       - id: "nbqa-black"
         additional_dependencies: ["black==23.1.0"]
