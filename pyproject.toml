@@ -9,7 +9,7 @@ description = "Computer vision routines suitable for nucleate pool boiling bubbl
 readme = "README.md"
 requires-python = ">=3.11"
 classifiers = [ "License :: OSI Approved :: MIT License",]
-dependencies = [ "imageio[pyav]>=2.31.1", "ipywidgets>=8.0.6", "loguru>=0.7.0", "matplotlib>=3.7.1", "opencv-contrib-python>=4.7.0.72", "pandas[hdf5,performance]>=2.0.2", "pandera>=0.15.1", "pillow>=9.5.0", "pyarrow>=12.0.1", "pydantic>=1.10.9", "pyjanitor>=0.24.0", "pyqtgraph>=0.13.3", "pyside6>=6.5.1.1", "pytz>=2023.3", "pyyaml>=6.0", "ruamel.yaml>=0.17.32", "scikit-image>=0.21.0", "scipy>=1.11.0", "seaborn>=0.12.2", "sympy>=1.12", "xarray[accel,io,parallel]>=2023.6.0", "dvc[gs]>=2.58.2", "numpy>=1.24.4",]
+dependencies = [ "imageio[pyav]>=2.31.1", "ipywidgets>=8.0.6", "loguru>=0.7.0", "matplotlib>=3.7.1", "opencv-contrib-python>=4.7.0.72", "pandas[hdf5,performance]>=2.0.2", "pandera>=0.15.1", "pillow>=9.5.0", "pyarrow>=12.0.1", "pydantic>=1.10.9", "pyjanitor>=0.24.0", "pyqtgraph>=0.13.3", "pyside6>=6.5.1.1", "pytz>=2023.3", "pyyaml>=6.0", "ruamel.yaml>=0.17.32", "scikit-image>=0.21.0", "scipy>=1.11.0", "seaborn>=0.12.2", "sympy>=1.12", "xarray[accel,io,parallel]>=2023.6.0", "dvc[gs]>=3.2.2", "numpy>=1.24.4",]
 [[project.authors]]
 name = "Blake Naccarato, Kwang Jin Kim"
 email = "blake.naccarato@gmail.com"
