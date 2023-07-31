@@ -26,4 +26,4 @@ sympy==1.12
 trackpy==0.6.1
 xarray[accel,io,parallel]==2023.6.0
 # ? Conflicts with imageio, matplotlib, and xarray
-numpy==1.24.4
+numpy==1.25.2
