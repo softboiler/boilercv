@@ -16,7 +16,7 @@ pandocfilters==1.5.0
 pillow==10.0.0
 ploomber-engine==0.0.30
 pyarrow==12.0.1
-pydantic==1.10.12
+pydantic==2.2.0
 pyjanitor==0.25.0
 pyqtgraph==0.13.3
 pyside6==6.5.2
