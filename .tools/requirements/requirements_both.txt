@@ -12,7 +12,7 @@ dulwich==0.21.5
 flit==3.9.0
 
 # Type checking
-pyright==1.1.318
+pyright==1.1.323
 
 # Pre-commit common requirements
 ruff==0.0.282
