@@ -12,7 +12,7 @@ nbconvert==7.7.4
 nbformat==5.9.2
 nbqa==1.7.0
 opencv-contrib-python==4.8.0.76
-pandas[hdf5,performance]==2.0.2
+pandas[hdf5,performance]==2.1.0
 pandas-stubs~=2.0.2
 pandocfilters==1.5.0
 pillow==10.0.0
@@ -34,7 +34,7 @@ xarray[accel,io,parallel]==2023.7.0
 # ! Unpin numba once it supports numpy>=1.25
 # ? Numba only supports numpy<1.25 https://github.com/numba/numba/issues/8698
 numba==0.57.1
-numpy==1.24.4
+numpy==1.25.2
 # ! Consider switching to pims instead
 boilercine@git+https://github.com/blakeNaccarato/boilercine@main
 # ! Pin the merge commit in master once it is merged
