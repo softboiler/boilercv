@@ -21,7 +21,7 @@ pandas-stubs~=2.1.1
 pandocfilters==1.5.0
 pillow==10.1.0
 ploomber-engine==0.0.31
-pyarrow==13.0.0
+pyarrow==14.0.1
 pydantic==1.10.12
 pyjanitor==0.26.0
 pyqtgraph==0.13.3
