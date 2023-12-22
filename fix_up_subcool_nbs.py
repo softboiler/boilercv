@@ -62,9 +62,9 @@ def rename_link(nb: Path, run: str):
     lines = nb.read_text(encoding="utf-8").splitlines()
     lines[LINKS_LINE - 1] = '''"RELINK = False\n"'''
     line = lines[LINKS_LINE]
-    lines[
-        LINKS_LINE
-    ] = f"{line[:LINKS_START]}{nb.with_suffix('.h5').name}{line[LINKS_END:]}"
+    lines[LINKS_LINE] = (
+        f"{line[:LINKS_START]}{nb.with_suffix('.h5').name}{line[LINKS_END:]}"
+    )
     h5 = NB_DIR / get_h5_name(run)
     if not h5.exists():
         nb.write_text(encoding="utf-8", data="\n".join(lines))
