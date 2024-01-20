@@ -15,7 +15,7 @@ nbdime==4.0.1
 nbformat==5.9.2
 numpy==1.26.3
 opencv-contrib-python==4.9.0.80
-pandas[hdf5,performance]==2.1.4
+pandas[hdf5,performance]==2.2.0
 pandas-stubs~=2.1.4
 pillow==10.2.0
 ploomber-engine==0.0.31
