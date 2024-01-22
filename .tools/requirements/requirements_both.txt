@@ -3,7 +3,7 @@
 # ? For caching with dill, unlike the stock PyPI version
 cachier@git+https://github.com/blakeNaccarato/cachier@0892f53dc8fd9fb8a7f959305a1a9ec692876dc0
 # Type checking
-pyright==1.1.347
+pyright==1.1.348
 # * ---------------------------------------------------------------------------------- *
 # Pre-commit common requirements
 ruff==0.1.11
