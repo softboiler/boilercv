@@ -84,7 +84,7 @@ jobs:
       # ! https://github.com/pytest-dev/pytest-cov/issues/479#issuecomment-1247444988
       - run: "pytest --cov --cov-config pyproject.toml"
       - if: ${{startsWith(matrix.github_actions_runner, 'ubuntu') && matrix.python_version == '3.11'}}
-        uses: "codecov/codecov-action@54bcd8715eee62d40e33596ef5e8f0f48dbbccab" # v3.1.4
+        uses: "codecov/codecov-action@54bcd8715eee62d40e33596ef5e8f0f48dbbccab" # v4.1.0
   pyright:
     needs: ["lock"]
     runs-on: "ubuntu-22.04"
