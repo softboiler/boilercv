@@ -5,6 +5,7 @@ from re import sub
 from warnings import catch_warnings, filterwarnings
 
 import sympy
+from boilercore import syms
 from cyclopts import App
 from loguru import logger
 from numpy import finfo
@@ -20,15 +21,10 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import 
     LOCALS,
     SOLUTIONS,
     SOLUTIONS_TOML,
-    Expr,
-    Soln,
-    Solns,
-    solve_syms,
+    BetaSolns,
 )
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    params,
-    syms,
-)
+from boilercv_pipeline.models import params
+from boilercv_pipeline.morphs import Expr, Soln
 
 SYMS_TO_PARAMS = dict(zip(syms, params, strict=True))
 """Mapping of symbols to parameters."""
@@ -61,7 +57,7 @@ def default(overwrite: bool = False):  # noqa: D103
 
 def get_solutions(eq: sympy.Eq):
     """Get solutions for an equation."""
-    return Solns({
+    return BetaSolns({
         param: solve_equation(eq, sym)
         for param, sym in ((s, LOCALS[s]) for s in solve_syms)
     })

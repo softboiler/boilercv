@@ -1,10 +1,7 @@
-"""Generated equations."""
+"""Equations."""
 
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
-    Forms,
-    replace,
-)
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import FormsRepl
+from boilercv_pipeline.correlations.types import FormsRepl
+from boilercv_pipeline.morphs import Forms, replace
 
 
 def set_param_forms(i: Forms, name: str = "") -> Forms:

@@ -22,15 +22,10 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import 
     EQUATIONS_TOML,
     LOCALS,
     MAKE_RAW,
-    Forms,
-    regex_replace,
-    set_equation_forms,
 )
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    K,
-    Kind,
-    V,
-)
+from boilercv_pipeline.correlations.types import Kind
+from boilercv_pipeline.morphs import Forms, regex_replace, set_equation_forms
+from boilercv_pipeline.types import K, V
 
 APP = App()
 """CLI."""
