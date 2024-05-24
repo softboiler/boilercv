@@ -20,11 +20,11 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.equations impo
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
     EQUATIONS,
     EQUATIONS_TOML,
-    LOCALS,
+    LOCAL_SYMBOLS,
     MAKE_RAW,
 )
-from boilercv_pipeline.correlations.types import Kind
-from boilercv_pipeline.morphs import Forms, regex_replace, set_equation_forms
+from boilercv_pipeline.correlations.types import Forms, Kind, set_equation_forms
+from boilercv_pipeline.morphs import regex_replace
 from boilercv_pipeline.types import K, V
 
 APP = App()
@@ -50,7 +50,7 @@ def default(overwrite: bool = False):  # noqa: D103
             continue
         changed = (
             eq.pipe(convert, PIPX, latex_parser, latex, symbolic)
-            .pipe(set_equation_forms, symbols=LOCALS)
+            .pipe(set_equation_forms, symbols=LOCAL_SYMBOLS)
             .pipe(compare, orig=eq)
             .pipe(remove_symbolically_equiv, orig=eq, symbolic=symbolic)
         )
@@ -106,8 +106,8 @@ def remove_symbolically_equiv(i: Forms, orig: Forms, symbolic: Kind) -> Forms:
     eq = i.get(symbolic)
     if not old_eq or not eq:
         return i
-    old = sympify(old_eq, locals=LOCALS.model_dump(), evaluate=False)
-    new = sympify(eq, locals=LOCALS.model_dump(), evaluate=False)
+    old = sympify(old_eq, locals=LOCAL_SYMBOLS.model_dump(), evaluate=False)
+    new = sympify(eq, locals=LOCAL_SYMBOLS.model_dump(), evaluate=False)
     compare = (old.lhs - old.rhs) - (new.lhs - new.rhs)
     if compare == 0:
         # ? Equations compare equal without simplifying
@@ -118,7 +118,7 @@ def remove_symbolically_equiv(i: Forms, orig: Forms, symbolic: Kind) -> Forms:
         # ? Equations compare equal after simplifying
         i.pop(symbolic)
         return i
-    compare = compare.evalf(subs=dict.fromkeys(LOCALS, 0.1))
+    compare = compare.evalf(subs=dict.fromkeys(LOCAL_SYMBOLS, 0.1))
     if complex(compare).real < finfo(float).eps:
         # ? Equations compare equal within machine after unit substitution
         i.pop(symbolic)

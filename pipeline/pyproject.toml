@@ -19,8 +19,7 @@ dependencies = [
     "loguru>=0.7.0",
     "matplotlib>=3.7.2",
     "numpy>=1.24.4",
-    "numpydantic @ git+https://github.com/p2p-ld/numpydantic@5e3ad790d70ecf41e181df47a3e0a01f74041afd",
-    "boilercine @ git+https://github.com/blakeNaccarato/boilercine@046ee0146394bebf5693fe0c18bbcea3d3e64fe5",
+    "numpydantic>=1.0.0",
     "opencv-python-headless>=4.9.0.80",
     "pandas[hdf5,performance]>=2.0.2",
     "pillow>=10.0.0",
@@ -39,6 +38,7 @@ dependencies = [
     "stopit>=1.1.2",
     "sympy>=1.12",
     "tomlkit>=0.12.4",
+    "typing_extensions>=4.12.0",
     "tqdm>=4.66.1",
     "xarray[accel,io,parallel]>=2023.7.0",
 ]

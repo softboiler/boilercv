@@ -2,12 +2,6 @@
 
 from typing import Literal, TypeAlias, get_args
 
-from pydantic import BeforeValidator
-from sympy import Basic, sympify
-
-from boilercv.morphs import Morph
-from boilercv_pipeline.types import Expr
-
 Sym: TypeAlias = Literal["Fo_0", "Ja", "Re_b0", "Pr", "beta", "pi"]
 """Symbol."""
 syms: tuple[Sym, ...] = get_args(Sym)
@@ -25,18 +19,3 @@ Param: TypeAlias = Literal[
 """Parameter."""
 params: tuple[Param, ...] = get_args(Param)
 """Parameters."""
-Locals: TypeAlias = Morph[Sym, Expr]
-"""Locals."""
-
-
-def SolnValidator(loc: Locals) -> BeforeValidator:  # noqa: N802; Can't inherit from frozen
-    """Validate solution."""
-
-    def validate(v: Basic | str) -> Basic:
-        return (
-            sympify(v, locals=loc.model_dump(), evaluate=False)
-            if isinstance(v, str)
-            else v
-        )
-
-    return BeforeValidator(validate)

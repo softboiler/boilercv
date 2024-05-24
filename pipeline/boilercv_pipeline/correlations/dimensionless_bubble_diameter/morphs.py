@@ -1,34 +1,34 @@
 """Morphs."""
 
 from pathlib import Path
-from string import whitespace
-from typing import Annotated, ClassVar
+from tomllib import loads
+from typing import ClassVar
 
 from numpy import linspace, pi
-from pydantic import Field
 from sympy import symbols
 from tomlkit import parse
 
+from boilercv.morphs import Morph
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    Locals,
-    Morph,
     Param,
-    SolnValidator,
     Sym,
     params,
     solve_syms,
     syms,
 )
-from boilercv_pipeline.correlations.types import Eq, FormsRepl, kinds
-from boilercv_pipeline.morphs import (
-    DefaultMorph,
-    Forms,
-    Soln,
-    TomlMorph,
-    replace,
-    set_equation_forms,
+from boilercv_pipeline.correlations.types import (
+    Equations,
+    EquationSolutions,
+    FormsContext,
+    FormsRepl,
 )
-from boilercv_pipeline.types import Expectation, Expr
+from boilercv_pipeline.morphs import DefaultMorph, Solutions
+from boilercv_pipeline.types import (
+    Expectation,
+    ExprContext,
+    LocalSymbols,
+    SympifyParams,
+)
 
 base = Path(__file__).with_suffix(".toml")
 EQUATIONS_TOML = base.with_stem("equations")
@@ -69,52 +69,36 @@ This is the correlation with the most rapidly vanishing value of
 `bubble_fourier` just found.
 """
 
-LOCALS = Locals(
-    dict(
-        zip(
-            syms,
-            symbols(
-                list(Morph[Param, Sym](dict(zip(params, syms, strict=True))).values()),
-                nonnegative=True,
-                real=True,
-                finite=True,
-            ),
-            strict=False,
-        )
+
+class BetaSolutions(DefaultMorph[Sym, Solutions]):
+    """Dimensionless bubble diameter solutions."""
+
+    default_keys: ClassVar[tuple[Sym, ...]] = solve_syms
+    default_factory: ClassVar = Solutions
+
+
+DefaultMorph.register(BetaSolutions)
+
+LOCAL_SYMBOLS: LocalSymbols = dict(
+    zip(
+        syms,
+        symbols(
+            list(Morph[Param, Sym](dict(zip(params, syms, strict=True))).values()),
+            nonnegative=True,
+            real=True,
+            finite=True,
+        ),
+        strict=False,
     )
 )
 """Local variables."""
-EQUATIONS = Morph[Eq, Forms]({
-    name: Forms(eq)  # pyright: ignore[reportArgumentType]
-    .pipe(
-        replace,
-        (
-            FormsRepl(src=kind, dst=kind, find=find, repl=" ")
-            for find in whitespace
-            for kind in kinds
-        ),
-    )
-    .pipe(set_equation_forms, symbols=LOCALS)
-    for name, eq in parse(EQUATIONS_TOML.read_text("utf-8")).items()
-})
+EQUATIONS = Equations.model_validate(
+    loads(EQUATIONS_TOML.read_text("utf-8")),
+    context=dict(FormsContext(locals=LOCAL_SYMBOLS)),
+)
 """Equations."""
-
-
-class BetaSolns(DefaultMorph[Sym, Soln[Annotated[Expr, SolnValidator(LOCALS)]]]):
-    """Solution forms."""
-
-    default_keys: ClassVar[tuple[Sym, ...]] = solve_syms
-    default_factory: ClassVar = Soln
-
-
-DefaultMorph.register(BetaSolns)
-
-
-class TomlSolns(TomlMorph[Eq, BetaSolns]):
-    """Morph with underlying TOML type and defaults."""
-
-    locals: Locals = Field(LOCALS, validate_default=True)
-
-
-SOLUTIONS = TomlSolns.read(path=SOLUTIONS_TOML)
+SOLUTIONS = EquationSolutions[BetaSolutions].model_validate(
+    loads(SOLUTIONS_TOML.read_text("utf-8")),
+    context=dict(ExprContext(params=SympifyParams(locals=LOCAL_SYMBOLS))),
+)
 """Solutions."""

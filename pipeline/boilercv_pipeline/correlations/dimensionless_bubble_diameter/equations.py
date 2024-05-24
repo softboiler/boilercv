@@ -1,7 +1,7 @@
 """Equations."""
 
-from boilercv_pipeline.correlations.types import FormsRepl
-from boilercv_pipeline.morphs import Forms, replace
+from boilercv_pipeline.correlations.types import Forms, FormsRepl
+from boilercv_pipeline.morphs import replace
 
 
 def set_param_forms(i: Forms, name: str = "") -> Forms:

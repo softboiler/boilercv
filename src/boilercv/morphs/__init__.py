@@ -40,6 +40,9 @@ from boilercv.morphs.types import (
     V,
 )
 
+TRUNC = 200
+"""Truncate representations beyond this length."""
+
 
 class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
     """Abstract base class for morphable mappings.
@@ -58,7 +61,7 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
     ```
     """
 
-    model_config: ClassVar = ConfigDict(strict=True, frozen=True)
+    model_config: ClassVar = ConfigDict(frozen=True)
     """Root configuration, merged with subclass configs."""
     registered_morphs: ClassVar[tuple[type, ...]] = ()  # type: ignore
     """Pipeline outputs not matching this model will attempt to match these."""
@@ -72,6 +75,11 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
         hijacked by the `pydantic` metaclass.
         """
 
+    @classmethod
+    @abstractmethod
+    def get_inner_types(cls) -> Types:
+        """Get types of the keys and values."""
+
     @abstractmethod
     def pipe(
         self, f: TypeType[Any, Any, P], /, *args: P.args, **kwds: P.kwargs
@@ -82,11 +90,6 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
     def register(cls, model: type):
         """Register the model."""
         cls.registered_morphs = (*cls.registered_morphs, model)
-
-    @classmethod
-    def get_inner_types(cls) -> Types:
-        """Get types of the keys and values."""
-        return Types(*get_args(cls.model_fields["root"].annotation))  # pyright: ignore[reportAttributeAccessIssue]
 
     @classmethod
     def get_parent(cls) -> type:
@@ -115,8 +118,21 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
                 copy.root = copy.root
             type(copy).model_config = orig_config
 
-    def __repr__(self):
-        return f"{type(self).__name__!r}({self.root!r})"  # pyright: ignore[reportAttributeAccessIssue]
+    @contextmanager
+    def thaw_self(self, validate: bool = True) -> Iterator[None]:
+        """Produce a thawed copy of an instance."""
+        orig_config = self.model_config
+        try:
+            type(self).model_config = (
+                orig_config
+                | ConfigDict(frozen=False)
+                | (ConfigDict(validate_assignment=True) if validate else {})
+            )
+            yield
+        finally:
+            if validate:
+                self.root = self.root
+            type(self).model_config = orig_config
 
     def __hash__(self):
         # ? https://github.com/pydantic/pydantic/issues/1303#issuecomment-2052395207
@@ -226,9 +242,22 @@ class Morph(RootModel[MutableMapping[K, V]], MorphCommon[K, V], Generic[K, V]):
     def fromkeys(cls, iterable, value=None):  # noqa: D102
         return cls(dict.fromkeys(iterable, value))
 
+    def __repr__(self):
+        root = str(self.root)
+        return (
+            f"{type(self).__name__}(" + root[:TRUNC] + "...)"
+            if len(root) > TRUNC
+            else f"{type(self).__name__}({self.root})"
+        )
+
     def __iter__(self):  # pyright: ignore[reportIncompatibleMethodOverride]  # Iterate over `root` instead of `self`.
         """Iterate over root mapping."""
         return iter(self.root)
+
+    @classmethod
+    def get_inner_types(cls) -> Types:
+        """Get types of the keys and values."""
+        return Types(*get_args(cls.model_fields["root"].annotation))  # pyright: ignore[reportAttributeAccessIssue]
 
     # ! (([K, V] -> [K, V]) -> Self)
     @overload
@@ -378,26 +407,42 @@ class Morph(RootModel[MutableMapping[K, V]], MorphCommon[K, V], Generic[K, V]):
         return Any
 
 
-class BaseMorph(BaseModel, MorphCommon[K, V], ABC, Generic[K, V]):
+M = TypeVar("M", bound=Morph[Any, Any])
+
+
+class BaseMorph(BaseModel, MorphCommon[Any, Any], Generic[M]):
     """Base model with a morph property."""
 
-    root: Morph[K, V] = Field(default_factory=Morph[K, V])
+    root: M
     """Morphable mapping."""
+
+    def __repr__(self):
+        root = str(self.root.root)
+        return (
+            f"{type(self).__name__}(" + root[:TRUNC] + "...)"
+            if len(root) > TRUNC
+            else f"{type(self).__name__}({self.root})"
+        )
 
     def __iter__(self):  # pyright: ignore[reportIncompatibleMethodOverride]  # Iterate over `root` instead of `self`.
         """Iterate over root mapping."""
         return iter(self.root)
 
+    @classmethod
+    def get_inner_types(cls):
+        """Get types of the keys and values."""
+        return cls.model_fields["root"].annotation.get_inner_types()  # pyright: ignore[reportOptionalMemberAccess]
+
     def pipe(
         self, f: TypeType[Any, Any, P], /, *args: P.args, **kwds: P.kwargs
     ) -> Self:
         """Pipe."""
-        with self.thaw(validate=True) as copy:
+        with self.thaw() as copy:
             copy.root = self.root.pipe(f, *args, **kwds)
         return copy
 
     @contextmanager
-    def thaw(self, validate: bool = False) -> Iterator[Self]:
+    def thaw(self, validate: bool = True) -> Iterator[Self]:
         """Produce a thawed copy of an instance."""
         with super().thaw(validate) as base_copy, self.root.thaw(validate) as root_copy:
             base_copy.root = root_copy
