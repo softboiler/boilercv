@@ -17,6 +17,7 @@ from tomlkit import parse
 from tqdm import tqdm
 
 from boilercv.morphs import Morph
+from boilercv_pipeline.annotations import SympifyParams
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
     EQUATIONS_TOML,
     KWDS,
@@ -33,8 +34,8 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
 )
 from boilercv_pipeline.correlations.types import Equations
 from boilercv_pipeline.mappings import filt, sync
-from boilercv_pipeline.morphs import Solutions, get_ctx
-from boilercv_pipeline.types import Eq, LocalSymbols, Symbol, SympifyParams
+from boilercv_pipeline.morphs import LocalSymbols, Solutions, get_ctx
+from boilercv_pipeline.types import Eq, Symbol
 
 SYMS_TO_PARAMS = dict(zip(syms, params, strict=True))
 """Mapping of symbols to parameters."""

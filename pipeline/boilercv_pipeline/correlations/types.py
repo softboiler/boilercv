@@ -5,8 +5,16 @@ from __future__ import annotations
 from string import whitespace
 from typing import Literal, TypeAlias, get_args
 
-from boilercv_pipeline.morphs import CtxMorph, regex_replace, replace, set_defaults
-from boilercv_pipeline.types import SK, Defaults, LocalSymbols, Morphs, Pipe, Repl
+from boilercv_pipeline.annotations import SK
+from boilercv_pipeline.morphs import (
+    CtxMorph,
+    LocalSymbols,
+    Morphs,
+    Pipe,
+    Repl,
+    regex_replace,
+    replace,
+)
 
 Kind: TypeAlias = Literal["latex", "sympy", "python"]
 """Kind."""
@@ -28,15 +36,20 @@ class Forms(CtxMorph[Kind, str]):
     @classmethod
     def get_morphs(cls, local_symbols: LocalSymbols[SK]) -> Morphs:
         """Get morphs."""
-        return Morphs({
-            Forms: [
-                Pipe(set_defaults, Defaults(default_keys=kinds, default="")),
-                Pipe(set_equation_forms, local_symbols),
-            ]
+        return cls.set_defaults(keys=kinds, value="") | Morphs({
+            cls: [Pipe(set_equation_forms, local_symbols)]
         })
 
 
-CtxMorph.register(Forms)
+class Equations(CtxMorph[Equation, Forms]):
+    """Equations."""
+
+    @classmethod
+    def get_morphs(cls, local_symbols: LocalSymbols[SK]) -> Morphs:
+        """Get morphs for {class}`Equations`."""
+        return cls.set_defaults(keys=eqs, factory=Forms) | Forms.get_morphs(
+            local_symbols
+        )
 
 
 def set_equation_forms(i: Forms, symbols: LocalSymbols[str]) -> Forms:
@@ -73,21 +86,3 @@ def set_equation_forms(i: Forms, symbols: LocalSymbols[str]) -> Forms:
             ),
         )
     )
-
-
-class Equations(CtxMorph[Equation, Forms]):
-    """Equations."""
-
-    @classmethod
-    def get_morphs(cls, local_symbols: LocalSymbols[SK]) -> Morphs:
-        """Get morphs for {class}`Equations`."""
-        return Morphs(
-            {
-                Equations: [
-                    Pipe(
-                        set_defaults, Defaults(default_keys=eqs, default_factory=Forms)
-                    )
-                ]
-            }
-            | Forms.get_morphs(local_symbols)
-        )

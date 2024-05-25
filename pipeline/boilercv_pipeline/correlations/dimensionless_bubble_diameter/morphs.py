@@ -8,6 +8,7 @@ from sympy import symbols
 from tomlkit import parse
 
 from boilercv.morphs import Morph
+from boilercv_pipeline.annotations import SympifyParams
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     Param,
     Sym,
@@ -16,15 +17,8 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     syms,
 )
 from boilercv_pipeline.correlations.types import Equation, Equations, FormsRepl, eqs
-from boilercv_pipeline.morphs import CtxMorph, Solutions, get_ctx, set_defaults
-from boilercv_pipeline.types import (
-    Defaults,
-    Expectation,
-    LocalSymbols,
-    Morphs,
-    Pipe,
-    SympifyParams,
-)
+from boilercv_pipeline.morphs import CtxMorph, LocalSymbols, Morphs, Solutions, get_ctx
+from boilercv_pipeline.types import Expectation
 
 base = Path(__file__).with_suffix(".toml")
 EQUATIONS_TOML = base.with_stem("equations")
@@ -72,14 +66,7 @@ class BetaSolutions(CtxMorph[Sym, Solutions]):
     @classmethod
     def get_morphs(cls) -> Morphs:
         """Get morphs."""
-        return Morphs({
-            BetaSolutions: [
-                Pipe(
-                    set_defaults,
-                    Defaults(default_keys=solve_syms, default_factory=Solutions),
-                )
-            ]
-        })
+        return cls.set_defaults(keys=solve_syms, factory=Solutions)
 
 
 class EquationSolutions(CtxMorph[Equation, BetaSolutions], foo="bar"):
@@ -87,16 +74,9 @@ class EquationSolutions(CtxMorph[Equation, BetaSolutions], foo="bar"):
 
     @classmethod
     def get_morphs(cls) -> Morphs:
-        """Get morphs for {class}`Equations`."""
-        return Morphs(
-            {
-                Equations: [
-                    Pipe(
-                        set_defaults,
-                        Defaults(default_keys=eqs, default_factory=BetaSolutions),
-                    )
-                ]
-            }
+        """Get morphs."""
+        return (
+            cls.set_defaults(keys=eqs, factory=BetaSolutions)
             | BetaSolutions.get_morphs()
         )
 
@@ -126,3 +106,4 @@ EQUATIONS = Equations.with_ctx(
     loads(EQUATIONS_TOML.read_text("utf-8")),
     get_ctx(Equations.get_morphs(local_symbols=LOCAL_SYMBOLS)),
 )
+"""Equations."""

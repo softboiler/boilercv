@@ -1,10 +1,11 @@
 """Morphs."""
 
-from collections.abc import Iterable, Iterator
-from contextlib import contextmanager
+from collections import UserDict, defaultdict
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass, field
 from pathlib import Path
 from re import sub
-from typing import Any, Generic, Self, overload
+from typing import Any, ClassVar, Generic, NamedTuple, Self, overload
 
 from pydantic import BaseModel, Field
 from tomlkit import parse
@@ -13,19 +14,43 @@ from tomlkit.items import Item
 
 from boilercv.morphs import BaseMorph, M, Morph
 from boilercv_pipeline import mappings
-from boilercv_pipeline.types import (
-    Ctx,
-    CtxV,
-    CtxV_T,
-    Defaults,
-    Expr,
-    K,
-    Leaf,
-    Morphs,
-    Node,
-    Repl,
-    V,
-)
+from boilercv_pipeline.annotations import CV, SK, CtxV, Expr, Symbol
+from boilercv_pipeline.types import Ctx, K, Leaf, Node, T, V
+
+# * MARK: Pydantic models
+
+
+class Solutions(BaseModel):
+    """Solutions for a symbol."""
+
+    solutions: list[Expr] = Field(default_factory=list)
+    """Solutions."""
+    warnings: list[str] = Field(default_factory=list)
+    """Warnings."""
+
+
+# * MARK: Classes for morph pipelines
+
+
+class Repl(NamedTuple, Generic[T]):
+    """Contents of `dst` to replace with `src`, with `find` substrings replaced with `repl`."""
+
+    src: T
+    """Source identifier."""
+    dst: T
+    """Destination identifier."""
+    find: str
+    """Find this in the source."""
+    repl: str
+    """Replacement for what was found."""
+
+
+# * MARK: Context value handlers
+
+
+def get_ctx(*ctx_vs: CtxV):
+    """Compose a context."""
+    return {ctx_v.name_to_snake(): ctx_v for ctx_v in ctx_vs}
 
 
 def replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
@@ -42,48 +67,110 @@ def regex_replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
     return i
 
 
+class LocalSymbols(UserDict[SK, Symbol], CtxV, Generic[SK]):
+    """Local symbols."""
+
+
+@dataclass
+class Defaults(CtxV, Generic[K, V]):
+    """Context for expression validation."""
+
+    default_keys: tuple[K, ...] = field(default_factory=tuple)
+    """Default keys."""
+    default: V | None = None
+    """Default value."""
+    default_factory: Callable[..., Any] | None = None
+    """Default value factory."""
+
+
+# * MARK: Hybrid context value and context morph handlers
+
+
+@dataclass
+class Pipe(Generic[T]):
+    """Pipe."""
+
+    f: Callable[[T, Any], T]
+    ctx_v: CtxV
+
+
+class Morphs(UserDict["type[CtxMorph[Any, Any]]", list[Pipe[Any]]], CtxV):
+    """Pipes."""
+
+    def __or__(self, other: Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
+        if isinstance(other, Morphs):
+            merged: dict[type[CtxMorph[Any, Any]], list[Pipe[Any]]] = defaultdict(list)
+            for model, pipes in other.items():
+                merged[model].extend(pipes)
+            return type(self)(merged)
+        return NotImplemented
+
+
+def merge_morphs(*all_morphs: Morphs) -> Morphs:
+    """Merge morphs."""
+    merged: dict[type[CtxMorph[Any, Any]], list[Pipe[Any]]] = defaultdict(list)
+    for morphs in all_morphs:
+        for model, pipes in morphs.items():
+            merged[model].extend(pipes)
+    return Morphs(merged)
+
+
+# * MARK: Context morphs
+
+
 class CtxMorph(Morph[K, V], Generic[K, V]):
     """Context morph."""
 
+    ctx: ClassVar[Ctx] = Ctx()
+    """Context."""
+
     def model_post_init(self, ctx: Ctx | None = None) -> None:
-        """Run post-initialization."""
-        if not ctx:
-            return
-        all_morphs = self.get_morphs_from_ctx(Morphs, ctx)
+        """Morph the model after initialization."""
+        ctx = ctx or self.ctx
+        morphs = self.get_context_value(Morphs, ctx)
         with self.thaw_self(validate=True):
             result = self
-            for model, morphs in all_morphs.items():
+            for model, pipes in morphs.items():
                 if not isinstance(result, model):
                     continue
-                for morph, ctx_v in morphs:
-                    result = self.pipe(morph, ctx_v)
+                for pipe in pipes:
+                    result = self.pipe(pipe.f, pipe.ctx_v)
             self.root = result
 
     @classmethod
-    def get_morphs(cls) -> Morphs:
-        """Get morphs."""
-        return Morphs()
-
-    @classmethod
-    def get_morphs_from_ctx(cls, typ: type[CtxV_T], ctx) -> CtxV_T:
-        """Get context value."""
+    def get_context_value(cls, typ: type[CV], ctx: Ctx | None) -> CV:
+        """Get context values for a type."""
         key = typ.name_to_snake()
-        val = ctx.get(key)
-        if not val:
+        val = (ctx or cls.ctx).get(key)
+        if val is None:
             raise ValueError(f"{key} missing from context.")
         return val  # pyright: ignore[reportReturnType]
 
     @classmethod
     def with_ctx(cls, obj: Any, ctx: Ctx | None = None):
         """Validate."""
-        return cls.model_validate(obj, context=ctx or Ctx())
+        return cls.model_validate(obj, context=ctx or cls.ctx)
 
     @classmethod
     def json_with_morphs(
         cls, json_data: str | bytes | bytearray, ctx: Ctx | None = None
     ):
         """Validate JSON."""
-        return cls.model_validate_json(json_data, context=ctx or Ctx())
+        return cls.model_validate_json(json_data, context=ctx or cls.ctx)
+
+    @classmethod
+    def set_defaults(
+        cls,
+        keys: tuple[K, ...] | None,
+        value: V | None = None,
+        factory: Callable[..., Any] | None = None,
+    ) -> Morphs:
+        """Set defaults."""
+        keys = keys or ()
+        return Morphs({cls: [Pipe(set_defaults, Defaults(keys, value, factory))]})
+
+
+# * MARK: Context morph handlers
 
 
 def set_defaults(i: CtxMorph[K, V], defaults: Defaults[K, V]) -> CtxMorph[K, V]:
@@ -102,24 +189,7 @@ def set_defaults(i: CtxMorph[K, V], defaults: Defaults[K, V]) -> CtxMorph[K, V]:
     return i
 
 
-def get_ctx(*ctx_vs: CtxV):
-    """Compose a context."""
-    return {ctx_v.name_to_snake(): ctx_v for ctx_v in ctx_vs}
-
-
-@contextmanager
-def context(ctx_morph: CtxMorph[Any, Any], *ctx_vs: CtxV, **kwds: Any) -> Iterator[Ctx]:
-    """Pydantic context manager."""
-    yield get_ctx(ctx_morph.get_morphs(**kwds), *ctx_vs)
-
-
-class Solutions(BaseModel):
-    """Solutions for a symbol."""
-
-    solutions: list[Expr] = Field(default_factory=list)
-    """Solutions."""
-    warnings: list[str] = Field(default_factory=list)
-    """Warnings."""
+# TODO: Consider removing this
 
 
 class TomlMorph(BaseMorph[M], Generic[M]):
