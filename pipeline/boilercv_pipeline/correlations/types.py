@@ -3,23 +3,10 @@
 from __future__ import annotations
 
 from string import whitespace
-from typing import (
-    Any,
-    ClassVar,
-    Generic,
-    Literal,
-    Protocol,
-    TypeAlias,
-    TypeVar,
-    get_args,
-)
+from typing import Literal, TypeAlias, get_args
 
-from pydantic import ValidationInfo
-from typing_extensions import TypedDict
-
-from boilercv.morphs import Morph
-from boilercv_pipeline.morphs import DefaultMorph, Solutions, regex_replace, replace
-from boilercv_pipeline.types import LocalSymbols, Repl
+from boilercv_pipeline.morphs import CtxMorph, regex_replace, replace, set_defaults
+from boilercv_pipeline.types import SK, Defaults, LocalSymbols, Morphs, Pipe, Repl
 
 Kind: TypeAlias = Literal["latex", "sympy", "python"]
 """Kind."""
@@ -35,24 +22,25 @@ eqs: tuple[Equation, ...] = get_args(Equation)
 """Equations."""
 
 
-class FormsContext(TypedDict):
-    """Context for expression validation."""
+class Forms(CtxMorph[Kind, str]):
+    """Forms."""
 
-    locals: LocalSymbols
-    """Local symbols."""
+    @classmethod
+    def get_morphs(cls, local_symbols: LocalSymbols[SK]) -> Morphs:
+        """Get morphs."""
+        return Morphs({
+            Forms: [
+                Pipe(set_defaults, Defaults(default_keys=kinds, default="")),
+                Pipe(set_equation_forms, local_symbols),
+            ]
+        })
 
 
-class FormsValidationInfo(ValidationInfo, Protocol):
-    """Argument passed to validation functions."""
-
-    @property
-    def context(self) -> FormsContext | None:
-        """Current validation context."""
+CtxMorph.register(Forms)
 
 
-def set_equation_forms(i: Forms, context: FormsContext | None) -> Forms:
+def set_equation_forms(i: Forms, symbols: LocalSymbols[str]) -> Forms:
     """Set equation forms."""
-    symbols = ctx["locals"] if (ctx := context) else {}
     return (
         i.pipe(
             replace,
@@ -87,42 +75,19 @@ def set_equation_forms(i: Forms, context: FormsContext | None) -> Forms:
     )
 
 
-class Forms(DefaultMorph[Kind, str]):
-    """Forms."""
+class Equations(CtxMorph[Equation, Forms]):
+    """Equations."""
 
-    default_keys: ClassVar = kinds
-    default: ClassVar = ""
-
-    def model_post_init(self, context: FormsContext | None):
-        """Set equation forms."""
-        super().model_post_init(context)
-        with self.thaw_self(validate=True):
-            self.root = self.pipe(set_equation_forms, context=context).root
-
-
-DefaultMorph.register(Forms)
-
-
-class Equations(DefaultMorph[Equation, Forms]):
-    """Equation forms."""
-
-    default_keys: ClassVar[tuple[Equation, ...]] = eqs
-    default_factory: ClassVar = Forms
-
-
-DefaultMorph.register(Equations)
-
-
-SymbolSolutions_T = TypeVar("SymbolSolutions_T", bound=Morph[Any, Solutions])
-"""Symbol solutions type."""
-
-
-class EquationSolutions(
-    DefaultMorph[Equation, SymbolSolutions_T], Generic[SymbolSolutions_T]
-):
-    """Equation solutions."""
-
-    default_keys: ClassVar[tuple[Equation, ...]] = eqs
-
-
-DefaultMorph.register(EquationSolutions)
+    @classmethod
+    def get_morphs(cls, local_symbols: LocalSymbols[SK]) -> Morphs:
+        """Get morphs for {class}`Equations`."""
+        return Morphs(
+            {
+                Equations: [
+                    Pipe(
+                        set_defaults, Defaults(default_keys=eqs, default_factory=Forms)
+                    )
+                ]
+            }
+            | Forms.get_morphs(local_symbols)
+        )

@@ -2,7 +2,6 @@
 
 from pathlib import Path
 from tomllib import loads
-from typing import ClassVar
 
 from numpy import linspace, pi
 from sympy import symbols
@@ -16,17 +15,14 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     solve_syms,
     syms,
 )
-from boilercv_pipeline.correlations.types import (
-    Equations,
-    EquationSolutions,
-    FormsContext,
-    FormsRepl,
-)
-from boilercv_pipeline.morphs import DefaultMorph, Solutions
+from boilercv_pipeline.correlations.types import Equation, Equations, FormsRepl, eqs
+from boilercv_pipeline.morphs import CtxMorph, Solutions, get_ctx, set_defaults
 from boilercv_pipeline.types import (
+    Defaults,
     Expectation,
-    ExprContext,
     LocalSymbols,
+    Morphs,
+    Pipe,
     SympifyParams,
 )
 
@@ -70,16 +66,42 @@ This is the correlation with the most rapidly vanishing value of
 """
 
 
-class BetaSolutions(DefaultMorph[Sym, Solutions]):
+class BetaSolutions(CtxMorph[Sym, Solutions]):
     """Dimensionless bubble diameter solutions."""
 
-    default_keys: ClassVar[tuple[Sym, ...]] = solve_syms
-    default_factory: ClassVar = Solutions
+    @classmethod
+    def get_morphs(cls) -> Morphs:
+        """Get morphs."""
+        return Morphs({
+            BetaSolutions: [
+                Pipe(
+                    set_defaults,
+                    Defaults(default_keys=solve_syms, default_factory=Solutions),
+                )
+            ]
+        })
 
 
-DefaultMorph.register(BetaSolutions)
+class EquationSolutions(CtxMorph[Equation, BetaSolutions], foo="bar"):
+    """Equation solutions."""
 
-LOCAL_SYMBOLS: LocalSymbols = dict(
+    @classmethod
+    def get_morphs(cls) -> Morphs:
+        """Get morphs for {class}`Equations`."""
+        return Morphs(
+            {
+                Equations: [
+                    Pipe(
+                        set_defaults,
+                        Defaults(default_keys=eqs, default_factory=BetaSolutions),
+                    )
+                ]
+            }
+            | BetaSolutions.get_morphs()
+        )
+
+
+LOCAL_SYMBOLS = LocalSymbols(
     zip(
         syms,
         symbols(
@@ -92,13 +114,15 @@ LOCAL_SYMBOLS: LocalSymbols = dict(
     )
 )
 """Local variables."""
-EQUATIONS = Equations.model_validate(
-    loads(EQUATIONS_TOML.read_text("utf-8")),
-    context=dict(FormsContext(locals=LOCAL_SYMBOLS)),
-)
-"""Equations."""
-SOLUTIONS = EquationSolutions[BetaSolutions].model_validate(
+SOLUTIONS = EquationSolutions.with_ctx(
     loads(SOLUTIONS_TOML.read_text("utf-8")),
-    context=dict(ExprContext(params=SympifyParams(locals=LOCAL_SYMBOLS))),
+    ctx=get_ctx(
+        EquationSolutions.get_morphs(),
+        SympifyParams(locals=dict(LOCAL_SYMBOLS), evaluate=False),
+    ),
 )
 """Solutions."""
+EQUATIONS = Equations.with_ctx(
+    loads(EQUATIONS_TOML.read_text("utf-8")),
+    get_ctx(Equations.get_morphs(local_symbols=LOCAL_SYMBOLS)),
+)

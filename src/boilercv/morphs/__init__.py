@@ -66,6 +66,16 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
     registered_morphs: ClassVar[tuple[type, ...]] = ()  # type: ignore
     """Pipeline outputs not matching this model will attempt to match these."""
 
+    def __init_subclass__(cls, /, foo: str | None = None, **kwargs):
+        super().__init_subclass__(**kwargs)
+        parent = cls.get_parent()
+        if (
+            parent in {BaseModel, RootModel, MorphCommon}
+            or cls in parent.registered_morphs
+        ):
+            return
+        parent.register(cls)
+
     @abstractmethod
     def __iter__(self) -> Iterator[K]:
         """Iterate over root mapping.
@@ -120,7 +130,7 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
 
     @contextmanager
     def thaw_self(self, validate: bool = True) -> Iterator[None]:
-        """Produce a thawed copy of an instance."""
+        """Thaw self."""
         orig_config = self.model_config
         try:
             type(self).model_config = (
@@ -130,8 +140,6 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
             )
             yield
         finally:
-            if validate:
-                self.root = self.root
             type(self).model_config = orig_config
 
     def __hash__(self):

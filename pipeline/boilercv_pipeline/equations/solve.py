@@ -3,7 +3,6 @@
 from pathlib import Path
 from re import sub
 from tomllib import loads
-from typing import ClassVar
 from warnings import catch_warnings, filterwarnings
 
 import sympy
@@ -23,6 +22,7 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import 
     KWDS,
     LOCAL_SYMBOLS,
     SOLUTIONS_TOML,
+    EquationSolutions,
 )
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     Param,
@@ -31,22 +31,20 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     solve_syms,
     syms,
 )
-from boilercv_pipeline.correlations.types import (
-    Equations,
-    EquationSolutions,
-    FormsContext,
-    set_equation_forms,
-)
+from boilercv_pipeline.correlations.types import Equations
 from boilercv_pipeline.mappings import filt, sync
-from boilercv_pipeline.morphs import DefaultMorph, Solutions
-from boilercv_pipeline.types import Eq, ExprContext, LocalSymbols, Symbol, SympifyParams
+from boilercv_pipeline.morphs import Solutions, get_ctx
+from boilercv_pipeline.types import Eq, LocalSymbols, Symbol, SympifyParams
 
 SYMS_TO_PARAMS = dict(zip(syms, params, strict=True))
 """Mapping of symbols to parameters."""
-SUBS = {sym: KWDS[SYMS_TO_PARAMS[name]] for name, sym in LOCAL_SYMBOLS.items()} | {  # pyright: ignore[reportArgumentType]
-    LOCAL_SYMBOLS[k]: v for k, v in {"Fo_0": 0, "beta": 0.5}.items()
+SUBS = {sym: KWDS[SYMS_TO_PARAMS[name]] for name, sym in LOCAL_SYMBOLS.items()} | {
+    LOCAL_SYMBOLS[k]: v  # pyright: ignore[reportArgumentType]
+    for k, v in {"Fo_0": 0, "beta": 0.5}.items()
 }
 """Substitutions to check for nonzero solutions."""
+TIMEOUT = 5
+"""Solver timeout in seconds."""
 APP = App()
 """CLI."""
 
@@ -64,39 +62,33 @@ def default(  # noqa: D103
     solutions: Path = SOLUTIONS_TOML,
     overwrite: bool = False,
 ):
-    class SymbolSolutions(DefaultMorph[Sym, Solutions]):
-        """Dimensionless bubble diameter solutions."""
-
-        default_keys: ClassVar[tuple[Sym, ...]] = solve_syms
-        default_factory: ClassVar = Solutions
-
-    subs = dict(zip(syms, symbol_subs, strict=True))
-    local_syms: LocalSymbols = dict(
-        zip(
-            symbol_names,
-            symbols(
-                list(Morph[Param, Sym](dict(zip(params, syms, strict=True))).values()),
-                nonnegative=True,
-                real=True,
-                finite=True,
-            ),
-            strict=False,
+    local_syms = dict(
+        LocalSymbols(
+            zip(
+                symbol_names,
+                symbols(
+                    list(
+                        Morph[Param, Sym](dict(zip(params, syms, strict=True))).values()
+                    ),
+                    nonnegative=True,
+                    real=True,
+                    finite=True,
+                ),
+                strict=False,
+            )
         )
     )
-    expr_ctx = dict(
-        ExprContext(params=SympifyParams(locals=local_syms, evaluate=False))
-    )
-    eqns = Equations.model_validate(
+    subs = dict(zip(syms, symbol_subs, strict=True))
+    eqns = Equations.with_ctx(
         loads(equations.read_text("utf-8")),
-        context=FormsContext(locals=local_syms)
-        | {"validator": set_equation_forms, "key": "locals"},
+        get_ctx(Equations.get_morphs(local_symbols=LOCAL_SYMBOLS)),
     )
-    solns = EquationSolutions[SymbolSolutions].model_validate(
-        loads(solutions.read_text("utf-8")), context=expr_ctx
-    )
-    EquationSolutions[SymbolSolutions].model_validate(
-        loads(SOLUTIONS_TOML.read_text("utf-8")),
-        context=dict(ExprContext(params=SympifyParams(locals=local_syms))),
+    solns = EquationSolutions.with_ctx(
+        loads(solutions.read_text("utf-8")),
+        ctx=get_ctx(
+            EquationSolutions.get_morphs(),
+            SympifyParams(locals=dict(LOCAL_SYMBOLS), evaluate=False),
+        ),
     )
     with solns.thaw_self():
         for name, eq in tqdm(eqns.items()):
@@ -130,7 +122,7 @@ def solve_equation(eq: sympy.Eq, sym: Symbol, subs: dict[Sym, float]) -> Solutio
         soln.solutions.append(eq.lhs)
         return soln
     with (
-        ThreadingTimeout(5) as solved,
+        ThreadingTimeout(TIMEOUT) as solved,
         catch_warnings(record=True, category=UserWarning) as warnings,
     ):
         filterwarnings("always", category=UserWarning)
@@ -140,6 +132,7 @@ def solve_equation(eq: sympy.Eq, sym: Symbol, subs: dict[Sym, float]) -> Solutio
         for w in warnings
     )
     if not solved:
+        soln.warnings.append(f"Unable to find solution within {TIMEOUT} seconds.")
         return soln
     for s in solutions:
         result = s.evalf(subs=subs)

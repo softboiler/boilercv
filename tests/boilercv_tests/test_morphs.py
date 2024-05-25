@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Callable, Hashable, Mapping, MutableMapping
+from collections.abc import Callable, Mapping, MutableMapping
 from contextlib import suppress
 from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias
 
@@ -15,7 +15,7 @@ from boilercv.morphs import K, Morph, TypeType, V
 
 # * MARK: Constants
 Fruit: TypeAlias = Literal["apple", "banana", "cherry"]
-ANY_MAP: dict[Hashable, Any] = {"any": "map"}
+ANY_MAP: dict[Any, Any] = {"any": "map"}
 FRUIT: list[Fruit] = ["apple", "banana", "cherry"]
 _SelfMap: TypeAlias = MutableMapping[Fruit, str]
 _SelfDict: TypeAlias = dict[Fruit, str]

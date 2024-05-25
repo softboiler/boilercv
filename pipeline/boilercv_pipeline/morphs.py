@@ -1,19 +1,31 @@
 """Morphs."""
 
-from collections.abc import Iterable
+from collections.abc import Iterable, Iterator
+from contextlib import contextmanager
 from pathlib import Path
 from re import sub
-from typing import Any, ClassVar, Generic, Self, overload
+from typing import Any, Generic, Self, overload
 
-from pydantic import BaseModel, Field, model_validator
-from pydantic_core import PydanticUndefinedType
+from pydantic import BaseModel, Field
 from tomlkit import parse
 from tomlkit.container import Container
 from tomlkit.items import Item
 
 from boilercv.morphs import BaseMorph, M, Morph
 from boilercv_pipeline import mappings
-from boilercv_pipeline.types import Expr, K, Leaf, Node, Repl, V
+from boilercv_pipeline.types import (
+    Ctx,
+    CtxV,
+    CtxV_T,
+    Defaults,
+    Expr,
+    K,
+    Leaf,
+    Morphs,
+    Node,
+    Repl,
+    V,
+)
 
 
 def replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
@@ -30,45 +42,75 @@ def regex_replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
     return i
 
 
-class DefaultMorph(Morph[K, V], Generic[K, V]):
-    """Morph with default values."""
+class CtxMorph(Morph[K, V], Generic[K, V]):
+    """Context morph."""
 
-    default_keys: ClassVar[tuple[Any, ...]] = ()
-    """Default keys."""
-    default: ClassVar = None
-    """Default value."""
-    default_factory: ClassVar = None
-    """Default value factory."""
+    def model_post_init(self, ctx: Ctx | None = None) -> None:
+        """Run post-initialization."""
+        if not ctx:
+            return
+        all_morphs = self.get_morphs_from_ctx(Morphs, ctx)
+        with self.thaw_self(validate=True):
+            result = self
+            for model, morphs in all_morphs.items():
+                if not isinstance(result, model):
+                    continue
+                for morph, ctx_v in morphs:
+                    result = self.pipe(morph, ctx_v)
+            self.root = result
 
-    @model_validator(mode="before")
     @classmethod
-    def set_defaults(cls, data: dict[K, V]) -> dict[K, V]:
-        """Set `self.default_keys` using `self.default_factory` or `self.default`."""
-        if not cls.default_keys:
-            return data
-        if isinstance(data, PydanticUndefinedType) or any(
-            key not in data for key in cls.default_keys
-        ):
-            if cls.default_factory:
-                default = cls.default_factory()
-            elif cls.default is not None:
-                default = cls.default
-            else:
-                default = cls.get_inner_types()[1]()
-            cls.get_inner_types()[1]()
-            return dict.fromkeys(  # pyright: ignore[reportReturnType]  # Eventually valid
-                cls.default_keys, default
-            ) | ({} if isinstance(data, PydanticUndefinedType) else data)
-        return data
+    def get_morphs(cls) -> Morphs:
+        """Get morphs."""
+        return Morphs()
 
-    def model_post_init(self, context: Any) -> None:
-        """Run post-initialization recursievely."""
-        for key in self.keys():
-            if isinstance(key, DefaultMorph):
-                key.model_post_init(context)
-        for value in self.values():
-            if isinstance(value, DefaultMorph):
-                value.model_post_init(context)
+    @classmethod
+    def get_morphs_from_ctx(cls, typ: type[CtxV_T], ctx) -> CtxV_T:
+        """Get context value."""
+        key = typ.name_to_snake()
+        val = ctx.get(key)
+        if not val:
+            raise ValueError(f"{key} missing from context.")
+        return val  # pyright: ignore[reportReturnType]
+
+    @classmethod
+    def with_ctx(cls, obj: Any, ctx: Ctx | None = None):
+        """Validate."""
+        return cls.model_validate(obj, context=ctx or Ctx())
+
+    @classmethod
+    def json_with_morphs(
+        cls, json_data: str | bytes | bytearray, ctx: Ctx | None = None
+    ):
+        """Validate JSON."""
+        return cls.model_validate_json(json_data, context=ctx or Ctx())
+
+
+def set_defaults(i: CtxMorph[K, V], defaults: Defaults[K, V]) -> CtxMorph[K, V]:
+    """Set `self.default_keys` using `self.default_factory` or `self.default`."""
+    if not defaults.default_keys:
+        return i
+    if any(key not in i for key in defaults.default_keys):
+        if defaults.default_factory:
+            default = defaults.default_factory()
+        elif defaults.default is not None:
+            default = defaults.default
+        else:
+            default = i.get_inner_types()[1]()
+        i.get_inner_types()[1]()
+        return dict.fromkeys(defaults.default_keys, default) | i
+    return i
+
+
+def get_ctx(*ctx_vs: CtxV):
+    """Compose a context."""
+    return {ctx_v.name_to_snake(): ctx_v for ctx_v in ctx_vs}
+
+
+@contextmanager
+def context(ctx_morph: CtxMorph[Any, Any], *ctx_vs: CtxV, **kwds: Any) -> Iterator[Ctx]:
+    """Pydantic context manager."""
+    yield get_ctx(ctx_morph.get_morphs(**kwds), *ctx_vs)
 
 
 class Solutions(BaseModel):

@@ -1,19 +1,11 @@
 """Types."""
 
+from collections import UserDict
 from collections.abc import Callable, Mapping, MutableMapping
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from types import SimpleNamespace
-from typing import (
-    Annotated,
-    Any,
-    Generic,
-    Literal,
-    NamedTuple,
-    Protocol,
-    TypeAlias,
-    TypeVar,
-)
+from typing import Annotated, Any, Generic, Literal, NamedTuple, TypeAlias, TypeVar
 
 import sympy
 from numpydantic import NDArray, Shape
@@ -27,11 +19,13 @@ from pydantic import (
     ValidationInfo,
     WrapValidator,
 )
+from pydantic.alias_generators import to_snake
+from pydantic_core.core_schema import NoInfoValidatorFunction, WithInfoValidatorFunction
 from sympy import sympify
-from typing_extensions import TypedDict
 
 T = TypeVar("T")
 K = TypeVar("K")
+SK = TypeVar("SK")
 V = TypeVar("V")
 
 # * MARK: Notebook processing
@@ -42,6 +36,7 @@ Stage: TypeAlias = Literal["large_sources", "sources", "filled"]
 """Stage."""
 
 # * MARK: Pydantic helpers
+
 
 Validators: TypeAlias = Literal["before", "wrap", "after", "plain"]
 
@@ -80,6 +75,21 @@ def StrSerializer(  # noqa: N802; Can't inherit from frozen
 ST = TypeVar("ST", bound=ShapeType)
 DT = TypeVar("DT", bound=DtypeType)
 
+
+class CtxV:
+    """Context value."""
+
+    @classmethod
+    def name_to_snake(cls) -> str:
+        """Get name."""
+        return to_snake(cls.__name__)
+
+
+Ctx: TypeAlias = dict[str, CtxV]
+
+
+CtxV_T = TypeVar("CtxV_T", bound=CtxV)
+
 # * MARK: Morphs
 
 
@@ -114,41 +124,57 @@ Basic: TypeAlias = Annotated[
 """Annotated {class}`~sympy.core.basic.Basic` suitable for use in Pydantic models."""
 Symbol: TypeAlias = Annotated[sympy.Symbol, TypeValidator(sympy.Symbol)]
 """Annotated {class}`~sympy.core.symbol.Symbol` suitable for use in Pydantic models."""
-LocalSymbols: TypeAlias = dict[str, Symbol]
-"""Local symbols."""
+
+
+class LocalSymbols(UserDict[SK, Symbol], CtxV, Generic[SK]):
+    """Local symbols."""
 
 
 @dataclass
-class SympifyParams:
+class SympifyParams(CtxV, Generic[SK]):
     """Sympify parameters."""
 
-    locals: LocalSymbols | None = None
+    locals: dict[SK, Any] | None = None
     convert_xor: bool | None = None
     strict: bool = False
     rational: bool = False
     evaluate: bool | None = None
 
 
-class ExprContext(TypedDict):
-    """Context for expression validation."""
-
-    params: SympifyParams
-    """Sympify parameters."""
+ValidatorF: TypeAlias = NoInfoValidatorFunction | WithInfoValidatorFunction
 
 
-class ExprValidationInfo(ValidationInfo, Protocol):
-    """Argument passed to validation functions."""
+def contextualize(ctx_v_type: type[CtxV_T]):
+    """Contextualize a function."""
 
-    @property
-    def context(self) -> ExprContext | None:
-        """Current validation context."""
+    def wrapper(f):
+        def validator(v: Callable[[str, CtxV_T], Any], info: ValidationInfo):
+            key = ctx_v_type.name_to_snake()
+            ctx = info.context
+            if not ctx:
+                raise ValueError(
+                    f"No context given. Expected value at '{key}' of type '{ctx_v_type}'."
+                )
+            ctx_v = ctx.get(key)
+            if not ctx_v:
+                raise ValueError(
+                    f"No context value at {key}. Expected context value at '{key}' of type '{ctx_v_type}'."
+                )
+            if not isinstance(ctx_v, ctx_v_type):
+                raise ValueError(  # noqa: TRY004. So Pydantic continues
+                    f"Context value at {key} not of expected type '{ctx_v_type}'."
+                )
+            return f(v, ctx_v)
+
+        return validator
+
+    return wrapper
 
 
-def validate_expr(expr: str, info: ExprValidationInfo):
+@contextualize(SympifyParams)
+def validate_expr(expr: str, sympify_params: SympifyParams[Any]) -> Any:
     """Sympify an expression from local variables."""
-    return sympify(
-        expr, **asdict(ctx["params"] if (ctx := info.context) else SympifyParams())
-    )
+    return sympify(expr, **asdict(sympify_params))
 
 
 Eq: TypeAlias = Annotated[
@@ -166,28 +192,25 @@ Expr = Annotated[
 Model = TypeVar("Model", bound=BaseModel)
 """Model type."""
 
-Context = TypeVar("Context", contravariant=True)
-"""Context mapping type."""
+
+@dataclass
+class Defaults(CtxV, Generic[K, V]):
+    """Context for expression validation."""
+
+    default_keys: tuple[K, ...] = field(default_factory=tuple)
+    """Default keys."""
+    default: V | None = None
+    """Default value."""
+    default_factory: Callable[..., Any] | None = None
+    """Default value factory."""
 
 
-class ContextualValidation(Protocol[Context]):
-    """Validation type-checking for {data}`~boilercv_pipeline.boilercv_pipeline.Expr`."""
+class Pipe(NamedTuple):
+    """Pipe."""
 
-    @classmethod
-    def model_validate(  # pyright: ignore[reportIncompatibleMethodOverride]  # noqa: D102
-        cls: type[Model],
-        obj: Any,
-        *,
-        strict: bool | None = None,
-        from_attributes: bool | None = None,
-        context: Context | None = None,
-    ) -> Model: ...
+    morph: Callable[[Any, Any], Any]
+    ctx_v: CtxV
 
-    @classmethod
-    def model_validate_json(  # pyright: ignore[reportIncompatibleMethodOverride]  # noqa: D102
-        cls: type[Model],
-        json_data: str | bytes | bytearray,
-        *,
-        strict: bool | None = None,
-        context: Context | None = None,
-    ) -> Model: ...
+
+class Morphs(dict[type, list[Pipe]], CtxV):
+    """Morphs."""
