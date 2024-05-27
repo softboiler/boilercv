@@ -21,7 +21,7 @@ from sympy import sympify
 # * MARK: `TypeVar`s and `TypeAlias`es for annotations
 
 K = TypeVar("K")
-CV = TypeVar("CV", bound="CtxV", contravariant=True)
+CV = TypeVar("CV", bound="CV", contravariant=True)
 
 SK = TypeVar("SK")
 """Symbol key."""
@@ -32,7 +32,7 @@ Validators: TypeAlias = Literal["before", "wrap", "after", "plain"]
 # * MARK: Needed for annotations and other things
 
 
-class CtxV:
+class ContextValue:
     """Context value."""
 
     @classmethod
@@ -72,7 +72,7 @@ def contextualize(ctx_v_type: type[CV]):
 
 
 @dataclass
-class SympifyParams(CtxV, Generic[SK]):
+class SympifyParams(ContextValue, Generic[SK]):
     """Sympify parameters."""
 
     locals: dict[SK, Any] | None = None

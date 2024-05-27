@@ -1,7 +1,12 @@
 """Morph types."""
 
 from collections.abc import MutableMapping
-from typing import NamedTuple, ParamSpec, Protocol, TypeVar
+from typing import TYPE_CHECKING, Any, NamedTuple, ParamSpec, Protocol, TypeVar
+
+if TYPE_CHECKING:
+    from boilercv.morphs import Morph
+
+M = TypeVar("M", bound="Morph[Any, Any]")
 
 T = TypeVar("T", contravariant=True)
 R = TypeVar("R", covariant=True)

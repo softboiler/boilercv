@@ -1,10 +1,16 @@
 """Mapping functions."""
 
-from collections.abc import Callable, Mapping, MutableMapping
+from collections.abc import Callable, Iterable, Mapping, MutableMapping
 from copy import deepcopy
-from typing import Any, TypeVar
+from re import sub
+from typing import TYPE_CHECKING, Any, TypeVar
 
+from boilercv_pipeline.mappings.models import Repl
+from boilercv_pipeline.mappings.types import K
 from boilercv_pipeline.types import Leaf, MutableNode, Node
+
+if TYPE_CHECKING:
+    from boilercv_pipeline.mappings.models import Repl
 
 
 def filt(
@@ -65,3 +71,17 @@ def sync(reference: Node | Leaf, target: MutableNode_T | Leaf) -> MutableNode_T:
 def write(self) -> None:
     """Write to TOML."""
     self.path.write_text(self.sync().as_string(), "utf-8")
+
+
+def replace(i: MutableMapping[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
+    """Make replacements from `Repl`s."""
+    for r in repls:
+        i[r.dst] = i[r.src].replace(r.find, r.repl)
+    return dict(i)
+
+
+def regex_replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
+    """Make regex replacements."""
+    for r in repls:
+        i[r.dst] = sub(r.find, r.repl, i[r.src])
+    return i

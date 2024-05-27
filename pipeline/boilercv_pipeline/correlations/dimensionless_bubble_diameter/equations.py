@@ -1,35 +1,22 @@
 """Equations."""
 
-from boilercv_pipeline.correlations.types import Forms, FormsRepl
-from boilercv_pipeline.morphs import replace
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
+    Param,
+    params,
+)
+from boilercv_pipeline.correlations.models import Params
 
-
-def set_param_forms(i: Forms, name: str = "") -> Forms:
-    """Set forms for parameters."""
-    if i["sympy"] and not i["latex"]:
-        i["latex"] = i["sympy"]
-    if not i["latex"]:
-        i["latex"] = rf"\{name}"
-    return i
-
-
-LATEX_PARAMS = {
-    name: (
-        param.pipe(set_param_forms, name=name).pipe(
-            replace,
-            repls=[
-                FormsRepl(src="latex", dst="sympy", find=k, repl=v)
-                for k, v in {r"_\b0": "_bo", r"_\o": "_0", "\\": ""}.items()
-            ],
-        )
-    )
-    for name, param in {
-        "bubble_fourier": Forms({"latex": r"\Fo_\o"}),
-        "bubble_jakob": Forms({"latex": r"\Ja"}),
-        "bubble_initial_reynolds": Forms({"latex": r"\Re_\bo"}),
-        **{n: Forms({"latex": f"\\{n}"}) for n in ["beta", "pi"]},
-    }.items()
-}
+LATEX_PARAMS = Params[Param].model_validate(
+    context=Params.get_context(default_keys=params),
+    obj={
+        "bubble_fourier": {"latex": r"\Fo_\o"},
+        "bubble_jakob": {"latex": r"\Ja"},
+        "bubble_initial_reynolds": {"latex": r"\Re_\bo"},
+        "liquid_prandtl": {"latex": r"\Pr"},
+        "dimensionless_bubble_diameter": {"latex": r"\beta"},
+        "pi": {"latex": r"\pi"},
+    },
+)
 """Parameters for function calls."""
 SYMPY_SUBS = {arg["sympy"]: name for name, arg in LATEX_PARAMS.items()}
 """Substitutions from SymPy symbolic variables to descriptive names."""

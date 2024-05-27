@@ -29,6 +29,7 @@ from boilercv.morphs.types import (
     DictDict,
     DictType,
     K,
+    M,
     MapMap,
     MapType,
     P,
@@ -129,7 +130,7 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
             type(copy).model_config = orig_config
 
     @contextmanager
-    def thaw_self(self, validate: bool = True) -> Iterator[None]:
+    def thaw_self(self, validate: bool = True) -> Iterator[Self]:
         """Thaw self."""
         orig_config = self.model_config
         try:
@@ -138,7 +139,7 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
                 | ConfigDict(frozen=False)
                 | (ConfigDict(validate_assignment=True) if validate else {})
             )
-            yield
+            yield self
         finally:
             type(self).model_config = orig_config
 
@@ -336,8 +337,10 @@ class Morph(RootModel[MutableMapping[K, V]], MorphCommon[K, V], Generic[K, V]):
                 result = f(copy, *args, **kwds)
             except TypeError as err:
                 raise TypeError(f"Failed to pipe {type(self)} through {f}.") from err
-        if return_alike or not isinstance(result, Mapping) or not result:
+        if not isinstance(result, Mapping) or not result:
             return result
+        if return_alike:
+            return self.validate_nearest(result, ret_k, ret_v)
         if all(ret and not isinstance(ret, TypeVar) for ret in (ret_k, ret_v)):
             return self.validate_nearest(result, ret_k, ret_v)
         return self.validate_nearest(
@@ -400,7 +403,7 @@ class Morph(RootModel[MutableMapping[K, V]], MorphCommon[K, V], Generic[K, V]):
         return None
 
     def validate_hint(
-        self, self_hint: type, ret_hint: type | None, result: Iterable[Any]
+        self, self_hint: type, ret_hint: type | TypeVar | None, result: Iterable[Any]
     ) -> type | Any:
         """Validate hint."""
         if not ret_hint or isinstance(ret_hint, TypeVar):
@@ -413,9 +416,6 @@ class Morph(RootModel[MutableMapping[K, V]], MorphCommon[K, V], Generic[K, V]):
             elif all(isinstance(k, self_hint) for k in result):
                 return self_hint
         return Any
-
-
-M = TypeVar("M", bound=Morph[Any, Any])
 
 
 class BaseMorph(BaseModel, MorphCommon[Any, Any], Generic[M]):

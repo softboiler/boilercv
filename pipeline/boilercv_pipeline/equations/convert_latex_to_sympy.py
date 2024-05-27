@@ -15,7 +15,7 @@ from tqdm import tqdm
 from boilercv.morphs import Morph
 from boilercv_pipeline.correlations import PIPX
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.equations import (
-    FormsRepl,
+    Repl[Kind],
 )
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
     EQUATIONS,
@@ -23,8 +23,9 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import 
     LOCAL_SYMBOLS,
     MAKE_RAW,
 )
-from boilercv_pipeline.correlations.types import Forms, Kind, set_equation_forms
-from boilercv_pipeline.morphs import regex_replace
+from boilercv_pipeline.correlations.models import Forms, set_equation_forms
+from boilercv_pipeline.correlations.types import Kind
+from boilercv_pipeline.mappings import regex_replace
 from boilercv_pipeline.types import K, V
 
 APP = App()
@@ -72,7 +73,7 @@ def convert(
     sanitized_latex = i.pipe(
         regex_replace,
         (
-            FormsRepl(src=latex, dst=latex, find=find, repl=repl)
+            Repl[Kind](src=latex, dst=latex, find=find, repl=repl)
             for find, repl in {r"\\left\(": "(", r"\\right\)": ")"}.items()
         ),
     )[latex]

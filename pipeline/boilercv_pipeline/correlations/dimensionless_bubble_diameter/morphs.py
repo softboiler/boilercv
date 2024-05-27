@@ -9,15 +9,16 @@ from tomlkit import parse
 
 from boilercv.morphs import Morph
 from boilercv_pipeline.annotations import SympifyParams
+from boilercv_pipeline.correlations.annotations import Kind
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     Param,
     Sym,
     params,
-    solve_syms,
     syms,
 )
-from boilercv_pipeline.correlations.types import Equation, Equations, FormsRepl, eqs
-from boilercv_pipeline.morphs import CtxMorph, LocalSymbols, Morphs, Solutions, get_ctx
+from boilercv_pipeline.correlations.models import Equations, EquationSolutions
+from boilercv_pipeline.mappings.models import Repl
+from boilercv_pipeline.morphs import LocalSymbols, compose_context
 from boilercv_pipeline.types import Expectation
 
 base = Path(__file__).with_suffix(".toml")
@@ -32,7 +33,7 @@ EXPECTATIONS = parse(EXPECTATIONS_TOML.read_text("utf-8"))
 MAKE_RAW = {'"': "'", r"\\": "\\"}
 """Replacement to turn escaped characters back to their raw form. Should be last."""
 LATEX_REPLS = tuple(
-    FormsRepl(src="latex", dst="latex", find=find, repl=repl)
+    Repl[Kind](src="latex", dst="latex", find=find, repl=repl)
     for find, repl in {"{0}": r"\o", "{b0}": r"\b0"}.items()
 )
 """Replacements to make after parsing LaTeX from PNGs."""
@@ -60,27 +61,6 @@ This is the correlation with the most rapidly vanishing value of
 """
 
 
-class BetaSolutions(CtxMorph[Sym, Solutions]):
-    """Dimensionless bubble diameter solutions."""
-
-    @classmethod
-    def get_morphs(cls) -> Morphs:
-        """Get morphs."""
-        return cls.set_defaults(keys=solve_syms, factory=Solutions)
-
-
-class EquationSolutions(CtxMorph[Equation, BetaSolutions], foo="bar"):
-    """Equation solutions."""
-
-    @classmethod
-    def get_morphs(cls) -> Morphs:
-        """Get morphs."""
-        return (
-            cls.set_defaults(keys=eqs, factory=BetaSolutions)
-            | BetaSolutions.get_morphs()
-        )
-
-
 LOCAL_SYMBOLS = LocalSymbols(
     zip(
         syms,
@@ -94,16 +74,14 @@ LOCAL_SYMBOLS = LocalSymbols(
     )
 )
 """Local variables."""
-SOLUTIONS = EquationSolutions.with_ctx(
-    loads(SOLUTIONS_TOML.read_text("utf-8")),
-    ctx=get_ctx(
-        EquationSolutions.get_morphs(),
-        SympifyParams(locals=dict(LOCAL_SYMBOLS), evaluate=False),
-    ),
+SOLUTIONS = EquationSolutions[Sym].model_validate(
+    context=EquationSolutions.get_context(solve_syms=syms)
+    | compose_context(SympifyParams(locals=dict(LOCAL_SYMBOLS), evaluate=False)),
+    obj=loads(SOLUTIONS_TOML.read_text("utf-8")),
 )
 """Solutions."""
-EQUATIONS = Equations.with_ctx(
-    loads(EQUATIONS_TOML.read_text("utf-8")),
-    get_ctx(Equations.get_morphs(local_symbols=LOCAL_SYMBOLS)),
+EQUATIONS = Equations.model_validate(
+    context=Equations.get_context(local_symbols=LOCAL_SYMBOLS),
+    obj=loads(EQUATIONS_TOML.read_text("utf-8")),
 )
 """Equations."""

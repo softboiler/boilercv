@@ -1,29 +1,30 @@
 """Types."""
 
-from __future__ import annotations
-
 from collections.abc import Callable, Mapping, MutableMapping
 from pathlib import Path
 from types import SimpleNamespace
-from typing import TYPE_CHECKING, Any, Literal, ParamSpec, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Literal, ParamSpec, Protocol, TypeAlias, TypeVar
 
 from numpydantic import NDArray, Shape
 from numpydantic.types import DtypeType, ShapeType
+from pydantic import BaseModel
 
-from boilercv_pipeline.annotations import CtxV
+from boilercv_pipeline.annotations import ContextValue
 
 if TYPE_CHECKING:
-    from boilercv_pipeline.morphs import CtxMorph
+    from boilercv_pipeline.morphs import Pipe
 
 
 ST = TypeVar("ST", bound=ShapeType)
 DT = TypeVar("DT", bound=DtypeType)
 T = TypeVar("T", contravariant=True)
 R = TypeVar("R", covariant=True)
+S = TypeVar("S")
 P = ParamSpec("P")
 K = TypeVar("K")
 V = TypeVar("V")
 CM = TypeVar("CM", bound="CtxMorph[Any, Any]")
+Model = TypeVar("Model", bound=BaseModel)
 
 # ? Notebook handling
 NbProcess: TypeAlias = Callable[[Path, SimpleNamespace], None]
@@ -50,6 +51,15 @@ Node: TypeAlias = Mapping[Any, "Node | Leaf"]
 MutableNode: TypeAlias = MutableMapping[Any, "MutableNode | Leaf"]
 """Mutable general node."""
 
+
 # ? Contexts
-Ctx: TypeAlias = dict[str, "CtxV"]
+
+
+class StaticPipe(Protocol[S]):  # noqa: D101
+    def __call__(self, i: S, /) -> S: ...  # noqa: D102
+
+
+Context: TypeAlias = dict[str, "ContextValue"]
 """Pydantic context."""
+Pipes: TypeAlias = list["Pipe[Any]" | StaticPipe[Any]]
+"""Pipes."""

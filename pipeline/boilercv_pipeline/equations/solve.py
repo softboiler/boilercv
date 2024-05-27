@@ -23,7 +23,6 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import 
     KWDS,
     LOCAL_SYMBOLS,
     SOLUTIONS_TOML,
-    EquationSolutions,
 )
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     Param,
@@ -32,9 +31,13 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     solve_syms,
     syms,
 )
-from boilercv_pipeline.correlations.types import Equations
+from boilercv_pipeline.correlations.models import (
+    Equations,
+    EquationSolutions,
+    Solutions,
+)
 from boilercv_pipeline.mappings import filt, sync
-from boilercv_pipeline.morphs import LocalSymbols, Solutions, get_ctx
+from boilercv_pipeline.morphs import LocalSymbols, compose_context
 from boilercv_pipeline.types import Eq, Symbol
 
 SYMS_TO_PARAMS = dict(zip(syms, params, strict=True))
@@ -80,13 +83,13 @@ def default(  # noqa: D103
         )
     )
     subs = dict(zip(syms, symbol_subs, strict=True))
-    eqns = Equations.with_ctx(
+    eqns = Equations.model_validate(
         loads(equations.read_text("utf-8")),
-        get_ctx(Equations.get_morphs(local_symbols=LOCAL_SYMBOLS)),
+        compose_context(Equations.get_context(local_symbols=LOCAL_SYMBOLS)),
     )
-    solns = EquationSolutions.with_ctx(
+    solns = EquationSolutions.model_validate(
         loads(solutions.read_text("utf-8")),
-        ctx=get_ctx(
+        ctx=compose_context(
             EquationSolutions.get_morphs(),
             SympifyParams(locals=dict(LOCAL_SYMBOLS), evaluate=False),
         ),
