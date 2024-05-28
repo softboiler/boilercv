@@ -23,5 +23,6 @@ Vector: TypeAlias = Shape["*"]  # noqa: F722
 """Vector shape."""
 
 # ? Equations
+
 Expectation: TypeAlias = float | NDArray[Vector, float]  # pyright: ignore[reportInvalidTypeArguments]
 """Expectation."""

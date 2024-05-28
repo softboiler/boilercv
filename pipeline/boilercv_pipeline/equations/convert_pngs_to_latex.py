@@ -8,7 +8,7 @@ from loguru import logger
 from tqdm import tqdm
 
 from boilercv_pipeline.correlations import PIPX, PNGS
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     EQUATIONS,
     LATEX_REPLS,
 )

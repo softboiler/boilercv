@@ -12,9 +12,7 @@ from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
 from boilercv_docs.nbs import init_nb_env
 from boilercv_docs.patch_nbs import patch_nbs
 from boilercv_docs.types import IspxMappingValue
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
-    EQUATIONS,
-)
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter import EQUATIONS
 
 # ! Initialization
 patch_nbs()

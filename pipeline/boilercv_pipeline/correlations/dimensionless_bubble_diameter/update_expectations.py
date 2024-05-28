@@ -6,7 +6,7 @@ from inspect import Signature, getmembers, isfunction
 from tomlkit import dumps, parse
 
 from boilercv_pipeline.correlations import dimensionless_bubble_diameter
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     EXPECTATIONS_TOML,
     KWDS,
 )

@@ -1,11 +1,9 @@
 """Type annotations used at runtime in {mod}`boilercv_pipeline`."""
 
-from __future__ import annotations
-
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 from functools import wraps
-from typing import Annotated, Any, Generic, Literal, TypeAlias, TypeVar
+from typing import Annotated, Any, Literal, TypeAlias, TypeVar
 
 import sympy
 from pydantic import (
@@ -16,32 +14,20 @@ from pydantic import (
     ValidationInfo,
     WrapValidator,
 )
-from pydantic.alias_generators import to_snake
 from sympy import sympify
 
+from boilercv.morphs.types.runtime import ContextValue
 from boilercv_pipeline.types import K
 
 # * MARK: `TypeVar`s and `TypeAlias`es for annotations
 
-CV = TypeVar("CV", bound="ContextValue", contravariant=True)
+CV = TypeVar("CV", bound=ContextValue, contravariant=True)
 """Context value."""
 SK = TypeVar("SK")
 """Symbol key."""
 
 Validators: TypeAlias = Literal["before", "wrap", "after", "plain"]
 """Validators."""
-
-# * MARK: Needed for annotations and other things
-
-
-class ContextValue:
-    """Context value."""
-
-    @classmethod
-    def name_to_snake(cls) -> str:
-        """Get name."""
-        return to_snake(cls.__name__)
-
 
 # * MARK: Annotation parts
 
@@ -75,21 +61,22 @@ def contextualize(ctx_v_type: type[CV]):
 
 
 @dataclass
-class SympifyParams(ContextValue, Generic[SK]):
+class SympifyParams(ContextValue):
     """Sympify parameters."""
 
-    locals: dict[SK, Any] | None = None
+    locals: dict[str, Any] | None = None
     convert_xor: bool | None = None
     strict: bool = False
     rational: bool = False
     evaluate: bool | None = None
 
 
-@contextualize(SympifyParams)
-def validate_expr(expr: str, sympify_params: SympifyParams[Any]) -> Any:
+def validate_expr(expr: str, sympify_params: SympifyParams) -> Any:
     """Sympify an expression from local variables."""
     return sympify(expr, **asdict(sympify_params))
 
+
+contextualized_validate_expr = contextualize(SympifyParams)(validate_expr)
 
 VALIDATORS: dict[Validators, Any] = {
     "before": BeforeValidator,
@@ -133,10 +120,14 @@ Basic: TypeAlias = Annotated[
 Symbol: TypeAlias = Annotated[sympy.Symbol, TypeValidator(sympy.Symbol)]
 """Annotated {class}`~sympy.core.symbol.Symbol` suitable for use in Pydantic models."""
 Eq: TypeAlias = Annotated[
-    Basic, BeforeValidator(validate_expr), TypeValidator(sympy.Eq, "after")
+    Basic,
+    BeforeValidator(contextualized_validate_expr),
+    TypeValidator(sympy.Eq, "after"),
 ]
 """{data}`~boilercv_pipeline.boilercv_pipeline.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""
 Expr: TypeAlias = Annotated[
-    Basic, BeforeValidator(validate_expr), TypeValidator(sympy.Expr, "after")
+    Basic,
+    BeforeValidator(contextualized_validate_expr),
+    TypeValidator(sympy.Expr, "after"),
 ]
 """{data}`~boilercv_pipeline.boilercv_pipeline.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""

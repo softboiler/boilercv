@@ -13,8 +13,6 @@ from typing import (
 
 from pydantic import BaseModel
 
-from boilercv.morphs.types.runtime import ContextValue
-
 if TYPE_CHECKING:
     from boilercv.morphs.contexts import Pipe
     from boilercv.morphs.morphs import Morph
@@ -96,7 +94,5 @@ class StaticPipe(Protocol[S]):  # noqa: D101
     def __call__(self, i: S, /) -> S: ...  # noqa: D102
 
 
-Context: TypeAlias = dict[str, "ContextValue"]
-"""Pydantic context."""
 Pipes: TypeAlias = list["Pipe[Any]" | StaticPipe[Any]]
 """Pipes."""

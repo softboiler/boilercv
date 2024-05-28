@@ -9,6 +9,8 @@ from itertools import chain
 from pathlib import Path
 from typing import Any, Generic, Self, TypeVar, overload
 
+import sympy
+from sympy import symbols
 from tomlkit import parse
 from tomlkit.container import Container
 from tomlkit.items import Item
@@ -16,28 +18,39 @@ from tomlkit.items import Item
 from boilercv.mappings import sync
 from boilercv.mappings.types import Leaf, Node
 from boilercv.morphs.morphs import BaseMorph, M, Morph
-from boilercv.morphs.types import Context, K, Model, Pipes, T, V
-from boilercv.morphs.types.runtime import CV, SK, ContextValue, Symbol
+from boilercv.morphs.types import K, Model, Pipes, T, V
+from boilercv.morphs.types.runtime import CV, ContextValue
 
 # * MARK: Context value handlers
 
 
-def get_context(
+def compose_morphs_with_context(
     morphs: Mapping[type, Pipes], context_values: Iterable[ContextValue] | None = None
 ) -> Context:
     """Get a Pydantic context from morphs and other context values."""
     return Context(compose_context(Morphs(morphs), *(context_values or ())))
 
 
-def compose_context(*context_values: ContextValue):
+def compose_context(*context_values: ContextValue) -> Context:
     """Compose inner contexts."""
-    return {
+    return Context({
         context_value.name_to_snake(): context_value for context_value in context_values
-    }
+    })
 
 
-class LocalSymbols(UserDict[SK, Symbol], ContextValue, Generic[SK]):
+class LocalSymbols(UserDict[str, sympy.Symbol], ContextValue):
     """Local symbols."""
+
+    @classmethod
+    def from_iterable(cls, syms: Iterable[str]):
+        """Create from an iterable of symbols."""
+        return cls(
+            zip(
+                syms,
+                symbols(syms, nonnegative=True, real=True, finite=True),
+                strict=True,
+            )
+        )
 
 
 @dataclass
@@ -61,6 +74,34 @@ class Pipe(Generic[T]):
 
     f: Callable[[T, Any], T]
     context_value: ContextValue
+
+
+class Context(UserDict[str, ContextValue]):
+    """Morphs."""
+
+    def __or__(self, other: Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
+        if isinstance(other, Context):
+            merged = dict(self) | dict(other)
+            if (morphs := get_context_value(Morphs, self)) is not None and (
+                other_morphs := get_context_value(Morphs, other)
+            ) is not None:
+                merged[get_context_key(Morphs)] = morphs | other_morphs
+            return type(self)(merged)
+        if isinstance(other, Mapping):
+            return self | type(self)(other)
+        return NotImplemented
+
+    def __ror__(self, other):  # pyright: ignore[reportIncompatibleMethodOverride]
+        if isinstance(other, Context):
+            return other | self
+        if isinstance(other, Mapping):
+            return type(self)(other) | self
+        return NotImplemented
+
+    def __ior__(self, other):  # pyright: ignore[reportIncompatibleMethodOverride]
+        if isinstance(other, Context):
+            self.data = (self | other).data
+        return self
 
 
 class Morphs(UserDict[type, Pipes], ContextValue):
@@ -97,10 +138,7 @@ class ContextMorph(Morph[K, V], Generic[K, V]):
 
     def model_post_init(self, context: Context | None = None) -> None:
         """Morph the model after initialization."""
-        try:
-            morphs = self.get_context_value(Morphs, context or Context())
-        except ValueError:
-            morphs = Morphs()
+        morphs = get_context_value(Morphs, context or Context()) or Morphs()
         with self.thaw_self(validate=True):
             result = self
             for model, pipes in morphs.items():
@@ -128,31 +166,7 @@ class ContextMorph(Morph[K, V], Generic[K, V]):
             self.root = result
 
     @classmethod
-    def get_context_value(cls, typ: type[CV], context: Context | None) -> CV:
-        """Get context values for a type."""
-        key = typ.name_to_snake()
-        val = (context or Context()).get(key)
-        if val is None:
-            raise ValueError(
-                f"Expected context for '{cls}' in model context at '{key}'."
-            )
-        return val  # pyright: ignore[reportReturnType]
-
-    @classmethod
-    def get_pipes(cls, *args, **kwds) -> Pipes:
-        """Get pipes for a model."""
-        return cls.get_morphs(*args, **kwds)[cls]
-
-    @classmethod
-    def get_morphs(cls, *args, **kwds) -> Morphs:
-        """Get morphs for a model."""
-        return cls.get_context_value(
-            typ=Morphs,
-            context=cls.get_context(*args, **kwds),  # pyright: ignore[reportAttributeAccessIssue]
-        )
-
-    @classmethod
-    def model_validate(
+    def model_validate(  # pyright: ignore[reportIncompatibleMethodOverride]
         cls: type[Model],
         obj: Any,
         *,
@@ -180,11 +194,11 @@ class ContextMorph(Morph[K, V], Generic[K, V]):
             obj,
             strict=strict,
             from_attributes=from_attributes,
-            context=(context or Context()),  # pyright: ignore[reportAttributeAccessIssue]
+            context=(context or Context()),  # pyright: ignore[reportArgumentType]
         )
 
     @classmethod
-    def model_validate_json(
+    def model_validate_json(  # pyright: ignore[reportIncompatibleMethodOverride]
         cls: type[Model],
         json_data: str | bytes | bytearray,
         *,
@@ -211,7 +225,7 @@ class ContextMorph(Morph[K, V], Generic[K, V]):
         return super().model_validate(
             json_data,
             strict=strict,
-            context=(context or Context()),  # pyright: ignore[reportAttributeAccessIssue]
+            context=(context or Context()),  # pyright: ignore[reportArgumentType]
         )
 
 
@@ -231,6 +245,16 @@ def set_defaults(i: ContextMorph[K, V], defaults: Defaults[K, V]) -> ContextMorp
             default = i.get_inner_types()[1]()
         return dict.fromkeys(defaults.keys, default) | i
     return i
+
+
+def get_context_value(value_type: type[CV], context: Context | None) -> CV | None:
+    """Get context values for a type."""
+    return (context or Context()).get(get_context_key(value_type))  # pyright: ignore[reportReturnType]
+
+
+def get_context_key(value_type: type[CV]) -> str:
+    """Get context keys for a type."""
+    return value_type.name_to_snake()
 
 
 # TODO: Consider removing this

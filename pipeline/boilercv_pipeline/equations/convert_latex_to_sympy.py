@@ -12,18 +12,18 @@ from tomlkit import dumps, parse
 from tomlkit.items import Table
 from tqdm import tqdm
 
+from boilercv.mappings import regex_replace
+from boilercv.mappings.models import Repl
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.correlations import PIPX
 from boilercv_pipeline.correlations.annotations import Kind
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     EQUATIONS,
     EQUATIONS_TOML,
     LOCAL_SYMBOLS,
     MAKE_RAW,
 )
 from boilercv_pipeline.correlations.models import Forms, set_equation_forms
-from boilercv_pipeline.mappings import regex_replace
-from boilercv_pipeline.mappings.models import Repl
 from boilercv_pipeline.types import K, V
 
 APP = App()
@@ -105,8 +105,8 @@ def remove_symbolically_equiv(i: Forms, orig: Forms, symbolic: Kind) -> Forms:
     eq = i.get(symbolic)
     if not old_eq or not eq:
         return i
-    old = sympify(old_eq, locals=LOCAL_SYMBOLS.model_dump(), evaluate=False)
-    new = sympify(eq, locals=LOCAL_SYMBOLS.model_dump(), evaluate=False)
+    old = sympify(old_eq, locals=LOCAL_SYMBOLS, evaluate=False)
+    new = sympify(eq, locals=LOCAL_SYMBOLS, evaluate=False)
     compare = (old.lhs - old.rhs) - (new.lhs - new.rhs)
     if compare == 0:
         # ? Equations compare equal without simplifying

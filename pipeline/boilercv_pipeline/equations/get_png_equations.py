@@ -6,9 +6,7 @@ from PIL import Image
 from tqdm import tqdm
 
 from boilercv_pipeline.correlations import PNGS
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
-    EQUATIONS,
-)
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter import EQUATIONS
 
 
 def main():  # noqa: D103

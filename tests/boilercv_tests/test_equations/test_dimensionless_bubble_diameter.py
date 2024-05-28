@@ -9,11 +9,11 @@ from sympy import lambdify
 
 from boilercv_pipeline.correlations import dimensionless_bubble_diameter
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
-    equations as symbolic,
-)
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
     EXPECTATIONS_TOML,
     KWDS,
+)
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
+    equations as symbolic,
 )
 
 lambdify  # noqa: B018

@@ -4,11 +4,9 @@ from loguru import logger
 from sympy import parse_expr, symbols
 from tqdm import tqdm
 
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter import EQUATIONS
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.equations import (
     SYMPY_SUBS,
-)
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
-    EQUATIONS,
 )
 
 syms = tuple(SYMPY_SUBS.values())
