@@ -5,12 +5,11 @@ from copy import deepcopy
 from re import sub
 from typing import TYPE_CHECKING, Any, TypeVar
 
-from boilercv_pipeline.mappings.models import Repl
-from boilercv_pipeline.mappings.types import K
-from boilercv_pipeline.types import Leaf, MutableNode, Node
+from boilercv.mappings.models import Repl
+from boilercv.mappings.types import K, Leaf, MutableNode, Node
 
 if TYPE_CHECKING:
-    from boilercv_pipeline.mappings.models import Repl
+    from boilercv.mappings.models import Repl
 
 
 def filt(

@@ -1,10 +1,24 @@
-"""Morph types."""
+"""Static type annotations used in {mod}`morphs`."""
 
 from collections.abc import MutableMapping
-from typing import TYPE_CHECKING, Any, NamedTuple, ParamSpec, Protocol, TypeVar
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    NamedTuple,
+    ParamSpec,
+    Protocol,
+    TypeAlias,
+    TypeVar,
+)
+
+from pydantic import BaseModel
+
+from boilercv.morphs.types.runtime import ContextValue
 
 if TYPE_CHECKING:
+    from boilercv.morphs.contexts import Pipe
     from boilercv.morphs.morphs import Morph
+
 
 M = TypeVar("M", bound="Morph[Any, Any]")
 
@@ -70,3 +84,19 @@ class Types(NamedTuple):
 
     key: type
     value: type
+
+
+S = TypeVar("S")
+Model = TypeVar("Model", bound=BaseModel)
+
+# ? Contexts
+
+
+class StaticPipe(Protocol[S]):  # noqa: D101
+    def __call__(self, i: S, /) -> S: ...  # noqa: D102
+
+
+Context: TypeAlias = dict[str, "ContextValue"]
+"""Pydantic context."""
+Pipes: TypeAlias = list["Pipe[Any]" | StaticPipe[Any]]
+"""Pipes."""

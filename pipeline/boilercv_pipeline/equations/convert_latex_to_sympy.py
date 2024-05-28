@@ -12,7 +12,7 @@ from tomlkit import dumps, parse
 from tomlkit.items import Table
 from tqdm import tqdm
 
-from boilercv.morphs import Morph
+from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.correlations import PIPX
 from boilercv_pipeline.correlations.annotations import Kind
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (

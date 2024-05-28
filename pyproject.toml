@@ -208,6 +208,9 @@ select = [
 unfixable = [
     "PIE790", # Don't remove `pass`/`...`, overridden in pre-commit
 ]
+extend-safe-fixes = [
+    "F401", # Allow autofix for unused imports even in `__init__.py`
+]
 ignore = [
     "ANN",     # Don't require type annotations
     "ARG005",  # Allow unused lambda argument. For consistency across df pipelines.

@@ -2,7 +2,7 @@
 
 from typing import Generic, NamedTuple
 
-from boilercv_pipeline.mappings.types import T
+from boilercv.mappings.types import T
 
 
 class Repl(NamedTuple, Generic[T]):

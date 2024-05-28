@@ -16,7 +16,8 @@ from sympy.solvers import solve
 from tomlkit import parse
 from tqdm import tqdm
 
-from boilercv.morphs import Morph
+from boilercv.morphs.contexts import LocalSymbols, compose_context
+from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
     EQUATIONS_TOML,
     KWDS,
@@ -36,7 +37,6 @@ from boilercv_pipeline.correlations.models import (
     Solutions,
 )
 from boilercv_pipeline.mappings import filt, sync
-from boilercv_pipeline.morphs import LocalSymbols, compose_context
 from boilercv_pipeline.types.runtime import Eq, Symbol, SympifyParams
 
 SYMS_TO_PARAMS = dict(zip(syms, params, strict=True))

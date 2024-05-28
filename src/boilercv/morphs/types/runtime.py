@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
-from functools import wraps
 from typing import Annotated, Any, Generic, Literal, TypeAlias, TypeVar
 
 import sympy
@@ -19,12 +18,11 @@ from pydantic import (
 from pydantic.alias_generators import to_snake
 from sympy import sympify
 
-from boilercv_pipeline.types import K
-
 # * MARK: `TypeVar`s and `TypeAlias`es for annotations
 
+K = TypeVar("K")
 CV = TypeVar("CV", bound="ContextValue", contravariant=True)
-"""Context value."""
+
 SK = TypeVar("SK")
 """Symbol key."""
 
@@ -49,8 +47,7 @@ class ContextValue:
 def contextualize(ctx_v_type: type[CV]):
     """Contextualize a function."""
 
-    def wrapper(f) -> Callable[[Any, ValidationInfo], Any]:
-        @wraps(f)
+    def wrapper(f):
         def validator(v: Callable[[str, CV], Any], info: ValidationInfo):
             key = ctx_v_type.name_to_snake()
             ctx = info.context

@@ -5,10 +5,9 @@ from typing import Generic
 
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.correlations.annotations import Equation, Kind, eqs, kinds
-from boilercv_pipeline.mappings import regex_replace, replace
-from boilercv_pipeline.mappings.models import Repl
-from boilercv_pipeline.morphs import (
+from boilercv.mappings import regex_replace, replace
+from boilercv.mappings.models import Repl
+from boilercv.morphs.contexts import (
     ContextMorph,
     Defaults,
     LocalSymbols,
@@ -16,7 +15,8 @@ from boilercv_pipeline.morphs import (
     get_context,
     set_defaults,
 )
-from boilercv_pipeline.types import Context, K
+from boilercv.morphs.types import Context, K
+from boilercv_pipeline.correlations.annotations import Equation, Kind, eqs, kinds
 from boilercv_pipeline.types.runtime import SK, Expr
 
 
