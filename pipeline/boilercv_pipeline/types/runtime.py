@@ -1,4 +1,4 @@
-"""Pydantic annotations."""
+"""Type annotations used at runtime in {mod}`boilercv_pipeline`."""
 
 from __future__ import annotations
 
@@ -21,7 +21,7 @@ from sympy import sympify
 # * MARK: `TypeVar`s and `TypeAlias`es for annotations
 
 K = TypeVar("K")
-CV = TypeVar("CV", bound="CV", contravariant=True)
+CV = TypeVar("CV", bound="ContextValue", contravariant=True)
 
 SK = TypeVar("SK")
 """Symbol key."""

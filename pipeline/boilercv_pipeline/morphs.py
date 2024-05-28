@@ -15,8 +15,8 @@ from tomlkit.items import Item
 
 from boilercv.morphs import BaseMorph, M, Morph
 from boilercv_pipeline import mappings
-from boilercv_pipeline.annotations import CV, SK, ContextValue, Symbol
 from boilercv_pipeline.types import Context, K, Leaf, Model, Node, Pipes, T, V
+from boilercv_pipeline.types.runtime import CV, SK, ContextValue, Symbol
 
 # * MARK: Context value handlers
 

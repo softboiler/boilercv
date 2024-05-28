@@ -5,7 +5,6 @@ from typing import Generic
 
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.annotations import SK, Expr
 from boilercv_pipeline.correlations.annotations import Equation, Kind, eqs, kinds
 from boilercv_pipeline.mappings import regex_replace, replace
 from boilercv_pipeline.mappings.models import Repl
@@ -18,6 +17,7 @@ from boilercv_pipeline.morphs import (
     set_defaults,
 )
 from boilercv_pipeline.types import Context, K
+from boilercv_pipeline.types.runtime import SK, Expr
 
 
 class Forms(ContextMorph[Kind, str]):

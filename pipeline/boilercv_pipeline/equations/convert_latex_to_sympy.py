@@ -14,9 +14,7 @@ from tqdm import tqdm
 
 from boilercv.morphs import Morph
 from boilercv_pipeline.correlations import PIPX
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.equations import (
-    Repl[Kind],
-)
+from boilercv_pipeline.correlations.annotations import Kind
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
     EQUATIONS,
     EQUATIONS_TOML,
@@ -24,8 +22,8 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import 
     MAKE_RAW,
 )
 from boilercv_pipeline.correlations.models import Forms, set_equation_forms
-from boilercv_pipeline.correlations.types import Kind
 from boilercv_pipeline.mappings import regex_replace
+from boilercv_pipeline.mappings.models import Repl
 from boilercv_pipeline.types import K, V
 
 APP = App()

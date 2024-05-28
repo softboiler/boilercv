@@ -8,7 +8,6 @@ from sympy import symbols
 from tomlkit import parse
 
 from boilercv.morphs import Morph
-from boilercv_pipeline.annotations import SympifyParams
 from boilercv_pipeline.correlations.annotations import Kind
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     Param,
@@ -20,6 +19,7 @@ from boilercv_pipeline.correlations.models import Equations, EquationSolutions
 from boilercv_pipeline.mappings.models import Repl
 from boilercv_pipeline.morphs import LocalSymbols, compose_context
 from boilercv_pipeline.types import Expectation
+from boilercv_pipeline.types.runtime import SympifyParams
 
 base = Path(__file__).with_suffix(".toml")
 EQUATIONS_TOML = base.with_stem("equations")

@@ -1,4 +1,4 @@
-"""Types."""
+"""Static type annotations used in {mod}`boilercv_pipeline`."""
 
 from collections.abc import Callable, Mapping, MutableMapping
 from pathlib import Path

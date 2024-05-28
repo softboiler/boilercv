@@ -17,7 +17,6 @@ from tomlkit import parse
 from tqdm import tqdm
 
 from boilercv.morphs import Morph
-from boilercv_pipeline.annotations import SympifyParams
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
     EQUATIONS_TOML,
     KWDS,
@@ -38,7 +37,7 @@ from boilercv_pipeline.correlations.models import (
 )
 from boilercv_pipeline.mappings import filt, sync
 from boilercv_pipeline.morphs import LocalSymbols, compose_context
-from boilercv_pipeline.types import Eq, Symbol
+from boilercv_pipeline.types.runtime import Eq, Symbol, SympifyParams
 
 SYMS_TO_PARAMS = dict(zip(syms, params, strict=True))
 """Mapping of symbols to parameters."""
@@ -89,7 +88,7 @@ def default(  # noqa: D103
     )
     solns = EquationSolutions.model_validate(
         loads(solutions.read_text("utf-8")),
-        ctx=compose_context(
+        context=compose_context(
             EquationSolutions.get_morphs(),
             SympifyParams(locals=dict(LOCAL_SYMBOLS), evaluate=False),
         ),
@@ -102,7 +101,9 @@ def default(  # noqa: D103
             with soln.thaw_self():
                 for sym in soln.default_keys:
                     soln[sym] = solve_equation(
-                        TypeAdapter(Eq).validate_python(eq["sympy"], context=expr_ctx),
+                        TypeAdapter(Eq).validate_python(
+                            eq["sympy"], context=expr_context
+                        ),
                         local_syms[sym],
                         subs,
                     )
