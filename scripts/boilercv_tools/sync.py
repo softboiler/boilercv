@@ -124,6 +124,7 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
                 compiler = sys_compiler
                 compilation = sys_compilation
             elif plat == PROJECT_PLATFORM and python_version == PROJECT_PYTHON_VERSION:
+                print("Wew lad")  # noqa: T201
                 compiler = proj_compiler
                 compilation = proj_compilation
                 contents["direct"]["time"] = compilation.time.isoformat()
