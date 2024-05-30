@@ -70,10 +70,8 @@ NODEPS = REQS / "nodeps.in"
 # ! Platforms and Python versions
 SYS_PLATFORM: Platform = platform(terse=True).casefold().split("-")[0]  # pyright: ignore[reportAssignmentType] 1.1.356
 """Platform identifier."""
-print(f"{SYS_PLATFORM=}")  # noqa: T201
 SYS_PYTHON_VERSION: PythonVersion = ".".join([str(v) for v in version_info[:2]])  # pyright: ignore[reportAssignmentType] 1.1.356
 """Python version associated with this platform."""
-print(f"{SYS_PYTHON_VERSION=}")  # noqa: T201
 PROJECT_PLATFORM: Platform = "linux"
 """This project's default compilation platform."""
 PROJECT_PYTHON_VERSION: PythonVersion = "3.11"
@@ -91,6 +89,7 @@ PYTHON_VERSIONS: tuple[PythonVersion, ...] = (  # pyright: ignore[reportAssignme
 def check_compilation(high: bool = False) -> str:
     """Check compilation, re-lock if incompatible, and return the requirements."""
     if high or not get_lockfile(high).exists():
+        print("Wew lad")  # noqa: T201
         return lock(high)
     old_compiler = Compiler.from_lock()
     if Compiler() != old_compiler:
@@ -124,7 +123,6 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
                 compiler = sys_compiler
                 compilation = sys_compilation
             elif plat == PROJECT_PLATFORM and python_version == PROJECT_PYTHON_VERSION:
-                print("Wew lad")  # noqa: T201
                 compiler = proj_compiler
                 compilation = proj_compilation
                 contents["direct"]["time"] = compilation.time.isoformat()
@@ -251,6 +249,7 @@ class Compiler:
     ) -> Self:
         """Get locked project compiler."""
         contents = loads(get_lockfile(high).read_text("utf-8"))
+        print("Whaaa")  # noqa: T201
         return cls(
             uv=contents["direct"]["uv"],
             platform=platform or contents["direct"]["project_platform"],
