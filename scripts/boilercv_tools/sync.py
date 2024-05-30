@@ -5,7 +5,6 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from json import dumps, loads
-from os import environ
 from pathlib import Path
 from platform import platform
 from re import finditer
@@ -116,8 +115,6 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
         if proj_compiler == sys_compiler
         else sys_compiler.compile(directs=proj_compilation.directs)
     )
-    if not environ.get("CI"):
-        return sys_compilation.requirements
     contents: Lock = {}
     contents["direct"] = {}
     contents["direct"]["time"] = proj_compilation.time.isoformat()
@@ -136,17 +133,8 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
     ])
     for plat in sorted(PLATFORMS):
         for python_version in sorted(PYTHON_VERSIONS):
-            if plat == SYS_PLATFORM and python_version == SYS_PYTHON_VERSION:
-                compiler = sys_compiler
-                compilation = sys_compilation
-            elif plat == PROJECT_PLATFORM and python_version == PROJECT_PYTHON_VERSION:
-                compiler = proj_compiler
-                compilation = proj_compilation
-            else:
-                compiler = Compiler(
-                    platform=plat, python_version=python_version, high=high
-                )
-                compilation = compiler.compile(directs=proj_compilation.directs)
+            compiler = Compiler(platform=plat, python_version=python_version, high=high)
+            compilation = compiler.compile(directs=proj_compilation.directs)
             key = compiler.get_lockfile_key()
             contents[key] = {}
             contents[key]["time"] = compilation.time.isoformat()
