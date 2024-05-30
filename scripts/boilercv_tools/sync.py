@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from json import dumps, loads
-from os import getenv
+from os import environ
 from pathlib import Path
 from platform import platform
 from re import finditer
@@ -71,7 +71,6 @@ NODEPS = REQS / "nodeps.in"
 SYS_PLATFORM: Platform = platform(terse=True).casefold().split("-")[0]  # pyright: ignore[reportAssignmentType] 1.1.356
 """Platform identifier."""
 SYS_PYTHON_VERSION: PythonVersion = ".".join([str(v) for v in version_info[:2]])  # pyright: ignore[reportAssignmentType] 1.1.356
-print(f"{SYS_PYTHON_VERSION=}")  # noqa: T201
 """Python version associated with this platform."""
 PROJECT_PLATFORM: Platform = "linux"
 """This project's default compilation platform."""
@@ -90,7 +89,6 @@ PYTHON_VERSIONS: tuple[PythonVersion, ...] = (  # pyright: ignore[reportAssignme
 def check_compilation(high: bool = False) -> str:
     """Check compilation, re-lock if incompatible, and return the requirements."""
     if high or not get_lockfile(high).exists():
-        print("Wew lad")  # noqa: T201
         return lock(high)
     old_compiler = Compiler.from_lock()
     if Compiler() != old_compiler:
@@ -114,7 +112,7 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
         platform=SYS_PLATFORM, python_version=SYS_PYTHON_VERSION, high=high
     )
     sys_compilation = sys_compiler.compile(directs=proj_compilation.directs)
-    if not getenv("CI"):
+    if not environ.get("CI"):
         return sys_compilation.requirements
     contents: Lock = {}
     contents["direct"] = {}
