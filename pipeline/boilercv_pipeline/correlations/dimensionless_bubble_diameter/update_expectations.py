@@ -5,7 +5,7 @@ from inspect import Signature, getmembers, isfunction
 
 from tomlkit import dumps, parse
 
-from boilercv_pipeline.correlations import dimensionless_bubble_diameter
+from boilercv_pipeline.correlations import _beta
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     EXPECTATIONS_TOML,
     KWDS,
@@ -15,9 +15,7 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
 def main():  # noqa: D103
     expectations = parse(EXPECTATIONS_TOML.read_text("utf-8"))
     for name, correlation in [
-        (name, attr)
-        for name, attr in getmembers(dimensionless_bubble_diameter)
-        if isfunction(attr)
+        (name, attr) for name, attr in getmembers(_beta) if isfunction(attr)
     ]:
         foo = correlation(**{  # pyright: ignore[reportArgumentType, reportIndexIssue]  1.1.356, tomlkit 0.12.4
             kwd: value

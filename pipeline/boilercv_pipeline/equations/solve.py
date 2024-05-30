@@ -11,11 +11,10 @@ from loguru import logger
 from numpy import finfo
 from stopit import ThreadingTimeout
 from sympy.solvers import solve
-from tomlkit import parse
+from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
 from boilercv.mappings import filt, sync
-from boilercv_pipeline.correlations import get_solutions_in_context
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     EQUATIONS_TOML,
     KWDS,
@@ -23,13 +22,15 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     SOLUTIONS_TOML,
 )
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    Sym,
     params,
     solve_syms,
     syms,
 )
-from boilercv_pipeline.correlations.models import Solutions
-from boilercv_pipeline.types.runtime import Symbol, validate_expr
+from boilercv_pipeline.correlations.models import (
+    Solutions,
+    contextualize_solutions,
+    identity_equation,
+)
 
 SYMS_TO_PARAMS = dict(zip(syms, params, strict=True))
 """Mapping of symbols to parameters."""
@@ -52,39 +53,39 @@ def default(  # noqa: D103
     equations: Path = EQUATIONS_TOML,
     solutions: Path = SOLUTIONS_TOML,
     symbols: tuple[str, ...] = syms,
-    solve_for: tuple[Sym, ...] = solve_syms,
-    symbol_subs: tuple[float, ...] = tuple(SUBS.values()),  # pyright: ignore[reportArgumentType]
+    substitutions: tuple[float, ...] = tuple(SUBS.values()),  # pyright: ignore[reportArgumentType]
+    solve_for: tuple[str, ...] = solve_syms,
     overwrite: bool = False,
 ):
-    local_symbols, eqns, solns, sympify_params = get_solutions_in_context(
-        equations=loads(equations.read_text("utf-8")),
-        solutions=loads(solutions.read_text("utf-8")),
+    logger.info("Start generating symbolic equations.")
+    solutions_content = solutions.read_text("utf-8") if solutions.exists() else ""
+    syms, _, solns, eqns = contextualize_solutions(
+        equations=loads(equations.read_text("utf-8") if equations.exists() else ""),
+        solutions=loads(solutions_content),
         symbols=symbols,
         solve_for=solve_for,
     )
-    with solns.thaw_self():
-        for name, eq in tqdm(eqns.items()):
-            soln = solns[name]
-            if not overwrite and eq and filt(soln.model_dump()):
-                continue
-            with soln.thaw_self():
-                for sym in solve_for:
-                    soln[sym] = solve_equation(
-                        eq=validate_expr(eq["sympy"], sympify_params),
-                        sym=local_symbols[sym],
-                        subs=dict(zip(local_symbols.keys(), symbol_subs, strict=True)),
-                    )
-                    solns[name] = soln
+    subs = dict(zip(syms.keys(), substitutions, strict=True))
+    for name, eq in tqdm(eqns.items()):
+        if not overwrite and eq != identity_equation and filt(solns[name].model_dump()):
+            continue
+        for sym in solve_for:
+            solns[name][sym] = solve_equation(eq=eq, sym=syms[sym], substitutions=subs)
     solutions.write_text(
         encoding="utf-8",
-        data=sync(
-            reference=solns.model_dump(mode="json"),
-            target=parse(solutions.read_text("utf-8")),
+        data=(
+            sync(
+                reference=solns.model_dump(mode="json"),
+                target=TOMLDocument() if overwrite else parse(solutions_content),
+            )
         ).as_string(),
     )
+    logger.info("Finish generating symbolic equations.")
 
 
-def solve_equation(eq: sympy.Eq, sym: Symbol, subs: dict[Sym, float]) -> Solutions:
+def solve_equation(
+    eq: sympy.Eq, sym: sympy.Symbol, substitutions: dict[str, float]
+) -> Solutions:
     """Find solution."""
     soln = Solutions()
     if eq.lhs is sym and sym not in eq.rhs.free_symbols:
@@ -107,7 +108,7 @@ def solve_equation(eq: sympy.Eq, sym: Symbol, subs: dict[Sym, float]) -> Solutio
         soln.warnings.append(f"Unable to find solution within {TIMEOUT} seconds.")
         return soln
     for s in solutions:
-        result = s.evalf(subs=subs)
+        result = s.evalf(subs=substitutions)
         if not result.is_real:
             continue
         if result < finfo(float).eps:
@@ -117,6 +118,4 @@ def solve_equation(eq: sympy.Eq, sym: Symbol, subs: dict[Sym, float]) -> Solutio
 
 
 if __name__ == "__main__":
-    logger.info("Start generating symbolic equations.")
     main()
-    logger.info("Finish generating symbolic equations.")

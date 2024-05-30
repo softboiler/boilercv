@@ -6,7 +6,9 @@ Sym: TypeAlias = Literal["Fo_0", "Ja", "Re_b0", "Pr", "beta", "pi"]
 """Symbol."""
 syms: tuple[Sym, ...] = get_args(Sym)
 """Symbols."""
-solve_syms: tuple[Sym, ...] = ("beta",)
+SolveSym: TypeAlias = Literal["beta"]
+"""Solve symbol."""
+solve_syms: tuple[SolveSym, ...] = get_args(SolveSym)
 """Symbols to solve for."""
 Param: TypeAlias = Literal[
     "bubble_fourier",

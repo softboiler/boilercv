@@ -6,7 +6,7 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
 )
 from boilercv_pipeline.correlations.models import Params
 
-LATEX_PARAMS = Params[Param].model_validate(
+LATEX_PARAMS = Params[Param].context_model_validate(
     context=Params.get_context(default_keys=params),
     obj={
         "bubble_fourier": {"latex": r"\Fo_\o"},

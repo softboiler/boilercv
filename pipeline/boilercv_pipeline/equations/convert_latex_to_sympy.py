@@ -16,14 +16,15 @@ from boilercv.mappings import regex_replace
 from boilercv.mappings.models import Repl
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.correlations import PIPX
-from boilercv_pipeline.correlations.annotations import Kind
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     EQUATIONS,
     EQUATIONS_TOML,
     LOCAL_SYMBOLS,
     MAKE_RAW,
 )
-from boilercv_pipeline.correlations.models import Forms, set_equation_forms
+from boilercv_pipeline.correlations.models import Forms
+from boilercv_pipeline.correlations.pipes import set_equation_forms
+from boilercv_pipeline.correlations.types.runtime import Kind
 from boilercv_pipeline.types import K, V
 
 APP = App()

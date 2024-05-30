@@ -72,7 +72,7 @@ def write(self) -> None:
     self.path.write_text(self.sync().as_string(), "utf-8")
 
 
-def replace(i: MutableMapping[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
+def replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
     """Make replacements from `Repl`s."""
     for r in repls:
         i[r.dst] = i[r.src].replace(r.find, r.repl)

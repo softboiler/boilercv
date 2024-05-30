@@ -4,6 +4,7 @@ from collections.abc import MutableMapping
 from typing import (
     TYPE_CHECKING,
     Any,
+    Literal,
     NamedTuple,
     ParamSpec,
     Protocol,
@@ -14,7 +15,6 @@ from typing import (
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from boilercv.morphs.contexts import Pipe
     from boilercv.morphs.morphs import Morph
 
 
@@ -87,12 +87,5 @@ class Types(NamedTuple):
 S = TypeVar("S")
 Model = TypeVar("Model", bound=BaseModel)
 
-# ? Contexts
-
-
-class StaticPipe(Protocol[S]):  # noqa: D101
-    def __call__(self, i: S, /) -> S: ...  # noqa: D102
-
-
-Pipes: TypeAlias = list["Pipe[Any]" | StaticPipe[Any]]
-"""Pipes."""
+Mode: TypeAlias = Literal["before", "after"]
+"""Mode."""

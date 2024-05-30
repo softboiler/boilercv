@@ -2,25 +2,15 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator, Mapping, MutableMapping
-from contextlib import contextmanager
+from collections.abc import Mapping, MutableMapping
+from copy import deepcopy
 from types import GenericAlias
-from typing import (
-    Any,
-    Generic,
-    Literal,
-    Self,
-    TypeVar,
-    get_args,
-    get_origin,
-    get_type_hints,
-    overload,
-)
+from typing import Any, Generic, Self, TypeVar, get_args, get_type_hints, overload
 from warnings import warn
 
 from pydantic import BaseModel, Field, RootModel, ValidationError
 
-from boilercv.morphs.morph_common import MorphCommon
+from boilercv.morphs.base import BaseMorph
 from boilercv.morphs.types import (
     RK,
     RV,
@@ -43,7 +33,7 @@ TRUNC = 200
 """Truncate representations beyond this length."""
 
 
-class Morph(RootModel[MutableMapping[K, V]], MorphCommon[K, V], Generic[K, V]):
+class Morph(RootModel[MutableMapping[K, V]], BaseMorph[K, V], Generic[K, V]):
     """Type-checked, generic, morphable mapping."""
 
     root: MutableMapping[K, V] = Field(default_factory=dict)
@@ -134,11 +124,7 @@ class Morph(RootModel[MutableMapping[K, V]], MorphCommon[K, V], Generic[K, V]):
                 if isinstance(ret_v, TypeVar) and ret_v is in_v:
                     ret_v = self_v
         return_alike = ret_k is self_k and ret_v is self_v
-        with self.thaw(validate=return_alike) as copy:
-            try:
-                result = f(copy, *args, **kwds)
-            except TypeError as err:
-                raise TypeError(f"Failed to pipe {type(self)} through {f}.") from err
+        result = f(deepcopy(self), *args, **kwds)
         if not isinstance(result, Mapping) or not result:
             return result
         if return_alike:
@@ -204,23 +190,8 @@ class Morph(RootModel[MutableMapping[K, V]], MorphCommon[K, V], Generic[K, V]):
                 )
         return None
 
-    def validate_hint(
-        self, self_hint: type, ret_hint: type | TypeVar | None, result: Iterable[Any]
-    ) -> type | Any:
-        """Validate hint."""
-        if not ret_hint or isinstance(ret_hint, TypeVar):
-            if (  # noqa: SIM114
-                get_origin(self_hint) == Literal
-                and (choices := get_args(self_hint))
-                and all(k in choices for k in result)
-            ):
-                return self_hint
-            elif all(isinstance(k, self_hint) for k in result):
-                return self_hint
-        return Any
 
-
-class BaseMorph(BaseModel, MorphCommon[Any, Any], Generic[M]):
+class MorphModel(BaseModel, BaseMorph[Any, Any], Generic[M]):
     """Base model with a morph property."""
 
     root: M
@@ -247,13 +218,5 @@ class BaseMorph(BaseModel, MorphCommon[Any, Any], Generic[M]):
         self, f: TypeType[Any, Any, P], /, *args: P.args, **kwds: P.kwargs
     ) -> Self:
         """Pipe."""
-        with self.thaw() as copy:
-            copy.root = self.root.pipe(f, *args, **kwds)
+        (copy := deepcopy(self)).root = self.root.pipe(f, *args, **kwds)
         return copy
-
-    @contextmanager
-    def thaw(self, validate: bool = True) -> Iterator[Self]:
-        """Produce a thawed copy of an instance."""
-        with super().thaw(validate) as base_copy, self.root.thaw(validate) as root_copy:
-            base_copy.root = root_copy
-            yield base_copy

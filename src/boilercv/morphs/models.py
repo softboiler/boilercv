@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from collections.abc import Iterator, Mapping, MutableMapping
-from contextlib import contextmanager
-from hashlib import sha512
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, Self, overload
 
 from pydantic import BaseModel, ConfigDict, RootModel
@@ -16,7 +14,7 @@ if TYPE_CHECKING:
     from boilercv.morphs.morphs import Morph
 
 
-class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
+class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):
     """Abstract base class for morphable mappings.
 
     Generally, you should subclass from {class}`Morph` or {class}`BaseMorph` for
@@ -82,47 +80,6 @@ class MorphCommon(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
         if mro := cls.mro():
             return mro[1] if len(mro) > 1 else mro[0]
         return object
-
-    @contextmanager
-    def thaw(self, validate: bool = False) -> Iterator[Self]:
-        """Produce a thawed copy of an instance."""
-        copy = self.model_copy()  # pyright: ignore[reportAttributeAccessIssue]
-        orig_config = copy.model_config
-        try:
-            type(copy).model_config = (
-                orig_config
-                | ConfigDict(frozen=False)
-                | (ConfigDict(validate_assignment=True) if validate else {})
-            )
-            yield copy
-        finally:
-            if validate:
-                copy.root = copy.root
-            type(copy).model_config = orig_config
-
-    @contextmanager
-    def thaw_self(self, validate: bool = True) -> Iterator[Self]:
-        """Thaw self."""
-        orig_config = self.model_config
-        try:
-            type(self).model_config = (
-                orig_config
-                | ConfigDict(frozen=False)
-                | (ConfigDict(validate_assignment=True) if validate else {})
-            )
-            yield self
-        finally:
-            type(self).model_config = orig_config
-
-    def __hash__(self):
-        # ? https://github.com/pydantic/pydantic/issues/1303#issuecomment-2052395207
-        return int.from_bytes(
-            sha512(
-                f"{self.__class__.__qualname__}::{self.model_dump_json()}".encode(  # pyright: ignore[reportAttributeAccessIssue]
-                    "utf-8", errors="ignore"
-                )
-            ).digest()
-        )
 
     # ! (([K] -> [K]) -> Self)
     @overload

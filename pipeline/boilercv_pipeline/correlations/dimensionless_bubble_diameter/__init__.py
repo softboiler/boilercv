@@ -8,13 +8,13 @@ from tomlkit import parse
 
 from boilercv.mappings.models import Repl
 from boilercv.morphs.morphs import Morph
-from boilercv_pipeline.correlations import get_solutions_in_context
-from boilercv_pipeline.correlations.annotations import Kind
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
     Param,
     solve_syms,
     syms,
 )
+from boilercv_pipeline.correlations.models import contextualize_solutions
+from boilercv_pipeline.correlations.types.runtime import Kind
 from boilercv_pipeline.types import Expectation
 
 base = Path(__file__).with_suffix(".toml")
@@ -57,12 +57,19 @@ This is the correlation with the most rapidly vanishing value of
 """
 
 
-LOCAL_SYMBOLS, EQUATIONS, SOLUTIONS, _ = get_solutions_in_context(
-    equations=loads(EQUATIONS_TOML.read_text("utf-8")),
-    solutions=loads(SOLUTIONS_TOML.read_text("utf-8")),
+_solns = contextualize_solutions(
+    equations=loads(
+        EQUATIONS_TOML.read_text("utf-8") if EQUATIONS_TOML.exists() else ""
+    ),
+    solutions=loads(
+        SOLUTIONS_TOML.read_text("utf-8") if SOLUTIONS_TOML.exists() else ""
+    ),
     symbols=syms,
     solve_for=solve_syms,
 )
+LOCAL_SYMBOLS = _solns.local_symbols
+EQUATIONS = _solns.equations
+SOLUTIONS = _solns.solutions
 
 
 def florschuetz_chao_1965(bubble_fourier, bubble_jakob):
