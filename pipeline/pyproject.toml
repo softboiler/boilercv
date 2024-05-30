@@ -28,8 +28,8 @@ dependencies = [
     "pydantic>=2.7.1",
     "pyqtgraph>=0.13.3",
     # ? Wheels are missing on Linux for PySide6, `uv` doesn't like it
-    "pyside6-addons==6.7.0; sys_platform!='linux'",
-    "pyside6-essentials==6.7.0; sys_platform!='linux'",
+    "pyside6-addons==6.7.1; sys_platform!='linux'",
+    "pyside6-essentials==6.7.1; sys_platform!='linux'",
     "ruamel.yaml>=0.17.32",
     "scikit-image>=0.21.0",
     "scipy>=1.11.1",

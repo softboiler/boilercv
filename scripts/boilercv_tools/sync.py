@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from json import dumps, loads
+from os import getenv
 from pathlib import Path
 from platform import platform
 from re import finditer
@@ -106,12 +107,21 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
     proj_compiler = Compiler(
         platform=PROJECT_PLATFORM, python_version=PROJECT_PYTHON_VERSION, high=high
     )
-    sys_compilation = proj_compilation = proj_compilation or proj_compiler.compile()
+    proj_compilation = proj_compilation or proj_compiler.compile()
+    sys_compiler = Compiler(
+        platform=SYS_PLATFORM, python_version=SYS_PYTHON_VERSION, high=high
+    )
+    sys_compilation = sys_compiler.compile(directs=proj_compilation.directs)
+    if not getenv("CI"):
+        return sys_compilation.requirements
     contents: Lock = {}
     contents["direct"] = {}
     for plat in sorted(PLATFORMS):
         for python_version in sorted(PYTHON_VERSIONS):
-            if plat == PROJECT_PLATFORM and python_version == PROJECT_PYTHON_VERSION:
+            if plat == SYS_PLATFORM and python_version == SYS_PYTHON_VERSION:
+                compiler = sys_compiler
+                compilation = sys_compilation
+            elif plat == PROJECT_PLATFORM and python_version == PROJECT_PYTHON_VERSION:
                 compiler = proj_compiler
                 compilation = proj_compilation
                 contents["direct"]["time"] = compilation.time.isoformat()
