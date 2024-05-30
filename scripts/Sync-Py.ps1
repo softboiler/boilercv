@@ -27,7 +27,7 @@ else { $msg = 'contributor environment' }
 'FINDING UV' | Write-Progress
 $uvVersionRe = Get-Content 'requirements/uv.in' | Select-String -Pattern '^uv==(.+)$'
 $uvVersion = $uvVersionRe.Matches.Groups[1].value
-if (!(Test-Path 'bin/uv*') -or !(uv --version | Select-String $uvVersion)) {
+if (!(Test-Path 'bin/uv*') -or !(bin/uv --version | Select-String $uvVersion)) {
     $Env:CARGO_HOME = '.'
     if ($IsWindows) {
         'INSTALLING UV FOR WINDOWS' | Write-Progress
@@ -57,7 +57,7 @@ else {
     $py = Get-Py $Version
     "Using $(Resolve-Path $py -Relative)" | Write-Progress -Info
 }
-uv pip install --editable=scripts
+bin/uv pip install --editable=scripts
 'TOOLS INSTALLED' | Write-Progress -Done
 
 '*** RUNNING PRE-SYNC TASKS' | Write-Progress
@@ -88,7 +88,7 @@ if (!$CI) {
 '*** PRE-SYNC DONE ***' | Write-Progress -Done
 
 'SYNCING DEPENDENCIES' | Write-Progress
-boilercv_tools compile $($High ? '--high' : '--no-high') | uv pip sync -
+boilercv_tools compile $($High ? '--high' : '--no-high') | bin/uv pip sync -
 'DEPENDENCIES SYNCED' | Write-Progress -Done
 
 '*** RUNNING POST-SYNC TASKS' | Write-Progress
