@@ -88,7 +88,7 @@ if (!$CI) {
 '*** PRE-SYNC DONE ***' | Write-Progress -Done
 
 'SYNCING DEPENDENCIES' | Write-Progress
-boilercv_tools compile $($High ? '--high' : '--no-high') | bin/uv pip sync -
+boilercv_tools compile | bin/uv pip sync -
 'DEPENDENCIES SYNCED' | Write-Progress -Done
 
 '*** RUNNING POST-SYNC TASKS' | Write-Progress
