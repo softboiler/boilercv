@@ -111,11 +111,29 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
     sys_compiler = Compiler(
         platform=SYS_PLATFORM, python_version=SYS_PYTHON_VERSION, high=high
     )
-    sys_compilation = sys_compiler.compile(directs=proj_compilation.directs)
+    sys_compilation = (
+        proj_compilation
+        if proj_compiler == sys_compiler
+        else sys_compiler.compile(directs=proj_compilation.directs)
+    )
     if not environ.get("CI"):
         return sys_compilation.requirements
     contents: Lock = {}
     contents["direct"] = {}
+    contents["direct"]["time"] = proj_compilation.time.isoformat()
+    contents["direct"]["uv"] = proj_compiler.uv
+    contents["direct"]["project_platform"] = proj_compiler.platform
+    contents["direct"]["project_python_version"] = proj_compiler.python_version
+    contents["direct"]["no_deps"] = proj_compiler.no_deps
+    contents["direct"]["high"] = proj_compiler.high
+    contents["direct"]["paths"] = tuple(p.as_posix() for p in proj_compiler.paths)
+    contents["direct"]["overrides"] = proj_compiler.overrides.as_posix()
+    contents["direct"]["directs"] = {
+        k: asdict(v) for k, v in proj_compilation.directs.items()
+    }
+    contents["direct"]["requirements"] = "\n".join([
+        f"{name}{dep.op}{dep.rev}" for name, dep in proj_compilation.directs.items()
+    ])
     for plat in sorted(PLATFORMS):
         for python_version in sorted(PYTHON_VERSIONS):
             if plat == SYS_PLATFORM and python_version == SYS_PYTHON_VERSION:
@@ -124,23 +142,6 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
             elif plat == PROJECT_PLATFORM and python_version == PROJECT_PYTHON_VERSION:
                 compiler = proj_compiler
                 compilation = proj_compilation
-                contents["direct"]["time"] = compilation.time.isoformat()
-                contents["direct"]["uv"] = compiler.uv
-                contents["direct"]["project_platform"] = compiler.platform
-                contents["direct"]["project_python_version"] = compiler.python_version
-                contents["direct"]["no_deps"] = compiler.no_deps
-                contents["direct"]["high"] = compiler.high
-                contents["direct"]["paths"] = tuple(
-                    p.as_posix() for p in compiler.paths
-                )
-                contents["direct"]["overrides"] = compiler.overrides.as_posix()
-                contents["direct"]["directs"] = {
-                    k: asdict(v) for k, v in compilation.directs.items()
-                }
-                contents["direct"]["requirements"] = "\n".join([
-                    f"{name}{dep.op}{dep.rev}"
-                    for name, dep in compilation.directs.items()
-                ])
             else:
                 compiler = Compiler(
                     platform=plat, python_version=python_version, high=high
