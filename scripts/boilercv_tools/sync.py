@@ -70,8 +70,10 @@ NODEPS = REQS / "nodeps.in"
 # ! Platforms and Python versions
 SYS_PLATFORM: Platform = platform(terse=True).casefold().split("-")[0]  # pyright: ignore[reportAssignmentType] 1.1.356
 """Platform identifier."""
+print(f"{SYS_PLATFORM=}")  # noqa: T201
 SYS_PYTHON_VERSION: PythonVersion = ".".join([str(v) for v in version_info[:2]])  # pyright: ignore[reportAssignmentType] 1.1.356
 """Python version associated with this platform."""
+print(f"{SYS_PYTHON_VERSION=}")  # noqa: T201
 PROJECT_PLATFORM: Platform = "linux"
 """This project's default compilation platform."""
 PROJECT_PYTHON_VERSION: PythonVersion = "3.11"
