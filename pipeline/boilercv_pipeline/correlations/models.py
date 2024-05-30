@@ -11,7 +11,6 @@ from boilercv.morphs.contexts import (
     ContextBaseModel,
     ContextMorph,
     Defaults,
-    LocalSymbols,
     Pipe,
     compose_contexts,
     compose_defaults,
@@ -25,7 +24,13 @@ from boilercv_pipeline.correlations.pipes import (
     set_latex_forms,
 )
 from boilercv_pipeline.correlations.types import K, S
-from boilercv_pipeline.correlations.types.runtime import Equation, Kind, eqs, kinds
+from boilercv_pipeline.correlations.types.runtime import (
+    Equation,
+    Kind,
+    LocalSymbols,
+    eqs,
+    kinds,
+)
 from boilercv_pipeline.types.runtime import Eq, Expr
 
 

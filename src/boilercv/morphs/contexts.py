@@ -4,16 +4,14 @@ from __future__ import annotations
 
 from abc import ABC
 from collections import UserDict, defaultdict
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from copy import deepcopy
 from dataclasses import dataclass, field
 from inspect import signature
 from itertools import chain
 from typing import Any, ClassVar, Generic, Self, TypeVar
 
-import sympy
 from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
-from sympy import symbols
 
 from boilercv.morphs.morphs import BaseMorph, Morph
 from boilercv.morphs.types import K, Mode, Model, S, V
@@ -84,21 +82,6 @@ def compose_pipelines(
 ) -> Context:
     """Compose defaults."""
     return compose_context(Morphs({typ: Pipelines.make(before=before, after=after)}))
-
-
-class LocalSymbols(UserDict[str, sympy.Symbol], ContextValue):
-    """Local symbols."""
-
-    @classmethod
-    def from_iterable(cls, syms: Iterable[str]):
-        """Create from an iterable of symbols."""
-        return cls(
-            zip(
-                syms,
-                symbols(syms, nonnegative=True, real=True, finite=True),
-                strict=True,
-            )
-        )
 
 
 @dataclass

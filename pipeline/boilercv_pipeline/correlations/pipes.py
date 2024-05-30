@@ -6,10 +6,10 @@ from typing import Any
 
 from boilercv.mappings import regex_replace, replace
 from boilercv.mappings.models import Repl
-from boilercv.morphs.contexts import Context, Defaults, LocalSymbols, compose_context
+from boilercv.morphs.contexts import Context, Defaults, compose_context
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.correlations.types import K
-from boilercv_pipeline.correlations.types.runtime import Kind
+from boilercv_pipeline.correlations.types.runtime import Kind, LocalSymbols
 from boilercv_pipeline.types.runtime import SympifyParams
 
 
