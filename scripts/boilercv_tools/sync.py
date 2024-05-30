@@ -249,7 +249,6 @@ class Compiler:
     ) -> Self:
         """Get locked project compiler."""
         contents = loads(get_lockfile(high).read_text("utf-8"))
-        print("Whaaa")  # noqa: T201
         return cls(
             uv=contents["direct"]["uv"],
             platform=platform or contents["direct"]["project_platform"],
