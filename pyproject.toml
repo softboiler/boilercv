@@ -45,6 +45,7 @@ ignore_errors = true
 [tool.fawltydeps]
 deps = ["pyproject.toml"]
 code = ["src"]
+ignore_undeclared = ["_typeshed"]
 
 [tool.pytest.ini_options]
 addopts = '''

@@ -4,13 +4,18 @@ from collections.abc import Iterable
 from string import whitespace
 from typing import Any
 
-from boilercv.mappings import regex_replace, replace
-from boilercv.mappings.models import Repl
-from boilercv.morphs.contexts import Context, Defaults, compose_context
+import sympy
+
+from boilercv.mappings import replace, replace_pattern, sort_by_keys_pattern
+from boilercv.mappings.types.runtime import Repl
+from boilercv.morphs.contexts import Context, Defaults, Pipe, compose_context
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.correlations.types import K
-from boilercv_pipeline.correlations.types.runtime import Kind, LocalSymbols
-from boilercv_pipeline.types.runtime import SympifyParams
+from boilercv_pipeline.correlations.types.runtime import KeysPattern, Kind, LocalSymbols
+from boilercv_pipeline.equations import keys_pattern
+from boilercv_pipeline.types.runtime import SympifyParams, contextualized
+
+identity_equation = sympy.Eq(0, 0, evaluate=False)
 
 
 def fold_whitespace(i: dict[K, str], defaults: Defaults[K, str]) -> dict[K, str]:
@@ -36,7 +41,7 @@ def set_equation_forms(
             for find, repl in {"{o}": "0", "{bo}": "b0"}.items()
         ),
     ).pipe(
-        regex_replace,
+        replace_pattern,
         (
             Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
             for sym in symbols
@@ -80,3 +85,6 @@ def get_symbolic_equations(i: dict[str, Any]) -> dict[str, Any]:
         name: i["equations"][name]["sympy"] for name in i["equations"]
     }
     return i
+
+
+sort_by_year = Pipe(contextualized(KeysPattern)(sort_by_keys_pattern), keys_pattern)

@@ -1,8 +1,10 @@
 """Runtime type annotations for bubble collapse correlations.."""
 
 from collections import UserDict
-from collections.abc import Iterable
-from typing import Literal, TypeAlias, get_args
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass
+from re import Pattern
+from typing import Any, Literal, TypeAlias, get_args
 
 from sympy import Symbol, symbols
 
@@ -11,7 +13,7 @@ from boilercv.morphs.types.runtime import ContextValue
 Kind: TypeAlias = Literal["latex", "sympy"]
 """Kind."""
 Equation: TypeAlias = Literal[
-    "akiyama_1973", "florschuetz_chao_1965", "isenberg_sideman_1970", "yuan_et_al_2009"
+    "florschuetz_chao_1965", "isenberg_sideman_1970", "akiyama_1973", "yuan_et_al_2009"
 ]
 """Equation."""
 kinds: tuple[Kind, ...] = get_args(Kind)
@@ -33,3 +35,13 @@ class LocalSymbols(UserDict[str, Symbol], ContextValue):
                 strict=True,
             )
         )
+
+
+@dataclass
+class KeysPattern(ContextValue):
+    """Keys pattern."""
+
+    pattern: Pattern[str]
+    group: str
+    apply_to_match: Callable[[str], Any] = str
+    message: str = "Match not found when sorting."

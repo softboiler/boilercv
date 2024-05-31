@@ -12,8 +12,8 @@ from tomlkit import dumps, parse
 from tomlkit.items import Table
 from tqdm import tqdm
 
-from boilercv.mappings import regex_replace
-from boilercv.mappings.models import Repl
+from boilercv.mappings import replace_pattern
+from boilercv.mappings.types.runtime import Repl
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.correlations import PIPX
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
@@ -70,7 +70,7 @@ def convert(
 ) -> Forms:
     """Convert LaTeX equation to SymPy equation."""
     sanitized_latex = i.pipe(
-        regex_replace,
+        replace_pattern,
         (
             Repl[Kind](src=latex, dst=latex, find=find, repl=repl)
             for find, repl in {r"\\left\(": "(", r"\\right\)": ")"}.items()

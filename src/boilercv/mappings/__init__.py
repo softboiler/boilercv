@@ -2,23 +2,14 @@
 
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
 from copy import deepcopy
-from re import sub
-from typing import TYPE_CHECKING, Any, TypeVar
+from re import Pattern, sub
+from typing import TYPE_CHECKING, Any
 
-from boilercv.mappings.models import Repl
-from boilercv.mappings.types import K, Leaf, MutableNode, Node
+from boilercv.mappings.types import MN, SK, K, Leaf, Node, V
+from boilercv.mappings.types.runtime import Repl
 
 if TYPE_CHECKING:
-    from boilercv.mappings.models import Repl
-
-
-def filt(
-    mapping: Mapping[Any, Any],
-    node_cond: Callable[[Node], bool] = bool,
-    leaf_cond: Callable[[Node], bool] = bool,
-) -> dict[Any, Any]:
-    """Filter nodes and leaves of a mapping recursively."""
-    return apply(mapping, node_cond=node_cond, leaf_cond=leaf_cond)
+    from boilercv.mappings.types.runtime import Repl
 
 
 def apply(
@@ -46,10 +37,47 @@ def apply(
     return filtered
 
 
-MutableNode_T = TypeVar("MutableNode_T", bound=MutableNode)
+def filt(
+    mapping: Mapping[Any, Any],
+    node_cond: Callable[[Node], bool] = bool,
+    leaf_cond: Callable[[Node], bool] = bool,
+) -> dict[Any, Any]:
+    """Filter nodes and leaves of a mapping recursively."""
+    return apply(mapping, node_cond=node_cond, leaf_cond=leaf_cond)
 
 
-def sync(reference: Node | Leaf, target: MutableNode_T | Leaf) -> MutableNode_T:
+def sort_by_keys_pattern(
+    i: Mapping[SK, V],
+    pattern: Pattern[str],
+    group: str,
+    apply_to_match: Callable[[str], Any] = str,
+    message: str = "Match not found when sorting.",
+) -> dict[SK, V]:
+    """Sort mapping by named grouping in keys pattern."""
+
+    def get_key(item: tuple[str, Any]) -> str:
+        if match := pattern.search(key := item[0]):
+            return apply_to_match(match[group])
+        raise ValueError(message.format(key=key))
+
+    return dict(sorted(i.items(), key=get_key))
+
+
+def replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
+    """Make replacements from `Repl`s."""
+    for r in repls:
+        i[r.dst] = i[r.src].replace(r.find, r.repl)
+    return dict(i)
+
+
+def replace_pattern(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
+    """Make regex replacements."""
+    for r in repls:
+        i[r.dst] = sub(r.find, r.repl, i[r.src])
+    return i
+
+
+def sync(reference: Node | Leaf, target: MN | Leaf) -> MN:
     """Sync two mappings."""
     synced = deepcopy(target)
     for key in [k for k in synced if k not in reference]:
@@ -65,22 +93,3 @@ def sync(reference: Node | Leaf, target: MutableNode_T | Leaf) -> MutableNode_T:
                 continue
         synced[key] = reference[key]
     return synced
-
-
-def write(self) -> None:
-    """Write to TOML."""
-    self.path.write_text(self.sync().as_string(), "utf-8")
-
-
-def replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
-    """Make replacements from `Repl`s."""
-    for r in repls:
-        i[r.dst] = i[r.src].replace(r.find, r.repl)
-    return dict(i)
-
-
-def regex_replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
-    """Make regex replacements."""
-    for r in repls:
-        i[r.dst] = sub(r.find, r.repl, i[r.src])
-    return i

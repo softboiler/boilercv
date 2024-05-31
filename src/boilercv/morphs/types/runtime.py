@@ -13,12 +13,8 @@ from boilercv.morphs.types import S
 if TYPE_CHECKING:
     from boilercv.morphs.contexts import Context, Pipe
 
-
-K = TypeVar("K")
 CV = TypeVar("CV", bound="ContextValue", contravariant=True)
 
-SK = TypeVar("SK")
-"""Symbol key."""
 
 # ? Pipelines
 # ? Making these runtime-checkable doesn't actually check the callable shape

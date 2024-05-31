@@ -1,13 +1,13 @@
-[akiyama_1973.beta]
-solutions = ["(1 - 1.036*Fo_0*Ja*Pr**(1/3)*Re_b0**(1/2))**0.714"]
-warnings = []
-
 [florschuetz_chao_1965.beta]
 solutions = ["1 - 4*Ja*sqrt(Fo_0/pi)"]
 warnings = []
 
 [isenberg_sideman_1970.beta]
 solutions = ["(1 - 3*Fo_0*Ja*Pr**(1/3)*Re_b0**(1/2)/(sqrt(pi)))**(2/3)"]
+warnings = []
+
+[akiyama_1973.beta]
+solutions = ["(1 - 1.036*Fo_0*Ja*Pr**(1/3)*Re_b0**(1/2))**0.714"]
 warnings = []
 
 [yuan_et_al_2009.beta]

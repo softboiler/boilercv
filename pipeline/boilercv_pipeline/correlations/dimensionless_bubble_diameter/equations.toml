@@ -1,10 +1,10 @@
-[akiyama_1973]
-latex = '\beta=(1 - 1.036 Re_\bo^{1/2} Pr^{1/3} Ja Fo_\o)^{0.714}'
-sympy = 'Eq(beta, (1 - 1.036 * Re_b0**(1/2) * Pr**(1/3) * Ja * Fo_0)**0.714)'
-
 [florschuetz_chao_1965]
 latex = '\beta = 1 - 4 \Ja \sqrt{\Fo_\o / \pi}'
 sympy = 'Eq(beta, 1 - 4 * Ja * sqrt(Fo_0 / pi))'
+
+[akiyama_1973]
+latex = '\beta=(1 - 1.036 Re_\bo^{1/2} Pr^{1/3} Ja Fo_\o)^{0.714}'
+sympy = 'Eq(beta, (1 - 1.036 * Re_b0**(1/2) * Pr**(1/3) * Ja * Fo_0)**0.714)'
 
 [isenberg_sideman_1970]
 latex = '''

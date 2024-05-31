@@ -10,7 +10,7 @@ from sympy import lambdify
 from boilercv_pipeline.correlations import dimensionless_bubble_diameter
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     EXPECTATIONS_TOML,
-    KWDS,
+    SYMBOL_EXPECTATIONS,
 )
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     equations as symbolic,
@@ -19,6 +19,14 @@ from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
 lambdify  # noqa: B018
 
 EXPECTATIONS = loads(EXPECTATIONS_TOML.read_text("utf-8"))
+SYMBOLS = {
+    "Fo_0": "bubble_fourier",
+    "Ja": "bubble_jakob",
+    "Re_b0": "bubble_initial_reynolds",
+    "Pr": "liquid_prandtl",
+    "beta": "dimensionless_bubble_diameter",
+    "pi": "pi",
+}
 
 
 @pytest.mark.parametrize(("name", "expected"), EXPECTATIONS.items())
@@ -26,9 +34,9 @@ def test_python(name, expected):
     """Equations evaluate as expected."""
     equation = getattr(dimensionless_bubble_diameter, name)
     result = equation(**{
-        kwd: value
-        for kwd, value in KWDS.items()
-        if kwd in Signature.from_callable(equation).parameters
+        SYMBOLS[kwd]: value
+        for kwd, value in SYMBOL_EXPECTATIONS.items()
+        if SYMBOLS[kwd] in Signature.from_callable(equation).parameters
     })
     assert allclose(result, expected)
 

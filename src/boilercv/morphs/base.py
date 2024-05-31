@@ -183,7 +183,7 @@ class BaseMorph(MutableMapping[K, V], ABC, Generic[K, V]):  # noqa: PLR0904
 
     def __or__(self, other) -> Self:
         if isinstance(other, Mapping):
-            return self.model_validate(self | dict(other))  # pyright: ignore[reportAttributeAccessIssue]
+            return self.model_validate(dict(self) | dict(other))  # pyright: ignore[reportAttributeAccessIssue]
         return NotImplemented
 
     def __ror__(self, other) -> Self:

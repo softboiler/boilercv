@@ -1,6 +1,6 @@
 """Static type annotations used in {mod}`morphs`."""
 
-from collections.abc import MutableMapping
+from collections.abc import Mapping, MutableMapping
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -15,14 +15,17 @@ from typing import (
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
+    from _typeshed import DataclassInstance
+
     from boilercv.morphs.morphs import Morph
 
 
 M = TypeVar("M", bound="Morph[Any, Any]")
-
 T = TypeVar("T", contravariant=True)
 R = TypeVar("R", covariant=True)
 P = ParamSpec("P")
+CVL = TypeVar("CVL", bound="DataclassInstance | Mapping[Any, Any]", contravariant=True)
+"""Context value-like type."""
 
 
 class TypeType(Protocol[T, R, P]):  # noqa: D101

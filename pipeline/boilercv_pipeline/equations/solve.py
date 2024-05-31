@@ -17,27 +17,16 @@ from tqdm import tqdm
 from boilercv.mappings import filt, sync
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
     EQUATIONS_TOML,
-    KWDS,
-    LOCAL_SYMBOLS,
     SOLUTIONS_TOML,
+    SYMBOL_EXPECTATIONS,
 )
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    params,
     solve_syms,
     syms,
 )
-from boilercv_pipeline.correlations.models import (
-    Solutions,
-    contextualize_solutions,
-    identity_equation,
-)
+from boilercv_pipeline.correlations.models import Solutions, contextualize_solutions
+from boilercv_pipeline.correlations.pipes import identity_equation
 
-SYMS_TO_PARAMS = dict(zip(syms, params, strict=True))
-"""Mapping of symbols to parameters."""
-SUBS = {sym: KWDS[SYMS_TO_PARAMS[name]] for name, sym in LOCAL_SYMBOLS.items()} | {  # pyright: ignore[reportArgumentType]
-    LOCAL_SYMBOLS[k]: v for k, v in {"Fo_0": 0, "beta": 0.5}.items()
-}
-"""Substitutions to check for nonzero solutions."""
 TIMEOUT = 5
 """Solver timeout in seconds."""
 APP = App()
@@ -53,7 +42,7 @@ def default(  # noqa: D103
     equations: Path = EQUATIONS_TOML,
     solutions: Path = SOLUTIONS_TOML,
     symbols: tuple[str, ...] = syms,
-    substitutions: tuple[float, ...] = tuple(SUBS.values()),  # pyright: ignore[reportArgumentType]
+    substitutions: tuple[float, ...] = tuple(SYMBOL_EXPECTATIONS.values()),  # pyright: ignore[reportArgumentType]
     solve_for: tuple[str, ...] = solve_syms,
     overwrite: bool = False,
 ):

@@ -6,10 +6,10 @@ from tomllib import loads
 from numpy import linspace, pi, sqrt
 from tomlkit import parse
 
-from boilercv.mappings.models import Repl
+from boilercv.mappings.types.runtime import Repl
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    Param,
+    Sym,
     solve_syms,
     syms,
 )
@@ -33,12 +33,12 @@ LATEX_REPLS = tuple(
     for find, repl in {"{0}": r"\o", "{b0}": r"\b0"}.items()
 )
 """Replacements to make after parsing LaTeX from PNGs."""
-KWDS = Morph[Param, Expectation]({
-    "bubble_fourier": linspace(start=0.0, stop=5.0e-3, num=10),
-    "bubble_jakob": 1.0,
-    "bubble_initial_reynolds": 100.0,
-    "liquid_prandtl": 1.0,
-    "dimensionless_bubble_diameter": 1.0,
+SYMBOL_EXPECTATIONS = Morph[Sym, Expectation]({
+    "Fo_0": linspace(start=0.0, stop=5.0e-3, num=10),
+    "Ja": 1.0,
+    "Re_b0": 100.0,
+    "Pr": 1.0,
+    "beta": 0.5,
     "pi": pi,
 })
 """Common keyword arguments applied to correlations.
@@ -139,6 +139,21 @@ def kalman_mori_2002(
     ) ** 0.873
 
 
+def yuan_et_al_2009(
+    bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
+):
+    """Bubble history correlation for condensation of a stagnant bubble {cite}`yuandewenCondensationHeatTransfer2009,tangReviewDirectContact2022`."""
+    return (
+        1
+        - 1.8
+        * bubble_initial_reynolds**0.5
+        * liquid_prandtl ** (1 / 3)
+        * bubble_jakob
+        * bubble_fourier
+        * (1 - 0.5 * bubble_jakob**0.1 * bubble_fourier)
+    ) ** (2 / 3)
+
+
 def lucic_mayinger_2010(
     bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
 ):
@@ -167,6 +182,20 @@ def kim_park_2011(
     ) ** 0.769
 
 
+def inaba_et_al_2013(
+    bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
+):
+    """Bubble history correlation for condensation of a stagnant bubble. {cite}`tangReviewDirectContact2022`."""
+    return (
+        1
+        - 1.1
+        * bubble_initial_reynolds**0.86
+        * liquid_prandtl ** (2 / 3)
+        * bubble_jakob**0.2
+        * bubble_fourier
+    )
+
+
 def al_issa_et_al_2014(
     bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
 ):
@@ -193,32 +222,3 @@ def tang_et_al_2016(
         * bubble_jakob**0.581
         * bubble_fourier
     ) ** 0.706
-
-
-def yuan_et_al_2009(
-    bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
-):
-    """Bubble history correlation for condensation of a stagnant bubble {cite}`yuandewenCondensationHeatTransfer2009,tangReviewDirectContact2022`."""
-    return (
-        1
-        - 1.8
-        * bubble_initial_reynolds**0.5
-        * liquid_prandtl ** (1 / 3)
-        * bubble_jakob
-        * bubble_fourier
-        * (1 - 0.5 * bubble_jakob**0.1 * bubble_fourier)
-    ) ** (2 / 3)
-
-
-def inaba_et_al_2013(
-    bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
-):
-    """Bubble history correlation for condensation of a stagnant bubble. {cite}`tangReviewDirectContact2022`."""
-    return (
-        1
-        - 1.1
-        * bubble_initial_reynolds**0.86
-        * liquid_prandtl ** (2 / 3)
-        * bubble_jakob**0.2
-        * bubble_fourier
-    )

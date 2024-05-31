@@ -20,8 +20,10 @@ from boilercv_pipeline.correlations.pipes import (
     compose_sympify_context,
     fold_whitespace,
     get_symbolic_equations,
+    identity_equation,
     set_equation_forms,
     set_latex_forms,
+    sort_by_year,
 )
 from boilercv_pipeline.correlations.types import K, S
 from boilercv_pipeline.correlations.types.runtime import (
@@ -53,6 +55,7 @@ class Equations(ContextMorph[Equation, Forms]):
             compose_defaults(
                 cls, keys=eqs, value_model=Forms, value_context=Forms.get_context()
             ),
+            compose_pipelines(cls, before=sort_by_year),
             compose_pipelines(
                 Forms,
                 after=[
@@ -112,17 +115,17 @@ class EquationSolutions(ContextMorph[Equation, SymbolSolutions[S]], Generic[S]):
     @classmethod
     def get_context(cls, symbols: Iterable[str], solve_syms: tuple[S, ...]) -> Context:
         """Get Pydantic context."""
-        return compose_defaults(
-            cls,
-            keys=eqs,
-            value_model=SymbolSolutions,
-            value_context=SymbolSolutions.get_context(
-                symbols=symbols, solve_syms=solve_syms
+        return compose_contexts(
+            compose_defaults(
+                cls,
+                keys=eqs,
+                value_model=SymbolSolutions,
+                value_context=SymbolSolutions.get_context(
+                    symbols=symbols, solve_syms=solve_syms
+                ),
             ),
+            compose_pipelines(cls, before=sort_by_year),
         )
-
-
-identity_equation = sympy.Eq(0, 0, evaluate=False)
 
 
 class SolvedEquations(ContextBaseModel, Generic[S]):
@@ -140,12 +143,17 @@ class SolvedEquations(ContextBaseModel, Generic[S]):
         """Get Pydantic context."""
         return compose_contexts(
             compose_pipelines(cls, before=get_symbolic_equations),
-            compose_defaults(
-                ContextMorph[Equation, Eq], keys=eqs, factory=lambda: identity_equation
-            ),
             Equations.get_context(symbols=symbols),
             EquationSolutions[S].get_context(symbols=symbols, solve_syms=solve_syms),
-            compose_sympify_context(symbols),  # for `Eq`
+            compose_contexts(
+                compose_defaults(
+                    ContextMorph[Equation, Eq],
+                    keys=eqs,
+                    factory=lambda: identity_equation,
+                ),
+                compose_pipelines(ContextMorph[Equation, Eq], before=sort_by_year),
+                compose_sympify_context(symbols),  # for `Eq`
+            ),
         )
 
 

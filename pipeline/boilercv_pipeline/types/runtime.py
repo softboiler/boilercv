@@ -1,8 +1,11 @@
 """Type annotations used at runtime in {mod}`boilercv_pipeline`."""
 
-from collections.abc import Callable
+from __future__ import annotations
+
+from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
-from typing import Annotated, Any, Literal, TypeAlias, TypeVar, overload
+from functools import wraps
+from typing import Annotated, Any, Literal, TypeAlias, overload
 
 import sympy
 from pydantic import (
@@ -15,29 +18,50 @@ from pydantic import (
 )
 from sympy import sympify
 
-from boilercv.morphs.types.runtime import ContextValue
-from boilercv_pipeline.types import K
+from boilercv.morphs.types import CVL
+from boilercv.morphs.types.runtime import CV, ContextValue
+from boilercv_pipeline.types import K, P, R, T, Transform
 
 # * MARK: `TypeVar`s and `TypeAlias`es for annotations
 
-CV = TypeVar("CV", bound=ContextValue, contravariant=True)
-"""Context value."""
-SK = TypeVar("SK")
-"""Symbol key."""
 
 Validator: TypeAlias = Literal["before", "wrap", "after", "plain"]
 """Validators."""
 
+
 # * MARK: Annotation parts
 
 
-def contextualize(context_value_type: type[CV]):
-    """Contextualize a function."""
+def contextualized(context_value_type: type[CVL]):
+    """Contextualize function on `context_value_type`."""
 
-    def wrapper(f) -> Callable[[Any, ValidationInfo], Any]:
-        def validator(
-            v: Callable[[str, CV, ValidationInfo], Any], info: ValidationInfo, /
-        ):
+    def contextualizer(f: Transform[T, P, R]) -> Callable[[T, CVL], R]:
+        @wraps(f)
+        def unpack_kwds(v: T, context_value: CVL) -> R:
+            if not isinstance(context_value, context_value_type):
+                raise ValueError(  # noqa: TRY004 so Pydantic catches it
+                    f"Expected context value type '{context_value_type}', got '{type(context_value)}."
+                )
+            context_mapping = (
+                context_value
+                if isinstance(context_value, Mapping)
+                else asdict(context_value)
+            )
+            return f(v, **context_mapping)  # pyright: ignore[reportCallIssue]
+
+        return unpack_kwds
+
+    return contextualizer
+
+
+def validator(context_value_type: type[CV]):
+    """Transform function expecting `context_value_type` to a Pydantic validator form.
+
+    Get {class}`~boilercv.morphs.types.runtime.ContextValue` of `context_value_type` from `ValidationInfo` and pass to function expecting `context_value_type`.
+    """
+
+    def validator_maker(f: Callable[[T, CV], R]) -> Callable[[T, ValidationInfo], R]:
+        def validate(v: T, info: ValidationInfo, /) -> R:
             key = context_value_type.name_to_snake()
             context = info.context or {}
             if not context:
@@ -55,9 +79,9 @@ def contextualize(context_value_type: type[CV]):
                 )
             return f(v, context_value)
 
-        return validator
+        return validate
 
-    return wrapper
+    return validator_maker
 
 
 @dataclass
@@ -76,7 +100,7 @@ def sympify_expr(expr: str, sympify_params: SympifyParams) -> Any:
     return sympify(expr, **asdict(sympify_params))
 
 
-validate_expr = contextualize(SympifyParams)(sympify_expr)
+validate_expr = validator(SympifyParams)(sympify_expr)
 
 VALIDATORS: dict[Validator, Any] = {
     "before": BeforeValidator,
