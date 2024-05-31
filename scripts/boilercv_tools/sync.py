@@ -95,18 +95,18 @@ def check_compilation(high: bool = False) -> str:
     old_proj_compilation = Compilation.from_lock()
     proj_compilation = Compiler(high=high, no_deps=True).compile()
     if proj_compilation.directs != old_proj_compilation.directs:
-        return lock(proj_compilation=proj_compilation)
+        return lock()
     return Compilation.from_lock(
         platform=SYS_PLATFORM, python_version=SYS_PYTHON_VERSION
     ).requirements
 
 
-def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str:
+def lock(high: bool = False) -> str:
     """Lock."""
     proj_compiler = Compiler(
         platform=PROJECT_PLATFORM, python_version=PROJECT_PYTHON_VERSION, high=high
     )
-    proj_compilation = proj_compilation or proj_compiler.compile()
+    proj_compilation = proj_compiler.compile()
     sys_compiler = Compiler(
         platform=SYS_PLATFORM, python_version=SYS_PYTHON_VERSION, high=high
     )
@@ -139,8 +139,6 @@ def lock(high: bool = False, proj_compilation: Compilation | None = None) -> str
             contents[key] = {}
             contents[key]["time"] = compilation.time.isoformat()
             contents[key]["requirements"] = compilation.requirements
-            if plat == SYS_PLATFORM and python_version == SYS_PYTHON_VERSION:
-                sys_compilation = compilation
     get_lockfile(high).write_text(
         encoding="utf-8", data=dumps(indent=2, obj=contents) + "\n"
     )
