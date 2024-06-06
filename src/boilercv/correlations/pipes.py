@@ -1,14 +1,16 @@
 """Pipes."""
 
 from collections import UserDict
-from collections.abc import Callable, Iterable
-from dataclasses import dataclass
+from collections.abc import Callable, Iterable, Mapping
+from dataclasses import asdict, dataclass
+from functools import wraps
 from re import Pattern, compile
 from string import whitespace
 from typing import Any
 
 from sympy import Symbol, symbols
 
+from boilercv.correlations.types import CVL, Kind, P, Ps, R, SympifyParams, Transform
 from boilercv.mappings import Repl, replace, replace_pattern, sort_by_keys_pattern
 from boilercv.morphs.contexts import (
     Context,
@@ -18,8 +20,6 @@ from boilercv.morphs.contexts import (
     compose_context,
 )
 from boilercv.morphs.morphs import Morph
-from boilercv_pipeline.correlations.types import Kind
-from boilercv_pipeline.types import SympifyParams, contextualized
 
 
 def fold_whitespace(
@@ -140,5 +140,28 @@ keys_pattern = KeysPattern(
     apply_to_match=lambda i: [int(n) for n in i.split("_")],
     message="Couldn't find year in equation identifier '{key}' when sorting.",
 )
+
+
+def contextualized(context_value_type: type[CVL]):
+    """Contextualize function on `context_value_type`."""
+
+    def contextualizer(f: Transform[P, Ps, R]) -> Callable[[P, CVL], R]:
+        @wraps(f)
+        def unpack_kwds(v: P, context_value: CVL) -> R:
+            if not isinstance(context_value, context_value_type):
+                raise ValueError(  # noqa: TRY004 so Pydantic catches it
+                    f"Expected context value type '{context_value_type}', got '{type(context_value)}."
+                )
+            context_mapping = (
+                context_value
+                if isinstance(context_value, Mapping)
+                else asdict(context_value)
+            )
+            return f(v, **context_mapping)  # pyright: ignore[reportCallIssue]
+
+        return unpack_kwds
+
+    return contextualizer
+
 
 sort_by_year = Pipe(contextualized(KeysPattern)(sort_by_keys_pattern), keys_pattern)

@@ -14,23 +14,18 @@ from sympy.solvers import solve
 from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
+from boilercv.correlations.models import Solutions, SolvedEquations, SymbolSolutions
+from boilercv.correlations.pipes import LocalSymbols
+from boilercv.correlations.types import Equation, trivial
 from boilercv.mappings import filt, sync
 from boilercv.morphs.contexts import Context
 from boilercv.morphs.morphs import Morph
-from boilercv_pipeline.correlations.models import (
-    Solutions,
-    SolvedEquations,
-    SymbolSolutions,
-)
-from boilercv_pipeline.correlations.pipes import LocalSymbols
-from boilercv_pipeline.correlations.types import Equation
 from boilercv_pipeline.equations import (
     default_equations,
     default_solutions,
     default_solve_syms,
     default_substitutions,
 )
-from boilercv_pipeline.types import trivial
 
 TIMEOUT = 5
 """Solver timeout in seconds."""

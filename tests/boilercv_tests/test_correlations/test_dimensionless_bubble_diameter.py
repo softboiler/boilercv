@@ -7,13 +7,11 @@ import pytest
 from numpy import allclose
 from sympy import lambdify
 
-from boilercv_pipeline.correlations import dimensionless_bubble_diameter
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
+from boilercv.correlations import dimensionless_bubble_diameter
+from boilercv.correlations import dimensionless_bubble_diameter as symbolic
+from boilercv.correlations.dimensionless_bubble_diameter import (
     EXPECTATIONS_TOML,
     SYMBOL_EXPECTATIONS,
-)
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
-    equations as symbolic,
 )
 
 lambdify  # noqa: B018

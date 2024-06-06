@@ -20,12 +20,12 @@ from numpy import any, histogram, sqrt, where
 from pandas import CategoricalDtype, DataFrame, NamedAgg
 from sparklines import sparklines
 
+from boilercv.correlations.types import NbProcess
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, Img
 from boilercv_pipeline.experiments import get_exp
 from boilercv_pipeline.models.params import PARAMS
-from boilercv_pipeline.types import NbProcess
 
 EXP = get_module_name(__spec__ or __file__)
 """Name of this experiment."""

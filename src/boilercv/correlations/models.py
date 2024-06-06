@@ -7,6 +7,15 @@ from typing import Generic, get_args
 from numpy import nan
 from pydantic import Field
 
+from boilercv.correlations.pipes import (
+    LocalSymbols,
+    compose_sympify_context,
+    fold_whitespace,
+    set_equation_forms,
+    set_latex_forms,
+    sort_by_year,
+)
+from boilercv.correlations.types import EQ, Eq, Equation, Expectation, Expr, K, Kind, S
 from boilercv.morphs.contexts import (
     Context,
     ContextBaseModel,
@@ -16,16 +25,6 @@ from boilercv.morphs.contexts import (
     compose_contexts,
     make_pipelines,
 )
-from boilercv_pipeline.correlations.pipes import (
-    LocalSymbols,
-    compose_sympify_context,
-    fold_whitespace,
-    set_equation_forms,
-    set_latex_forms,
-    sort_by_year,
-)
-from boilercv_pipeline.correlations.types import EQ, Equation, K, Kind, S
-from boilercv_pipeline.types import Eq, Expectation, Expr
 
 
 class Expectations(ContextMorph[K, Expectation], Generic[K]):

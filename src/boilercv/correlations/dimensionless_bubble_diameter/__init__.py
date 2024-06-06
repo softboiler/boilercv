@@ -6,11 +6,10 @@ from typing import get_args
 
 from numpy import linspace, pi, sqrt
 
+from boilercv.correlations.dimensionless_bubble_diameter.types import Sym
+from boilercv.correlations.models import Equations, Expectations
+from boilercv.correlations.types import Eq, Kind
 from boilercv.mappings import Repl
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import Sym
-from boilercv_pipeline.correlations.models import Equations, Expectations
-from boilercv_pipeline.correlations.types import Kind
-from boilercv_pipeline.types import Eq
 
 base = Path(__file__).with_suffix(".toml")
 EQUATIONS_TOML = base.with_stem("equations")

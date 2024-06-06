@@ -11,9 +11,9 @@ from loguru import logger
 from tomlkit import parse
 from tqdm import tqdm
 
+from boilercv.correlations import PIPX
+from boilercv.correlations.models import EquationForms, Equations, Forms
 from boilercv.mappings import Repl, replace_pattern, sync
-from boilercv_pipeline.correlations import PIPX
-from boilercv_pipeline.correlations.models import EquationForms, Equations, Forms
 from boilercv_pipeline.equations import default_equations, default_syms
 
 LATEX_PARSER = Path("scripts") / "convert_latex_to_sympy.py"

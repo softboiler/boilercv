@@ -7,8 +7,8 @@ from loguru import logger
 from PIL import Image
 from tqdm import tqdm
 
-from boilercv_pipeline.correlations import PNGS
-from boilercv_pipeline.correlations.types import Equation
+from boilercv.correlations import PNGS
+from boilercv.correlations.types import Equation
 
 
 def main():  # noqa: D103

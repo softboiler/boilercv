@@ -10,13 +10,13 @@ from loguru import logger
 from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
-from boilercv.mappings import sync
-from boilercv_pipeline.correlations import PIPX, PNGS
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
+from boilercv.correlations import PIPX, PNGS
+from boilercv.correlations.dimensionless_bubble_diameter import (
     EQUATIONS_TOML,
     LATEX_REPLS,
 )
-from boilercv_pipeline.correlations.models import Equations
+from boilercv.correlations.models import Equations
+from boilercv.mappings import sync
 from boilercv_pipeline.equations import default_syms
 
 PNG_PARSER = quote((Path("scripts") / "convert_png_to_latex.py").as_posix())

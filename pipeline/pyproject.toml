@@ -19,7 +19,6 @@ dependencies = [
     "loguru>=0.7.0",
     "matplotlib>=3.7.2",
     "numpy>=1.24.4",
-    "numpydantic>=1.0.0",
     "opencv-python-headless>=4.9.0.80",
     "pandas[hdf5,performance]>=2.0.2",
     "pillow>=10.0.0",
@@ -51,7 +50,6 @@ ignore_undeclared = [
     "boilercv_scripts",
     "boilercv_tests",
     "boilercv",
-    "_typeshed",
 ]
 ignore_unused = [
     "dvc",     # Core dependency for reproducing the pipeline

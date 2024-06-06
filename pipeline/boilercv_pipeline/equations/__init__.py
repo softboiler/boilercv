@@ -2,13 +2,13 @@
 
 from typing import cast, get_args
 
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
+from boilercv.correlations.dimensionless_bubble_diameter import (
     EQUATIONS_TOML,
     EXPECTATIONS_TOML,
     SOLUTIONS_TOML,
     SYMBOL_EXPECTATIONS,
 )
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import SolveSym
+from boilercv.correlations.dimensionless_bubble_diameter.types import SolveSym
 
 default_equations = EQUATIONS_TOML
 default_solutions = SOLUTIONS_TOML

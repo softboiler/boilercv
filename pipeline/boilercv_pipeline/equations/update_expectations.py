@@ -9,12 +9,12 @@ from cyclopts import App
 from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
+from boilercv.correlations import dimensionless_bubble_diameter
+from boilercv.correlations.models import Expectations
+from boilercv.correlations.pipes import equation_name_pattern
 from boilercv.mappings import sync
-from boilercv_pipeline.correlations import dimensionless_bubble_diameter
-from boilercv_pipeline.correlations.models import Expectations
-from boilercv_pipeline.correlations.pipes import equation_name_pattern
 from boilercv_pipeline.equations import default_expectations
-from boilercv_tests.test_equations.test_dimensionless_bubble_diameter import SYMBOLS
+from boilercv_tests.test_correlations.test_dimensionless_bubble_diameter import SYMBOLS
 
 default_substitutions = cast(
     tuple[tuple[str, float], ...],
