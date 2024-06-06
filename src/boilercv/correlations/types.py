@@ -1,4 +1,4 @@
-"""Static type annotations used in {mod}`boilercv.correlations`."""
+"""Types used in {mod}`correlations`."""
 
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
@@ -37,7 +37,8 @@ if TYPE_CHECKING:
     from _typeshed import DataclassInstance
 
 # * MARK: Type aliases
-
+Corr = Literal["beta", "nusselt"]
+"""Correlation type."""
 LiteralKeys: TypeAlias = _LiteralGenericAlias
 """Keys."""
 # ? Notebook handling

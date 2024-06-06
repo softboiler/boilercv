@@ -11,13 +11,11 @@ from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
 from boilercv.correlations import PIPX, PNGS
-from boilercv.correlations.dimensionless_bubble_diameter import (
-    EQUATIONS_TOML,
-    LATEX_REPLS,
-)
+from boilercv.correlations.dimensionless_bubble_diameter import LATEX_REPLS
 from boilercv.correlations.models import Equations
+from boilercv.correlations.types import Corr
 from boilercv.mappings import sync
-from boilercv_pipeline.equations import default_syms
+from boilercv_pipeline.equations import EQUATIONS, SYMS
 
 PNG_PARSER = quote((Path("scripts") / "convert_png_to_latex.py").as_posix())
 """Escaped path to converter script suitable for `subprocess.run` invocation."""
@@ -32,12 +30,12 @@ def main():  # noqa: D103
 
 
 @APP.default
-def default(  # noqa: D103
-    equations: Path = EQUATIONS_TOML,
-    symbols: tuple[str, ...] = default_syms,
-    overwrite: bool = False,
-):
+def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
+    symbols = SYMS[corr]
+    equations = EQUATIONS[corr]
+
     logger.info("Start converting images of equations to LaTeX.")
+
     equations_content = equations.read_text("utf-8") if equations.exists() else ""
     eqns = Equations.context_model_validate(
         obj=loads(equations_content), context=Equations.get_context(symbols=symbols)

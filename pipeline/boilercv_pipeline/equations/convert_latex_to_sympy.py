@@ -13,8 +13,9 @@ from tqdm import tqdm
 
 from boilercv.correlations import PIPX
 from boilercv.correlations.models import EquationForms, Equations, Forms
+from boilercv.correlations.types import Corr
 from boilercv.mappings import Repl, replace_pattern, sync
-from boilercv_pipeline.equations import default_equations, default_syms
+from boilercv_pipeline.equations import EQUATIONS, SYMS
 
 LATEX_PARSER = Path("scripts") / "convert_latex_to_sympy.py"
 """Isolated LaTeX parser."""
@@ -26,10 +27,10 @@ def main():  # noqa: D103
     APP()
 
 
-@APP.default
-def default(  # noqa: D103
-    equations: Path = default_equations, symbols: tuple[str, ...] = default_syms
-):
+def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103, ARG001
+    symbols = SYMS[corr]
+    equations = EQUATIONS[corr]
+
     logger.info("Start converting LaTeX expressions to SymPy expressions.")
 
     # ? Don't process strings

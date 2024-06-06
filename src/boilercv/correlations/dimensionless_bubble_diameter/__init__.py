@@ -1,4 +1,4 @@
-"""Morphs."""
+"""Dimensionless bubble diameter correlations for subcooled boiling bubble collapse."""
 
 from pathlib import Path
 from tomllib import loads

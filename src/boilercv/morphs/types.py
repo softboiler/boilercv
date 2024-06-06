@@ -1,4 +1,4 @@
-"""Static type annotations used in {mod}`morphs`."""
+"""Types used in {mod}`morphs`."""
 
 from collections.abc import Callable, MutableMapping
 from typing import (

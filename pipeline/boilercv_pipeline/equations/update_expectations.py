@@ -1,7 +1,6 @@
 """Update expected results for the response of each correlation to `KWDS`."""
 
 from inspect import Signature, getmembers, isfunction
-from pathlib import Path
 from tomllib import loads
 from typing import cast
 
@@ -12,8 +11,9 @@ from tqdm import tqdm
 from boilercv.correlations import dimensionless_bubble_diameter
 from boilercv.correlations.models import Expectations
 from boilercv.correlations.pipes import equation_name_pattern
+from boilercv.correlations.types import Corr
 from boilercv.mappings import sync
-from boilercv_pipeline.equations import default_expectations
+from boilercv_pipeline.equations import EXPECTATIONS, SUBSTITUTIONS
 from boilercv_tests.test_correlations.test_dimensionless_bubble_diameter import SYMBOLS
 
 default_substitutions = cast(
@@ -32,11 +32,10 @@ def main():  # noqa: D103
 
 
 @APP.default
-def default(  # noqa: D103
-    expectations: Path = default_expectations,
-    substitutions: tuple[tuple[str, float], ...] = default_substitutions,
-    overwrite: bool = False,
-):
+def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
+    expectations = EXPECTATIONS[corr]
+    substitutions = SUBSTITUTIONS[corr]
+
     content = expectations.read_text("utf-8") if expectations.exists() else ""
     expec = Expectations[str](loads(content))
     for name, correlation in tqdm([

@@ -2,20 +2,31 @@
 
 from typing import cast, get_args
 
-from boilercv.correlations.dimensionless_bubble_diameter import (
-    EQUATIONS_TOML,
-    EXPECTATIONS_TOML,
-    SOLUTIONS_TOML,
-    SYMBOL_EXPECTATIONS,
-)
+from boilercv.correlations import dimensionless_bubble_diameter, nusselt
 from boilercv.correlations.dimensionless_bubble_diameter.types import SolveSym
 
-default_equations = EQUATIONS_TOML
-default_solutions = SOLUTIONS_TOML
-default_expectations = EXPECTATIONS_TOML
-_overridden_symbol_expectations = SYMBOL_EXPECTATIONS | {"Fo_0": 0.0}
-default_substitutions = cast(
-    tuple[tuple[str, float], ...], tuple((_overridden_symbol_expectations).items())
-)
-default_syms = tuple(_overridden_symbol_expectations.keys())
-default_solve_syms = get_args(SolveSym)
+_expectations = {
+    "beta": dimensionless_bubble_diameter.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
+    "nusselt": nusselt.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
+}
+
+EQUATIONS = {
+    "beta": dimensionless_bubble_diameter.EQUATIONS_TOML,
+    "nusselt": nusselt.EQUATIONS_TOML,
+}
+SOLUTIONS = {
+    "beta": dimensionless_bubble_diameter.SOLUTIONS_TOML,
+    "nusselt": nusselt.SOLUTIONS_TOML,
+}
+EXPECTATIONS = {
+    "beta": dimensionless_bubble_diameter.EXPECTATIONS_TOML,
+    "nusselt": nusselt.EXPECTATIONS_TOML,
+}
+SUBSTITUTIONS = {
+    corr: cast(tuple[tuple[str, float], ...], tuple(expectations.items()))
+    for corr, expectations in _expectations.items()
+}
+SYMS = {
+    corr: tuple(expectations.keys()) for corr, expectations in _expectations.items()
+}
+SOLVE_SYMS = {"beta": get_args(SolveSym), "nusselt": get_args(SolveSym)}

@@ -1,6 +1,5 @@
 """Solve equations."""
 
-from pathlib import Path
 from re import sub
 from tomllib import loads
 from warnings import catch_warnings, filterwarnings
@@ -16,16 +15,11 @@ from tqdm import tqdm
 
 from boilercv.correlations.models import Solutions, SolvedEquations, SymbolSolutions
 from boilercv.correlations.pipes import LocalSymbols
-from boilercv.correlations.types import Equation, trivial
+from boilercv.correlations.types import Corr, Equation, trivial
 from boilercv.mappings import filt, sync
 from boilercv.morphs.contexts import Context
 from boilercv.morphs.morphs import Morph
-from boilercv_pipeline.equations import (
-    default_equations,
-    default_solutions,
-    default_solve_syms,
-    default_substitutions,
-)
+from boilercv_pipeline.equations import EQUATIONS, SOLUTIONS, SOLVE_SYMS, SUBSTITUTIONS
 
 TIMEOUT = 5
 """Solver timeout in seconds."""
@@ -38,13 +32,12 @@ def main():  # noqa: D103
 
 
 @APP.default
-def default(  # noqa: D103
-    equations: Path = default_equations,
-    solutions: Path = default_solutions,
-    substitutions: tuple[tuple[str, float], ...] = default_substitutions,
-    solve_for: tuple[str, ...] = default_solve_syms,
-    overwrite: bool = False,
-):
+def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
+    equations = EQUATIONS[corr]
+    solutions = SOLUTIONS[corr]
+    substitutions = SUBSTITUTIONS[corr]
+    solve_for = SOLVE_SYMS[corr]
+
     logger.info("Start generating symbolic equations.")
 
     # ? Produce equations and solutions model
