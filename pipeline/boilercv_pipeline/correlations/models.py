@@ -1,9 +1,10 @@
 """Bubble collapse correlation models."""
 
 from collections.abc import Iterable
-from typing import Any, Generic, NamedTuple, cast
+from functools import partial
+from typing import Generic, get_args
 
-import sympy
+from numpy import nan
 from pydantic import Field
 
 from boilercv.morphs.contexts import (
@@ -13,53 +14,42 @@ from boilercv.morphs.contexts import (
     Defaults,
     Pipe,
     compose_contexts,
-    compose_defaults,
     compose_pipelines,
 )
 from boilercv_pipeline.correlations.pipes import (
+    LocalSymbols,
     compose_sympify_context,
     fold_whitespace,
-    get_symbolic_equations,
-    identity_equation,
     set_equation_forms,
     set_latex_forms,
     sort_by_year,
 )
-from boilercv_pipeline.correlations.types import K, S
-from boilercv_pipeline.correlations.types.runtime import (
-    Equation,
-    Kind,
-    LocalSymbols,
-    eqs,
-    kinds,
-)
-from boilercv_pipeline.types.runtime import Eq, Expr
+from boilercv_pipeline.correlations.types import EQ, Equation, K, Kind, S
+from boilercv_pipeline.types import Eq, Expectation, Expr
+
+
+class Expectations(ContextMorph[K, Expectation], Generic[K]):
+    """Expectations."""
+
+    @classmethod
+    def get_context(cls) -> Context:
+        """Get Pydantic context."""
+        Keys, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
+        return cls.compose_defaults(keys=get_args(Keys), value=nan)
 
 
 class Forms(ContextMorph[Kind, str]):
     """Forms."""
 
     @classmethod
-    def get_context(cls) -> Context:
-        """Get context."""
-        return compose_defaults(cls, keys=kinds, value="")
-
-
-class Equations(ContextMorph[Equation, Forms]):
-    """Equations."""
-
-    @classmethod
     def get_context(cls, symbols: Iterable[str]) -> Context:
         """Get context."""
         return compose_contexts(
-            compose_defaults(
-                cls, keys=eqs, value_model=Forms, value_context=Forms.get_context()
-            ),
-            compose_pipelines(cls, before=sort_by_year),
+            cls.compose_defaults(value=""),
             compose_pipelines(
-                Forms,
-                after=[
-                    Pipe(fold_whitespace, Defaults(keys=kinds)),
+                cls,
+                before=[
+                    Pipe(fold_whitespace, Defaults(keys=get_args(Kind))),
                     Pipe(set_equation_forms, LocalSymbols.from_iterable(symbols)),
                 ],
             ),
@@ -70,14 +60,67 @@ class Params(ContextMorph[K, Forms], Generic[K]):
     """Parameters."""
 
     @classmethod
-    def get_context(cls, default_keys: tuple[K, ...]) -> Context:
+    def get_context(cls, symbols: Iterable[str]) -> Context:
         """Get Pydantic context."""
         return compose_contexts(
-            compose_defaults(cls, keys=default_keys, value_model=Forms),
+            cls.compose_defaults(value_context=Forms.get_context(symbols=symbols)),
+            compose_pipelines(Forms, after=[set_latex_forms]),
+        )
+
+
+def prep_equation_forms(i: dict[Kind, str], context: Context) -> dict[Kind, str]:
+    """Prepare equation forms."""
+    return (Forms.context_model_validate(i, context=context)).model_dump()
+
+
+class EquationForms(ContextBaseModel, Generic[EQ]):
+    """Equation forms."""
+
+    latex: str
+    """LaTeX form."""
+    sympy: EQ
+    """Symbolic form."""
+
+    @classmethod
+    def get_context(
+        cls, symbols: Iterable[str] | None = None, forms_context: Context | None = None
+    ) -> Context:
+        """Get context."""
+        symbols = symbols or ()
+        forms_context = forms_context or Forms.get_context(symbols=symbols)
+        return compose_contexts(
             compose_pipelines(
-                Forms,
-                after=[Pipe(fold_whitespace, Defaults(keys=kinds)), set_latex_forms],
+                cls, before=partial(prep_equation_forms, context=forms_context)
             ),
+            forms_context,
+        )
+
+
+class Equations(ContextMorph[Equation, EquationForms[EQ]], Generic[EQ]):
+    """Equations."""
+
+    @classmethod
+    def get_context(
+        cls, symbols: Iterable[str] | None = None, forms_context: Context | None = None
+    ) -> Context:
+        """Get context."""
+        symbols = symbols or ()
+        sympify_context = compose_sympify_context(symbols)  # If `EQ` is `Eq`
+        Eq_, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
+        k, _ = cls.morph_get_inner_types()
+        return compose_contexts(
+            cls.compose_defaults(
+                keys=get_args(k),
+                value_context=EquationForms[Eq_].get_context(
+                    symbols=symbols,
+                    forms_context=compose_contexts(
+                        forms_context or Forms.get_context(symbols=symbols),
+                        sympify_context,
+                    ),
+                ),
+            ),
+            compose_pipelines(cls, before=sort_by_year),
+            sympify_context,
         )
 
 
@@ -99,12 +142,13 @@ class SymbolSolutions(ContextMorph[S, Solutions], Generic[S]):
     """Solutions for given symbols."""
 
     @classmethod
-    def get_context(cls, symbols: Iterable[str], solve_syms: tuple[S, ...]) -> Context:
+    def get_context(
+        cls, symbols: Iterable[str], solve_syms: tuple[str, ...] | None = None
+    ) -> Context:
         """Get Pydantic context."""
-        return compose_defaults(
-            cls,
-            keys=solve_syms,
-            value_model=Solutions,
+        SolveSyms, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
+        return cls.compose_defaults(
+            keys=solve_syms or get_args(SolveSyms),
             value_context=Solutions.get_context(symbols=symbols),
         )
 
@@ -113,16 +157,16 @@ class EquationSolutions(ContextMorph[Equation, SymbolSolutions[S]], Generic[S]):
     """Equation solutions."""
 
     @classmethod
-    def get_context(cls, symbols: Iterable[str], solve_syms: tuple[S, ...]) -> Context:
+    def get_context(
+        cls, symbols: Iterable[str], solve_syms: tuple[str, ...] | None = None
+    ) -> Context:
         """Get Pydantic context."""
+        SolveSyms, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
         return compose_contexts(
-            compose_defaults(
-                cls,
-                keys=eqs,
-                value_model=SymbolSolutions,
-                value_context=SymbolSolutions.get_context(
+            cls.compose_defaults(
+                value_context=SymbolSolutions[SolveSyms].get_context(
                     symbols=symbols, solve_syms=solve_syms
-                ),
+                )
             ),
             compose_pipelines(cls, before=sort_by_year),
         )
@@ -131,57 +175,23 @@ class EquationSolutions(ContextMorph[Equation, SymbolSolutions[S]], Generic[S]):
 class SolvedEquations(ContextBaseModel, Generic[S]):
     """Solved equations."""
 
-    equations: Equations
+    equations: Equations[Eq]
     """Equations."""
     solutions: EquationSolutions[S]
     """Solutions."""
-    symbolic_equations: ContextMorph[Equation, Eq]
-    """Symbolic form of equations."""
 
     @classmethod
-    def get_context(cls, symbols: Iterable[str], solve_syms: tuple[S, ...]) -> Context:
+    def get_context(
+        cls, symbols: Iterable[str], solve_syms: tuple[str, ...]
+    ) -> Context:
         """Get Pydantic context."""
+        SolveSyms, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
         return compose_contexts(
-            compose_pipelines(cls, before=get_symbolic_equations),
-            Equations.get_context(symbols=symbols),
-            EquationSolutions[S].get_context(symbols=symbols, solve_syms=solve_syms),
-            compose_contexts(
-                compose_defaults(
-                    ContextMorph[Equation, Eq],
-                    keys=eqs,
-                    factory=lambda: identity_equation,
-                ),
-                compose_pipelines(ContextMorph[Equation, Eq], before=sort_by_year),
-                compose_sympify_context(symbols),  # for `Eq`
+            Equations[Eq].get_context(
+                symbols=symbols,
+                forms_context=compose_contexts(Forms.get_context(symbols)),
+            ),
+            EquationSolutions[SolveSyms].get_context(
+                symbols=symbols, solve_syms=solve_syms
             ),
         )
-
-
-class ContextualizedSolutions(NamedTuple, Generic[S]):
-    """Contextualized solutions."""
-
-    local_symbols: LocalSymbols
-    equations: Equations
-    solutions: EquationSolutions[S]
-    symbolic_equations: dict[Equation, sympy.Eq]
-
-
-def contextualize_solutions(
-    equations: dict[str, Any],
-    solutions: dict[str, Any],
-    symbols: tuple[str, ...],
-    solve_for: tuple[str, ...],
-) -> ContextualizedSolutions[str]:
-    """Get equations and their solutions."""
-    solved_equations = SolvedEquations.context_model_validate(
-        dict(equations=equations, solutions=solutions),
-        context=SolvedEquations.get_context(symbols=symbols, solve_syms=solve_for),
-    )
-    return ContextualizedSolutions(
-        local_symbols=LocalSymbols.from_iterable(symbols),
-        equations=solved_equations.equations,
-        solutions=solved_equations.solutions,
-        symbolic_equations=cast(
-            dict[Equation, sympy.Eq], dict(solved_equations.symbolic_equations)
-        ),
-    )

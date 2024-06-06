@@ -1,8 +1,7 @@
 """Static type annotations used in {mod}`morphs`."""
 
-from collections.abc import Mapping, MutableMapping
+from collections.abc import MutableMapping
 from typing import (
-    TYPE_CHECKING,
     Any,
     Literal,
     NamedTuple,
@@ -10,22 +9,18 @@ from typing import (
     Protocol,
     TypeAlias,
     TypeVar,
+    _LiteralGenericAlias,  # pyright: ignore[reportAttributeAccessIssue]
 )
 
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from _typeshed import DataclassInstance
-
-    from boilercv.morphs.morphs import Morph
-
-
-M = TypeVar("M", bound="Morph[Any, Any]")
 T = TypeVar("T", contravariant=True)
 R = TypeVar("R", covariant=True)
 P = ParamSpec("P")
-CVL = TypeVar("CVL", bound="DataclassInstance | Mapping[Any, Any]", contravariant=True)
-"""Context value-like type."""
+
+
+class TypeType2(Protocol[R, P]):  # noqa: D101
+    def __call__(self, i: Any, /, *args: P.args, **kwds: P.kwargs) -> R: ...  # noqa: D102
 
 
 class TypeType(Protocol[T, R, P]):  # noqa: D101
@@ -89,6 +84,10 @@ class Types(NamedTuple):
 
 S = TypeVar("S")
 Model = TypeVar("Model", bound=BaseModel)
+ModelType = TypeVar("ModelType", bound=type[BaseModel])
 
 Mode: TypeAlias = Literal["before", "after"]
 """Mode."""
+
+LiteralKeys: TypeAlias = _LiteralGenericAlias
+"""Keys."""

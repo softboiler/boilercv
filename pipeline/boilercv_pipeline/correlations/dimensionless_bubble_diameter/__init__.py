@@ -2,20 +2,15 @@
 
 from pathlib import Path
 from tomllib import loads
+from typing import get_args
 
 from numpy import linspace, pi, sqrt
-from tomlkit import parse
 
 from boilercv.mappings.types.runtime import Repl
-from boilercv.morphs.morphs import Morph
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    Sym,
-    solve_syms,
-    syms,
-)
-from boilercv_pipeline.correlations.models import contextualize_solutions
-from boilercv_pipeline.correlations.types.runtime import Kind
-from boilercv_pipeline.types import Expectation
+from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import Sym
+from boilercv_pipeline.correlations.models import Equations, Expectations
+from boilercv_pipeline.correlations.types import Kind
+from boilercv_pipeline.types import Eq
 
 base = Path(__file__).with_suffix(".toml")
 EQUATIONS_TOML = base.with_stem("equations")
@@ -24,23 +19,22 @@ EXPECTATIONS_TOML = base.with_stem("expectations")
 """TOML file with expectations."""
 SOLUTIONS_TOML = base.with_stem("solutions")
 """TOML file with solutions."""
-EXPECTATIONS = parse(EXPECTATIONS_TOML.read_text("utf-8"))
-"""Expected results for the response of each correlation to `KWDS`."""
-MAKE_RAW = {'"': "'", r"\\": "\\"}
-"""Replacement to turn escaped characters back to their raw form. Should be last."""
 LATEX_REPLS = tuple(
     Repl[Kind](src="latex", dst="latex", find=find, repl=repl)
     for find, repl in {"{0}": r"\o", "{b0}": r"\b0"}.items()
 )
 """Replacements to make after parsing LaTeX from PNGs."""
-SYMBOL_EXPECTATIONS = Morph[Sym, Expectation]({
-    "Fo_0": linspace(start=0.0, stop=5.0e-3, num=10),
-    "Ja": 1.0,
-    "Re_b0": 100.0,
-    "Pr": 1.0,
-    "beta": 0.5,
-    "pi": pi,
-})
+SYMBOL_EXPECTATIONS = Expectations[Sym].context_model_validate(
+    obj={
+        "Fo_0": linspace(start=0.0, stop=5.0e-3, num=10),
+        "Ja": 1.0,
+        "Re_b0": 100.0,
+        "Pr": 1.0,
+        "beta": 0.5,
+        "pi": pi,
+    },
+    context=Expectations[Sym].get_context(),
+)
 """Common keyword arguments applied to correlations.
 
 A single test condition has been chosen to exercise each correlation across as wide of a
@@ -57,19 +51,11 @@ This is the correlation with the most rapidly vanishing value of
 """
 
 
-_solns = contextualize_solutions(
-    equations=loads(
-        EQUATIONS_TOML.read_text("utf-8") if EQUATIONS_TOML.exists() else ""
-    ),
-    solutions=loads(
-        SOLUTIONS_TOML.read_text("utf-8") if SOLUTIONS_TOML.exists() else ""
-    ),
-    symbols=syms,
-    solve_for=solve_syms,
-)
-LOCAL_SYMBOLS = _solns.local_symbols
-EQUATIONS = _solns.equations
-SOLUTIONS = _solns.solutions
+def get_equations() -> Equations[Eq]:  # noqa: D103
+    return Equations[Eq].context_model_validate(
+        obj=loads(EQUATIONS_TOML.read_text("utf-8") if EQUATIONS_TOML.exists() else ""),
+        context=Equations[Eq].get_context(symbols=get_args(Sym)),
+    )
 
 
 def florschuetz_chao_1965(bubble_fourier, bubble_jakob):

@@ -89,7 +89,7 @@ def sync(reference: Node | Leaf, target: MN | Leaf) -> MN:
             if isinstance(reference[key], dict) and isinstance(
                 synced[key], MutableMapping
             ):
-                sync(reference[key], synced[key])
+                synced[key] = sync(reference[key], synced[key])
                 continue
         synced[key] = reference[key]
     return synced

@@ -41,7 +41,7 @@ OTHER = _Other(OTHER_DICT)
 
 # ! Note that `TypeAlias`es cannot be `Generic`, e.g. they don't support `TypeVar`s.
 class _GenericMorph(Morph[K, V], Generic[K, V]): ...
-GENERIC_MORPH = _GenericMorph(ANY_MAP)
+GENERIC_MORPH = _GenericMorph[Any, Any](ANY_MAP)
 
 # ! Descriptions
 _SubSelfMorph: TypeAlias = _GenericMorph[Fruit, str]
@@ -278,16 +278,15 @@ return_matching_maps: list[ReturnMatchingMap] = [
     morph_morph,
     morph_self,
     self_self,
-    self_any,
     other_dict,
 ]
 return_mismatched_maps: list[ReturnMismatchedMap] = [
     map_any,
     dict_any,
+    self_any,
     morph_any,
-    morph1_self2,
-    self1_self2,
 ]
+return_other_morph: list[ReturnMismatchedMap] = [morph1_self2, self1_self2]
 take_fruits_return_other = [list_int_str]
 take_strs_return_other = [list_str_int]
 
@@ -313,23 +312,21 @@ def test_pipe_returns_other_from_not_mappings(f: Pipe):
     assert SELF.pipe(f) == f(SELF)
 
 
-@pytest.mark.xfail(reason="Test does not test for the desired behavior.")
 @pytest.mark.parametrize("f", take_fruits_return_other)
 def test_pipe_returns_self_from_mismatched_keys(f: TakeFruitsReturnOther):
     """Pipe produces mismatched keys wrapped in instances of its class."""
     result = SELF.pipe_keys(f)
-    k, v = result.get_inner_types()
+    k, v = result.morph_get_inner_types()
     assert result == Morph[k, v](
         dict(zip(f(list(SELF.keys())), SELF.values(), strict=False))
     )
 
 
-@pytest.mark.xfail(reason="Test does not test for the desired behavior.")
 @pytest.mark.parametrize("f", take_strs_return_other)
 def test_pipe_returns_base_from_mismatched_values(f: TakeIntsReturnOther):
     """Pipe produces mismatched values wrapped in instances of its base."""
     result = SELF.pipe_values(f)
-    k, v = result.get_inner_types()
+    k, v = result.morph_get_inner_types()
     assert result == Morph[k, v](
         dict(zip(SELF.keys(), f(list(SELF.values())), strict=False))
     )
@@ -341,10 +338,16 @@ def test_pipe_returns_self_from_matching_map(f: Pipe):
     assert SELF.pipe(f) == _Self(f(SELF))
 
 
-@pytest.mark.xfail(reason="Test does not test for the desired behavior.")
 @pytest.mark.parametrize("f", return_mismatched_maps)
 def test_pipe_returns_base_from_mismatched_map(f: Pipe):
     """Pipe produces mismatched mappings wrapped in nearest instances."""
     result = SELF.pipe(f)
-    k, v = result.get_inner_types()
+    k, v = result.morph_get_inner_types()
     assert result == Morph[k, v](f(SELF))
+
+
+@pytest.mark.parametrize("f", return_other_morph)
+def test_pipe_returns_other_morph(f: Pipe):
+    """Pipe produces other morphs."""
+    result = SELF.pipe(f)
+    assert result == OTHER_MORPH

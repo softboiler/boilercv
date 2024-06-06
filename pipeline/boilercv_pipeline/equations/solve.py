@@ -15,17 +15,22 @@ from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
 from boilercv.mappings import filt, sync
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter import (
-    EQUATIONS_TOML,
-    SOLUTIONS_TOML,
-    SYMBOL_EXPECTATIONS,
+from boilercv.morphs.contexts import Context
+from boilercv.morphs.morphs import Morph
+from boilercv_pipeline.correlations.models import (
+    Solutions,
+    SolvedEquations,
+    SymbolSolutions,
 )
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    solve_syms,
-    syms,
+from boilercv_pipeline.correlations.pipes import LocalSymbols
+from boilercv_pipeline.correlations.types import Equation
+from boilercv_pipeline.equations import (
+    default_equations,
+    default_solutions,
+    default_solve_syms,
+    default_substitutions,
 )
-from boilercv_pipeline.correlations.models import Solutions, contextualize_solutions
-from boilercv_pipeline.correlations.pipes import identity_equation
+from boilercv_pipeline.types import trivial
 
 TIMEOUT = 5
 """Solver timeout in seconds."""
@@ -39,43 +44,92 @@ def main():  # noqa: D103
 
 @APP.default
 def default(  # noqa: D103
-    equations: Path = EQUATIONS_TOML,
-    solutions: Path = SOLUTIONS_TOML,
-    symbols: tuple[str, ...] = syms,
-    substitutions: tuple[float, ...] = tuple(SYMBOL_EXPECTATIONS.values()),  # pyright: ignore[reportArgumentType]
-    solve_for: tuple[str, ...] = solve_syms,
+    equations: Path = default_equations,
+    solutions: Path = default_solutions,
+    substitutions: tuple[tuple[str, float], ...] = default_substitutions,
+    solve_for: tuple[str, ...] = default_solve_syms,
     overwrite: bool = False,
 ):
     logger.info("Start generating symbolic equations.")
-    solutions_content = solutions.read_text("utf-8") if solutions.exists() else ""
-    syms, _, solns, eqns = contextualize_solutions(
-        equations=loads(equations.read_text("utf-8") if equations.exists() else ""),
-        solutions=loads(solutions_content),
-        symbols=symbols,
-        solve_for=solve_for,
+
+    # ? Produce equations and solutions model
+    eqns_content = loads(equations.read_text("utf-8") if equations.exists() else "")
+    solns_content = solutions.read_text("utf-8") if solutions.exists() else ""
+    symbols = tuple(dict(substitutions).keys())
+    context = SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_for)
+    model = SolvedEquations[str].context_model_validate(
+        dict(equations=eqns_content, solutions=loads(solns_content)), context=context
     )
-    subs = dict(zip(syms.keys(), substitutions, strict=True))
-    for name, eq in tqdm(eqns.items()):
-        if not overwrite and eq != identity_equation and filt(solns[name].model_dump()):
-            continue
-        for sym in solve_for:
-            solns[name][sym] = solve_equation(eq=eq, sym=syms[sym], substitutions=subs)
+
+    # ? Solve equations
     solutions.write_text(
         encoding="utf-8",
         data=(
             sync(
-                reference=solns.model_dump(mode="json"),
-                target=TOMLDocument() if overwrite else parse(solutions_content),
+                reference=model.solutions.context_pipe(
+                    solve_equations,
+                    context,
+                    equations={
+                        name: eq["sympy"]
+                        for name, eq in model.equations.model_dump().items()
+                    },
+                    substitutions=dict(substitutions),
+                    solve_for=solve_for,
+                    overwrite=overwrite,
+                    symbols=LocalSymbols.from_iterable(symbols),
+                    context=context,
+                ).model_dump(mode="json"),
+                target=TOMLDocument() if overwrite else parse(solns_content),
             )
         ).as_string(),
     )
     logger.info("Finish generating symbolic equations.")
 
 
+def solve_equations(
+    solutions: Morph[Equation, SymbolSolutions[str]],
+    equations: dict[Equation, sympy.Eq],
+    substitutions: dict[str, float],
+    solve_for: tuple[str, ...],
+    overwrite: bool,
+    symbols: LocalSymbols,
+    context: Context,
+) -> Morph[Equation, SymbolSolutions[str]]:
+    """Solve equations."""
+    for name, eq in tqdm(equations.items()):
+        filtered_solutions = filt(solutions[name].model_dump())
+        if eq == trivial or (not overwrite and filtered_solutions):
+            continue
+        solutions[name] = solutions[name].context_pipe(
+            solve_equation,
+            context,
+            equation=eq,
+            substitutions=substitutions,
+            solve_for=solve_for,
+            symbols=symbols,
+        )
+    return solutions
+
+
 def solve_equation(
+    solutions: dict[str, Solutions],
+    equation: sympy.Eq,
+    substitutions: dict[str, float],
+    solve_for: tuple[str, ...],
+    symbols: LocalSymbols,
+) -> dict[str, Solutions]:
+    """Solve equation."""
+    for sym in solve_for:
+        solutions[sym] = solve_for_symbol(
+            eq=equation, sym=symbols[sym], substitutions=substitutions
+        )
+    return solutions
+
+
+def solve_for_symbol(
     eq: sympy.Eq, sym: sympy.Symbol, substitutions: dict[str, float]
 ) -> Solutions:
-    """Find solution."""
+    """Solve equation."""
     soln = Solutions()
     if eq.lhs is sym and sym not in eq.rhs.free_symbols:
         soln.solutions.append(eq.rhs)

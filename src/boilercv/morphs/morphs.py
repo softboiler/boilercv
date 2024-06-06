@@ -2,22 +2,27 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping, MutableMapping
-from copy import deepcopy
+from collections.abc import Iterator, Mapping, MutableMapping
 from types import GenericAlias
-from typing import Any, Generic, Self, TypeVar, get_args, get_type_hints, overload
-from warnings import warn
+from typing import (
+    Any,
+    ClassVar,
+    Generic,
+    Self,
+    TypeVar,
+    get_args,
+    get_type_hints,
+    overload,
+)
 
-from pydantic import BaseModel, Field, RootModel, ValidationError
+from pydantic import ConfigDict, Field, RootModel, ValidationError, model_validator
 
-from boilercv.morphs.base import BaseMorph
 from boilercv.morphs.types import (
     RK,
     RV,
     DictDict,
     DictType,
     K,
-    M,
     MapMap,
     MapType,
     P,
@@ -28,20 +33,30 @@ from boilercv.morphs.types import (
     TypeType,
     V,
 )
+from boilercv.morphs.types.runtime import HasModelDump
 
 TRUNC = 200
 """Truncate representations beyond this length."""
 
 
-class Morph(RootModel[MutableMapping[K, V]], BaseMorph[K, V], Generic[K, V]):
+def get_morph_hint(
+    in_hint: type, out_hint: type | TypeVar | None = None
+) -> type | None:
+    """Handle missing and {attr}`~typing.TypeVar` hints."""
+    if in_hint is out_hint:
+        return in_hint
+    if not out_hint or isinstance(out_hint, TypeVar):
+        return in_hint
+    return out_hint
+
+
+class Morph(RootModel[MutableMapping[K, V]], MutableMapping[K, V], Generic[K, V]):  # noqa: PLR0904
     """Type-checked, generic, morphable mapping."""
 
     root: MutableMapping[K, V] = Field(default_factory=dict)
     """Type-checked dictionary as the root data."""
-
-    @classmethod
-    def fromkeys(cls, iterable, value=None):  # noqa: D102
-        return cls(dict.fromkeys(iterable, value))
+    model_config: ClassVar = ConfigDict(protected_namespaces=("model_", "morph_"))
+    """Root configuration, merged with subclass configs."""
 
     def __repr__(self):
         root = str(self.root)
@@ -51,14 +66,155 @@ class Morph(RootModel[MutableMapping[K, V]], BaseMorph[K, V], Generic[K, V]):
             else f"{type(self).__name__}({self.root})"
         )
 
-    def __iter__(self):  # pyright: ignore[reportIncompatibleMethodOverride]  # Iterate over `root` instead of `self`.
-        """Iterate over root mapping."""
-        return iter(self.root)
-
     @classmethod
-    def get_inner_types(cls) -> Types:
+    def morph_get_inner_types(cls) -> Types:
         """Get types of the keys and values."""
-        return Types(*get_args(cls.model_fields["root"].annotation))  # pyright: ignore[reportAttributeAccessIssue]
+        return Types(*get_args(cls.model_fields["root"].annotation))
+
+    @model_validator(mode="before")
+    @classmethod
+    def morph_check_parametrized(cls, morph):
+        """Qualify."""
+        if cls.__pydantic_generic_metadata__["parameters"]:
+            raise ValueError("Cannot instantiate generic morphs.")
+        return morph
+
+    # ! (([K, V] -> [K, V]) -> Self)
+    @overload
+    def context_pipe(
+        self,
+        f: MapMap[K, V, K, V, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> Self: ...
+    @overload
+    def context_pipe(
+        self,
+        f: DictDict[K, V, K, V, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> Self: ...
+    # ! ((Self -> [K, V]) -> Self)
+    @overload
+    def context_pipe(
+        self,
+        f: TypeMap[Self, K, V, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> Self: ...
+    @overload
+    def context_pipe(
+        self,
+        f: TypeDict[Self, K, V, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> Self: ...
+    # ! ((Self -> [RK, RV]) -> Morph[RK, RV])
+    @overload
+    def context_pipe(
+        self,
+        f: TypeMap[Self, RK, RV, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> Morph[RK, RV]: ...
+    @overload
+    def context_pipe(
+        self,
+        f: TypeDict[Self, RK, RV, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> Morph[RK, RV]: ...
+    # ! (([K, V] -> R) -> R)
+    @overload
+    def context_pipe(
+        self,
+        f: MapType[K, V, R, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> R: ...
+    @overload
+    def context_pipe(
+        self,
+        f: DictType[K, V, R, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> R: ...
+    # ! ((Self -> Self) -> Self)
+    @overload
+    def context_pipe(
+        self,
+        f: TypeType[Self, Self, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> Self: ...
+    # ! ((Self -> R) -> R)
+    @overload
+    def context_pipe(
+        self,
+        f: TypeType[Self, R, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> R: ...
+    # ! ((Any -> Any) -> Any)
+    def context_pipe(
+        self,
+        f: TypeType[Any, Any, P],
+        morph_context: Mapping[str, Any],
+        /,
+        *args: P.args,
+        **kwds: P.kwargs,
+    ) -> Self | Morph[Any, Any] | Any:
+        """Pipe with context."""
+        context = dict(morph_context)
+        self_k, self_v = self.morph_get_inner_types()
+        out_k, out_v = (Any, Any)
+        if (type_hints := get_type_hints(f)) and (hint := type_hints.get("return")):
+            hints = get_args(hint)
+            if hints and len(hints) == 2:
+                out_k, out_v = Types(*hints)
+            elif not isinstance(hint, GenericAlias) and issubclass(hint, Morph):
+                out_k, out_v = hint.morph_get_inner_types()
+        try:
+            copy = self.model_validate(obj=self, context=context)
+        except (ValidationError, TypeError, ValueError):
+            copy = self.model_copy(deep=True)
+        result = f(copy, *args, **kwds)
+        result = (
+            result.model_dump(warnings="none")
+            if isinstance(result, HasModelDump)
+            else result
+        )
+        if not isinstance(result, Mapping) or not result:
+            return result
+        k = get_morph_hint(self_k, out_k) or Any
+        v = get_morph_hint(self_v, out_v) or Any
+        if Types(k, v) == self.morph_get_inner_types():
+            return self.model_validate(obj=dict(result), context=context)
+        try:
+            return Morph[k, v].model_validate(obj=dict(result), context=context)
+        except (ValidationError, TypeError, ValueError):
+            pass
+        return result
 
     # ! (([K, V] -> [K, V]) -> Self)
     @overload
@@ -109,114 +265,100 @@ class Morph(RootModel[MutableMapping[K, V]], BaseMorph[K, V], Generic[K, V]):
         self, f: TypeType[Any, Any, P], /, *args: P.args, **kwds: P.kwargs
     ) -> Self | Morph[Any, Any] | Any:
         """Pipe."""
-        self_k, self_v = self.get_inner_types()
-        ret_k = ret_v = None
-        if (
-            len(hints := get_type_hints(f)) > 1
-            and (first_hint := next(iter(get_type_hints(f).values())))
-            and (in_hint := self.get_hint(first_hint))
-        ):
-            in_k, in_v = in_hint
-            if ret_hint := self.get_hint(hints.get("return")):
-                ret_k, ret_v = ret_hint
-                if isinstance(ret_k, TypeVar) and ret_k is in_k:
-                    ret_k = self_k
-                if isinstance(ret_v, TypeVar) and ret_v is in_v:
-                    ret_v = self_v
-        return_alike = ret_k is self_k and ret_v is self_v
-        result = f(deepcopy(self), *args, **kwds)
-        if not isinstance(result, Mapping) or not result:
-            return result
-        if return_alike:
-            return self.validate_nearest(result, ret_k, ret_v)
-        if all(ret and not isinstance(ret, TypeVar) for ret in (ret_k, ret_v)):
-            return self.validate_nearest(result, ret_k, ret_v)
-        return self.validate_nearest(
-            result,
-            self.validate_hint(self_k, ret_k, result.keys()),
-            self.validate_hint(self_v, ret_v, result.values()),
-        )
+        return self.context_pipe(f, {}, *args, **kwds)
 
-    def validate_nearest(
-        self, result: Self | Mapping[Any, Any], k: type | None, v: type | None
-    ) -> Self | Mapping[Any, Any]:
-        """Try validating against own, registered, or parent models, or just return."""
-        if k and v and Types(k, v) == self.get_inner_types():
-            try:
-                return self.model_validate(result)
-            except ValidationError:
-                pass
-        for morph in self.registered_morphs:
-            meta = morph.__pydantic_generic_metadata__
-            concrete = not meta["origin"]
-            ret_k, ret_v = k, v
-            if not concrete:
-                morph_k, morph_v = meta["args"]
-                ret_k = k if isinstance(morph_k, TypeVar) else morph_k
-                ret_v = v if isinstance(morph_v, TypeVar) else morph_v
-            try:
-                return (
-                    morph.model_validate(result)
-                    if concrete
-                    else morph[ret_k, ret_v].model_validate(result)
-                )
-            except ValidationError:
-                pass
-        base = previous_base = self
-        while (get_parent := getattr(base, "get_parent", None)) and (
-            (base := get_parent()) is not previous_base
-        ):
-            try:
-                return base[k, v](result)
-            except ValidationError:
-                previous_base = base
-                continue
-        return result
+    # ! (([K] -> [K]) -> Self)
+    @overload
+    def pipe_keys(
+        self, f: TypeType[list[K], list[K], P], /, *args: P.args, **kwds: P.kwargs
+    ) -> Self: ...
+    # ! (([K] -> [RK]) -> Morph[RK, V])
+    @overload
+    def pipe_keys(
+        self, f: TypeType[list[K], list[RK], P], /, *args: P.args, **kwds: P.kwargs
+    ) -> Morph[RK, V]: ...
+    # ! (([K] -> [Any]) -> Self | Morph[Any, V]
+    def pipe_keys(
+        self, f: TypeType[list[K], list[Any], P], /, *args: P.args, **kwds: P.kwargs
+    ) -> Self | Morph[Any, V]:
+        """Pipe, morphing keys."""
 
-    def get_hint(self, hint: Any) -> Types | None:
-        """Get hint."""
-        hints = get_args(hint)
-        if not hints:
-            return None
-        if len(hints) == 2:
-            return Types(*hints)
-        if not isinstance(hint, GenericAlias):
-            if issubclass(hint, Morph):
-                return hint.get_inner_types()
-            if not issubclass(hint, Mapping):
-                warn(
-                    f"Function to pipe {type(self)} through has input {hint} that doesn't appear to take a mapping.",
-                    stacklevel=2,
-                )
-        return None
+        def pipe(_, *args: P.args, **kwds: P.kwargs):
+            return dict(
+                zip(f(list(self.keys()), *args, **kwds), self.values(), strict=False)
+            )
 
+        return self.pipe(pipe, *args, **kwds)
 
-class MorphModel(BaseModel, BaseMorph[Any, Any], Generic[M]):
-    """Base model with a morph property."""
+    # ! (([V] -> [V]) -> Self)
+    @overload
+    def pipe_values(
+        self, f: TypeType[list[V], list[V], P], /, *args: P.args, **kwds: P.kwargs
+    ) -> Self: ...
+    # ! (([V] -> [RV]) -> Morph[K, RV])
+    @overload
+    def pipe_values(
+        self, f: TypeType[list[V], list[RV], P], /, *args: P.args, **kwds: P.kwargs
+    ) -> Morph[K, RV]: ...
+    # ! (([V] -> [Any]) -> Self | Morph[K, Any]
+    def pipe_values(
+        self, f: TypeType[list[V], list[Any], P], /, *args: P.args, **kwds: P.kwargs
+    ) -> Self | Morph[K, Any]:
+        """Pipe, morphing values."""
 
-    root: M
-    """Morphable mapping."""
+        def pipe(_, *args: P.args, **kwds: P.kwargs):
+            return dict(
+                zip(self.keys(), f(list(self.values()), *args, **kwds), strict=False)
+            )
 
-    def __repr__(self):
-        root = str(self.root.root)
-        return (
-            f"{type(self).__name__}(" + root[:TRUNC] + "...)"
-            if len(root) > TRUNC
-            else f"{type(self).__name__}({self.root})"
-        )
+        return self.pipe(pipe, *args, **kwds)
 
-    def __iter__(self):  # pyright: ignore[reportIncompatibleMethodOverride]  # Iterate over `root` instead of `self`.
-        """Iterate over root mapping."""
-        return iter(self.root)
+    # `MutableMapping` methods adapted from `collections.UserDict`, but with `data`
+    # replaced by `root`and `hasattr` guard changed to equivalent `getattr(..., None)`
+    # pattern in `__getitem__`. This is done to prevent inheriting directly from
+    # `UserDict`, which doesn't play nicely with `pydantic.RootModel`.
+    # Source: https://github.com/python/cpython/blob/7d7eec595a47a5cd67ab420164f0059eb8b9aa28/Lib/collections/__init__.py#L1121-L1211
 
     @classmethod
-    def get_inner_types(cls):
-        """Get types of the keys and values."""
-        return cls.model_fields["root"].annotation.get_inner_types()  # pyright: ignore[reportOptionalMemberAccess]
+    def fromkeys(cls, iterable, value=None):  # noqa: D102
+        return cls(dict.fromkeys(iterable, value))
 
-    def pipe(
-        self, f: TypeType[Any, Any, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Self:
-        """Pipe."""
-        (copy := deepcopy(self)).root = self.root.pipe(f, *args, **kwds)
-        return copy
+    def __len__(self):
+        return len(self.root)
+
+    def __getitem__(self, key: K) -> V:
+        if key in self.root:
+            return self.root[key]
+        if missing := getattr(self.__class__, "__missing__", None):
+            return missing(self, key)
+        raise KeyError(key)
+
+    def __iter__(self) -> Iterator[K]:  # pyright: ignore[reportIncompatibleMethodOverride] iterate over `root` instead of `self`
+        return iter(self.root)
+
+    def __setitem__(self, key: K, item: V):
+        self.root[key] = item
+
+    def __delitem__(self, key: K):
+        del self.root[key]
+
+    # Modify __contains__ to work correctly when __missing__ is present
+    def __contains__(self, key: K):  # pyright: ignore[reportIncompatibleMethodOverride]
+        return key in self.root
+
+    def __or__(self, other: HasModelDump | Mapping[Any, Any] | Any) -> Self:
+        if isinstance(other, Mapping) and isinstance(other, HasModelDump):
+            return self.model_construct(self.model_dump() | other.model_dump())
+        if isinstance(other, Mapping):
+            return self.model_construct(self.model_dump() | other)
+        return NotImplemented
+
+    def __ror__(self, other: HasModelDump | Mapping[Any, Any] | Any) -> Self:
+        if isinstance(other, Mapping) and isinstance(other, HasModelDump):
+            return self.model_construct(other.model_dump() | self.model_dump())
+        if isinstance(other, Mapping):
+            return self.model_construct(other | self.model_dump())
+        return NotImplemented
+
+    def __ior__(self, other) -> Self:
+        return self | other

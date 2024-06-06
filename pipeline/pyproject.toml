@@ -51,6 +51,7 @@ ignore_undeclared = [
     "boilercv_scripts",
     "boilercv_tests",
     "boilercv",
+    "_typeshed",
 ]
 ignore_unused = [
     "dvc",     # Core dependency for reproducing the pipeline
