@@ -11,8 +11,7 @@ from loguru import logger
 from tomlkit import parse
 from tqdm import tqdm
 
-from boilercv.mappings import replace_pattern, sync
-from boilercv.mappings.types.runtime import Repl
+from boilercv.mappings import Repl, replace_pattern, sync
 from boilercv_pipeline.correlations import PIPX
 from boilercv_pipeline.correlations.models import EquationForms, Equations, Forms
 from boilercv_pipeline.equations import default_equations, default_syms
@@ -43,7 +42,7 @@ def default(  # noqa: D103
     parsed_eqns = (
         Equations[str]
         .context_model_validate(obj=loads(equations_content), context=context)
-        .context_pipe(parse_equations, context)
+        .morph_cpipe(parse_equations, context)
     )
 
     # ? Update the TOML file with changes

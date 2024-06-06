@@ -9,11 +9,15 @@ from typing import Any
 
 from sympy import Symbol, symbols
 
-from boilercv.mappings import replace, replace_pattern, sort_by_keys_pattern
-from boilercv.mappings.types.runtime import Repl
-from boilercv.morphs.contexts import Context, Defaults, Pipe, compose_context
+from boilercv.mappings import Repl, replace, replace_pattern, sort_by_keys_pattern
+from boilercv.morphs.contexts import (
+    Context,
+    ContextValue,
+    Defaults,
+    Pipe,
+    compose_context,
+)
 from boilercv.morphs.morphs import Morph
-from boilercv.morphs.types.runtime import ContextValue
 from boilercv_pipeline.correlations.types import Kind
 from boilercv_pipeline.types import SympifyParams, contextualized
 
@@ -24,7 +28,7 @@ def fold_whitespace(
     """Fold whitespace."""
     return (
         forms.model_validate(obj=forms)
-        .pipe(
+        .morph_pipe(
             replace,
             (
                 Repl[Kind](src=key, dst=key, find=find, repl=" ")
@@ -32,7 +36,7 @@ def fold_whitespace(
                 for key in defaults.keys
             ),
         )
-        .pipe(
+        .morph_pipe(
             replace_pattern,
             (
                 Repl[Kind](src=key, dst=key, find=r"\s+", repl=r" ")
@@ -63,14 +67,14 @@ def set_equation_forms(
     """Set equation forms."""
     return (
         forms.model_validate(obj=forms)
-        .pipe(
+        .morph_pipe(
             replace,
             (
                 Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
                 for find, repl in {"{o}": "0", "{bo}": "b0"}.items()
             ),
         )
-        .pipe(
+        .morph_pipe(
             replace_pattern,
             (
                 Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
@@ -92,7 +96,7 @@ def set_latex_forms(forms: Morph[Kind, str]) -> Morph[Kind, str]:
     """Set forms for parameters."""
     if forms["sympy"] and not forms["latex"]:
         forms["latex"] = forms["sympy"]
-    forms = forms.pipe(
+    forms = forms.morph_pipe(
         replace,
         repls=[
             Repl[Kind](src="latex", dst="sympy", find=k, repl=v)

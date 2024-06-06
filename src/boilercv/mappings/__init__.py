@@ -3,13 +3,9 @@
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
 from copy import deepcopy
 from re import Pattern, sub
-from typing import TYPE_CHECKING, Any
+from typing import Any, Generic, NamedTuple
 
-from boilercv.mappings.types import MN, SK, K, Leaf, Node, V
-from boilercv.mappings.types.runtime import Repl
-
-if TYPE_CHECKING:
-    from boilercv.mappings.types.runtime import Repl
+from boilercv.mappings.types import MN, SK, K, Leaf, Node, T, V
 
 
 def apply(
@@ -61,6 +57,19 @@ def sort_by_keys_pattern(
         raise ValueError(message.format(key=key))
 
     return dict(sorted(i.items(), key=get_key))
+
+
+class Repl(NamedTuple, Generic[T]):
+    """Contents of `dst` to replace with `src`, with `find` substrings replaced with `repl`."""
+
+    src: T
+    """Source identifier."""
+    dst: T
+    """Destination identifier."""
+    find: str
+    """Find this in the source."""
+    repl: str
+    """Replacement for what was found."""
 
 
 def replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:

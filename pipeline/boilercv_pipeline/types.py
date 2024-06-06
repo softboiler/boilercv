@@ -32,21 +32,10 @@ from pydantic import (
 from sympy import sympify
 from sympy.logic.boolalg import BooleanAtom
 
-from boilercv.morphs.types.runtime import ContextValue
+from boilercv.morphs.contexts import ContextValue
 
 if TYPE_CHECKING:
     from _typeshed import DataclassInstance
-
-T = TypeVar("T", contravariant=True)
-R = TypeVar("R", covariant=True)
-P = ParamSpec("P")
-K = TypeVar("K")
-V = TypeVar("V")
-
-CV = TypeVar("CV", bound=ContextValue, contravariant=True)
-
-CVL = TypeVar("CVL", bound="DataclassInstance | Mapping[Any, Any]", contravariant=True)
-"""Context value-like type."""
 
 # ? Notebook handling
 NbProcess: TypeAlias = Callable[[Path, SimpleNamespace], None]
@@ -65,8 +54,24 @@ Expectation: TypeAlias = float | NDArray[Vector, float]  # pyright: ignore[repor
 """Expectation."""
 
 
-class Transform(Protocol[T, P, R]):  # noqa: D101
-    def __call__(self, i: T, /, *args: P.args, **kwds: P.kwargs) -> R: ...  # noqa: D102
+P = TypeVar("P", contravariant=True)
+"""Contravariant type to represent parameters."""
+R = TypeVar("R", covariant=True)
+"""Covariant type to represent returns."""
+Ps = ParamSpec("Ps")
+"""Parameter type specification."""
+K = TypeVar("K")
+"""Key type."""
+V = TypeVar("V")
+"""Value type."""
+CV = TypeVar("CV", bound=ContextValue, contravariant=True)
+"""Context value type."""
+CVL = TypeVar("CVL", bound="DataclassInstance | Mapping[Any, Any]", contravariant=True)
+"""Context value-like type."""
+
+
+class Transform(Protocol[P, Ps, R]):  # noqa: D101
+    def __call__(self, i: P, /, *args: Ps.args, **kwds: Ps.kwargs) -> R: ...  # noqa: D102
 
 
 def StrSerializer(  # noqa: N802; Can't inherit from frozen
@@ -133,9 +138,9 @@ LiteralKeys: TypeAlias = _LiteralGenericAlias
 def contextualized(context_value_type: type[CVL]):
     """Contextualize function on `context_value_type`."""
 
-    def contextualizer(f: Transform[T, P, R]) -> Callable[[T, CVL], R]:
+    def contextualizer(f: Transform[P, Ps, R]) -> Callable[[P, CVL], R]:
         @wraps(f)
-        def unpack_kwds(v: T, context_value: CVL) -> R:
+        def unpack_kwds(v: P, context_value: CVL) -> R:
             if not isinstance(context_value, context_value_type):
                 raise ValueError(  # noqa: TRY004 so Pydantic catches it
                     f"Expected context value type '{context_value_type}', got '{type(context_value)}."
@@ -158,8 +163,8 @@ def validator(context_value_type: type[CV]):
     Get {class}`~boilercv.morphs.types.runtime.ContextValue` of `context_value_type` from `ValidationInfo` and pass to function expecting `context_value_type`.
     """
 
-    def validator_maker(f: Callable[[T, CV], R]) -> Callable[[T, ValidationInfo], R]:
-        def validate(v: T, info: ValidationInfo, /) -> R:
+    def validator_maker(f: Callable[[P, CV], R]) -> Callable[[P, ValidationInfo], R]:
+        def validate(v: P, info: ValidationInfo, /) -> R:
             key = context_value_type.name_to_snake()
             context = info.context or {}
             if not context:

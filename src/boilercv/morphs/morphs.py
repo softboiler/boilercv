@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Iterator, Mapping, MutableMapping
-from types import GenericAlias
+from contextlib import suppress
 from typing import (
     Any,
     ClassVar,
@@ -22,10 +22,11 @@ from boilercv.morphs.types import (
     RV,
     DictDict,
     DictType,
+    HasModelDump,
     K,
     MapMap,
     MapType,
-    P,
+    Ps,
     R,
     TypeDict,
     TypeMap,
@@ -33,21 +34,9 @@ from boilercv.morphs.types import (
     TypeType,
     V,
 )
-from boilercv.morphs.types.runtime import HasModelDump
 
 TRUNC = 200
 """Truncate representations beyond this length."""
-
-
-def get_morph_hint(
-    in_hint: type, out_hint: type | TypeVar | None = None
-) -> type | None:
-    """Handle missing and {attr}`~typing.TypeVar` hints."""
-    if in_hint is out_hint:
-        return in_hint
-    if not out_hint or isinstance(out_hint, TypeVar):
-        return in_hint
-    return out_hint
 
 
 class Morph(RootModel[MutableMapping[K, V]], MutableMapping[K, V], Generic[K, V]):  # noqa: PLR0904
@@ -81,123 +70,121 @@ class Morph(RootModel[MutableMapping[K, V]], MutableMapping[K, V], Generic[K, V]
 
     # ! (([K, V] -> [K, V]) -> Self)
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: MapMap[K, V, K, V, P],
+        f: MapMap[K, V, K, V, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self: ...
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: DictDict[K, V, K, V, P],
+        f: DictDict[K, V, K, V, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self: ...
     # ! ((Self -> [K, V]) -> Self)
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: TypeMap[Self, K, V, P],
+        f: TypeMap[Self, K, V, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self: ...
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: TypeDict[Self, K, V, P],
+        f: TypeDict[Self, K, V, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self: ...
     # ! ((Self -> [RK, RV]) -> Morph[RK, RV])
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: TypeMap[Self, RK, RV, P],
+        f: TypeMap[Self, RK, RV, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Morph[RK, RV]: ...
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: TypeDict[Self, RK, RV, P],
+        f: TypeDict[Self, RK, RV, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Morph[RK, RV]: ...
     # ! (([K, V] -> R) -> R)
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: MapType[K, V, R, P],
+        f: MapType[K, V, R, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> R: ...
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: DictType[K, V, R, P],
+        f: DictType[K, V, R, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> R: ...
     # ! ((Self -> Self) -> Self)
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: TypeType[Self, Self, P],
+        f: TypeType[Self, Self, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self: ...
     # ! ((Self -> R) -> R)
     @overload
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: TypeType[Self, R, P],
+        f: TypeType[Self, R, Ps],
         morph_context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> R: ...
     # ! ((Any -> Any) -> Any)
-    def context_pipe(
+    def morph_cpipe(
         self,
-        f: TypeType[Any, Any, P],
-        morph_context: Mapping[str, Any],
+        f: TypeType[Any, Any, Ps],
+        context: Mapping[str, Any],
         /,
-        *args: P.args,
-        **kwds: P.kwargs,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self | Morph[Any, Any] | Any:
         """Pipe with context."""
-        context = dict(morph_context)
+        context = dict(context)
         self_k, self_v = self.morph_get_inner_types()
         out_k, out_v = (Any, Any)
         if (type_hints := get_type_hints(f)) and (hint := type_hints.get("return")):
             hints = get_args(hint)
             if hints and len(hints) == 2:
                 out_k, out_v = Types(*hints)
-            elif not isinstance(hint, GenericAlias) and issubclass(hint, Morph):
-                out_k, out_v = hint.morph_get_inner_types()
-        try:
-            copy = self.model_validate(obj=self, context=context)
-        except (ValidationError, TypeError, ValueError):
-            copy = self.model_copy(deep=True)
+            with suppress(TypeError):
+                if issubclass(hint, Morph):
+                    out_k, out_v = hint.morph_get_inner_types()
+        copy = self.model_validate(obj=self.model_dump(), context=context)
         result = f(copy, *args, **kwds)
         result = (
             result.model_dump(warnings="none")
@@ -206,112 +193,177 @@ class Morph(RootModel[MutableMapping[K, V]], MutableMapping[K, V], Generic[K, V]
         )
         if not isinstance(result, Mapping) or not result:
             return result
+        result = dict(result)
         k = get_morph_hint(self_k, out_k) or Any
         v = get_morph_hint(self_v, out_v) or Any
         if Types(k, v) == self.morph_get_inner_types():
-            return self.model_validate(obj=dict(result), context=context)
-        try:
-            return Morph[k, v].model_validate(obj=dict(result), context=context)
-        except (ValidationError, TypeError, ValueError):
-            pass
+            return self.model_validate(obj=result, context=context)
+        with suppress(ValidationError, TypeError, ValueError):
+            return Morph[k, v].model_validate(obj=result, context=context)
         return result
-
-    # ! (([K, V] -> [K, V]) -> Self)
-    @overload
-    def pipe(
-        self, f: MapMap[K, V, K, V, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Self: ...
-    @overload
-    def pipe(
-        self, f: DictDict[K, V, K, V, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Self: ...
-    # ! ((Self -> [K, V]) -> Self)
-    @overload
-    def pipe(
-        self, f: TypeMap[Self, K, V, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Self: ...
-    @overload
-    def pipe(
-        self, f: TypeDict[Self, K, V, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Self: ...
-    # ! ((Self -> [RK, RV]) -> Morph[RK, RV])
-    @overload
-    def pipe(
-        self, f: TypeMap[Self, RK, RV, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Morph[RK, RV]: ...
-    @overload
-    def pipe(
-        self, f: TypeDict[Self, RK, RV, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Morph[RK, RV]: ...
-    # ! (([K, V] -> R) -> R)
-    @overload
-    def pipe(self, f: MapType[K, V, R, P], /, *args: P.args, **kwds: P.kwargs) -> R: ...
-    @overload
-    def pipe(
-        self, f: DictType[K, V, R, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> R: ...
-    # ! ((Self -> Self) -> Self)
-    @overload
-    def pipe(
-        self, f: TypeType[Self, Self, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Self: ...
-    # ! ((Self -> R) -> R)
-    @overload
-    def pipe(
-        self, f: TypeType[Self, R, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> R: ...
-    # ! ((Any -> Any) -> Any)
-    def pipe(
-        self, f: TypeType[Any, Any, P], /, *args: P.args, **kwds: P.kwargs
-    ) -> Self | Morph[Any, Any] | Any:
-        """Pipe."""
-        return self.context_pipe(f, {}, *args, **kwds)
 
     # ! (([K] -> [K]) -> Self)
     @overload
-    def pipe_keys(
-        self, f: TypeType[list[K], list[K], P], /, *args: P.args, **kwds: P.kwargs
+    def morph_ckpipe(
+        self,
+        f: TypeType[list[K], list[K], Ps],
+        context: Mapping[str, Any],
+        /,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self: ...
     # ! (([K] -> [RK]) -> Morph[RK, V])
     @overload
-    def pipe_keys(
-        self, f: TypeType[list[K], list[RK], P], /, *args: P.args, **kwds: P.kwargs
+    def morph_ckpipe(
+        self,
+        f: TypeType[list[K], list[RK], Ps],
+        context: Mapping[str, Any],
+        /,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Morph[RK, V]: ...
     # ! (([K] -> [Any]) -> Self | Morph[Any, V]
-    def pipe_keys(
-        self, f: TypeType[list[K], list[Any], P], /, *args: P.args, **kwds: P.kwargs
+    def morph_ckpipe(
+        self,
+        f: TypeType[list[K], list[Any], Ps],
+        context: Mapping[str, Any],
+        /,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self | Morph[Any, V]:
         """Pipe, morphing keys."""
 
-        def pipe(_, *args: P.args, **kwds: P.kwargs):
+        def pipe(_, *args: Ps.args, **kwds: Ps.kwargs):
             return dict(
                 zip(f(list(self.keys()), *args, **kwds), self.values(), strict=False)
             )
 
-        return self.pipe(pipe, *args, **kwds)
+        return self.morph_cpipe(pipe, context, *args, **kwds)
 
     # ! (([V] -> [V]) -> Self)
     @overload
-    def pipe_values(
-        self, f: TypeType[list[V], list[V], P], /, *args: P.args, **kwds: P.kwargs
+    def morph_cvpipe(
+        self,
+        f: TypeType[list[V], list[V], Ps],
+        context: Mapping[str, Any],
+        /,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self: ...
     # ! (([V] -> [RV]) -> Morph[K, RV])
     @overload
-    def pipe_values(
-        self, f: TypeType[list[V], list[RV], P], /, *args: P.args, **kwds: P.kwargs
+    def morph_cvpipe(
+        self,
+        f: TypeType[list[V], list[RV], Ps],
+        context: Mapping[str, Any],
+        /,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Morph[K, RV]: ...
     # ! (([V] -> [Any]) -> Self | Morph[K, Any]
-    def pipe_values(
-        self, f: TypeType[list[V], list[Any], P], /, *args: P.args, **kwds: P.kwargs
+    def morph_cvpipe(
+        self,
+        f: TypeType[list[V], list[Any], Ps],
+        context: Mapping[str, Any],
+        /,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
     ) -> Self | Morph[K, Any]:
         """Pipe, morphing values."""
 
-        def pipe(_, *args: P.args, **kwds: P.kwargs):
+        def pipe(_, *args: Ps.args, **kwds: Ps.kwargs):
             return dict(
                 zip(self.keys(), f(list(self.values()), *args, **kwds), strict=False)
             )
 
-        return self.pipe(pipe, *args, **kwds)
+        return self.morph_cpipe(pipe, context, *args, **kwds)
+
+    # ! (([K, V] -> [K, V]) -> Self)
+    @overload
+    def morph_pipe(
+        self, f: MapMap[K, V, K, V, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self: ...
+    @overload
+    def morph_pipe(
+        self, f: DictDict[K, V, K, V, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self: ...
+    # ! ((Self -> [K, V]) -> Self)
+    @overload
+    def morph_pipe(
+        self, f: TypeMap[Self, K, V, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self: ...
+    @overload
+    def morph_pipe(
+        self, f: TypeDict[Self, K, V, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self: ...
+    # ! ((Self -> [RK, RV]) -> Morph[RK, RV])
+    @overload
+    def morph_pipe(
+        self, f: TypeMap[Self, RK, RV, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Morph[RK, RV]: ...
+    @overload
+    def morph_pipe(
+        self, f: TypeDict[Self, RK, RV, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Morph[RK, RV]: ...
+    # ! (([K, V] -> R) -> R)
+    @overload
+    def morph_pipe(
+        self, f: MapType[K, V, R, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> R: ...
+    @overload
+    def morph_pipe(
+        self, f: DictType[K, V, R, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> R: ...
+    # ! ((Self -> Self) -> Self)
+    @overload
+    def morph_pipe(
+        self, f: TypeType[Self, Self, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self: ...
+    # ! ((Self -> R) -> R)
+    @overload
+    def morph_pipe(
+        self, f: TypeType[Self, R, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> R: ...
+    # ! ((Any -> Any) -> Any)
+    def morph_pipe(
+        self, f: TypeType[Any, Any, Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self | Morph[Any, Any] | Any:
+        """Pipe."""
+        return self.morph_cpipe(f, {}, *args, **kwds)
+
+    # ! (([K] -> [K]) -> Self)
+    @overload
+    def morph_kpipe(
+        self, f: TypeType[list[K], list[K], Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self: ...
+    # ! (([K] -> [RK]) -> Morph[RK, V])
+    @overload
+    def morph_kpipe(
+        self, f: TypeType[list[K], list[RK], Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Morph[RK, V]: ...
+    # ! (([K] -> [Any]) -> Self | Morph[Any, V]
+    def morph_kpipe(
+        self, f: TypeType[list[K], list[Any], Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self | Morph[Any, V]:
+        """Pipe, morphing keys."""
+        return self.morph_ckpipe(f, {}, *args, **kwds)
+
+    # ! (([V] -> [V]) -> Self)
+    @overload
+    def morph_vpipe(
+        self, f: TypeType[list[V], list[V], Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self: ...
+    # ! (([V] -> [RV]) -> Morph[K, RV])
+    @overload
+    def morph_vpipe(
+        self, f: TypeType[list[V], list[RV], Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Morph[K, RV]: ...
+    # ! (([V] -> [Any]) -> Self | Morph[K, Any]
+    def morph_vpipe(
+        self, f: TypeType[list[V], list[Any], Ps], /, *args: Ps.args, **kwds: Ps.kwargs
+    ) -> Self | Morph[K, Any]:
+        """Pipe, morphing values."""
+        return self.morph_cvpipe(f, {}, *args, **kwds)
 
     # `MutableMapping` methods adapted from `collections.UserDict`, but with `data`
     # replaced by `root`and `hasattr` guard changed to equivalent `getattr(..., None)`
@@ -362,3 +414,14 @@ class Morph(RootModel[MutableMapping[K, V]], MutableMapping[K, V], Generic[K, V]
 
     def __ior__(self, other) -> Self:
         return self | other
+
+
+def get_morph_hint(
+    in_hint: type, out_hint: type | TypeVar | None = None
+) -> type | None:
+    """Handle missing and {attr}`~typing.TypeVar` hints."""
+    if in_hint is out_hint:
+        return in_hint
+    if not out_hint or isinstance(out_hint, TypeVar):
+        return in_hint
+    return out_hint

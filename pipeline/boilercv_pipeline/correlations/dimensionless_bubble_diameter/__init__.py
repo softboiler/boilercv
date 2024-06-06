@@ -6,7 +6,7 @@ from typing import get_args
 
 from numpy import linspace, pi, sqrt
 
-from boilercv.mappings.types.runtime import Repl
+from boilercv.mappings import Repl
 from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import Sym
 from boilercv_pipeline.correlations.models import Equations, Expectations
 from boilercv_pipeline.correlations.types import Kind

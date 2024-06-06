@@ -4,10 +4,10 @@ from numpy import split
 from pandas import DataFrame, concat
 
 from boilercv.data import YX_PX
-from boilercv.types import DF, ArrLike
+from boilercv.types import DF, ArrayLike
 
 
-def df_points(points: ArrLike, dims: list[str] = YX_PX) -> DF:
+def df_points(points: ArrayLike, dims: list[str] = YX_PX) -> DF:
     """Build a dataframe from an array of points."""
     return (
         DataFrame(
@@ -19,7 +19,7 @@ def df_points(points: ArrLike, dims: list[str] = YX_PX) -> DF:
     )
 
 
-def frame_lines(lines: ArrLike) -> DF:
+def frame_lines(lines: ArrayLike) -> DF:
     """Build a dataframe from an array of line segments."""
     ordered_pairs = [df_points(point) for point in split(lines, 2, axis=1)]
     return (

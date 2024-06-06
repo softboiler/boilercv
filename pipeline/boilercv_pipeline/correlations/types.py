@@ -5,13 +5,13 @@ from typing import Annotated, Literal, TypeAlias, TypeVar
 from boilercv_pipeline.types import Eq, LiteralKeys, StrSerializer, TypeValidator
 
 K = TypeVar("K")
+"""Key type."""
 V = TypeVar("V")
-
+"""Value type."""
 S = TypeVar(
     "S", bound=Annotated[LiteralKeys, TypeValidator(str), StrSerializer("json")] | str
 )
 """Keys representing symbols."""
-
 EQ = TypeVar("EQ", bound=Eq | str)
 """SymPy symbolic equation or string type."""
 

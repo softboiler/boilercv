@@ -61,41 +61,41 @@ SUB_OTHER = _SubOther(OTHER_DICT)
 def str_unk(i: str
     ): return len(i)
 def _():
-    return SELF.pipe(str_unk)  # type: ignore
+    return SELF.morph_pipe(str_unk)  # type: ignore
 
 # ! (str -> Any)
 def str_any(i: str
     ) -> Any: return len(i)
 def _():
-    return SELF.pipe(str_any)  # type: ignore
+    return SELF.morph_pipe(str_any)  # type: ignore
 
 # ! (str -> int)
 def str_int(i: str
     ) -> int: return len(i)
 def _():
-    return SELF.pipe(str_int)  # type: ignore
+    return SELF.morph_pipe(str_int)  # type: ignore
 
 # ! (str -> Map)
 def str_map(i: str
     ) -> MutableMapping[str, int]: return {i: len(i)}
 def _():
-    return SELF.pipe(str_map)  # type: ignore
+    return SELF.morph_pipe(str_map)  # type: ignore
 def str_dict(_: str
     ) -> _SelfDict: return SELF_DICT
 def _():
-    return SELF.pipe(str_dict)  # type: ignore
+    return SELF.morph_pipe(str_dict)  # type: ignore
 
 # ! (str -> Morph)
 def str_morph(_: str
     ) -> Morph_: return SELF_MORPH
 def _():
-    return SELF.pipe(str_morph)  # type: ignore
+    return SELF.morph_pipe(str_morph)  # type: ignore
 
 # ! (str -> Self)
 def str_self(_: str
     ) -> _Self: return SELF
 def _():
-    return SELF.pipe(str_self)  # type: ignore
+    return SELF.morph_pipe(str_self)  # type: ignore
 
 # * MARK: ((*[K2, V2] -> R) -> R)
 
@@ -103,53 +103,53 @@ def _():
 def unk_str(i
     ) -> str: return str(i)
 def _():
-    return SELF.pipe(unk_str)
+    return SELF.morph_pipe(unk_str)
 
 # ! (Any -> str)
 def any_str(i: Any
     ) -> str: return str(i)
 def _():
-    return SELF.pipe(any_str)
+    return SELF.morph_pipe(any_str)
 
 # ! (Map -> str)
 def map_str(i: _SelfMap
     ) -> str: return str(i)
 def _():
-    return SELF.pipe(map_str)
+    return SELF.morph_pipe(map_str)
 
 # ! (dict -> str)
 def dict_str(i: _SelfDict
     ) -> str: return str(i)
 def _():
-    return SELF.pipe(dict_str)
+    return SELF.morph_pipe(dict_str)
 
 # ! (otherdict -> str)
 def otherdict_str(i: _OtherDict
     ) -> str: return str(i)
 def _():
-    return SELF.pipe(otherdict_str)  # type: ignore
+    return SELF.morph_pipe(otherdict_str)  # type: ignore
 
 # ! (Morph -> str)
 def morph_str(i: Morph_
     ) -> str: return str(i)
 def _():
-    return SELF.pipe(morph_str)
+    return SELF.morph_pipe(morph_str)
 
 # ! (Self -> str)
 def self_str(i: _Self
     ) -> str: return str(i)
 def _():
-    return SELF.pipe(self_str)
+    return SELF.morph_pipe(self_str)
 
 # ! Concrete subclasses are compatible with matching aliases, but not vice versa
 def str_aliased_desc_2(_: str
     ) -> Morph_: return SELF
 def _():
-    return SELF.pipe(str_aliased_desc_2)  # type: ignore
+    return SELF.morph_pipe(str_aliased_desc_2)  # type: ignore
 def str_desc_2(_: str
     ) -> _Self: return SELF_MORPH  # type: ignore
 def _():
-    return SELF.pipe(str_desc_2)  # type: ignore
+    return SELF.morph_pipe(str_desc_2)  # type: ignore
 
 # * MARK: Define map-taking functions
 
@@ -157,91 +157,91 @@ def _():
 def map_unk(i: _SelfMap
     ): return Morph_(i)
 def _():
-    return SELF.pipe(map_unk)
+    return SELF.morph_pipe(map_unk)
 def dict_unk(i: dict[Fruit, str]
     ): return Morph_(i)
 def _():
-    return SELF.pipe(dict_unk)
+    return SELF.morph_pipe(dict_unk)
 def morph_unk(i: Morph_
     ): return Morph_(i)
 def _():
-    return SELF.pipe(morph_unk)
+    return SELF.morph_pipe(morph_unk)
 def self_unk(i: _Self
     ): return i
 def _():
-    return SELF.pipe(self_unk)
+    return SELF.morph_pipe(self_unk)
 
 # ! (Map -> Any)
 def map_any(i: _SelfMap
     ) -> Any: return Morph_(i)
 def _():
-    return SELF.pipe(map_any)
+    return SELF.morph_pipe(map_any)
 def dict_any(i: dict[Fruit, str]
     ) -> Any: return Morph_(i)
 def _():
-    return SELF.pipe(dict_any)
+    return SELF.morph_pipe(dict_any)
 def morph_any(i: Morph_
     ) -> Any: return Morph_(i)
 def _():
-    return SELF.pipe(morph_any)
+    return SELF.morph_pipe(morph_any)
 def self_any(i: _Self
     ) -> Any: return i
 def _():
-    return SELF.pipe(self_any)
+    return SELF.morph_pipe(self_any)
 
 # ! (MutableMapping -> Morph)
 def map_morph(i: _SelfMap
     ) -> Morph_: return Morph_(i)
 def _():
-    return SELF.pipe(map_morph)
+    return SELF.morph_pipe(map_morph)
 def map_self(i: _SelfMap
     ) -> _Self: return _Self(i)
 def _():
-    return SELF.pipe(map_self)
+    return SELF.morph_pipe(map_self)
 
 # ! (dict -> Self)
 def dict_morph(i: dict[Fruit, str]
     ) -> Morph_: return Morph_(i)
 def _():
-    return SELF.pipe(dict_morph)
+    return SELF.morph_pipe(dict_morph)
 def dict_self(i: dict[Fruit, str]
     ) -> _Self: return _Self(i)
 def _():
-    return SELF.pipe(dict_self)
+    return SELF.morph_pipe(dict_self)
 
 # ! (Morph -> Self)
 def morph_morph(i: Morph_
     ) -> Morph_: return Morph_(i)
 def _():
-    return SELF.pipe(morph_morph)
+    return SELF.morph_pipe(morph_morph)
 def morph_self(i: Morph_
     ) -> _Self: return _Self(i)
 def _():
-    return SELF.pipe(morph_self)
+    return SELF.morph_pipe(morph_self)
 
 # ! (Self -> Self)
 def self_self(i: _Self
     ) -> _Self: return i
 def _():
-    return SELF.pipe(self_self)
+    return SELF.morph_pipe(self_self)
 
 # ! (Morph -> Other)
 def morph1_self2(_: Morph_
     ) -> _Other: return OTHER
 def _():
-    return SELF.pipe(morph1_self2)
+    return SELF.morph_pipe(morph1_self2)
 
 # ! (Self -> Other)
 def self1_self2(_: _Self
     ) -> _Other: return OTHER
 def _():
-    return SELF.pipe(self1_self2)
+    return SELF.morph_pipe(self1_self2)
 
 # ! (Self -> Other)
 def other_dict(_: _GenericMorph[Fruit, int]
     ) -> _SelfDict: return SELF_DICT
 def _():
-    return SELF.pipe(other_dict)  # type: ignore
+    return SELF.morph_pipe(other_dict)  # type: ignore
 
 # * MARK: Key and value functions
 
@@ -293,29 +293,29 @@ take_strs_return_other = [list_str_int]
 if TYPE_CHECKING:
     with suppress(TypeError, ValidationError):
         for f in take_str:
-            v1 = SELF.pipe(f)  # type: ignore
+            v1 = SELF.morph_pipe(f)  # type: ignore
         for f in take_other_map:
-            v2 = SELF.pipe(f)
+            v2 = SELF.morph_pipe(f)
         for f in return_matching_maps:
-            v3 = SELF.pipe(f)
+            v3 = SELF.morph_pipe(f)
         for f in return_mismatched_maps:
-            v4 = SELF.pipe(f)
+            v4 = SELF.morph_pipe(f)
         for f in take_fruits_return_other:
-            v5 = SELF.pipe_keys(f)
+            v5 = SELF.morph_kpipe(f)
         for f in take_strs_return_other:
-            v6 = SELF.pipe_values(f)
+            v6 = SELF.morph_vpipe(f)
 
 
 @pytest.mark.parametrize("f", take_other_map)
 def test_pipe_returns_other_from_not_mappings(f: Pipe):
     """Pipe produces other types from non-mappings."""
-    assert SELF.pipe(f) == f(SELF)
+    assert SELF.morph_pipe(f) == f(SELF)
 
 
 @pytest.mark.parametrize("f", take_fruits_return_other)
 def test_pipe_returns_self_from_mismatched_keys(f: TakeFruitsReturnOther):
     """Pipe produces mismatched keys wrapped in instances of its class."""
-    result = SELF.pipe_keys(f)
+    result = SELF.morph_kpipe(f)
     k, v = result.morph_get_inner_types()
     assert result == Morph[k, v](
         dict(zip(f(list(SELF.keys())), SELF.values(), strict=False))
@@ -325,7 +325,7 @@ def test_pipe_returns_self_from_mismatched_keys(f: TakeFruitsReturnOther):
 @pytest.mark.parametrize("f", take_strs_return_other)
 def test_pipe_returns_base_from_mismatched_values(f: TakeIntsReturnOther):
     """Pipe produces mismatched values wrapped in instances of its base."""
-    result = SELF.pipe_values(f)
+    result = SELF.morph_vpipe(f)
     k, v = result.morph_get_inner_types()
     assert result == Morph[k, v](
         dict(zip(SELF.keys(), f(list(SELF.values())), strict=False))
@@ -335,13 +335,13 @@ def test_pipe_returns_base_from_mismatched_values(f: TakeIntsReturnOther):
 @pytest.mark.parametrize("f", return_matching_maps)
 def test_pipe_returns_self_from_matching_map(f: Pipe):
     """Pipe produces matching mappings wrapped in instances of its class."""
-    assert SELF.pipe(f) == _Self(f(SELF))
+    assert SELF.morph_pipe(f) == _Self(f(SELF))
 
 
 @pytest.mark.parametrize("f", return_mismatched_maps)
 def test_pipe_returns_base_from_mismatched_map(f: Pipe):
     """Pipe produces mismatched mappings wrapped in nearest instances."""
-    result = SELF.pipe(f)
+    result = SELF.morph_pipe(f)
     k, v = result.morph_get_inner_types()
     assert result == Morph[k, v](f(SELF))
 
@@ -349,5 +349,5 @@ def test_pipe_returns_base_from_mismatched_map(f: Pipe):
 @pytest.mark.parametrize("f", return_other_morph)
 def test_pipe_returns_other_morph(f: Pipe):
     """Pipe produces other morphs."""
-    result = SELF.pipe(f)
+    result = SELF.morph_pipe(f)
     assert result == OTHER_MORPH

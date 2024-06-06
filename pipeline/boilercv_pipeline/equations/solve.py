@@ -66,7 +66,7 @@ def default(  # noqa: D103
         encoding="utf-8",
         data=(
             sync(
-                reference=model.solutions.context_pipe(
+                reference=model.solutions.morph_cpipe(
                     solve_equations,
                     context,
                     equations={
@@ -100,7 +100,7 @@ def solve_equations(
         filtered_solutions = filt(solutions[name].model_dump())
         if eq == trivial or (not overwrite and filtered_solutions):
             continue
-        solutions[name] = solutions[name].context_pipe(
+        solutions[name] = solutions[name].morph_cpipe(
             solve_equation,
             context,
             equation=eq,

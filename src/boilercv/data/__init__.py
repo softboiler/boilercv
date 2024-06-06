@@ -10,7 +10,7 @@ from pytz import timezone
 from xarray import DataArray, Dataset, apply_ufunc
 
 from boilercv.data.models import Dimension, get_dims
-from boilercv.types import DA, DS, ArrLike
+from boilercv.types import DA, DS, ArrayLike
 
 VIDEO = "video"
 """Name of the video array in a dataset."""
@@ -126,7 +126,7 @@ def apply_to_img_da(
 
 def assign_ds(
     name: str,
-    data: ArrLike,
+    data: ArrayLike,
     dims: Sequence[Dimension],
     secondary_dims: Sequence[Dimension] = (),
     fixed_dims: Sequence[Dimension] = (),
@@ -154,7 +154,7 @@ def assign_ds(
 
 def build_da(
     name: str,
-    data: ArrLike,
+    data: ArrayLike,
     dims: Sequence[Dimension],
     secondary_dims: Sequence[Dimension] = (),
     fixed_dims: Sequence[Dimension] = (),

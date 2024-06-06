@@ -14,7 +14,7 @@ from boilercv.morphs.contexts import (
     Defaults,
     Pipe,
     compose_contexts,
-    compose_pipelines,
+    make_pipelines,
 )
 from boilercv_pipeline.correlations.pipes import (
     LocalSymbols,
@@ -46,7 +46,7 @@ class Forms(ContextMorph[Kind, str]):
         """Get context."""
         return compose_contexts(
             cls.compose_defaults(value=""),
-            compose_pipelines(
+            make_pipelines(
                 cls,
                 before=[
                     Pipe(fold_whitespace, Defaults(keys=get_args(Kind))),
@@ -64,7 +64,7 @@ class Params(ContextMorph[K, Forms], Generic[K]):
         """Get Pydantic context."""
         return compose_contexts(
             cls.compose_defaults(value_context=Forms.get_context(symbols=symbols)),
-            compose_pipelines(Forms, after=[set_latex_forms]),
+            make_pipelines(Forms, after=[set_latex_forms]),
         )
 
 
@@ -89,7 +89,7 @@ class EquationForms(ContextBaseModel, Generic[EQ]):
         symbols = symbols or ()
         forms_context = forms_context or Forms.get_context(symbols=symbols)
         return compose_contexts(
-            compose_pipelines(
+            make_pipelines(
                 cls, before=partial(prep_equation_forms, context=forms_context)
             ),
             forms_context,
@@ -119,7 +119,7 @@ class Equations(ContextMorph[Equation, EquationForms[EQ]], Generic[EQ]):
                     ),
                 ),
             ),
-            compose_pipelines(cls, before=sort_by_year),
+            make_pipelines(cls, before=sort_by_year),
             sympify_context,
         )
 
@@ -168,7 +168,7 @@ class EquationSolutions(ContextMorph[Equation, SymbolSolutions[S]], Generic[S]):
                     symbols=symbols, solve_syms=solve_syms
                 )
             ),
-            compose_pipelines(cls, before=sort_by_year),
+            make_pipelines(cls, before=sort_by_year),
         )
 
 
