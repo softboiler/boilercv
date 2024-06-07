@@ -50,6 +50,7 @@ class Forms(ContextMorph[Kind, str]):
                 before=[
                     Pipe(fold_whitespace, Defaults(keys=get_args(Kind))),
                     Pipe(set_equation_forms, LocalSymbols.from_iterable(symbols)),
+                    Pipe(fold_whitespace, Defaults(keys=get_args(Kind))),
                 ],
             ),
         )

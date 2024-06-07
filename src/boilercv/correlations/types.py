@@ -132,6 +132,7 @@ Equation: TypeAlias = Literal[
     "florschuetz_chao_1965",
     "florschuetz_chao_1965_2",
     "hughmark_1967",
+    "hughmark_1967_2",
     "isenberg_sideman_1970",
     "akiyama_1973",
     "chen_mayinger_1992",

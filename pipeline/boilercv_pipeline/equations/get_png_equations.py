@@ -27,7 +27,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103, ARG001
         png = pngs / f"{name}.png"
         if not name or png.exists():
             continue
-        input(f"\n\nPlease snip equation `{name}` to the clipboard...")
+        input(f"\n\nPlease snip '{corr}' equation '{name}' to the clipboard...")
         pixels, width, height = paste_image()
         img = Image.frombytes(mode="RGBA", size=(width, height), data=pixels)
         img.convert("RGB").save(png)

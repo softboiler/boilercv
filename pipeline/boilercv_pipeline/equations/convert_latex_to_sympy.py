@@ -14,7 +14,7 @@ from tqdm import tqdm
 from boilercv.correlations.models import EquationForms, Equations, Forms
 from boilercv.correlations.types import Corr
 from boilercv.mappings import Repl, replace_pattern, sync
-from boilercv_pipeline.equations import EQUATIONS, PIPX, SYMS
+from boilercv_pipeline.equations import EQUATIONS, PIPX, SYMS, escape
 
 LATEX_PARSER = Path("scripts") / "convert_latex_to_sympy.py"
 """Isolated LaTeX parser."""
@@ -98,11 +98,6 @@ def convert(
         raise RuntimeError(result.stderr)
     forms.sympy = result.stdout.strip()
     return forms
-
-
-def escape(path: Path) -> str:
-    """Escape path for running subprocesses."""
-    return quote(path.as_posix())
 
 
 if __name__ == "__main__":

@@ -9,7 +9,7 @@ from numpy import linspace, pi, sqrt
 from boilercv.correlations.models import Equations, Expectations
 from boilercv.correlations.types import Eq, Sym
 
-PNGS = Path("data/png_equations_nusselt")
+PNGS = Path("data/png_equations_beta")
 """Equation PNGs."""
 
 _base = Path(__file__).with_suffix(".toml")

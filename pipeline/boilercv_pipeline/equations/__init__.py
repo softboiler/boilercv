@@ -1,6 +1,7 @@
 """Equation processing."""
 
 from pathlib import Path
+from shlex import quote
 from typing import cast, get_args
 
 from boilercv.correlations import dimensionless_bubble_diameter, nusselt
@@ -10,7 +11,6 @@ from boilercv.correlations.dimensionless_bubble_diameter.types import (
 from boilercv.correlations.nusselt.types import SolveSym as SolveSymNusselt
 
 PIPX = Path(".venv") / "scripts" / "pipx"
-"""Escaped path to `pipx` executable suitable for `subprocess.run` invocation."""
 
 PNGS = {"beta": dimensionless_bubble_diameter.PNGS, "nusselt": nusselt.PNGS}
 
@@ -39,3 +39,8 @@ SYMS = {
     corr: tuple(expectations.keys()) for corr, expectations in _expectations.items()
 }
 SOLVE_SYMS = {"beta": get_args(SolveSymBeta), "nusselt": get_args(SolveSymNusselt)}
+
+
+def escape(path: Path) -> str:
+    """Escape path for running subprocesses."""
+    return quote(path.as_posix())
