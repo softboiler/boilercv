@@ -6,30 +6,29 @@ from typing import get_args
 
 from numpy import linspace, pi, sqrt
 
-from boilercv.correlations.dimensionless_bubble_diameter.types import Sym
 from boilercv.correlations.models import Equations, Expectations
-from boilercv.correlations.types import Eq, Kind
-from boilercv.mappings import Repl
+from boilercv.correlations.types import Eq, Sym
 
-base = Path(__file__).with_suffix(".toml")
-EQUATIONS_TOML = base.with_stem("equations")
+PNGS = Path("data/png_equations_nusselt")
+"""Equation PNGs."""
+
+_base = Path(__file__).with_suffix(".toml")
+
+EQUATIONS_TOML = _base.with_stem("equations")
 """TOML file with equations."""
-EXPECTATIONS_TOML = base.with_stem("expectations")
+EXPECTATIONS_TOML = _base.with_stem("expectations")
 """TOML file with expectations."""
-SOLUTIONS_TOML = base.with_stem("solutions")
+SOLUTIONS_TOML = _base.with_stem("solutions")
 """TOML file with solutions."""
-LATEX_REPLS = tuple(
-    Repl[Kind](src="latex", dst="latex", find=find, repl=repl)
-    for find, repl in {"{0}": r"\o", "{b0}": r"\b0"}.items()
-)
-"""Replacements to make after parsing LaTeX from PNGs."""
 SYMBOL_EXPECTATIONS = Expectations[Sym].context_model_validate(
     obj={
+        "Nu_c": 1.0,
         "Fo_0": linspace(start=0.0, stop=5.0e-3, num=10),
         "Ja": 1.0,
         "Re_b0": 100.0,
         "Pr": 1.0,
         "beta": 0.5,
+        "alpha": 1.0,
         "pi": pi,
     },
     context=Expectations[Sym].get_context(),

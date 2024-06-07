@@ -294,6 +294,3 @@ convention = "numpy"
     "E302", # Allow manual spacing of test classes close to their headings
     "E305", # Allow manual spacing of test classes close to their headings
 ]
-"pipeline/boilercv_pipeline/correlations.py" = [
-    "S307", # Allow `eval` since we're generating lambdas for correlations
-]

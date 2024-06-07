@@ -17,7 +17,7 @@ from boilercv.correlations.models import Solutions, SolvedEquations, SymbolSolut
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, trivial
 from boilercv.mappings import filt, sync
-from boilercv.morphs.contexts import Context
+from boilercv.morphs.contexts import Context, compose_contexts, make_pipelines
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.equations import EQUATIONS, SOLUTIONS, SOLVE_SYMS, SUBSTITUTIONS
 
@@ -36,7 +36,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     equations = EQUATIONS[corr]
     solutions = SOLUTIONS[corr]
     substitutions = SUBSTITUTIONS[corr]
-    solve_for = SOLVE_SYMS[corr]
+    solve_syms = SOLVE_SYMS[corr]
 
     logger.info("Start generating symbolic equations.")
 
@@ -44,7 +44,14 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     eqns_content = loads(equations.read_text("utf-8") if equations.exists() else "")
     solns_content = solutions.read_text("utf-8") if solutions.exists() else ""
     symbols = tuple(dict(substitutions).keys())
-    context = SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_for)
+
+    def bar(model):
+        return model
+
+    context = compose_contexts(
+        make_pipelines(SolvedEquations[str], after=bar),
+        SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_syms),
+    )
     model = SolvedEquations[str].context_model_validate(
         dict(equations=eqns_content, solutions=loads(solns_content)), context=context
     )
@@ -62,7 +69,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
                         for name, eq in model.equations.model_dump().items()
                     },
                     substitutions=dict(substitutions),
-                    solve_for=solve_for,
+                    solve_syms=solve_syms,
                     overwrite=overwrite,
                     symbols=LocalSymbols.from_iterable(symbols),
                     context=context,
@@ -78,7 +85,7 @@ def solve_equations(
     solutions: Morph[Equation, SymbolSolutions[str]],
     equations: dict[Equation, sympy.Eq],
     substitutions: dict[str, float],
-    solve_for: tuple[str, ...],
+    solve_syms: tuple[str, ...],
     overwrite: bool,
     symbols: LocalSymbols,
     context: Context,
@@ -93,7 +100,7 @@ def solve_equations(
             context,
             equation=eq,
             substitutions=substitutions,
-            solve_for=solve_for,
+            solve_for=solve_syms,
             symbols=symbols,
         )
     return solutions

@@ -419,7 +419,7 @@ class Morph(RootModel[MutableMapping[K, V]], MutableMapping[K, V], Generic[K, V]
 def get_morph_hint(
     in_hint: type, out_hint: type | TypeVar | None = None
 ) -> type | None:
-    """Handle missing and {attr}`~typing.TypeVar` hints."""
+    """Handle missing and {class}`~typing.TypeVar` hints."""
     if in_hint is out_hint:
         return in_hint
     if not out_hint or isinstance(out_hint, TypeVar):

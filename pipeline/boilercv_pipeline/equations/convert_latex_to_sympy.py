@@ -11,11 +11,10 @@ from loguru import logger
 from tomlkit import parse
 from tqdm import tqdm
 
-from boilercv.correlations import PIPX
 from boilercv.correlations.models import EquationForms, Equations, Forms
 from boilercv.correlations.types import Corr
 from boilercv.mappings import Repl, replace_pattern, sync
-from boilercv_pipeline.equations import EQUATIONS, SYMS
+from boilercv_pipeline.equations import EQUATIONS, PIPX, SYMS
 
 LATEX_PARSER = Path("scripts") / "convert_latex_to_sympy.py"
 """Isolated LaTeX parser."""

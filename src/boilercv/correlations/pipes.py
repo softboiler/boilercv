@@ -23,27 +23,22 @@ from boilercv.morphs.morphs import Morph
 
 
 def fold_whitespace(
-    forms: Morph[Kind, str], defaults: Defaults[Kind, str]
-) -> Morph[Kind, str]:
+    forms: dict[Kind, str], defaults: Defaults[Kind, str]
+) -> dict[Kind, str]:
     """Fold whitespace."""
-    return (
-        forms.model_validate(obj=forms)
-        .morph_pipe(
-            replace,
-            (
-                Repl[Kind](src=key, dst=key, find=find, repl=" ")
-                for find in whitespace
-                for key in defaults.keys
-            ),
-        )
-        .morph_pipe(
-            replace_pattern,
-            (
-                Repl[Kind](src=key, dst=key, find=r"\s+", repl=r" ")
-                for key in defaults.keys
-            ),
-        )
+    forms = replace(
+        forms,
+        (
+            Repl[Kind](src=key, dst=key, find=find, repl=" ")
+            for find in whitespace
+            for key in defaults.keys
+        ),
     )
+    forms = replace_pattern(
+        forms,
+        (Repl[Kind](src=key, dst=key, find=r"\s+", repl=r" ") for key in defaults.keys),
+    )
+    return forms
 
 
 class LocalSymbols(UserDict[str, Symbol], ContextValue):
@@ -62,34 +57,32 @@ class LocalSymbols(UserDict[str, Symbol], ContextValue):
 
 
 def set_equation_forms(
-    forms: Morph[Kind, str], symbols: LocalSymbols
-) -> Morph[Kind, str]:
+    forms: dict[Kind, str], symbols: LocalSymbols
+) -> dict[Kind, str]:
     """Set equation forms."""
-    return (
-        forms.model_validate(obj=forms)
-        .morph_pipe(
-            replace,
-            (
-                Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
-                for find, repl in {"{o}": "0", "{bo}": "b0"}.items()
-            ),
-        )
-        .morph_pipe(
-            replace_pattern,
-            (
-                Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
-                for sym in symbols
-                for find, repl in {
-                    # ? Symbol split by `(` after first character.
-                    rf"{sym[0]}\*\({sym[1:]}([^)]+)\)": rf"{sym}\g<1>",
-                    # ? Symbol split by a `*` after first character.
-                    rf"{sym[0]}\*{sym[1:]}": rf"{sym}",
-                    # ? Symbol missing `*` resulting in failed attempt to call it
-                    rf"{sym}\(": rf"{sym}*(",
-                }.items()
-            ),
-        )
+    forms = replace(
+        forms,
+        (
+            Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
+            for find, repl in {"{o}": "0", "{bo}": "b0"}.items()
+        ),
     )
+    forms = replace_pattern(
+        forms,
+        (
+            Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
+            for sym in symbols
+            for find, repl in {
+                # ? Symbol split by `(` after first character.
+                rf"{sym[0]}\*\({sym[1:]}([^)]+)\)": rf"{sym}\g<1>",
+                # ? Symbol split by a `*` after first character.
+                rf"{sym[0]}\*{sym[1:]}": rf"{sym}",
+                # ? Symbol missing `*` resulting in failed attempt to call it
+                rf"{sym}\(": rf"{sym}*(",
+            }.items()
+        ),
+    )
+    return forms
 
 
 def set_latex_forms(forms: Morph[Kind, str]) -> Morph[Kind, str]:
@@ -113,33 +106,14 @@ def compose_sympify_context(symbols: Iterable[str]) -> Context:
     )
 
 
-equation_name_pattern = compile(
-    r"""(?xm)^  # x: verbose, m: multiline, ^: begin, always use multiline https://web.archive.org/web/20240429145610/https://sethmlarson.dev/regex-$-matches-end-of-string-or-newline
-    (?P<author>[\w_]+?)  # lazy so year is leftmost match
-    _(?P<sort>  # sort on year and optional equation number
-        (?P<year>\d{4})  # year must be four digits
-        (?:_(?P<num>[\d_]+))?  # optionally, multiple equations from one paper
-    )
-    $"""  # end), group="", message=""),
-)
-
-
 @dataclass
 class KeysPattern(ContextValue):
     """Keys pattern."""
 
     pattern: Pattern[str]
-    group: str
-    apply_to_match: Callable[[str], Any] = str
+    groups: Iterable[str]
+    apply_to_match: Callable[[list[str]], Any] = str
     message: str = "Match not found when sorting."
-
-
-keys_pattern = KeysPattern(
-    pattern=equation_name_pattern,
-    group="sort",
-    apply_to_match=lambda i: [int(n) for n in i.split("_")],
-    message="Couldn't find year in equation identifier '{key}' when sorting.",
-)
 
 
 def contextualized(context_value_type: type[CVL]):
@@ -164,4 +138,32 @@ def contextualized(context_value_type: type[CVL]):
     return contextualizer
 
 
-sort_by_year = Pipe(contextualized(KeysPattern)(sort_by_keys_pattern), keys_pattern)
+equation_name_pattern = compile(
+    r"""(?xm)^  # x: verbose, m: multiline, ^: begin, always use multiline https://web.archive.org/web/20240429145610/https://sethmlarson.dev/regex-$-matches-end-of-string-or-newline
+    (?P<author>[\w_]+?)  # lazy so year is leftmost match
+    _(?P<sort>  # sort on year and optional equation number
+        (?P<year>\d{4})  # year must be four digits
+        (?:_(?P<num>[\d_]+))?  # optionally, multiple equations from one paper
+    )
+    $"""
+)
+
+
+def apply_to_match(groups: list[str]) -> tuple[int, int, str]:
+    """Apply to match."""
+    first, *rest = groups[0].split("_")
+    year = int(first)
+    num = int(rest[0]) if rest else 0
+    author = groups[1]
+    return year, num, author
+
+
+sort_by_year = Pipe(
+    contextualized(KeysPattern)(sort_by_keys_pattern),
+    KeysPattern(
+        pattern=equation_name_pattern,
+        groups=["sort", "author"],
+        apply_to_match=apply_to_match,
+        message="Couldn't find year in equation identifier '{key}' when sorting.",
+    ),
+)

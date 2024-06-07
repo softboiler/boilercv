@@ -1,4 +1,4 @@
-"""Types used in {mod}`correlations`."""
+"""Types used in {mod}`~boilercv.correlations`."""
 
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
@@ -37,7 +37,7 @@ if TYPE_CHECKING:
     from _typeshed import DataclassInstance
 
 # * MARK: Type aliases
-Corr = Literal["beta", "nusselt"]
+Corr: TypeAlias = Literal["beta", "nusselt"]
 """Correlation type."""
 LiteralKeys: TypeAlias = _LiteralGenericAlias
 """Keys."""
@@ -114,17 +114,45 @@ def validator(context_value_type: type[CV]):
 
 Kind: TypeAlias = Literal["latex", "sympy"]
 """Kind."""
+Sym: TypeAlias = Literal["Nu_c", "Fo_0", "Ja", "Re_b0", "Pr", "beta", "alpha", "pi"]
+"""Symbol."""
+Param: TypeAlias = Literal[
+    "nusselt",
+    "bubble_fourier",
+    "bubble_jakob",
+    "bubble_initial_reynolds",
+    "liquid_prandtl",
+    "dimensionless_bubble_diameter",
+    "thermal_diffusivity",
+    "pi",
+]
+"""Parameter."""
 Equation: TypeAlias = Literal[
-    "florschuetz_chao_1965", "isenberg_sideman_1970", "akiyama_1973", "yuan_et_al_2009"
+    "ranz_marshall_1952",
+    "florschuetz_chao_1965",
+    "florschuetz_chao_1965_2",
+    "hughmark_1967",
+    "isenberg_sideman_1970",
+    "akiyama_1973",
+    "chen_mayinger_1992",
+    "zeitoun_et_al_1995",
+    "kalman_mori_2002",
+    "warrier_et_al_2002",
+    "yuan_et_al_2009",
+    "lucic_mayinger_2010",
+    "kim_park_2011",
+    "inaba_et_al_2013",
+    "al_issa_et_al_2014",
+    "tang_et_al_2016",
 ]
 """Equation."""
 
 # * MARK: Serializers
 
+WhenUsed: TypeAlias = Literal["always", "unless-none", "json", "json-unless-none"]
 
-def StrSerializer(  # noqa: N802; Can't inherit from frozen
-    when_used: Literal["always", "unless-none", "json", "json-unless-none"] = "always",
-) -> WrapSerializer:
+
+def StrSerializer(when_used: WhenUsed = "always") -> WrapSerializer:  # noqa: N802; Can't inherit from frozen
     """Serialize as string."""
     return WrapSerializer(_str, when_used=when_used)
 
@@ -210,7 +238,13 @@ trivial = sympy.Eq(1, 0, evaluate=False)
 Eq: TypeAlias = Annotated[
     Basic,
     BeforeValidator(validator(SympifyParams)(sympify_expr)),
-    BeforeValidator(lambda v: v or trivial),
+    BeforeValidator(
+        lambda v: (
+            sympy.Eq(1, 0, evaluate=False)
+            if isinstance(v, BooleanAtom) or v == trivial or not v
+            else v
+        )
+    ),
     TypeValidator(sympy.Eq, "after"),
     # ? SymPy equations sometimes evaluate to `bool` on copy
     WrapSerializer(
@@ -218,14 +252,14 @@ Eq: TypeAlias = Annotated[
         when_used="json",
     ),
 ]
-"""{data}`~boilercv_pipeline.types.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""
+"""{data}`~boilercv.correlations.types.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""
 
 Expr: TypeAlias = Annotated[
     Basic,
     BeforeValidator(validator(SympifyParams)(sympify_expr)),
     TypeValidator(sympy.Expr, "after"),
 ]
-"""{data}`~boilercv_pipeline.types.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""
+"""{data}`~boilercv.correlations.types.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""
 
 EQ = TypeVar("EQ", bound=Eq | str)
 """SymPy symbolic equation or string type."""

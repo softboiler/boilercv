@@ -4,12 +4,17 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, MutableMapping
 from contextlib import suppress
-from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias
+from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar
 
 import pytest
 from pydantic import ValidationError
 
-from boilercv.morphs.morphs import K, Morph, TypeType, V
+from boilercv.morphs.morphs import Morph, TypeType
+
+K = TypeVar("K")
+"""Key type."""
+V = TypeVar("V")
+"""Value type."""
 
 # fmt: off
 

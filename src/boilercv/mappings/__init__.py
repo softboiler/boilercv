@@ -45,15 +45,15 @@ def filt(
 def sort_by_keys_pattern(
     i: Mapping[SK, V],
     pattern: Pattern[str],
-    group: str,
-    apply_to_match: Callable[[str], Any] = str,
+    groups: Iterable[str],
+    apply_to_match: Callable[[list[str]], Any] = str,
     message: str = "Match not found when sorting.",
 ) -> dict[SK, V]:
     """Sort mapping by named grouping in keys pattern."""
 
     def get_key(item: tuple[str, Any]) -> str:
         if match := pattern.search(key := item[0]):
-            return apply_to_match(match[group])
+            return apply_to_match([match[g] for g in groups])
         raise ValueError(message.format(key=key))
 
     return dict(sorted(i.items(), key=get_key))

@@ -241,7 +241,9 @@ nitpick_ignore = [
     ("py:class", f"{PACKAGE}.data.sets.Stage"),
     ("py:class", f"{PACKAGE}.experiments.e230920_subcool.NbProcess"),
     ("py:class", f"{PACKAGE}.experiments.e230920_subcool.NbProcess"),
+    ("py:class", f"{PACKAGE}.morphs.contexts"),
 ]
+
 nitpick_ignore_regex = [
     # ? Missing inventory
     (r"py:.*", r"docutils\..+"),

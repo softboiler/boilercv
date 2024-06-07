@@ -10,17 +10,20 @@ from loguru import logger
 from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
-from boilercv.correlations import PIPX, PNGS
-from boilercv.correlations.dimensionless_bubble_diameter import LATEX_REPLS
 from boilercv.correlations.models import Equations
-from boilercv.correlations.types import Corr
-from boilercv.mappings import sync
-from boilercv_pipeline.equations import EQUATIONS, SYMS
+from boilercv.correlations.types import Corr, Kind
+from boilercv.mappings import Repl, sync
+from boilercv_pipeline.equations import EQUATIONS, PIPX, PNGS, SYMS
 
 PNG_PARSER = quote((Path("scripts") / "convert_png_to_latex.py").as_posix())
 """Escaped path to converter script suitable for `subprocess.run` invocation."""
 INDEX = "https://download.pytorch.org/whl/cu121"
 """Extra index URL for PyTorch and CUDA dependencies."""
+LATEX_REPLS = tuple(
+    Repl[Kind](src="latex", dst="latex", find=find, repl=repl)
+    for find, repl in {"{0}": r"\o", "{b0}": r"\b0"}.items()
+)
+"""Replacements to make after parsing LaTeX from PNGs."""
 APP = App()
 """CLI."""
 
@@ -33,6 +36,7 @@ def main():  # noqa: D103
 def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     symbols = SYMS[corr]
     equations = EQUATIONS[corr]
+    pngs = PNGS[corr]
 
     logger.info("Start converting images of equations to LaTeX.")
 
@@ -41,7 +45,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
         obj=loads(equations_content), context=Equations.get_context(symbols=symbols)
     )
     for name, eq in tqdm(eqns.items()):
-        png = PNGS / f"{name}.png"
+        png = pngs / f"{name}.png"
         if (not overwrite and not png.exists()) or eq.latex:
             continue
         sep = " "

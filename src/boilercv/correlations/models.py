@@ -86,12 +86,15 @@ class EquationForms(ContextBaseModel, Generic[EQ]):
     ) -> Context:
         """Get context."""
         symbols = symbols or ()
-        forms_context = forms_context or Forms.get_context(symbols=symbols)
         return compose_contexts(
             make_pipelines(
-                cls, before=partial(prep_equation_forms, context=forms_context)
+                cls,
+                before=partial(
+                    prep_equation_forms,
+                    context=forms_context or Forms.get_context(symbols=symbols),
+                ),
             ),
-            forms_context,
+            compose_sympify_context(symbols),  # If `EQ` is `Eq`
         )
 
 
@@ -104,7 +107,6 @@ class Equations(ContextMorph[Equation, EquationForms[EQ]], Generic[EQ]):
     ) -> Context:
         """Get context."""
         symbols = symbols or ()
-        sympify_context = compose_sympify_context(symbols)  # If `EQ` is `Eq`
         Eq_, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
         k, _ = cls.morph_get_inner_types()
         return compose_contexts(
@@ -113,13 +115,11 @@ class Equations(ContextMorph[Equation, EquationForms[EQ]], Generic[EQ]):
                 value_context=EquationForms[Eq_].get_context(
                     symbols=symbols,
                     forms_context=compose_contexts(
-                        forms_context or Forms.get_context(symbols=symbols),
-                        sympify_context,
+                        forms_context or Forms.get_context(symbols=symbols)
                     ),
                 ),
             ),
             make_pipelines(cls, before=sort_by_year),
-            sympify_context,
         )
 
 

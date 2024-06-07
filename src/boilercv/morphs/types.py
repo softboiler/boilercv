@@ -1,4 +1,4 @@
-"""Types used in {mod}`morphs`."""
+"""Types used in {mod}`~boilercv.morphs`."""
 
 from collections.abc import Callable, MutableMapping
 from typing import (
@@ -17,7 +17,12 @@ from typing import (
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from boilercv.morphs.contexts import ContextValue, Pipe, PipeWithInfo
+    from boilercv.morphs.contexts import (
+        ContextValue,
+        Pipe,
+        PipelineContext,
+        PipeWithInfo,
+    )
 
 AnyPipe: TypeAlias = "Pipe | PipeWithInfo | Callable[[Any], Any]"
 """Any pipe."""
@@ -25,6 +30,8 @@ Mode: TypeAlias = Literal["before", "after"]
 """Mode."""
 LiteralType: TypeAlias = _LiteralGenericAlias
 """Literal type."""
+ContextValueLike: TypeAlias = "PipelineContext | ContextValue"
+"""Allowable context-value-like values."""
 
 T = TypeVar("T")
 """Type."""

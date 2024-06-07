@@ -5,8 +5,8 @@ from __future__ import annotations
 from collections import UserDict, defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from contextlib import suppress
-from copy import deepcopy
 from dataclasses import dataclass, field
+from functools import partial
 from itertools import chain
 from typing import Any, ClassVar, Generic, Self, get_args
 
@@ -17,6 +17,7 @@ from boilercv.morphs.morphs import Morph
 from boilercv.morphs.types import (
     CV,
     AnyPipe,
+    ContextValueLike,
     HasModelDump,
     K,
     LiteralType,
@@ -64,9 +65,8 @@ class BaseContext:
         -------
             The validated model instance.
         """
-        obj = obj.model_dump() if isinstance(obj, HasModelDump) else obj
         return cls.model_validate(  # pyright: ignore[reportAttributeAccessIssue]
-            obj or {},
+            obj.model_dump() if isinstance(obj, HasModelDump) else obj or {},
             strict=strict,
             from_attributes=from_attributes,
             context=context or Context(),  # pyright: ignore[reportArgumentType]
@@ -97,7 +97,7 @@ class BaseContext:
         ------
             ValueError: If `json_data` is not a JSON string.
         """
-        return cls.model_validate(  # pyright: ignore[reportAttributeAccessIssue]
+        return cls.model_validate_json(
             json_data,
             strict=strict,
             context=context or Context(),  # pyright: ignore[reportArgumentType]
@@ -164,7 +164,9 @@ class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
 
     @model_validator(mode="before")
     @classmethod
-    def context_validate_before(cls, data: dict[K, V], info: ValidationInfo) -> Self:
+    def context_validate_before(
+        cls, data: dict[K, V], info: ValidationInfo
+    ) -> dict[K, V]:
         """Validate context before."""
         return cls.apply(mode="before", data=data, info=info)
 
@@ -174,55 +176,48 @@ class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
         return self.apply(mode="after", data=self, info=info)
 
     @classmethod
-    def apply(  # noqa: C901
-        cls, mode: Mode | Any, data: Self | dict[K, V], info: ValidationInfo
-    ) -> Self:
+    def apply(cls, mode: Mode, data: T, info: ValidationInfo) -> T:  # noqa: C901, PLR0912
         """Apply a pipe to data."""
         context = Context(info.context) or Context()
         pipelines_context = (
             get_context_value(PipelineContext, context) or PipelineContext()
         )
         pipelines = pipelines_context.get(cls)  # pyright: ignore[reportArgumentType]
-        result = data if isinstance(data, cls) else cls.model_construct(data)
         if pipelines is None:
-            return result
-        match mode:
-            case "after":
-                pipeline = pipelines.after
-            case "before":
-                pipeline = pipelines.before
-            case _:
-                raise ValueError("Invalid mode.")
-        if not pipeline:
-            return result
+            return data
         if mode == "before":
+            pipeline = pipelines.before
+            if not pipeline:
+                return data
             for pipe in pipeline:
                 if isinstance(pipe, Pipe):
-                    result = pipe.f(result, pipe.context_value)
+                    data = pipe.f(data, pipe.context_value)
                     continue
                 if isinstance(pipe, PipeWithInfo):
-                    pipe.f(result, pipe.context_value, info)
-                    result = result.morph_cpipe(
-                        pipe.f, context, pipe.context_value, info
-                    )
+                    data = pipe.f(data, pipe.context_value, info)
                     continue
                 if isinstance(pipe, Callable):
-                    result = pipe(result)
+                    data = pipe(data)
                     continue
                 raise ValueError("Invalid pipe.")
-            return result
+            return data
+        pipeline = pipelines.after
+        if not pipeline:
+            return data
         for pipe in pipeline:
+            if not pipeline:
+                return data
             if isinstance(pipe, Pipe):
-                result = result.morph_cpipe(pipe.f, context, pipe.context_value)
+                data = data.morph_cpipe(pipe.f, context, pipe.context_value)  # pyright: ignore[reportAttributeAccessIssue]
                 continue
             if isinstance(pipe, PipeWithInfo):
-                result = result.morph_cpipe(pipe.f, context, pipe.context_value, info)
+                data = data.morph_cpipe(pipe.f, context, pipe.context_value, info)  # pyright: ignore[reportAttributeAccessIssue]
                 continue
             if isinstance(pipe, Callable):
-                result = result.morph_cpipe(pipe, context)
+                data = data.morph_cpipe(pipe, context)  # pyright: ignore[reportAttributeAccessIssue]
                 continue
             raise ValueError("Invalid pipe.")
-        return result
+        return data
 
     @classmethod
     def compose_defaults(
@@ -230,7 +225,7 @@ class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
         mapping: dict[K, V | BaseModel] | None = None,
         keys: tuple[K, ...] | None = None,
         value: V | BaseModel | None = None,
-        value_copy_method: Callable[[V | BaseModel], V | BaseModel] = deepcopy,
+        value_copier: Callable[[V | BaseModel], V | BaseModel] = lambda v: v,
         factory: Callable[..., Any] | None = None,
         value_model: type[ContextMorph[K, V] | ContextBaseModel | BaseModel]
         | None = None,
@@ -246,19 +241,16 @@ class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
         keys = keys or get_args(cls.morph_get_inner_types().key)
         value_context = value_context or Context()
         if value_model:
-            value = (
-                value_model.context_model_validate(context=value_context)
+            factory = (
+                partial(value_model.context_model_validate, context=value_context)
                 if issubclass(value_model, ContextMorph | ContextBaseModel)
-                else value_model.model_validate(obj={}, context=dict(value_context))
+                else partial(value_model.model_validate, context=dict(value_context))
             )
         defaults = (
-            Defaults(mapping=mapping, value_copier=value_copy_method)
+            Defaults(mapping=mapping, value_copier=value_copier)
             if mapping
             else Defaults(
-                keys=keys or (),
-                value=value,
-                factory=factory,
-                value_copier=value_copy_method,
+                keys=keys or (), value=value, factory=factory, value_copier=value_copier
             )
         )
         context = compose_context(
@@ -349,7 +341,7 @@ class PipeWithInfo:
 # * MARK: Contexts
 
 
-class Context(UserDict[str, PipelineContext | ContextValue]):
+class Context(UserDict[str, ContextValueLike]):
     """Morphs."""
 
     @property
@@ -395,7 +387,7 @@ class Defaults(ContextValue, Generic[K, V]):
     """Default value."""
     factory: Callable[..., Any] | None = None
     """Default value factory."""
-    value_copier: Callable[[V], V] | None = deepcopy
+    value_copier: Callable[[V], V] | None = lambda v: v
     """Method to copy the default value."""
 
 
