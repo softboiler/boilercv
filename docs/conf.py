@@ -7,7 +7,6 @@ from pathlib import Path
 from ruamel.yaml import YAML
 from sphinx.application import Sphinx
 
-from boilercv.correlations.dimensionless_bubble_diameter import get_equations
 from boilercv_docs import DOCS, PYPROJECT, chdir_docs
 from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
 from boilercv_docs.nbs import init_nb_env
@@ -126,7 +125,7 @@ copyright = f"{date.today().year}, {AUTHORS}"  # noqa: A001
 version = VERSION
 master_doc = "index"
 language = "en"
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/_*.md", "**/_*.ipynb"]
 extensions = [
     "autodoc2",
     "myst_nb",
@@ -190,16 +189,8 @@ myst_enable_extensions = [
     "tasklist",
 ]
 myst_heading_anchors = 6
-equations = {
-    name: f"""
-$$
-{eq.latex}
-$$ (eq_{name})""".strip()
-    for name, eq in get_equations().items()
-}
 myst_substitutions = {
-    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/blakeNaccarato/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Ffind_centers.ipynb)",
-    **equations,
+    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/blakeNaccarato/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Ffind_centers.ipynb)"
 }
 # ! BibTeX
 bibtex_bibfiles = dpaths(BIB_TEMPLATE, BIB)

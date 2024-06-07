@@ -1,20 +1,31 @@
 """Convert LaTeX equations to SymPy equations."""
 
 from pathlib import Path
-from re import finditer
 from shlex import quote, split
 from subprocess import run
 from tomllib import loads
+from typing import get_args
 
 from cyclopts import App
 from loguru import logger
 from tomlkit import parse
 from tqdm import tqdm
 
-from boilercv.correlations.models import EquationForms, Equations, Forms
-from boilercv.correlations.types import Corr
-from boilercv.mappings import Repl, replace_pattern, sync
-from boilercv_pipeline.equations import EQUATIONS, PIPX, SYMS, escape
+from boilercv.correlations.models import EquationForms, Equations
+from boilercv.correlations.pipes import fold_whitespace
+from boilercv.correlations.types import Corr, Kind
+from boilercv.mappings import Repl, replace, replace_pattern, sync
+from boilercv.morphs.contexts import Defaults
+from boilercv.morphs.morphs import Morph
+from boilercv_pipeline.equations import (
+    EQUATIONS,
+    PIPX,
+    SYMS,
+    escape,
+    get_raw_equations_context,
+    make_raw,
+    sanitize_forms,
+)
 
 LATEX_PARSER = Path("scripts") / "convert_latex_to_sympy.py"
 """Isolated LaTeX parser."""
@@ -26,61 +37,48 @@ def main():  # noqa: D103
     APP()
 
 
-def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103, ARG001
-    symbols = SYMS[corr]
-    equations = EQUATIONS[corr]
-
+@APP.default
+def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
+    equations_path = EQUATIONS[corr]
     logger.info("Start converting LaTeX expressions to SymPy expressions.")
-
-    # ? Don't process strings
-    forms_context = Forms.get_context(symbols=symbols)
-    forms_context.pipelines[Forms].before = (forms_context.pipelines[Forms].before[0],)
-    context = Equations[str].get_context(symbols=symbols, forms_context=forms_context)
-
-    # ? Parse equations
-    equations_content = equations.read_text("utf-8") if equations.exists() else ""
-    parsed_eqns = (
+    content = equations_path.read_text("utf-8") if equations_path.exists() else ""
+    symbols = SYMS[corr]
+    context = get_raw_equations_context(symbols=symbols)
+    equations = (
         Equations[str]
-        .context_model_validate(obj=loads(equations_content), context=context)
-        .morph_cpipe(parse_equations, context)
+        .context_model_validate(obj=loads(content), context=context)
+        .morph_cpipe(parse_equations, context, symbols=symbols, overwrite=overwrite)
     )
-
-    # ? Update the TOML file with changes
-    toml = sync(
-        reference=parsed_eqns.model_dump(mode="json"), target=parse(equations_content)
+    equations_path.write_text(
+        encoding="utf-8",
+        data=make_raw(
+            sync(
+                reference=equations.model_dump(mode="json"), target=parse(content)
+            ).as_string()
+        ),
     )
-
-    # ? Convert escaped strings to raw strings
-    content = toml.as_string()
-    for match in finditer(r'"[^"]*"', content):
-        old_eq = new_eq = match.group()
-        for old, new in {'"': "'", r"\\": "\\"}.items():
-            new_eq = new_eq.replace(old, new)
-        content = content.replace(old_eq, new_eq)
-
-    # ? Write the result
-    equations.write_text(encoding="utf-8", data=content)
-
     logger.info("Finish converting LaTeX expressions to SymPy expressions.")
 
 
-def parse_equations(equations: Equations[str]) -> Equations[str]:
+def parse_equations(
+    equations: Equations[str], symbols: tuple[str, ...], overwrite: bool
+) -> Equations[str]:
     """Parse equations."""
     for name, eq in tqdm(equations.items()):
-        if not eq.latex:
+        if not overwrite and (eq.sympy or not eq.latex):
             continue
-        if eq.sympy:
-            continue
-        equations[name] = convert(forms=eq, interpreter=PIPX, script=LATEX_PARSER)
+        equations[name] = convert(
+            forms=eq, symbols=symbols, interpreter=PIPX, script=LATEX_PARSER
+        )
     return equations
 
 
 def convert(
-    forms: EquationForms[str], interpreter: Path, script: Path
+    forms: EquationForms[str], symbols: tuple[str, ...], interpreter: Path, script: Path
 ) -> EquationForms[str]:
     """Convert LaTeX equation to SymPy equation."""
     sanitized_latex = replace_pattern(
-        forms.model_dump(),
+        sanitize_forms(forms, symbols, sanitizer=sanitize_and_fold).model_dump(),
         (
             Repl(src="latex", dst="latex", find=find, repl=repl)
             for find, repl in {r"\\left\(": "(", r"\\right\)": ")"}.items()
@@ -97,7 +95,47 @@ def convert(
     if result.returncode:
         raise RuntimeError(result.stderr)
     forms.sympy = result.stdout.strip()
-    return forms
+    return sanitize_forms(forms, symbols, sanitizer=sanitize)
+
+
+def sanitize_and_fold(
+    forms: dict[Kind, str], symbols: tuple[str, ...]
+) -> Morph[Kind, str]:
+    """Sanitize and fold symbolic forms."""
+    return (
+        Morph[Kind, str](forms)
+        .morph_pipe(sanitize, symbols=symbols)
+        .morph_pipe(fold_whitespace, Defaults(keys=get_args(Kind)))
+    )
+
+
+def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, str]:
+    """Sanitize symbolic forms."""
+    return (
+        Morph[Kind, str](forms)
+        .morph_pipe(
+            replace,
+            (
+                Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
+                for find, repl in {"{o}": "0", "{bo}": "b0"}.items()
+            ),
+        )
+        .morph_pipe(
+            replace_pattern,
+            (
+                Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
+                for sym in symbols
+                for find, repl in {
+                    # ? Symbol split by `(` after first character.
+                    rf"{sym[0]}\*\({sym[1:]}([^)]+)\)": rf"{sym}\g<1>",
+                    # ? Symbol split by a `*` after first character.
+                    rf"{sym[0]}\*{sym[1:]}": rf"{sym}",
+                    # ? Symbol missing `*` resulting in failed attempt to call it
+                    rf"{sym}\(": rf"{sym}*(",
+                }.items()
+            ),
+        )
+    )
 
 
 if __name__ == "__main__":

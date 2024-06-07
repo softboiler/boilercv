@@ -24,21 +24,27 @@ from boilercv.morphs.morphs import Morph
 
 def fold_whitespace(
     forms: dict[Kind, str], defaults: Defaults[Kind, str]
-) -> dict[Kind, str]:
+) -> Morph[Kind, str]:
     """Fold whitespace."""
-    forms = replace(
-        forms,
-        (
-            Repl[Kind](src=key, dst=key, find=find, repl=" ")
-            for find in whitespace
-            for key in defaults.keys
-        ),
+    return (
+        Morph[Kind, str](forms)
+        .morph_pipe(
+            replace,
+            (
+                Repl[Kind](src=key, dst=key, find=find, repl=" ")
+                for find in whitespace
+                for key in defaults.keys
+            ),
+        )
+        .morph_pipe(
+            replace_pattern,
+            (
+                Repl[Kind](src=key, dst=key, find=r"\s+", repl=r" ")
+                for key in defaults.keys
+            ),
+        )
+        .morph_pipe(lambda forms: {k: v.strip() for k, v in forms.items()})
     )
-    forms = replace_pattern(
-        forms,
-        (Repl[Kind](src=key, dst=key, find=r"\s+", repl=r" ") for key in defaults.keys),
-    )
-    return forms
 
 
 class LocalSymbols(UserDict[str, Symbol], ContextValue):
@@ -54,35 +60,6 @@ class LocalSymbols(UserDict[str, Symbol], ContextValue):
                 strict=True,
             )
         )
-
-
-def set_equation_forms(
-    forms: dict[Kind, str], symbols: LocalSymbols
-) -> dict[Kind, str]:
-    """Set equation forms."""
-    forms = replace(
-        forms,
-        (
-            Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
-            for find, repl in {"{o}": "0", "{bo}": "b0"}.items()
-        ),
-    )
-    forms = replace_pattern(
-        forms,
-        (
-            Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
-            for sym in symbols
-            for find, repl in {
-                # ? Symbol split by `(` after first character.
-                rf"{sym[0]}\*\({sym[1:]}([^)]+)\)": rf"{sym}\g<1>",
-                # ? Symbol split by a `*` after first character.
-                rf"{sym[0]}\*{sym[1:]}": rf"{sym}",
-                # ? Symbol missing `*` resulting in failed attempt to call it
-                rf"{sym}\(": rf"{sym}*(",
-            }.items()
-        ),
-    )
-    return forms
 
 
 def set_latex_forms(forms: Morph[Kind, str]) -> Morph[Kind, str]:

@@ -8,13 +8,12 @@ from cyclopts import App
 from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
-from boilercv.correlations import dimensionless_bubble_diameter
+from boilercv.correlations import SYMBOLS, dimensionless_bubble_diameter
 from boilercv.correlations.models import Expectations
 from boilercv.correlations.pipes import equation_name_pattern
 from boilercv.correlations.types import Corr
 from boilercv.mappings import sync
 from boilercv_pipeline.equations import EXPECTATIONS, SUBSTITUTIONS
-from boilercv_tests.test_correlations.test_dimensionless_bubble_diameter import SYMBOLS
 
 default_substitutions = cast(
     tuple[tuple[str, float], ...],

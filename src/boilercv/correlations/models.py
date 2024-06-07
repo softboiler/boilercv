@@ -8,10 +8,8 @@ from numpy import nan
 from pydantic import Field
 
 from boilercv.correlations.pipes import (
-    LocalSymbols,
     compose_sympify_context,
     fold_whitespace,
-    set_equation_forms,
     set_latex_forms,
     sort_by_year,
 )
@@ -25,6 +23,7 @@ from boilercv.morphs.contexts import (
     compose_contexts,
     make_pipelines,
 )
+from boilercv.morphs.morphs import Morph
 
 
 class Expectations(ContextMorph[K, Expectation], Generic[K]):
@@ -41,36 +40,40 @@ class Forms(ContextMorph[Kind, str]):
     """Forms."""
 
     @classmethod
-    def get_context(cls, symbols: Iterable[str]) -> Context:
+    def get_context(cls) -> Context:
         """Get context."""
-        return compose_contexts(
-            cls.compose_defaults(value=""),
-            make_pipelines(
-                cls,
-                before=[
-                    Pipe(fold_whitespace, Defaults(keys=get_args(Kind))),
-                    Pipe(set_equation_forms, LocalSymbols.from_iterable(symbols)),
-                    Pipe(fold_whitespace, Defaults(keys=get_args(Kind))),
-                ],
-            ),
-        )
+        return compose_contexts(cls.compose_defaults(value=""))
 
 
 class Params(ContextMorph[K, Forms], Generic[K]):
     """Parameters."""
 
     @classmethod
-    def get_context(cls, symbols: Iterable[str]) -> Context:
+    def get_context(cls) -> Context:
         """Get Pydantic context."""
         return compose_contexts(
-            cls.compose_defaults(value_context=Forms.get_context(symbols=symbols)),
+            cls.compose_defaults(value_context=Forms.get_context()),
             make_pipelines(Forms, after=[set_latex_forms]),
         )
 
 
-def prep_equation_forms(i: dict[Kind, str], context: Context) -> dict[Kind, str]:
+def prep_equation_forms(
+    i: dict[Kind, str], context: Context | None = None
+) -> Morph[Kind, str]:
     """Prepare equation forms."""
-    return (Forms.context_model_validate(i, context=context)).model_dump()
+    return Forms.context_model_validate(
+        obj=i,
+        context=(
+            context
+            or make_pipelines(
+                Forms,
+                before=[
+                    Forms.get_context().pipelines[Forms].before[0],
+                    Pipe(fold_whitespace, Defaults(keys=get_args(Kind))),
+                ],
+            )
+        ),
+    )
 
 
 class EquationForms(ContextBaseModel, Generic[EQ]):
@@ -89,11 +92,7 @@ class EquationForms(ContextBaseModel, Generic[EQ]):
         symbols = symbols or ()
         return compose_contexts(
             make_pipelines(
-                cls,
-                before=partial(
-                    prep_equation_forms,
-                    context=forms_context or Forms.get_context(symbols=symbols),
-                ),
+                cls, before=partial(prep_equation_forms, context=forms_context)
             ),
             compose_sympify_context(symbols),  # If `EQ` is `Eq`
         )
@@ -114,10 +113,7 @@ class Equations(ContextMorph[Equation, EquationForms[EQ]], Generic[EQ]):
             cls.compose_defaults(
                 keys=get_args(k),
                 value_context=EquationForms[Eq_].get_context(
-                    symbols=symbols,
-                    forms_context=compose_contexts(
-                        forms_context or Forms.get_context(symbols=symbols)
-                    ),
+                    symbols=symbols, forms_context=forms_context
                 ),
             ),
             make_pipelines(cls, before=sort_by_year),
@@ -187,10 +183,7 @@ class SolvedEquations(ContextBaseModel, Generic[S]):
         """Get Pydantic context."""
         SolveSyms, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
         return compose_contexts(
-            Equations[Eq].get_context(
-                symbols=symbols,
-                forms_context=compose_contexts(Forms.get_context(symbols)),
-            ),
+            Equations[Eq].get_context(symbols=symbols),
             EquationSolutions[SolveSyms].get_context(
                 symbols=symbols, solve_syms=solve_syms
             ),

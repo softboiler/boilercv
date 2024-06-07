@@ -14,18 +14,5 @@ where ${Re}_{b0}$ and ${Pr}$ are the bubble Reynolds and liquid Prandtl numbers,
 
 Bubble histories seem to correspond roughly with the analytical model by Florschuetz and Chao initially, with later times corresponding to the Yuan et al. model. The present bubble data shows about 0.5&NonBreakingSpace;K subcooling. Since correlations are sensitive to subcool temperature, this motivates the collection of bubble data over a wider range of subcooling.
 
-## Florschuetz and Chao (2009)
-
-{{ florschuetz_chao_1965 }}
-
-## Isenberg and Sideman (1970)
-
-{{ isenberg_sideman_1970 }}
-
-## Akiyama (1973)
-
-{{ akiyama_1973 }}
-
-## Yuan et al (2009)
-
-{{ yuan_et_al_2009 }}
+:::{include} _correlations.md
+:::

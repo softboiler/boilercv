@@ -17,7 +17,7 @@ from boilercv.correlations.models import Solutions, SolvedEquations, SymbolSolut
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, trivial
 from boilercv.mappings import filt, sync
-from boilercv.morphs.contexts import Context, compose_contexts, make_pipelines
+from boilercv.morphs.contexts import Context
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.equations import EQUATIONS, SOLUTIONS, SOLVE_SYMS, SUBSTITUTIONS
 
@@ -45,13 +45,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     solns_content = solutions.read_text("utf-8") if solutions.exists() else ""
     symbols = tuple(dict(substitutions).keys())
 
-    def bar(model):
-        return model
-
-    context = compose_contexts(
-        make_pipelines(SolvedEquations[str], after=bar),
-        SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_syms),
-    )
+    context = SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_syms)
     model = SolvedEquations[str].context_model_validate(
         dict(equations=eqns_content, solutions=loads(solns_content)), context=context
     )

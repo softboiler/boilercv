@@ -1,13 +1,18 @@
 """Dimensionless bubble diameter correlations for subcooled boiling bubble collapse."""
 
+from collections.abc import Callable
 from pathlib import Path
 from tomllib import loads
-from typing import get_args
+from typing import Any, cast, get_args
 
+import numpy
+import sympy
 from numpy import linspace, pi, sqrt
 
-from boilercv.correlations.models import Equations, Expectations
-from boilercv.correlations.types import Eq, Sym
+from boilercv.correlations import SYMBOLS
+from boilercv.correlations.dimensionless_bubble_diameter.types import SolveSym
+from boilercv.correlations.models import Equations, Expectations, SolvedEquations
+from boilercv.correlations.types import Eq, Equation, Sym
 
 PNGS = Path("data/png_equations_beta")
 """Equation PNGs."""
@@ -49,11 +54,53 @@ This is the correlation with the most rapidly vanishing value of
 """
 
 
-def get_equations() -> Equations[Eq]:  # noqa: D103
+def get_equations() -> Equations[Eq]:
+    """Get equations."""
     return Equations[Eq].context_model_validate(
         obj=loads(EQUATIONS_TOML.read_text("utf-8") if EQUATIONS_TOML.exists() else ""),
         context=Equations[Eq].get_context(symbols=get_args(Sym)),
     )
+
+
+def get_solutions() -> dict[Equation, sympy.Expr]:  # noqa: D103
+    equations = EQUATIONS_TOML
+    solutions = SOLUTIONS_TOML
+    context = SolvedEquations[str].get_context(
+        symbols=get_args(Sym), solve_syms=get_args(SolveSym)
+    )
+    return cast(
+        dict[Equation, sympy.Expr],
+        {
+            name: soln["beta"].solutions[0]
+            for name, soln in (
+                SolvedEquations[SolveSym]
+                .context_model_validate(
+                    dict(
+                        equations=loads(
+                            equations.read_text("utf-8") if equations.exists() else ""
+                        ),
+                        solutions=loads(
+                            solutions.read_text("utf-8") if solutions.exists() else ""
+                        ),
+                    ),
+                    context=context,
+                )
+                .solutions
+            ).items()
+        },
+    )
+
+
+def get_correlations() -> dict[Equation, Callable[..., Any]]:
+    """Get symbolic functions."""
+    return {
+        name: sympy.lambdify(
+            expr=soln,
+            modules=numpy,
+            args=[s for s in soln.free_symbols if s.name in SYMBOLS],  # type: ignore
+        )
+        for name, soln in get_solutions().items()
+    }
 
 
 def florschuetz_chao_1965(bubble_fourier, bubble_jakob):
