@@ -56,9 +56,9 @@ warnings = []
 solutions = ["(1 - 0.67*Fo_0*Ja**0.7959*Re_b0**0.7/Pr**0.4564)**0.769"]
 warnings = []
 
-[inaba_et_al_2013.beta]
-solutions = ["1 - 1.1*Fo_0*Ja**0.2*Pr**(2/3)*Re_b0**0.86"]
-warnings = []
+# [inaba_et_al_2013.beta]
+# solutions = ["1 - 1.1*Fo_0*Ja**0.2*Pr**(2/3)*Re_b0**0.86"]
+# warnings = []
 
 [al_issa_et_al_2014.beta]
 solutions = ["(1 - 0.135*Fo_0*Ja*Pr**0.33*Re_b0**0.89)**0.901"]

@@ -8,7 +8,7 @@ from cyclopts import App
 from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
 
-from boilercv.correlations import SYMBOLS, dimensionless_bubble_diameter
+from boilercv.correlations import SYMBOLS, beta
 from boilercv.correlations.models import Expectations
 from boilercv.correlations.pipes import equation_name_pattern
 from boilercv.correlations.types import Corr
@@ -16,8 +16,7 @@ from boilercv.mappings import sync
 from boilercv_pipeline.equations import EXPECTATIONS, SUBSTITUTIONS
 
 default_substitutions = cast(
-    tuple[tuple[str, float], ...],
-    tuple(dimensionless_bubble_diameter.SYMBOL_EXPECTATIONS.items()),
+    tuple[tuple[str, float], ...], tuple(beta.SYMBOL_EXPECTATIONS.items())
 )
 
 TIMEOUT = 5
@@ -39,7 +38,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     expec = Expectations[str](loads(content))
     for name, correlation in tqdm([
         (name, attr)
-        for name, attr in getmembers(dimensionless_bubble_diameter)
+        for name, attr in getmembers(beta)
         if isfunction(attr) and equation_name_pattern.match(name)
     ]):
         if not overwrite and expec.get(name) is not None:

@@ -48,7 +48,7 @@ sympy = 'Eq( beta , 1 - 4 * Ja * sqrt(Fo_0 / pi))'
 [isenberg_sideman_1970]
 latex = '''
 \beta =
-\left( 1 - \left(3/\sqrt{\pi}\right) \Re_\bo^{1/2} \Pr^{1/3} Ja \Fo_\o \right) ^ {2/3}
+\left( 1 - \left( 3/\sqrt{\pi} \right) \Re_\bo^{1/2} \Pr^{1/3} Ja \Fo_\o \right) ^ {2/3}
 '''
 sympy = 'Eq( beta , (1 - (3/sqrt(pi)) * Re_b0**(1/2) * Pr**(1/3) * Ja * Fo_0 )**(2/3) )'
 
@@ -70,7 +70,7 @@ sympy = 'Eq( beta , (1 - 5.67 * Re_b0**0.61 * alpha**0.328 * Ja**0.692 * Fo_0 )*
 [kalman_mori_2002]
 latex = '''
 \beta =
-\left( 1 - 0.0094 \Re_\bo^{0.85} \Pr^{0.85} \Ja \Fo_\o \right) ^ {0.873}
+\left( 1 - 0.0094 \Re_\bo^{0.855} \Pr^{0.855} \Ja \Fo_\o \right) ^ {0.873}
 '''
 sympy = 'Eq( beta , (1 - 0.0094 * Re_b0**0.85 * Pr**0.85 * Ja * Fo_0 )**0.873 )'
 
@@ -118,9 +118,9 @@ beta ,
 (1 - 0.67 * Re_b0**0.7 * Pr**(-0.4564) * Ja**0.7959 * Fo_0 )**0.769
 )'''
 
-[inaba_et_al_2013]
-latex = '\beta = 1 - 1.1 \Re_\bo^{0.86} \Pr^{2/3} \Ja^{0.2} \Fo_\o'
-sympy = 'Eq( beta , 1 - 1.1 * Re_b0**0.86 * Pr**(2/3) * Ja**0.2 * Fo_0 )'
+# [inaba_et_al_2013]
+# latex = '\beta = 1 - 1.1 \Re_\bo^{0.86} \Pr^{2/3} \Ja^{0.2} \Fo_\o'
+# sympy = 'Eq( beta , 1 - 1.1 * Re_b0**0.86 * Pr**(2/3) * Ja**0.2 * Fo_0 )'
 
 [al_issa_et_al_2014]
 latex = '\beta = \left( 1 - 0.135 \Re_\bo^{0.89} \Pr^{0.33} \Ja \Fo_\o \right) ^ {0.901}'

@@ -7,9 +7,9 @@ import pytest
 from numpy import allclose
 from sympy import lambdify
 
-from boilercv.correlations import SYMBOLS, dimensionless_bubble_diameter
-from boilercv.correlations import dimensionless_bubble_diameter as symbolic
-from boilercv.correlations.dimensionless_bubble_diameter import (
+from boilercv.correlations import SYMBOLS, beta
+from boilercv.correlations import beta as symbolic
+from boilercv.correlations.beta import (
     EXPECTATIONS_TOML,
     SYMBOL_EXPECTATIONS,
     get_correlations,
@@ -24,7 +24,7 @@ CORRELATIONS = get_correlations()
 @pytest.mark.parametrize(("name", "expected"), EXPECTATIONS.items())
 def test_python(name, expected):
     """Equations evaluate as expected."""
-    equation = getattr(dimensionless_bubble_diameter, name)
+    equation = getattr(beta, name)
     result = equation(**{
         SYMBOLS[kwd]: value
         for kwd, value in SYMBOL_EXPECTATIONS.items()
@@ -49,6 +49,7 @@ def test_syms(symbol_group_name: str):
         for name, expected in EXPECTATIONS.items()
         if name in EXPECTATIONS
     ),
+    ids=EXPECTATIONS,
 )
 def test_sympy(name, corr, expected):
     """Symbolic equations evaluate as expected."""

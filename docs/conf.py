@@ -173,7 +173,10 @@ mathjax3_config = {
         "macros": {
             # ? User-defined macros: https://docs.mathjax.org/en/latest/input/tex/macros.html
             # ? Built-in macros: https://docs.mathjax.org/en/latest/input/tex/macros/index.html#tex-commands
-            **{const: rf"\mathit{{{const}}}" for const in ["Fo", "Ja", "Re", "Pr"]},
+            **{
+                const: rf"\mathit{{{const}}}"
+                for const in ["Nu", "Fo", "Ja", "Re", "Pr"]
+            },
             **{f"{const}o": rf"\mathit{{{const}0}}" for const in ["", "b"]},
         }
     }

@@ -6,10 +6,8 @@ from re import finditer
 from shlex import quote
 from typing import cast, get_args
 
-from boilercv.correlations import dimensionless_bubble_diameter, nusselt
-from boilercv.correlations.dimensionless_bubble_diameter.types import (
-    SolveSym as SolveSymBeta,
-)
+from boilercv.correlations import beta, nusselt
+from boilercv.correlations.beta.types import SolveSym as SolveSymBeta
 from boilercv.correlations.models import EquationForms, Equations, Forms
 from boilercv.correlations.nusselt.types import SolveSym as SolveSymNusselt
 from boilercv.correlations.pipes import LocalSymbols
@@ -19,23 +17,14 @@ from boilercv.morphs.morphs import Morph
 
 PIPX = Path(".venv") / "scripts" / "pipx"
 
-PNGS = {"beta": dimensionless_bubble_diameter.PNGS, "nusselt": nusselt.PNGS}
+PNGS = {"beta": beta.PNGS, "nusselt": nusselt.PNGS}
 
-EQUATIONS = {
-    "beta": dimensionless_bubble_diameter.EQUATIONS_TOML,
-    "nusselt": nusselt.EQUATIONS_TOML,
-}
-SOLUTIONS = {
-    "beta": dimensionless_bubble_diameter.SOLUTIONS_TOML,
-    "nusselt": nusselt.SOLUTIONS_TOML,
-}
-EXPECTATIONS = {
-    "beta": dimensionless_bubble_diameter.EXPECTATIONS_TOML,
-    "nusselt": nusselt.EXPECTATIONS_TOML,
-}
+EQUATIONS = {"beta": beta.EQUATIONS_TOML, "nusselt": nusselt.EQUATIONS_TOML}
+SOLUTIONS = {"beta": beta.SOLUTIONS_TOML, "nusselt": nusselt.SOLUTIONS_TOML}
+EXPECTATIONS = {"beta": beta.EXPECTATIONS_TOML, "nusselt": nusselt.EXPECTATIONS_TOML}
 
 _expectations = {
-    "beta": dimensionless_bubble_diameter.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
+    "beta": beta.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
     "nusselt": nusselt.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
 }
 SUBSTITUTIONS = {

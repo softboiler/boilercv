@@ -1,5 +1,7 @@
 # Correlations
 
+## Dimensionless bubble diameter
+
 One correlation for bubble history of direct contact condensation of vapor bubbles in a subcooled liquid such considers a stagnant bubble in liquid dominated by heat transfer, which can be represented as
 
 <!-- {{ florschuetz_chao_1965 }} -->
@@ -14,5 +16,8 @@ where ${Re}_{b0}$ and ${Pr}$ are the bubble Reynolds and liquid Prandtl numbers,
 
 Bubble histories seem to correspond roughly with the analytical model by Florschuetz and Chao initially, with later times corresponding to the Yuan et al. model. The present bubble data shows about 0.5&NonBreakingSpace;K subcooling. Since correlations are sensitive to subcool temperature, this motivates the collection of bubble data over a wider range of subcooling.
 
-:::{include} _correlations.md
+:::{toctree}
+:hidden:
+beta
+nusselt
 :::

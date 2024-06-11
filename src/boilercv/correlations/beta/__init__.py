@@ -10,7 +10,7 @@ import sympy
 from numpy import linspace, pi, sqrt
 
 from boilercv.correlations import SYMBOLS
-from boilercv.correlations.dimensionless_bubble_diameter.types import SolveSym
+from boilercv.correlations.beta.types import SolveSym
 from boilercv.correlations.models import Equations, Expectations, SolvedEquations
 from boilercv.correlations.types import Eq, Equation, Sym
 
@@ -43,14 +43,12 @@ SYMBOL_EXPECTATIONS = Expectations[Sym].context_model_validate(
 A single test condition has been chosen to exercise each correlation across as wide of a
 range as possible without returning `np.nan` values. This is done as follows:
 
-- Let `bubble_initial_reynolds`,
-`liquid_prandtl`, and `bubble_jakob` be 100.0, 1.0, and 1.0, respectively.
-- Apply the correlation `dimensionless_bubble_diameter_tang_et_al_2016` with
-`bubble_fourier` such that the `dimensionless_bubble_diameter` is very close to zero.
-This is the correlation with the most rapidly vanishing value of
-`dimensionless_bubble_diameter`.
-- Choose ten linearly-spaced points for `bubble_fourier` between `0` and the maximum
-`bubble_fourier` just found.
+- Let `Re_b0`, `Pr`, and `Ja` be 100.0, 1.0, and 1.0, respectively.
+- Apply the correlation {eq}`eq_beta_tang_et_al_2016` with `Fo_0` such that `beta` is
+  very close to zero. This is the correlation with the most rapidly vanishing value of
+  `beta`.
+- Choose ten linearly-spaced points for `Fo_0` between `0` and the maximum
+  `Fo_0` just found.
 """
 
 
@@ -213,18 +211,18 @@ def kim_park_2011(
     ) ** 0.769
 
 
-def inaba_et_al_2013(
-    bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
-):
-    """Bubble history correlation for condensation of a stagnant bubble. {cite}`tangReviewDirectContact2022`."""
-    return (
-        1
-        - 1.1
-        * bubble_initial_reynolds**0.86
-        * liquid_prandtl ** (2 / 3)
-        * bubble_jakob**0.2
-        * bubble_fourier
-    )
+# def inaba_et_al_2013(
+#     bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
+# ):
+#     """Bubble history correlation for condensation of a stagnant bubble. {cite}`tangReviewDirectContact2022`."""
+#     return (
+#         1
+#         - 1.1
+#         * bubble_initial_reynolds**0.86
+#         * liquid_prandtl ** (2 / 3)
+#         * bubble_jakob**0.2
+#         * bubble_fourier
+#     )
 
 
 def al_issa_et_al_2014(

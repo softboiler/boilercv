@@ -117,22 +117,35 @@ def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, st
             replace,
             (
                 Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
-                for find, repl in {"{o}": "0", "{bo}": "b0"}.items()
+                for find, repl in {
+                    "{b}": "b",
+                    "{c}": "c",
+                    "{bo}": "b0",
+                    "{o}": "0",
+                    ",": " , ",
+                }.items()
             ),
         )
         .morph_pipe(
             replace_pattern,
             (
-                Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
-                for sym in symbols
-                for find, repl in {
-                    # ? Symbol split by `(` after first character.
-                    rf"{sym[0]}\*\({sym[1:]}([^)]+)\)": rf"{sym}\g<1>",
-                    # ? Symbol split by a `*` after first character.
-                    rf"{sym[0]}\*{sym[1:]}": rf"{sym}",
-                    # ? Symbol missing `*` resulting in failed attempt to call it
-                    rf"{sym}\(": rf"{sym}*(",
-                }.items()
+                Repl[Kind](src="sympy", dst="sympy", find=f, repl=r)
+                for f, r in {
+                    # ? Unwrapped negative.
+                    r"(?<!\()(-[\d.]+)(?!\()": r"(\g<1>)",
+                    **{
+                        find: repl
+                        for sym in symbols
+                        for find, repl in {
+                            # ? Symbol split by `(` after first character.
+                            rf"{sym[0]}\*\({sym[1:]}([^)]+)\)": rf"{sym}\g<1>",
+                            # ? Symbol split by a `*` after first character.
+                            rf"{sym[0]}\*{sym[1:]}": rf"{sym}",
+                            # ? Symbol missing `*` resulting in failed call
+                            rf"{sym}\(": rf"{sym}*(",
+                        }.items()
+                    },
+                }
             ),
         )
     )

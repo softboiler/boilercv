@@ -1,0 +1,47 @@
+[florschuetz_chao_1965.Nu_c]
+solutions = ["4*Ja*beta/(pi*(1 - beta))"]
+warnings = []
+
+[isenberg_sideman_1970.Nu_c]
+solutions = ["1*Re_b**(1/2)*Pr**(1/3)/sqrt(pi)"]
+warnings = []
+
+[akiyama_1973.Nu_c]
+solutions = ["0.37*Pr**(1/3)*Re_b**0.6"]
+warnings = []
+
+[chen_mayinger_1992.Nu_c]
+solutions = ["0.185*Pr**0.5*Re_b0**0.7"]
+warnings = []
+
+[zeitoun_et_al_1995.Nu_c]
+solutions = ["2.04*Re_b**0.61*alpha**0.328/Ja**0.308"]
+warnings = []
+
+[kalman_mori_2002.Nu_c]
+solutions = ["0.0041*Pr**0.855*Re_b**0.855"]
+warnings = []
+
+[warrier_et_al_2002.Nu_c]
+solutions = ["0.6*Pr**(1/3)*Re_b**(1/2)*(1 - 1.2*Fo_0**(2/3)*Ja**(9/10))"]
+warnings = []
+
+[yuan_et_al_2009.Nu_c]
+solutions = ["0.6*Pr**(1/3)*Re_b**(1/2)*(1 - Fo_0*Ja**0.1)"]
+warnings = []
+
+[lucic_mayinger_2010.Nu_c]
+solutions = ["1.46*Pr**0.33*Re_b0**0.61/Ja**0.31"]
+warnings = []
+
+[kim_park_2011.Nu_c]
+solutions = ["0.2575*Re_b**0.7/(Ja**0.2043*Pr**0.4564)"]
+warnings = []
+
+[al_issa_et_al_2014.Nu_c]
+solutions = ["0.0609*Pr**0.33*Re_b**0.89"]
+warnings = []
+
+[tang_et_al_2016.Nu_c]
+solutions = ["4.34*Pr**0.333*Re_b**0.584/Ja**0.419"]
+warnings = []

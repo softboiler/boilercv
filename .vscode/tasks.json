@@ -61,7 +61,40 @@
       "icon": { "id": "file-code" },
       "problemMatcher": []
     },
-
+    {
+      "label": "proj: Generate correlation equation docs",
+      "type": "shell",
+      "options": {
+        "shell": { "executable": "pwsh", "args": ["-Command"] }
+      },
+      "dependsOn": [
+        "proj: Generate beta equations",
+        "proj: Generate nusselt equations"
+      ],
+      "dependsOrder": "parallel",
+      "icon": { "id": "file-code" },
+      "problemMatcher": []
+    },
+    {
+      "label": "proj: Generate beta equations",
+      "type": "shell",
+      "options": {
+        "shell": { "executable": "pwsh", "args": ["-Command"] }
+      },
+      "command": "python -m boilercv_pipeline.equations.make_docs beta",
+      "icon": { "id": "file-code" },
+      "problemMatcher": []
+    },
+    {
+      "label": "proj: Generate nusselt equations",
+      "type": "shell",
+      "options": {
+        "shell": { "executable": "pwsh", "args": ["-Command"] }
+      },
+      "command": "python -m boilercv_pipeline.equations.make_docs nusselt",
+      "icon": { "id": "file-code" },
+      "problemMatcher": []
+    },
     {
       "label": "proj: remove empty data folders",
       "type": "shell",

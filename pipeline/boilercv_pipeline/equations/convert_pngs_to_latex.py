@@ -72,7 +72,7 @@ def parse_equations(
     """Parse equations."""
     for name, eq in tqdm(equations.items()):
         png = pngs / f"{name}.png"
-        if not overwrite and (eq.latex or png.exists()):
+        if not overwrite and (eq.latex or not png.exists()):
             continue
         equations[name] = convert(forms=equations[name], png=png, symbols=symbols)
     return equations

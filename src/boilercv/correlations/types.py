@@ -122,17 +122,17 @@ Param: TypeAlias = Literal[
     "bubble_jakob",
     "bubble_initial_reynolds",
     "liquid_prandtl",
-    "dimensionless_bubble_diameter",
+    "beta",
     "thermal_diffusivity",
     "pi",
 ]
 """Parameter."""
 Equation: TypeAlias = Literal[
-    # "ranz_marshall_1952",
+    # "ranz_marshall_1952",  # Requires numerical solution
     "florschuetz_chao_1965",
-    # "florschuetz_chao_1965_2",
-    # "hughmark_1967",
-    # "hughmark_1967_2",
+    # "florschuetz_chao_1965_2",  # Requires numerical solution
+    # "hughmark_1967",  # Requires numerical solution
+    # "hughmark_1967_2",  # Requires numerical solution
     "isenberg_sideman_1970",
     "akiyama_1973",
     "chen_mayinger_1992",
@@ -142,7 +142,7 @@ Equation: TypeAlias = Literal[
     "yuan_et_al_2009",
     "lucic_mayinger_2010",
     "kim_park_2011",
-    "inaba_et_al_2013",
+    # "inaba_et_al_2013",  # Uses custom `epsilon` and void fraction
     "al_issa_et_al_2014",
     "tang_et_al_2016",
 ]
