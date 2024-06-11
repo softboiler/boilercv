@@ -42,12 +42,11 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     equations_path = EQUATIONS[corr]
     logger.info("Start converting LaTeX expressions to SymPy expressions.")
     content = equations_path.read_text("utf-8") if equations_path.exists() else ""
-    symbols = SYMS[corr]
-    context = get_raw_equations_context(symbols=symbols)
+    context = get_raw_equations_context(symbols=SYMS)
     equations = (
         Equations[str]
         .context_model_validate(obj=loads(content), context=context)
-        .morph_cpipe(parse_equations, context, symbols=symbols, overwrite=overwrite)
+        .morph_cpipe(parse_equations, context, symbols=SYMS, overwrite=overwrite)
     )
     equations_path.write_text(
         encoding="utf-8",

@@ -45,15 +45,12 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     equations_path = EQUATIONS[corr]
     logger.info("Start converting images of equations to LaTeX.")
     content = equations_path.read_text("utf-8") if equations_path.exists() else ""
-    symbols = SYMS[corr]
     equations = (
         Equations[str]
         .context_model_validate(
-            obj=loads(content), context=get_raw_equations_context(symbols=symbols)
+            obj=loads(content), context=get_raw_equations_context(symbols=SYMS)
         )
-        .morph_pipe(
-            parse_equations, pngs=PNGS[corr], overwrite=overwrite, symbols=symbols
-        )
+        .morph_pipe(parse_equations, pngs=PNGS[corr], overwrite=overwrite, symbols=SYMS)
     )
     equations_path.write_text(
         encoding="utf-8",

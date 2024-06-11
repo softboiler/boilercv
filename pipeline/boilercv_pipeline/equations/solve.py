@@ -36,7 +36,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     equations = EQUATIONS[corr]
     solutions = SOLUTIONS[corr]
     substitutions = SUBSTITUTIONS[corr]
-    solve_syms = SOLVE_SYMS[corr]
+    solve_syms = SOLVE_SYMS
 
     logger.info("Start generating symbolic equations.")
 

@@ -20,7 +20,7 @@ def main():  # noqa: D103
 
 
 @APP.default
-def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103, ARG001
+def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: ARG001, D103
     pngs = PNGS[corr]
     logger.info("Start making equations from clipboard.")
     for name in tqdm(get_args(Equation)):

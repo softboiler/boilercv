@@ -1,5 +1,13 @@
 """Theoretical correlations for bubble lifetimes."""
 
+from pathlib import Path
+from tomllib import loads
+from typing import get_args
+
+from boilercv.correlations.models import Equations
+from boilercv.correlations.types import Eq, Sym
+
+RANGES_TOML = Path(__file__).with_stem("ranges").with_suffix(".toml")
 SYMBOLS = {
     "Nu_c": "nusselt",
     "Fo_0": "bubble_fourier",
@@ -30,3 +38,11 @@ GROUPS = {
         "tang_et_al_2016": 3,
     }.items()
 }
+
+
+def get_rangs() -> Equations[Eq]:
+    """Get ranges."""
+    return Equations[Eq].context_model_validate(
+        obj=loads(RANGES_TOML.read_text("utf-8") if RANGES_TOML.exists() else ""),
+        context=Equations[Eq].get_context(symbols=get_args(Sym)),
+    )

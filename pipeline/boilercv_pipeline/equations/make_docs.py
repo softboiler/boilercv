@@ -74,7 +74,7 @@ def make_docs(corr: Corr):
             obj=loads(
                 equations_path.read_text("utf-8") if equations_path.exists() else ""
             ),
-            context=get_raw_equations_context(symbols=SYMS[corr]),
+            context=get_raw_equations_context(symbols=SYMS),
         )
         .model_dump()
     )
