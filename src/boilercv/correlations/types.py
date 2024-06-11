@@ -39,6 +39,8 @@ if TYPE_CHECKING:
 # * MARK: Type aliases
 Corr: TypeAlias = Literal["beta", "nusselt"]
 """Correlation type."""
+Range: TypeAlias = Literal["range"]
+"""Range type."""
 LiteralKeys: TypeAlias = _LiteralGenericAlias
 """Keys."""
 # ? Notebook handling

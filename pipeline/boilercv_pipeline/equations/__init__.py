@@ -8,27 +8,42 @@ from typing import cast, get_args
 
 from boilercv.correlations import SYMBOLS, beta, nusselt
 from boilercv.correlations.beta.types import SolveSym as SolveSymBeta
-from boilercv.correlations.models import EquationForms, Equations, Forms
+from boilercv.correlations.models import EquationForms, Equations, Expectations, Forms
 from boilercv.correlations.nusselt.types import SolveSym as SolveSymNusselt
 from boilercv.correlations.pipes import LocalSymbols
-from boilercv.correlations.types import Kind
+from boilercv.correlations.types import Corr, Kind, Sym
 from boilercv.morphs.contexts import Context, Pipe, make_pipelines
 from boilercv.morphs.morphs import Morph
 
 SYMS = tuple(SYMBOLS.keys())
 PIPX = Path(".venv") / "scripts" / "pipx"
-PNGS = {"beta": beta.PNGS, "nusselt": nusselt.PNGS}
-EQUATIONS = {"beta": beta.EQUATIONS_TOML, "nusselt": nusselt.EQUATIONS_TOML}
-SOLUTIONS = {"beta": beta.SOLUTIONS_TOML, "nusselt": nusselt.SOLUTIONS_TOML}
-EXPECTATIONS = {"beta": beta.EXPECTATIONS_TOML, "nusselt": nusselt.EXPECTATIONS_TOML}
-SUBSTITUTIONS = {
-    corr: cast(tuple[tuple[str, float], ...], tuple(expectations.items()))
-    for corr, expectations in {
-        "beta": beta.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
-        "nusselt": nusselt.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
-    }.items()
+PNGS: dict[Corr, Path] = {"beta": beta.PNGS, "nusselt": nusselt.PNGS}
+EQUATIONS: dict[Corr, Path] = {
+    "beta": beta.EQUATIONS_TOML,
+    "nusselt": nusselt.EQUATIONS_TOML,
 }
-SOLVE_SYMS = {"beta": get_args(SolveSymBeta), "nusselt": get_args(SolveSymNusselt)}
+SOLUTIONS: dict[Corr, Path] = {
+    "beta": beta.SOLUTIONS_TOML,
+    "nusselt": nusselt.SOLUTIONS_TOML,
+}
+EXPECTATIONS: dict[Corr, Path] = {
+    "beta": beta.EXPECTATIONS_TOML,
+    "nusselt": nusselt.EXPECTATIONS_TOML,
+}
+SUBSTITUTIONS: dict[Corr, tuple[tuple[str, float], ...]] = {
+    corr: cast(tuple[tuple[str, float], ...], tuple(expectations.items()))
+    for corr, expectations in cast(
+        dict[Corr, Expectations[Sym]],
+        {
+            "beta": beta.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
+            "nusselt": nusselt.SYMBOL_EXPECTATIONS | {"Fo_0": 0.0},
+        },
+    ).items()
+}
+SOLVE_SYMS: dict[Corr, tuple[str, ...]] = {
+    "beta": get_args(SolveSymBeta),
+    "nusselt": get_args(SolveSymNusselt),
+}
 
 
 def escape(path: Path) -> str:

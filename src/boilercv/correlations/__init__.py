@@ -16,6 +16,7 @@ SYMBOLS = {
     "Re_b0": "bubble_initial_reynolds",
     "Pr": "liquid_prandtl",
     "beta": "beta",
+    "Pe": "peclet",
     "alpha": "thermal_diffusivity",
     "pi": "pi",
 }
