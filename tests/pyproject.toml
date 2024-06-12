@@ -23,7 +23,6 @@ dependencies = [
     "pandas[hdf5,performance]>=2.0.2",
     "pydantic>=2.7.1",
     "seaborn>=0.12.2",
-    "sympy>=1.12",
 ]
 
 [tool.fawltydeps]

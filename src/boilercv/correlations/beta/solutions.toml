@@ -1,0 +1,69 @@
+# [ranz_marshall_1952.beta]
+# solutions = []
+# warnings = ["Unable to find solution within 5 seconds."]
+
+[florschuetz_chao_1965.beta]
+solutions = ["1 - 4*Ja*sqrt(Fo_0/pi)"]
+warnings = []
+
+# [florschuetz_chao_1965_2.beta]
+# solutions = []
+# warnings = ["could not verify solution {beta: -(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3)/3 + (-48*Fo_0*Ja**2 - 3*pi)/(pi*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3))}.", "could not verify solution {beta: -(-1/2 + sqrt(3)*I/2)*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3)/3 + (-48*Fo_0*Ja**2 - 3*pi)/(pi*(-1/2 + sqrt(3)*I/2)*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3))}.", "could not verify solution {beta: -(-1/2 - sqrt(3)*I/2)*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3)/3 + (-48*Fo_0*Ja**2 - 3*pi)/(pi*(-1/2 - sqrt(3)*I/2)*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3))}.", "assumptions concerning following solution(s) cannot be checked: {beta: -(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3)/3 + (-48*Fo_0*Ja**2 - 3*pi)/(pi*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3))}, {beta: -(-1/2 + sqrt(3)*I/2)*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3)/3 + (-48*Fo_0*Ja**2 - 3*pi)/(pi*(-1/2 + sqrt(3)*I/2)*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3))}, {beta: -(-1/2 - sqrt(3)*I/2)*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3)/3 + (-48*Fo_0*Ja**2 - 3*pi)/(pi*(-1/2 - sqrt(3)*I/2)*(sqrt(2916 + 108*(-48*Fo_0*Ja**2 - 3*pi)**3/pi**3)/2 + 27)**(1/3))}"]
+
+# [hughmark_1967.beta]
+# solutions = []
+# warnings = ["Unable to find solution within 5 seconds."]
+
+# [hughmark_1967_2.beta]
+# solutions = []
+# warnings = ["Unable to find solution within 5 seconds."]
+
+[isenberg_sideman_1970.beta]
+solutions = ["(1 - 3*Fo_0*Ja*Pr**(1/3)*Re_b0**(1/2)/(sqrt(pi)))**(2/3)"]
+warnings = []
+
+[akiyama_1973.beta]
+solutions = ["(1 - 1.036*Fo_0*Ja*Pr**(1/3)*Re_b0**(1/2))**0.714"]
+warnings = []
+
+[chen_mayinger_1992.beta]
+solutions = ["(1 - 0.56*Fo_0*Ja*Pr**0.5*Re_b0**0.7)**0.9"]
+warnings = []
+
+[zeitoun_et_al_1995.beta]
+solutions = ["(1 - 5.67*Fo_0*Ja**0.692*Re_b0**0.61*alpha**0.328)**0.72"]
+warnings = []
+
+[kalman_mori_2002.beta]
+solutions = ["(1 - 0.0094*Fo_0*Ja*Pr**0.85*Re_b0**0.85)**0.873"]
+warnings = []
+
+[warrier_et_al_2002.beta]
+solutions = [
+    "(1 - 1.8*Fo_0*Ja*Pr**(1/3)*Re_b0**0.5*(1 - 0.72*Fo_0**(2/3)*Ja**0.9))**(2/3)",
+]
+warnings = []
+
+[yuan_et_al_2009.beta]
+solutions = ["(1 - 1.8*Fo_0*Ja*Pr**(1/3)*Re_b0**0.5*(1 - 0.5*Fo_0*Ja**0.1))**(2/3)"]
+warnings = []
+
+[lucic_mayinger_2010.beta]
+solutions = ["1 - 2.92*Fo_0*Ja**0.69*Pr**0.33*Re_b0**0.61"]
+warnings = []
+
+[kim_park_2011.beta]
+solutions = ["(1 - 0.67*Fo_0*Ja**0.7959*Re_b0**0.7/Pr**0.4564)**0.769"]
+warnings = []
+
+# [inaba_et_al_2013.beta]
+# solutions = ["1 - 1.1*Fo_0*Ja**0.2*Pr**(2/3)*Re_b0**0.86"]
+# warnings = []
+
+[al_issa_et_al_2014.beta]
+solutions = ["(1 - 0.135*Fo_0*Ja*Pr**0.33*Re_b0**0.89)**0.901"]
+warnings = []
+
+[tang_et_al_2016.beta]
+solutions = ["(1 - 12.29*Fo_0*Ja**0.581*Pr**0.333*Re_b0**0.584)**0.706"]
+warnings = []

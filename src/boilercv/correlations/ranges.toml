@@ -1,0 +1,47 @@
+[florschuetz_chao_1965]
+latex = ''
+sympy = ''
+
+[isenberg_sideman_1970]
+latex = ''
+sympy = ''
+
+[akiyama_1973]
+latex = ''
+sympy = ''
+
+[chen_mayinger_1992]
+latex = '0 < \Re_b < 10\,000 ,\ 0 < \Ja < 80 ,\ 2 < \Pr < 15'
+sympy = '(0 < Re_b) & (Re_b < 10000) & (Ja < 80) & (Pr < 15)'
+
+[zeitoun_et_al_1995]
+latex = '2\,266 < \Re_b < 7\,953'
+sympy = '(2266 < Re_b) & (Re_b < 7953)'
+
+[kalman_mori_2002]
+latex = '0.05 < \Re_b < 2\,000 ,\ 10 < \Pe < 20\,000 ,\ 3 < \Pr < 7.5'
+sympy = '(0.05 < Re_b) & (Re_b < 2000) & (Pe < 20000) & (Pr < 7.5)'
+
+[warrier_et_al_2002]
+latex = '20 < \Re_b < 700 ,\ 12 < \Ja < 100 ,\ 1.8 < \Pr < 2.9'
+sympy = '(20 < Re_b) & (Re_b < 700) & (Ja < 100) & (Pr < 2.9)'
+
+[yuan_et_al_2009]
+latex = '335 < \Re_b < 1\,770 ,\ 0 < \Ja < 60 ,\ 1.71 < \Pr < 1.75'
+sympy = '(335 < Re_b) & (Re_b < 1770) & (Ja < 60) & (Pr < 1.75)'
+
+[lucic_mayinger_2010]
+latex = '1\,000 < \Re_b < 3\,400 ,\ 10 < \Ja < 30'
+sympy = '(1000 < Re_b) & (Re_b < 3400) & (Ja < 30)'
+
+[kim_park_2011]
+latex = '1\,000 < \Re_b < 6\,000 ,\ 18 < \Ja < 36 ,\ 1.87 < \Pr < 2.03'
+sympy = '(1000 < Re_b) & (Re_b < 6000) & (Ja < 36) & (Pr < 2.03)'
+
+[al_issa_et_al_2014]
+latex = '2\,100 < \Re_b < 270\,000 ,\ 16 < \Ja < 35 ,\ 1.75 < \Pr < 1.9'
+sympy = '(2100 < Re_b) & (Re_b < 270000) & (Ja < 35) & (Pr < 1.9)'
+
+[tang_et_al_2016]
+latex = '1\,000 < \Re_b < 30\,000 ,\ 45 < \Ja < 180 ,\ 2.1 < \Pr < 4.3'
+sympy = '(1000 < Re_b) & (Re_b < 30000) & (Ja < 180) & (Pr < 4.3)'

@@ -1,0 +1,134 @@
+# [ranz_marshall_1952]
+# latex = '''
+# \beta^{0.5} =
+# \frac
+#     { 6 \Ja \Fo_\o + \beta^{2} }
+#     { 1 - 1.8 \Re_\bo^{0.5} \Pr^{0.3} \Ja \Fo_\o }
+# '''
+# sympy = '''Eq(
+# beta**0.5,
+#     ( 6 * Ja * Fo_0 + beta**2 ) /
+#     ( 1 - 1.8 * Re_b0**0.5 * Pr**0.3 * Ja *Fo_0 )
+# )'''
+
+[florschuetz_chao_1965]
+latex = '\beta = 1 - 4 \Ja \sqrt{\Fo_\o / \pi}'
+sympy = 'Eq( beta , 1 - 4 * Ja * sqrt(Fo_0 / pi))'
+
+# [florschuetz_chao_1965_2]
+# latex = '\frac{2}{\beta} + \beta^{2} -3 = \frac{48}{\pi} \Ja^{2} \Fo_\o'
+# sympy = ' Eq( (2/beta) + beta**2 - 3 , (48/pi)*(Ja**2 * Fo_0) ) '
+
+# [hughmark_1967]
+# latex = '''
+# \beta^{0.5} =
+# \frac
+#     { 6 \Ja \Fo_\o + \beta^{2} }
+#     { 1 - 1.8 \Re_\bo^{1/2} \Pr^{1/3} \Ja \Fo_\o }
+# '''
+# sympy = '''Eq(
+# beta**0.5 ,
+#     ( 6* Ja * Fo_0 + beta**2 ) /
+#     ( 1 - 1.8 * Re_b0**(1/2) * Pr**(1/3) * Ja * Fo_0 )
+# )'''
+
+# [hughmark_1967_2]
+# latex = '''
+# \beta^{0.5} =
+# \frac
+#     {6 \Ja \Fo_\o + \beta^{2} }
+#     {1 - 0.81 \Re_\bo^{1/2} \Pr^{1/3} \Ja \Fo_\o }
+# '''
+# sympy = '''Eq(
+# beta**0.5 ,
+#     ( 6 * Ja *Fo_0 + beta**2) /
+#     ( 1 - 0.81 * Re_b0**(1/2) * Pr**(1/3) * Ja * Fo_0 )
+# )'''
+
+[isenberg_sideman_1970]
+latex = '''
+\beta =
+\left( 1 - \left( 3/\sqrt{\pi} \right) \Re_\bo^{1/2} \Pr^{1/3} Ja \Fo_\o \right) ^ {2/3}
+'''
+sympy = 'Eq( beta , (1 - (3/sqrt(pi)) * Re_b0**(1/2) * Pr**(1/3) * Ja * Fo_0 )**(2/3) )'
+
+[akiyama_1973]
+latex = '\beta = \left( 1 - 1.036 \Re_\bo^{1/2} \Pr^{1/3} \Ja \Fo_\o \right) ^ {0.714}'
+sympy = 'Eq( beta , ( 1 - 1.036 * Re_b0**(1/2) * Pr**(1/3) * Ja * Fo_0 )**0.714 )'
+
+[chen_mayinger_1992]
+latex = '\beta = \left( 1 - 0.56 \Re_\bo^{0.7} \Pr^{0.5} \Ja \Fo_\o \right) ^ {0.9}'
+sympy = 'Eq( beta , ( 1 - 0.56 * Re_b0**0.7 * Pr**0.5 * Ja * Fo_0 )**0.9 )'
+
+[zeitoun_et_al_1995]
+latex = '''
+\beta =
+\left( 1 - 5.67 \Re_\bo^{0.61} \alpha^{0.328} \Ja^{0.692} \Fo_\o \right) ^ {0.72}
+'''
+sympy = 'Eq( beta , (1 - 5.67 * Re_b0**0.61 * alpha**0.328 * Ja**0.692 * Fo_0 )**0.72 )'
+
+[kalman_mori_2002]
+latex = '''
+\beta =
+\left( 1 - 0.0094 \Re_\bo^{0.855} \Pr^{0.855} \Ja \Fo_\o \right) ^ {0.873}
+'''
+sympy = 'Eq( beta , (1 - 0.0094 * Re_b0**0.85 * Pr**0.85 * Ja * Fo_0 )**0.873 )'
+
+[warrier_et_al_2002]
+latex = '''
+\beta =
+\left(
+    1 - 1.8 \Re_\bo^{0.5} \Pr^{1/3} \Ja \Fo_\o \left(
+        1 - 0.72 \Ja^{0.9} \Fo_\o^{2/3}
+    \right)
+\right) ^ {2/3}
+'''
+sympy = '''Eq(
+beta ,
+(
+    1 - 1.8 * Re_b0**0.5 * Pr**(1/3) * Ja * Fo_0 * (
+        1 - 0.72 * Ja**0.9 * Fo_0**(2/3)
+    )
+)**(2/3)
+)'''
+
+[yuan_et_al_2009]
+latex = '''
+\beta =
+\left(
+    1 - 1.8 \Re_\bo^{0.5} \Pr^{1/3} \Ja \Fo_\o \left(1 - 0.5 \Ja^{0.1} \Fo_\o\right)
+\right) ^ {2/3}
+'''
+sympy = '''Eq(
+beta ,
+(1 - 1.8 * Re_b0**0.5 * Pr**(1/3) * Ja * Fo_0 * (1 - 0.5 * Ja**0.1 * Fo_0))**(2/3)
+)'''
+
+[lucic_mayinger_2010]
+latex = '\beta = 1 - 2.92 \Re_\bo^{0.61} \Pr^{0.33} \Ja^{0.69} \Fo_\o'
+sympy = 'Eq( beta , 1 - 2.92 * Re_b0**0.61 * Pr**0.33 * Ja**0.69 * Fo_0 )'
+
+[kim_park_2011]
+latex = '''
+\beta =
+\left( 1 - 0.67 \Re_\bo^{0.7} \Pr^{-0.4564} \Ja^{0.7959} \Fo_\o \right) ^ {0.769}
+'''
+sympy = '''Eq(
+beta ,
+(1 - 0.67 * Re_b0**0.7 * Pr**(-0.4564) * Ja**0.7959 * Fo_0 )**0.769
+)'''
+
+# [inaba_et_al_2013]
+# latex = '\beta = 1 - 1.1 \Re_\bo^{0.86} \Pr^{2/3} \Ja^{0.2} \Fo_\o'
+# sympy = 'Eq( beta , 1 - 1.1 * Re_b0**0.86 * Pr**(2/3) * Ja**0.2 * Fo_0 )'
+
+[al_issa_et_al_2014]
+latex = '\beta = \left( 1 - 0.135 \Re_\bo^{0.89} \Pr^{0.33} \Ja \Fo_\o \right) ^ {0.901}'
+sympy = 'Eq( beta , ( 1 - 0.135 * Re_b0**0.89 * Pr**0.33 * Ja * Fo_0 )**0.901 )'
+
+[tang_et_al_2016]
+latex = '''
+\beta =
+\left(1 - 12.29 \Re_\bo^{0.584} \Pr^{0.333} \Ja^{0.581} \Fo_\o \right) ^ {0.706}
+'''
+sympy = 'Eq( beta , (1 - 12.29* Re_b0**0.584 * Pr**0.333 * Ja**0.581 * Fo_0 )**0.706 )'

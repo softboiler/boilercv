@@ -13,10 +13,12 @@ classifiers = ["License :: OSI Approved :: MIT License"]
 dependencies = [
     "matplotlib>=3.7.2",
     "numpy>=1.24.4",
+    "numpydantic>=1.0.0",
     "pandas[hdf5,performance]>=2.0.2",
     "pillow>=10.0.0",
-    "pydantic>=2.7.1",                     # ? RootModel improvements
+    "pydantic>=2.7.1",
     "pytz>=2023.3",
+    "sympy>=1.12",
     "xarray[accel,io,parallel]>=2023.7.0",
 ]
 [project.optional-dependencies]
@@ -42,9 +44,11 @@ source = [
 ]
 [tool.coverage.report]
 ignore_errors = true
+
 [tool.fawltydeps]
 deps = ["pyproject.toml"]
 code = ["src"]
+ignore_undeclared = ["_typeshed"]
 
 [tool.pytest.ini_options]
 addopts = '''
@@ -208,6 +212,9 @@ select = [
 unfixable = [
     "PIE790", # Don't remove `pass`/`...`, overridden in pre-commit
 ]
+extend-safe-fixes = [
+    "F401", # Allow autofix for unused imports even in `__init__.py`
+]
 ignore = [
     "ANN",     # Don't require type annotations
     "ARG005",  # Allow unused lambda argument. For consistency across df pipelines.
@@ -247,6 +254,7 @@ ignore = [
     "PLR6201", # Don't require set literal for membership checks
     "PLR6301", # Allow methods that don't reference self, may be overridden
     "PLW0108", # Don't warn about unnecessary lambda. Often needed in pandas chains
+    "PLW0642", # Allow reassignment to `cls` and `self`
     "PLW2901", # For loop variable
     "RET",     # Return checks are flaky, Sourcery does fine analysing these paths
     "S301",    # Don't warn about pickling.
@@ -285,7 +293,4 @@ convention = "numpy"
     "D103", # Allow not documenting a test function
     "E302", # Allow manual spacing of test classes close to their headings
     "E305", # Allow manual spacing of test classes close to their headings
-]
-"pipeline/boilercv_pipeline/correlations.py" = [
-    "S307", # Allow `eval` since we're generating lambdas for correlations
 ]

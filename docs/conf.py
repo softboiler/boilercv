@@ -12,9 +12,6 @@ from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
 from boilercv_docs.nbs import init_nb_env
 from boilercv_docs.patch_nbs import patch_nbs
 from boilercv_docs.types import IspxMappingValue
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
-    EQUATIONS,
-)
 
 # ! Initialization
 patch_nbs()
@@ -128,7 +125,7 @@ copyright = f"{date.today().year}, {AUTHORS}"  # noqa: A001
 version = VERSION
 master_doc = "index"
 language = "en"
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/_*.md", "**/_*.ipynb"]
 extensions = [
     "autodoc2",
     "myst_nb",
@@ -176,7 +173,10 @@ mathjax3_config = {
         "macros": {
             # ? User-defined macros: https://docs.mathjax.org/en/latest/input/tex/macros.html
             # ? Built-in macros: https://docs.mathjax.org/en/latest/input/tex/macros/index.html#tex-commands
-            **{const: rf"\mathit{{{const}}}" for const in ["Fo", "Ja", "Re", "Pr"]},
+            **{
+                const: rf"\mathit{{{const}}}"
+                for const in ["Fo", "Ja", "Nu", "Pe", "Pr", "Re"]
+            },
             **{f"{const}o": rf"\mathit{{{const}0}}" for const in ["", "b"]},
         }
     }
@@ -192,16 +192,8 @@ myst_enable_extensions = [
     "tasklist",
 ]
 myst_heading_anchors = 6
-equations = {
-    name: f"""
-$$
-{eq["latex"]}
-$$ (eq_{name})""".strip()
-    for name, eq in EQUATIONS.items()
-}
 myst_substitutions = {
-    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/blakeNaccarato/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Ffind_centers.ipynb)",
-    **equations,
+    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/blakeNaccarato/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Ffind_centers.ipynb)"
 }
 # ! BibTeX
 bibtex_bibfiles = dpaths(BIB_TEMPLATE, BIB)
@@ -243,7 +235,9 @@ nitpick_ignore = [
     ("py:class", f"{PACKAGE}.data.sets.Stage"),
     ("py:class", f"{PACKAGE}.experiments.e230920_subcool.NbProcess"),
     ("py:class", f"{PACKAGE}.experiments.e230920_subcool.NbProcess"),
+    ("py:class", f"{PACKAGE}.morphs.contexts"),
 ]
+
 nitpick_ignore_regex = [
     # ? Missing inventory
     (r"py:.*", r"docutils\..+"),

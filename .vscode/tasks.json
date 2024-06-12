@@ -30,6 +30,19 @@
       "options": ["gray", "binarized", "filled", "composite"]
     },
     {
+      "id": "correlations",
+      "type": "pickString",
+      "description": "correlations",
+      "default": "",
+      "options": [
+        "beta",
+        "nusselt",
+        "beta --overwrite",
+        "nusselt --overwrite",
+        "range"
+      ]
+    },
+    {
       "id": "version",
       "type": "promptString",
       "description": "version",
@@ -44,6 +57,26 @@
     }
   ],
   "tasks": [
+    {
+      "label": "proj: Generate correlation",
+      "type": "shell",
+      "options": {
+        "shell": { "executable": "pwsh", "args": ["-Command"] }
+      },
+      "command": "python ${file} ${input:correlations}",
+      "icon": { "id": "file-code" },
+      "problemMatcher": []
+    },
+    {
+      "label": "proj: Generate correlation docs",
+      "type": "shell",
+      "options": {
+        "shell": { "executable": "pwsh", "args": ["-Command"] }
+      },
+      "command": "python -m boilercv_pipeline.equations.make_docs",
+      "icon": { "id": "file-code" },
+      "problemMatcher": []
+    },
     {
       "label": "proj: remove empty data folders",
       "type": "shell",
@@ -301,7 +334,7 @@
       "label": "task: sphinx-autobuild docs (preview)",
       "type": "shell",
       "options": { "shell": { "executable": "pwsh", "args": ["-Command"] } },
-      "command": ". scripts/Initialize-Shell.ps1; sphinx-build -EaT docs _site; sphinx-autobuild -T docs _site --watch pipeline/boilercv_pipeline/correlations --ignore **/params.yaml --ignore **/params_schema.json --ignore **/apidocs --ignore docs/data --ignore docs/temp",
+      "command": ". scripts/Initialize-Shell.ps1; sphinx-autobuild -T docs _site --ignore **/params.yaml --ignore **/params_schema.json --ignore **/apidocs --ignore docs/data --ignore docs/temp",
       "icon": { "id": "book" },
       "problemMatcher": []
     },

@@ -1,0 +1,51 @@
+[florschuetz_chao_1965]
+latex = '\Nu_c = (4/\pi) \Ja \frac{\beta}{1-\beta}'
+sympy = 'Eq( Nu_c , (4/pi) * Ja * beta/(1 - beta) )'
+
+[isenberg_sideman_1970]
+latex = '\Nu_c = \left(1/\sqrt{\pi}\right) \Re_b^{1/2} Pr^{1/3}'
+sympy = 'Eq( Nu_c , (1/sqrt(pi)) * Re_b**(1/2) * Pr**(1/3) )'
+
+[akiyama_1973]
+latex = '\Nu_c = 0.37 \Re_b^{0.6} Pr^{1/3}'
+sympy = 'Eq( Nu_c , 0.37*Re_b**0.6 * Pr**(1/3) )'
+
+[chen_mayinger_1992]
+latex = '\Nu_c = 0.185 \Re_\bo^{0.7} \Pr^{0.5}'
+sympy = 'Eq( Nu_c , 0.185*Re_b0**0.7 * Pr**0.5 )'
+
+[zeitoun_et_al_1995]
+latex = '\Nu_c = 2.04 \Re_b^{0.61} \alpha^{0.328} \Ja^{-0.308}'
+sympy = 'Eq( Nu_c , 2.04*Re_b**0.61 * alpha**0.328 * Ja**(-0.308) )'
+
+[kalman_mori_2002]
+latex = '\Nu_c = 0.0041 \Re_b^{0.855} \Pr^{0.855}'
+sympy = 'Eq( Nu_c , 0.0041*Pr**0.855 * Re_b**0.855 )'
+
+[warrier_et_al_2002]
+latex = '\Nu_c = 0.6 \Re_b^{1/2} \Pr^{1/3} \left(1 - 1.2 \Ja^{9/10} \Fo_\o^{2/3} \right)'
+sympy = 'Eq( Nu_c , 0.6*Re_b**(1/2) * Pr**(1/3) * (1 - 1.2*Ja**(9/10) * Fo_0**(2/3)) )'
+
+[yuan_et_al_2009]
+latex = '\Nu_c = 0.6 \Re_b^{1/2} \Pr^{1/3} (1 - \Ja^{0.1} \Fo_\o )'
+sympy = 'Eq( Nu_c , 0.6*Re_b**(1/2) * Pr**(1/3) * (1 - Ja**0.1 * Fo_0) )'
+
+[lucic_mayinger_2010]
+latex = '\Nu_c = 1.46 \Re_\bo^{0.61} \Ja^{-0.31} \Pr^{0.33}'
+sympy = 'Eq( Nu_c , 1.46*Re_b0**0.61 * Ja**(-0.31) * Pr**0.33 )'
+
+[kim_park_2011]
+latex = '\Nu_c = 0.2575 \Re_b^{0.7} \Ja^{-0.2043} \Pr^{-0.4564}'
+sympy = 'Eq( Nu_c , 0.2575 * Re_b**0.7 * Ja**(-0.2043) * Pr**(-0.4564) )'
+
+# [inaba_et_al_2013]
+# latex = '\Nu_c = 0.75 \Re_b^{0.6} \alpha^{0.35} \Ja^{-1/5} \Pr^{1/3} \epsilon^{-1/4}'
+# sympy = ''
+
+[al_issa_et_al_2014]
+latex = '\Nu_c = 0.0609 \Re_b^{0.89} \Pr^{0.33}'
+sympy = 'Eq( Nu_c , 0.0609 * Re_b**0.89 * Pr**0.33 )'
+
+[tang_et_al_2016]
+latex = '\Nu_c = 4.34 \Re_b^{0.584} \Ja^{-0.419} \Pr^{0.333}'
+sympy = 'Eq( Nu_c , 4.34*Re_b**0.584 * Ja**(-0.419) * Pr**0.333 )'

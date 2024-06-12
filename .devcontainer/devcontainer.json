@@ -20,7 +20,7 @@
     "install-pyqtgraph-deps": [
       "pwsh",
       "-Command",
-      "sudo apt update && sudo apt install --yes libegl1-mesa"
+      "sudo apt update && sudo apt install --yes libegl1"
     ],
     "set-up-profile": [
       "pwsh",

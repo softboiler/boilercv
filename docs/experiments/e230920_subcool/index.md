@@ -4,7 +4,7 @@ Subcooled bubble collapse experiment.
 
 :::{toctree}
 :hidden:
-correlations
+correlations/index
 find_contours
 find_centers
 find_objects

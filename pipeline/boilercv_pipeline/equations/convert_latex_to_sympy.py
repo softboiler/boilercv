@@ -1,37 +1,35 @@
 """Convert LaTeX equations to SymPy equations."""
 
 from pathlib import Path
+from re import sub
 from shlex import quote, split
 from subprocess import run
+from tomllib import loads
+from typing import get_args
 
 from cyclopts import App
 from loguru import logger
-from numpy import finfo
-from sympy import sympify
-from tomlkit import dumps, parse
-from tomlkit.items import Table
+from tomlkit import parse
 from tqdm import tqdm
 
-from boilercv.morphs import Morph
-from boilercv_pipeline.correlations import PIPX
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.equations import (
-    FormsRepl,
-)
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.morphs import (
+from boilercv.correlations.models import EquationForms, Equations
+from boilercv.correlations.pipes import fold_whitespace
+from boilercv.correlations.types import Corr, Kind, Range
+from boilercv.mappings import Repl, replace, replace_pattern, sync
+from boilercv.morphs.contexts import Defaults
+from boilercv.morphs.morphs import Morph
+from boilercv_pipeline.equations import (
     EQUATIONS,
-    EQUATIONS_TOML,
-    LOCALS,
-    MAKE_RAW,
-    Forms,
-    regex_replace,
-    set_equation_forms,
-)
-from boilercv_pipeline.correlations.dimensionless_bubble_diameter.types import (
-    K,
-    Kind,
-    V,
+    PIPX,
+    SYMS,
+    escape,
+    get_raw_equations_context,
+    make_raw,
+    sanitize_forms,
 )
 
+LATEX_PARSER = Path("scripts") / "convert_latex_to_sympy.py"
+"""Isolated LaTeX parser."""
 APP = App()
 """CLI."""
 
@@ -41,98 +39,149 @@ def main():  # noqa: D103
 
 
 @APP.default
-def default(overwrite: bool = False):  # noqa: D103
-    latex_parser = Path("scripts") / "convert_latex_to_sympy.py"
-    latex = "latex"
-    symbolic = "sympy"
-    data = EQUATIONS_TOML.read_text("utf-8")
-    raw_all_single_quoted = '"' not in data
-    toml = parse(data)
-    for name, eq in tqdm(((name, equation) for name, equation in EQUATIONS.items())):
-        if not eq.get(latex):
+def default(corr: Corr | Range = "beta", overwrite: bool = False):  # noqa: D103
+    equations_path = EQUATIONS[corr]
+    logger.info("Start converting LaTeX expressions to SymPy expressions.")
+    content = equations_path.read_text("utf-8") if equations_path.exists() else ""
+    context = get_raw_equations_context(symbols=SYMS)
+    equations = (
+        Equations[str]
+        .context_model_validate(obj=loads(content), context=context)
+        .morph_cpipe(parse_equations, context, symbols=SYMS, overwrite=overwrite)
+    )
+    equations_path.write_text(
+        encoding="utf-8",
+        data=make_raw(
+            sync(
+                reference=equations.model_dump(mode="json"), target=parse(content)
+            ).as_string()
+        ),
+    )
+    logger.info("Finish converting LaTeX expressions to SymPy expressions.")
+
+
+def parse_equations(
+    equations: Equations[str], symbols: tuple[str, ...], overwrite: bool
+) -> Equations[str]:
+    """Parse equations."""
+    for name, eq in tqdm(equations.items()):
+        if not overwrite and (eq.sympy or not eq.latex):
             continue
-        if eq.get(symbolic) and not overwrite:
-            continue
-        changed = (
-            eq.pipe(convert, PIPX, latex_parser, latex, symbolic)
-            .pipe(set_equation_forms, symbols=LOCALS)
-            .pipe(compare, orig=eq)
-            .pipe(remove_symbolically_equiv, orig=eq, symbolic=symbolic)
+        equations[name] = convert(
+            forms=eq, symbols=symbols, interpreter=PIPX, script=LATEX_PARSER
         )
-        if overwrite or changed:
-            for kind, eq in changed.items():
-                if (table := toml.get(name)) and isinstance(table, Table):
-                    table[kind] = eq
-    data = dumps(toml)
-    if raw_all_single_quoted and r"\"" not in data:
-        for old, new in MAKE_RAW.items():
-            data = data.replace(old, new)
-    EQUATIONS_TOML.write_text(encoding="utf-8", data=data)
+    return equations
 
 
 def convert(
-    i: Forms, interpreter: Path, script: Path, latex: Kind, symbolic: Kind
-) -> Forms:
+    forms: EquationForms[str], symbols: tuple[str, ...], interpreter: Path, script: Path
+) -> EquationForms[str]:
     """Convert LaTeX equation to SymPy equation."""
-    sanitized_latex = i.pipe(
-        regex_replace,
+    sanitized = replace_pattern(
+        sanitize_forms(forms, symbols, sanitizer=sanitize_and_fold).model_dump(),
         (
-            FormsRepl(src=latex, dst=latex, find=find, repl=repl)
-            for find, repl in {r"\\left\(": "(", r"\\right\)": ")"}.items()
+            Repl(src="latex", dst="latex", find=find, repl=repl)
+            for find, repl in {
+                r"\\left\(": "(",
+                r"\\right\)": ")",
+                r"\\,": "",
+                r"\\ ": " ",
+            }.items()
         ),
-    )[latex]
+    )["latex"]
+    forms.sympy = (
+        parse_ineq(sanitized, symbols, interpreter, script)
+        if "<" in sanitized
+        else parse_expr(interpreter, script, sanitized)
+    )
+    return sanitize_forms(forms, symbols, sanitizer=sanitize)
+
+
+def parse_ineq(
+    sanitized: str, symbols: tuple[str, ...], interpreter: Path, script: Path
+) -> str:
+    """Parse inequalities."""
+    sep = " , "
+    sanitized = sep.join([
+        sub(r"(.+) < (.+) < (.+)", r"\g<1> < \g<2> & \g<2> < \g<3>", s)
+        for s in sanitized.split(sep)
+    ])
+    sep = " & "
+    return sep.join([
+        f"""({
+            sanitize(
+                {"sympy": parse_expr(interpreter, script, latex)}, symbols
+            ).model_dump()["sympy"]
+        })"""
+        for latex in sanitized.split(sep)
+    ])
+
+
+def parse_expr(interpreter, script, latex):
+    """Parse expression."""
     result = run(
-        args=split(
-            f"{escape(interpreter)} run {escape(script)} {quote(sanitized_latex)}"
-        ),
+        args=split(f"{escape(interpreter)} run {escape(script)} {quote(latex)}"),
         capture_output=True,
         check=False,
         text=True,
     )
     if result.returncode:
         raise RuntimeError(result.stderr)
-    i[symbolic] = result.stdout.strip()
-    return i
+    return result.stdout.strip()
 
 
-def compare(i: Morph[K, V], orig: Morph[K, V]) -> dict[K, V]:
-    """Compare, returning only the subset that changed."""
-    return {k: v for k, v in i.items() if v != orig[k]}
+def sanitize_and_fold(
+    forms: dict[Kind, str], symbols: tuple[str, ...]
+) -> Morph[Kind, str]:
+    """Sanitize and fold symbolic forms."""
+    return (
+        Morph[Kind, str](forms)
+        .morph_pipe(sanitize, symbols=symbols)
+        .morph_pipe(fold_whitespace, Defaults(keys=get_args(Kind)))
+    )
 
 
-def escape(path: Path) -> str:
-    """Escape path for running subprocesses."""
-    return quote(path.as_posix())
-
-
-def remove_symbolically_equiv(i: Forms, orig: Forms, symbolic: Kind) -> Forms:
-    """Remove symbolically equivalent forms."""
-    old_eq = orig.get(symbolic)
-    eq = i.get(symbolic)
-    if not old_eq or not eq:
-        return i
-    old = sympify(old_eq, locals=LOCALS.model_dump(), evaluate=False)
-    new = sympify(eq, locals=LOCALS.model_dump(), evaluate=False)
-    compare = (old.lhs - old.rhs) - (new.lhs - new.rhs)
-    if compare == 0:
-        # ? Equations compare equal without simplifying
-        i.pop(symbolic)
-        return i
-    compare = compare.simplify()
-    if compare == 0:
-        # ? Equations compare equal after simplifying
-        i.pop(symbolic)
-        return i
-    compare = compare.evalf(subs=dict.fromkeys(LOCALS, 0.1))
-    if complex(compare).real < finfo(float).eps:
-        # ? Equations compare equal within machine after unit substitution
-        i.pop(symbolic)
-        return i
-    # ? Equations are not symbolically equivalent
-    return i
+def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, str]:
+    """Sanitize symbolic forms."""
+    return (
+        Morph[Kind, str](forms)
+        .morph_pipe(
+            replace,
+            (
+                Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
+                for find, repl in {
+                    "{b}": "b",
+                    "{c}": "c",
+                    "{bo}": "b0",
+                    "{o}": "0",
+                    ",": " , ",
+                }.items()
+            ),
+        )
+        .morph_pipe(
+            replace_pattern,
+            tuple(
+                Repl[Kind](src="sympy", dst="sympy", find=f, repl=r)
+                for f, r in {
+                    # ? Unwrapped negative.
+                    r"(?<!\()(-[\d.]+)(?!\()": r"(\g<1>)",
+                    **{
+                        find: repl
+                        for sym in symbols
+                        for find, repl in {
+                            # ? Symbol split by `(` after first character.
+                            rf"{sym[0]}\*\({sym[1:]}([^)]+)\)": rf"{sym}\g<1>",
+                            # ? Symbol split by a `*` after first character.
+                            rf"{sym[0]}\*{sym[1:]}": rf"{sym}",
+                            # ? Symbol missing `*` resulting in failed call
+                            rf"{sym}\(": rf"{sym}*(",
+                        }.items()
+                    },
+                }.items()
+            ),
+        )
+    )
 
 
 if __name__ == "__main__":
-    logger.info("Start converting LaTeX expressions to SymPy expressions.")
     main()
-    logger.info("Finish converting LaTeX expressions to SymPy expressions.")

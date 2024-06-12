@@ -8,12 +8,12 @@ from typing import Any
 from pandas import read_hdf
 from xarray import Dataset, open_dataset
 
+from boilercv.correlations.types import Stage
 from boilercv.data import HEADER, ROI, VIDEO
 from boilercv.data.packing import unpack
 from boilercv.types import DF, DS
 from boilercv_pipeline.models.params import PARAMS
 from boilercv_pipeline.models.paths import get_sorted_paths
-from boilercv_pipeline.types import Stage
 
 ALL_FRAMES = slice(None)
 """Slice that gets all frames."""

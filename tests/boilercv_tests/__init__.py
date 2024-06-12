@@ -69,10 +69,10 @@ def get_cached_nb_ns(
     return get_nb_ns(nb, params, attributes)
 
 
-boilercv_dir = Path("src") / PACKAGE
+boilercv_pipeline_dir = Path("pipeline") / f"{PACKAGE}_pipeline"
 STAGES: list[ParameterSet] = []
-for module in walk_modules(boilercv_dir):
-    if module.startswith("boilercv.manual"):
+for module in walk_modules(boilercv_pipeline_dir):
+    if module.startswith("boilercv_pipeline.manual"):
         stage = get_module_rel(module, "manual")
         match stage.split("."):
             case ("generate_experiment_docs", *_):
@@ -85,7 +85,7 @@ for module in walk_modules(boilercv_dir):
             pytest.param(module, id=get_module_rel(module, PACKAGE), marks=marks)
         )
         continue
-    if not module.startswith("boilercv.stages"):
+    if not module.startswith("boilercv_pipeline.stages"):
         continue
     stage = get_module_rel(module, "stages")
     match stage.split("."):
