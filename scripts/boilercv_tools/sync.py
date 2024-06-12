@@ -48,13 +48,10 @@ UV = REQS / "uv.in"
 """UV requirement."""
 DEV = REQS / "dev.in"
 """Other development tools and editable local dependencies."""
-DVC = REQS / "dvc.in"
-"""Separate DVC dependency due to occasional VSCode extension sync conflict."""
 OVERRIDES = REQS / "override.txt"
 """Overrides to satisfy otherwise incompatible combinations."""
 DEPS = (
     DEV,
-    DVC,
     *[
         Path(editable["path"]) / "pyproject.toml"
         for editable in finditer(
@@ -77,8 +74,8 @@ PROJECT_PYTHON_VERSION: PythonVersion = "3.11"
 """This project's default Python version."""
 PLATFORMS: tuple[Platform, ...] = ("linux", "macos", "windows")
 """Supported platforms."""
-PYTHON_VERSIONS: tuple[PythonVersion, ...] = (  # pyright: ignore[reportAssignmentType] 1.1.356
-    tuple(PYTHON_VERSIONS_FILE.read_text("utf-8").splitlines())
+PYTHON_VERSIONS: tuple[PythonVersion, ...] = (
+    tuple(PYTHON_VERSIONS_FILE.read_text("utf-8").splitlines())  # pyright: ignore[reportArgumentType] 1.1.356
     if PYTHON_VERSIONS_FILE.exists()
     else ("3.9", "3.10", "3.11", "3.12")
 )

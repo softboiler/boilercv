@@ -106,6 +106,7 @@
   "python.analysis.autoFormatStrings": true,
   "python.analysis.autoImportCompletions": true,
   "python.analysis.extraCommitChars": true,
+  "python.analysis.gotoDefinitionInStringLiteral": true,
   "python.analysis.importFormat": "absolute",
   "python.analysis.inlayHints.callArgumentNames": "all",
   "python.analysis.inlayHints.functionReturnTypes": true,

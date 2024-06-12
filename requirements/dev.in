@@ -5,6 +5,7 @@
 --editable tests/
 --editable submodules/boilercore
 debugpy==1.8.1
+dvc[gs]==3.50.2
 fawltydeps==0.15.0
 flit==3.9.0
 keyring==25.2.1
