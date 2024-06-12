@@ -61,7 +61,7 @@ bin/uv pip install --editable=scripts
 'TOOLS INSTALLED' | Write-Progress -Done
 
 '*** RUNNING PRE-SYNC TASKS' | Write-Progress
-if ($SyncTemplate -and $CI) {
+if ($CI) {
     'SYNCING PROJECT WITH TEMPLATE' | Write-Progress
     try {scripts/Sync-Template.ps1 -Stay} catch [System.Management.Automation.NativeCommandExitException] {
         git stash save --include-untracked
