@@ -1,13 +1,13 @@
 """Nusselt number correlations for subcooled boiling bubble collapse."""
 
 from pathlib import Path
-from tomllib import loads
-from typing import get_args
 
 from numpy import linspace, pi
 
-from boilercv.correlations.models import Equations, Expectations
-from boilercv.correlations.types import Eq, Sym
+from boilercv import correlations
+from boilercv.correlations.models import Correlation, Expectations, SymbolicCorrelation
+from boilercv.correlations.nusselt.types import SolveSym
+from boilercv.correlations.types import Equation, Sym
 
 PNGS = Path("data/png_equations_nusselt")
 """Equation PNGs."""
@@ -36,8 +36,13 @@ SYMBOL_EXPECTATIONS = Expectations[Sym].context_model_validate(
 """Common keyword arguments applied to correlations."""
 
 
-def get_equations() -> Equations[Eq]:  # noqa: D103
-    return Equations[Eq].context_model_validate(
-        obj=loads(EQUATIONS_TOML.read_text("utf-8") if EQUATIONS_TOML.exists() else ""),
-        context=Equations[Eq].get_context(symbols=get_args(Sym)),
+def get_equations_and_solutions() -> dict[Equation, SymbolicCorrelation]:
+    """Get correlations."""
+    return correlations.get_equations_and_solutions(
+        EQUATIONS_TOML, SOLUTIONS_TOML, SolveSym
     )
+
+
+def get_correlations() -> dict[Equation, Correlation]:
+    """Get correlations."""
+    return correlations.get_correlations(EQUATIONS_TOML, SOLUTIONS_TOML, SolveSym)

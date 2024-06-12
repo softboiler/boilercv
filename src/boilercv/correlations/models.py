@@ -1,11 +1,14 @@
 """Bubble collapse correlation models."""
 
-from collections.abc import Iterable
+from collections.abc import Callable, Iterable
+from dataclasses import dataclass
 from functools import partial
-from typing import Generic, get_args
+from typing import Any, Generic, get_args
 
+import sympy
 from numpy import nan
-from pydantic import Field
+from pydantic import BaseModel, Field
+from sympy.logic.boolalg import Boolean
 
 from boilercv.correlations.pipes import (
     compose_sympify_context,
@@ -13,7 +16,17 @@ from boilercv.correlations.pipes import (
     set_latex_forms,
     sort_by_year,
 )
-from boilercv.correlations.types import EQ, Eq, Equation, Expectation, Expr, K, Kind, S
+from boilercv.correlations.types import (
+    EQ,
+    Eq,
+    Equation,
+    Expectation,
+    Expr,
+    ExtraEquation,
+    K,
+    Kind,
+    S,
+)
 from boilercv.morphs.contexts import (
     Context,
     ContextBaseModel,
@@ -26,14 +39,33 @@ from boilercv.morphs.contexts import (
 from boilercv.morphs.morphs import Morph
 
 
+class EquationMetadata(BaseModel):
+    """Meta."""
+
+    name: str = ""
+    """Name."""
+    citekey: str = ""
+    """Citekey."""
+
+
+class Metadata(ContextMorph[Equation | ExtraEquation, EquationMetadata]):
+    """Equations."""
+
+    @classmethod
+    def get_context(cls) -> Context:
+        """Get context."""
+        return compose_contexts(
+            cls.compose_defaults(), make_pipelines(cls, before=sort_by_year)
+        )
+
+
 class Expectations(ContextMorph[K, Expectation], Generic[K]):
     """Expectations."""
 
     @classmethod
     def get_context(cls) -> Context:
         """Get Pydantic context."""
-        Keys, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
-        return cls.compose_defaults(keys=get_args(Keys), value=nan)
+        return cls.compose_defaults(value=nan)
 
 
 class Forms(ContextMorph[Kind, str]):
@@ -108,13 +140,11 @@ class Equations(ContextMorph[Equation, EquationForms[EQ]], Generic[EQ]):
         """Get context."""
         symbols = symbols or ()
         Eq_, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
-        k, _ = cls.morph_get_inner_types()
         return compose_contexts(
             cls.compose_defaults(
-                keys=get_args(k),
                 value_context=EquationForms[Eq_].get_context(
                     symbols=symbols, forms_context=forms_context
-                ),
+                )
             ),
             make_pipelines(cls, before=sort_by_year),
         )
@@ -142,10 +172,8 @@ class SymbolSolutions(ContextMorph[S, Solutions], Generic[S]):
         cls, symbols: Iterable[str], solve_syms: tuple[str, ...] | None = None
     ) -> Context:
         """Get Pydantic context."""
-        SolveSyms, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
         return cls.compose_defaults(
-            keys=solve_syms or get_args(SolveSyms),
-            value_context=Solutions.get_context(symbols=symbols),
+            keys=solve_syms, value_context=Solutions.get_context(symbols=symbols)
         )
 
 
@@ -188,3 +216,19 @@ class SolvedEquations(ContextBaseModel, Generic[S]):
                 symbols=symbols, solve_syms=solve_syms
             ),
         )
+
+
+@dataclass
+class SymbolicCorrelation:
+    """Correlation."""
+
+    expr: sympy.Expr
+    range: Boolean | None = None
+
+
+@dataclass
+class Correlation:
+    """Correlation."""
+
+    expr: Callable[..., Any]
+    range: Callable[..., Any] | None

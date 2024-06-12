@@ -20,10 +20,11 @@ from boilercv.morphs.types import (
     ContextValueLike,
     HasModelDump,
     K,
-    LiteralType,
+    LiteralGenericAlias,
     Mode,
     Model,
     T,
+    UnionGenericAlias,
     V,
 )
 
@@ -233,8 +234,14 @@ class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
     ) -> Context:
         """Compose defaults."""
         k, v = cls.morph_get_inner_types()
-        if isinstance(k, LiteralType):
-            keys = keys or get_args(k)
+        if (
+            not keys
+            and isinstance(k, UnionGenericAlias)
+            and all(isinstance(t, LiteralGenericAlias) for t in get_args(k))
+        ):
+            keys = tuple(chain.from_iterable([get_args(t) for t in get_args(k)]))
+        if not keys and isinstance(k, LiteralGenericAlias):
+            keys = get_args(k)
         with suppress(TypeError):
             if issubclass(v, BaseModel):
                 value_model = value_model or v
@@ -244,7 +251,9 @@ class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
             factory = (
                 partial(value_model.context_model_validate, context=value_context)
                 if issubclass(value_model, ContextMorph | ContextBaseModel)
-                else partial(value_model.model_validate, context=dict(value_context))
+                else partial(
+                    value_model.model_validate, obj={}, context=dict(value_context)
+                )
             )
         defaults = (
             Defaults(mapping=mapping, value_copier=value_copier)

@@ -11,6 +11,7 @@ from typing import (
     TypeAlias,
     TypeVar,
     _LiteralGenericAlias,  # pyright: ignore[reportAttributeAccessIssue]
+    _UnionGenericAlias,  # pyright: ignore[reportAttributeAccessIssue]
     runtime_checkable,
 )
 
@@ -28,7 +29,9 @@ AnyPipe: TypeAlias = "Pipe | PipeWithInfo | Callable[[Any], Any]"
 """Any pipe."""
 Mode: TypeAlias = Literal["before", "after"]
 """Mode."""
-LiteralType: TypeAlias = _LiteralGenericAlias
+UnionGenericAlias: TypeAlias = _UnionGenericAlias
+"""Union type."""
+LiteralGenericAlias: TypeAlias = _LiteralGenericAlias
 """Literal type."""
 ContextValueLike: TypeAlias = "PipelineContext | ContextValue"
 """Allowable context-value-like values."""

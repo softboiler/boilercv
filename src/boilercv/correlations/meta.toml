@@ -1,0 +1,67 @@
+[ranz_marshall_1952]
+name = "Ranz and Marshall (1952)"
+citekey = "ranzEvaporationDrops1952"
+
+[florschuetz_chao_1965]
+name = "Florschuetz and Chao (1965)"
+citekey = "florschuetzMechanicsVaporBubble1965"
+
+[florschuetz_chao_1965_2]
+name = "Florschuetz and Chao (1965)"
+citekey = "florschuetzMechanicsVaporBubble1965"
+
+[hughmark_1967]
+name = "Hughmark (1967)"
+citekey = "hughmarkMassHeatTransfer1967"
+
+[hughmark_1967_2]
+name = "Hughmark (1967)"
+citekey = "hughmarkMassHeatTransfer1967"
+
+[isenberg_sideman_1970]
+name = "Isenberg and Sideman (1970)"
+citekey = "isenbergDirectContactHeat1970"
+
+[akiyama_1973]
+name = "Akiyama (1973)"
+citekey = "akiyamaBubbleCollapseSubcooled1973"
+
+[chen_mayinger_1992]
+name = "Chen and Mayinger (1992)"
+citekey = "chenMeasurementHeatTransfer1992"
+
+[zeitoun_et_al_1995]
+name = "Zeitoun et al. (1995)"
+citekey = "zeitounInterfacialHeatTransfer1995"
+
+[kalman_mori_2002]
+name = "Kalman and Mori (2002)"
+citekey = "kalmanExperimentalAnalysisSingle2002"
+
+[warrier_et_al_2002]
+name = "Warrier et al. (2002)"
+citekey = "warrierInterfacialHeatTransfer2002"
+
+[yuan_et_al_2009]
+name = "Yuan et al. (2009)"
+citekey = "yuandewenCondensationHeatTransfer2009"
+
+[lucic_mayinger_2010]
+name = "Lucic and Mayinger (2010)"
+citekey = "lucicTransportphenomenaSubcooledFlow2010"
+
+[kim_park_2011]
+name = "Kim and Park (2011)"
+citekey = "kimInterfacialHeatTransfer2011"
+
+[inaba_et_al_2013]
+name = "Inaba et al (2013)"
+citekey = "inabaInterfacialHeatTransfer2013"
+
+[al_issa_et_al_2014]
+name = "Al Issa et al. (2014)"
+citekey = "alissaExperimentalInvestigationSteam2014"
+
+[tang_et_al_2016]
+name = "Tang et al. (2016)"
+citekey = "tangEnhancedVaporBubble2016"

@@ -3,17 +3,16 @@
 from asyncio import TaskGroup, run
 from pathlib import Path
 from sys import stdout
-from textwrap import dedent
 from tomllib import loads
-from typing import cast, get_args
+from typing import get_args
 
 from cyclopts import App
 from loguru import logger
 from watchfiles import awatch
 
-from boilercv.correlations import GROUPS
-from boilercv.correlations.models import Equations, prep_equation_forms
-from boilercv.correlations.types import Corr, Kind, Range
+from boilercv.correlations import GROUPS, META_TOML, RANGES_TOML, get_equations
+from boilercv.correlations.models import Equations, Metadata
+from boilercv.correlations.types import Corr, Equation, Range
 from boilercv_pipeline.equations import EQUATIONS, SYMS, get_raw_equations_context
 
 logger.remove()
@@ -68,43 +67,45 @@ async def watch_eqs(corr: Corr | Range):
 
 def make_docs():
     """Generate equation documentation."""
-    all_eqs: dict[Corr, Equations[str]] = {
-        corr: get_equations(corr) for corr in get_args(Corr)
-    }
-    all_ranges = get_equations("range")
+    all_eqs = {corr: get_raw_equations(corr) for corr in get_args(Corr)}
+    ranges = {name: r.latex for name, r in get_equations(RANGES_TOML).items()}
+    meta = Metadata.context_model_validate(
+        obj=loads(META_TOML.read_text("utf-8") if META_TOML.exists() else ""),
+        context=Metadata.get_context(),
+    )
     header = "# Correlation equations\n"
     groups = ""
     for group in ["Group 1", "Group 3", "Group 4", "Group 5"]:
         groups += f"\n## {group}\n"
-        for name in all_eqs["beta"]:
+        for name in get_args(Equation):
             if GROUPS[name] == group:
-                eqs = {
-                    **{
-                        corr: prep_equation_forms(
-                            cast(dict[Kind, str], all_eqs[corr][name])
-                        )["latex"]
-                        for corr in get_args(Corr)
-                    },
-                    "range": prep_equation_forms(
-                        cast(dict[Kind, str], all_ranges[name])
-                    )["latex"],
-                }
-                latex_eqs = "".join([
+                latex = f"""
+$$
+{all_eqs["nusselt"][name]}
+$$ (eq_nusselt_{name})
+
+$$
+{all_eqs["beta"][name]}
+$$ (eq_beta_{name})
+"""
+                latex += (
                     f"""
-                    $$
-                    {eq}
-                    $$ (eq_{corr}_{name})
-                    """
-                    for corr, eq in eqs.items()
-                    if eq
-                ])
-                groups += dedent(f"""
-                    ### {name}
-                    {latex_eqs}""")
+$$
+{ranges[name]}
+$$ (eq_range_{name})
+"""
+                    if ranges[name]
+                    else ""
+                )
+                long_name = meta[name].name
+                citekey = meta[name].citekey
+                groups += f"""
+### {long_name} {{cite}}`{citekey},tangReviewDirectContact2022`
+{latex}"""
     OUT.write_text(encoding="utf-8", data=f"{header}\n{groups.strip()}\n")
 
 
-def get_equations(corr: Corr | Range) -> Equations[str]:
+def get_raw_equations(corr: Corr | Range) -> dict[Equation, str]:
     """Get equations."""
     equations = (
         Equations[str]
@@ -116,8 +117,7 @@ def get_equations(corr: Corr | Range) -> Equations[str]:
         )
         .model_dump()
     )
-
-    return equations
+    return {name: eq["latex"] for name, eq in equations.items()}
 
 
 if __name__ == "__main__":

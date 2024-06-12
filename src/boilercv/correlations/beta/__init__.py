@@ -1,20 +1,13 @@
 """Dimensionless bubble diameter correlations for subcooled boiling bubble collapse."""
 
-from collections.abc import Callable
-from dataclasses import dataclass
 from pathlib import Path
-from tomllib import loads
-from typing import Any, cast, get_args
 
-import numpy
-import sympy
 from numpy import linspace, pi, sqrt
-from sympy.logic.boolalg import Boolean
 
-from boilercv.correlations import RANGES_TOML, SYMBOLS
+from boilercv import correlations
 from boilercv.correlations.beta.types import SolveSym
-from boilercv.correlations.models import Equations, Expectations, SolvedEquations
-from boilercv.correlations.types import AnyExpr, Equation, Sym, trivial_expr
+from boilercv.correlations.models import Correlation, Expectations, SymbolicCorrelation
+from boilercv.correlations.types import Equation, Sym
 
 PNGS = Path("data/png_equations_beta")
 """Equation PNGs."""
@@ -56,75 +49,16 @@ range as possible without returning `np.nan` values. This is done as follows:
 """
 
 
-def get_equations(path: Path) -> Equations[AnyExpr]:
-    """Get equations."""
-    return Equations[AnyExpr].context_model_validate(
-        obj=loads(path.read_text("utf-8") if path.exists() else ""),
-        context=Equations[AnyExpr].get_context(symbols=get_args(Sym)),
+def get_equations_and_solutions() -> dict[Equation, SymbolicCorrelation]:
+    """Get correlations."""
+    return correlations.get_equations_and_solutions(
+        EQUATIONS_TOML, SOLUTIONS_TOML, SolveSym
     )
 
 
-@dataclass
-class Correlation:
-    """Correlation."""
-
-    expr: sympy.Expr
-    range: Boolean | None = None
-
-
-def get_solutions() -> dict[Equation, Correlation]:  # noqa: D103
-    equations = EQUATIONS_TOML
-    solutions = SOLUTIONS_TOML
-    context = SolvedEquations[str].get_context(
-        symbols=get_args(Sym), solve_syms=get_args(SolveSym)
-    )
-    ranges = get_equations(RANGES_TOML)
-    return {
-        name: Correlation(
-            expr=cast(sympy.Expr, soln["beta"].solutions[0]),
-            range=cast(
-                Boolean,
-                None if ranges[name].sympy == trivial_expr else ranges[name].sympy,
-            ),
-        )
-        for name, soln in (
-            SolvedEquations[SolveSym]
-            .context_model_validate(
-                dict(
-                    equations=loads(
-                        equations.read_text("utf-8") if equations.exists() else ""
-                    ),
-                    solutions=loads(
-                        solutions.read_text("utf-8") if solutions.exists() else ""
-                    ),
-                ),
-                context=context,
-            )
-            .solutions
-        ).items()
-    }
-
-
-def get_correlations() -> dict[Equation, Callable[..., Any]]:
-    """Get symbolic functions."""
-    return {name: lambdify_expr(soln.expr) for name, soln in get_solutions().items()}
-
-
-def get_ranges() -> dict[Equation, Callable[..., Any] | None]:
-    """Get ranges."""
-    return {
-        name: lambdify_expr(soln.range) if soln.range else None
-        for name, soln in get_solutions().items()
-    }
-
-
-def lambdify_expr(expr: sympy.Basic) -> Callable[..., Any]:
-    """Get symbolic functions."""
-    return sympy.lambdify(
-        expr=expr,
-        modules=numpy,
-        args=[s for s in expr.free_symbols if s.name in SYMBOLS],  # type: ignore
-    )
+def get_correlations() -> dict[Equation, Correlation]:
+    """Get correlations."""
+    return correlations.get_correlations(EQUATIONS_TOML, SOLUTIONS_TOML, SolveSym)
 
 
 def florschuetz_chao_1965(bubble_fourier, bubble_jakob):

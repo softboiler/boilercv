@@ -8,10 +8,17 @@ from typing import cast, get_args
 
 from boilercv.correlations import RANGES_TOML, SYMBOLS, beta, nusselt
 from boilercv.correlations.beta.types import SolveSym as SolveSymBeta
-from boilercv.correlations.models import EquationForms, Equations, Expectations, Forms
+from boilercv.correlations.models import (
+    Correlation,
+    EquationForms,
+    Equations,
+    Expectations,
+    Forms,
+    SymbolicCorrelation,
+)
 from boilercv.correlations.nusselt.types import SolveSym as SolveSymNusselt
 from boilercv.correlations.pipes import LocalSymbols
-from boilercv.correlations.types import Corr, Kind, Range, Sym
+from boilercv.correlations.types import Corr, Equation, Kind, Range, Sym
 from boilercv.morphs.contexts import Context, Pipe, make_pipelines
 from boilercv.morphs.morphs import Morph
 
@@ -44,6 +51,16 @@ SUBSTITUTIONS: dict[Corr, tuple[tuple[str, float], ...]] = {
 SOLVE_SYMS: dict[Corr, tuple[str, ...]] = {
     "beta": get_args(SolveSymBeta),
     "nusselt": get_args(SolveSymNusselt),
+}
+EQUATIONS_AND_SOLUTIONS: dict[
+    Corr, Callable[[], dict[Equation, SymbolicCorrelation]]
+] = {
+    "beta": beta.get_equations_and_solutions,
+    "nusselt": nusselt.get_equations_and_solutions,
+}
+CORRELATIONS: dict[Corr, Callable[[], dict[Equation, Correlation]]] = {
+    "beta": beta.get_correlations,
+    "nusselt": nusselt.get_correlations,
 }
 
 

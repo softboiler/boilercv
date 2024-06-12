@@ -13,11 +13,6 @@ APP = App()
 
 
 def main():  # noqa: D103
-    APP()
-
-
-@APP.default
-def default(overwrite: bool = False):  # noqa: ARG001, D103
     RANGES_TOML.write_text(
         encoding="utf-8",
         data=make_raw(

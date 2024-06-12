@@ -5,22 +5,18 @@ from tomllib import loads
 
 import pytest
 from numpy import allclose, bool_
-from sympy import lambdify
 
 from boilercv.correlations import SYMBOLS, beta
-from boilercv.correlations import beta as symbolic
 from boilercv.correlations.beta import (
     EXPECTATIONS_TOML,
     SYMBOL_EXPECTATIONS,
     get_correlations,
-    get_ranges,
 )
-
-lambdify  # noqa: B018
 
 EXPECTATIONS = loads(EXPECTATIONS_TOML.read_text("utf-8"))
 CORRELATIONS = get_correlations()
-RANGES = get_ranges()
+exprs = {name: corr.expr for name, corr in CORRELATIONS.items()}
+ranges = {name: corr.range for name, corr in CORRELATIONS.items()}
 
 
 @pytest.mark.parametrize(("name", "expected"), EXPECTATIONS.items())
@@ -35,25 +31,12 @@ def test_python(name, expected):
     assert allclose(result, expected)
 
 
-@pytest.mark.skip()
-@pytest.mark.parametrize("symbol_group_name", ["SYMS", "LONG_SYMS"])
-def test_syms(symbol_group_name: str):
-    """Declared symbolic variables assigned to correct symbols."""
-    symbols = [group_sym.name for group_sym in getattr(symbolic, symbol_group_name)]
-    variables = [name for name in symbols if getattr(symbolic, name)]
-    assert symbols == variables
-
-
 @pytest.mark.parametrize(
-    ("name", "corr", "expected"),
-    (
-        (name, CORRELATIONS[name], expected)  # pyright: ignore[reportArgumentType]
-        for name, expected in EXPECTATIONS.items()
-        if name in EXPECTATIONS
-    ),
+    ("corr", "expected"),
+    ((exprs[name], expected) for name, expected in EXPECTATIONS.items()),
     ids=EXPECTATIONS,
 )
-def test_sympy(name, corr, expected):
+def test_correlations(corr, expected):
     """Symbolic equations evaluate as expected."""
     result = corr(**{
         kwd: value
@@ -64,15 +47,9 @@ def test_sympy(name, corr, expected):
 
 
 @pytest.mark.parametrize(
-    ("name", "range_", "expected"),
-    (
-        (name, RANGES[name], expected)  # pyright: ignore[reportArgumentType]
-        for name, expected in EXPECTATIONS.items()
-        if name in EXPECTATIONS
-    ),
-    ids=EXPECTATIONS,
+    ("range_"), (ranges[name] for name in EXPECTATIONS), ids=EXPECTATIONS
 )
-def test_sympy_range(name, range_, expected):
+def test_correlation_ranges(range_):
     """Symbolic ranges evaluate as expected."""
     if not range_:
         return
