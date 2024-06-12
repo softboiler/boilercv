@@ -116,13 +116,17 @@ def validator(context_value_type: type[CV]):
 
 Kind: TypeAlias = Literal["latex", "sympy"]
 """Kind."""
-Sym: TypeAlias = Literal["Nu_c", "Fo_0", "Ja", "Re_b0", "Pr", "beta", "alpha", "pi"]
+Sym: TypeAlias = Literal[
+    "Nu_c", "Fo_0", "Ja", "Re_b", "Re_b0", "Pe", "Pr", "beta", "alpha", "pi"
+]
 """Symbol."""
 Param: TypeAlias = Literal[
     "nusselt",
     "bubble_fourier",
     "bubble_jakob",
+    "bubble_reynolds",
     "bubble_initial_reynolds",
+    "bubble_peclet",
     "liquid_prandtl",
     "beta",
     "thermal_diffusivity",
@@ -261,6 +265,30 @@ Expr: TypeAlias = Annotated[
     Basic,
     BeforeValidator(validator(SympifyParams)(sympify_expr)),
     TypeValidator(sympy.Expr, "after"),
+]
+"""{data}`~boilercv.correlations.types.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""
+
+trivial_expr = sympy.Expr()
+"""Trivial boolean that won't evaluate to a `True` instance of `sympy.boolean.linalg.BooleanAtom`."""
+
+
+AnyExpr: TypeAlias = Annotated[
+    Basic,
+    BeforeValidator(validator(SympifyParams)(sympify_expr)),
+    BeforeValidator(
+        lambda v: (
+            sympy.Expr()
+            if isinstance(v, BooleanAtom) or v == trivial_expr or not v
+            else v
+        )
+    ),
+    # ? SymPy equations sometimes evaluate to `bool` on copy
+    WrapSerializer(
+        lambda v, nxt: ""
+        if isinstance(v, BooleanAtom) or v == trivial_expr
+        else nxt(v),
+        when_used="json",
+    ),
 ]
 """{data}`~boilercv.correlations.types.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""
 

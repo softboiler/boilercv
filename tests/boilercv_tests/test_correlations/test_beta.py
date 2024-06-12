@@ -4,7 +4,7 @@ from inspect import Signature
 from tomllib import loads
 
 import pytest
-from numpy import allclose
+from numpy import allclose, bool_
 from sympy import lambdify
 
 from boilercv.correlations import SYMBOLS, beta
@@ -13,12 +13,14 @@ from boilercv.correlations.beta import (
     EXPECTATIONS_TOML,
     SYMBOL_EXPECTATIONS,
     get_correlations,
+    get_ranges,
 )
 
 lambdify  # noqa: B018
 
 EXPECTATIONS = loads(EXPECTATIONS_TOML.read_text("utf-8"))
 CORRELATIONS = get_correlations()
+RANGES = get_ranges()
 
 
 @pytest.mark.parametrize(("name", "expected"), EXPECTATIONS.items())
@@ -59,3 +61,33 @@ def test_sympy(name, corr, expected):
         if kwd in Signature.from_callable(corr).parameters
     })
     assert allclose(result, expected, rtol=1.0e-4)
+
+
+@pytest.mark.parametrize(
+    ("name", "range_", "expected"),
+    (
+        (name, RANGES[name], expected)  # pyright: ignore[reportArgumentType]
+        for name, expected in EXPECTATIONS.items()
+        if name in EXPECTATIONS
+    ),
+    ids=EXPECTATIONS,
+)
+def test_sympy_range(name, range_, expected):
+    """Symbolic ranges evaluate as expected."""
+    if not range_:
+        return
+    assert isinstance(
+        range_(**{
+            kwd: value
+            for kwd, value in {
+                "Nu_c": 1.0,
+                "Ja": 1.0,
+                "Re_b": 1.0,
+                "Pe": 1.0,
+                "Pr": 1.0,
+                "alpha": 1.0,
+            }.items()
+            if kwd in Signature.from_callable(range_).parameters
+        }),
+        bool_,
+    )

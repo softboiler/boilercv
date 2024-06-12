@@ -1,6 +1,7 @@
 """Dimensionless bubble diameter correlations for subcooled boiling bubble collapse."""
 
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from tomllib import loads
 from typing import Any, cast, get_args
@@ -8,11 +9,12 @@ from typing import Any, cast, get_args
 import numpy
 import sympy
 from numpy import linspace, pi, sqrt
+from sympy.logic.boolalg import Boolean
 
-from boilercv.correlations import SYMBOLS
+from boilercv.correlations import RANGES_TOML, SYMBOLS
 from boilercv.correlations.beta.types import SolveSym
 from boilercv.correlations.models import Equations, Expectations, SolvedEquations
-from boilercv.correlations.types import Eq, Equation, Sym
+from boilercv.correlations.types import AnyExpr, Equation, Sym, trivial_expr
 
 PNGS = Path("data/png_equations_beta")
 """Equation PNGs."""
@@ -30,7 +32,9 @@ SYMBOL_EXPECTATIONS = Expectations[Sym].context_model_validate(
         "Nu_c": 1.0,
         "Fo_0": linspace(start=0.0, stop=5.0e-3, num=10),
         "Ja": 1.0,
+        "Re_b": 10.0,
         "Re_b0": 100.0,
+        "Pe": 1.0,
         "Pr": 1.0,
         "beta": 0.5,
         "alpha": 1.0,
@@ -52,53 +56,75 @@ range as possible without returning `np.nan` values. This is done as follows:
 """
 
 
-def get_equations() -> Equations[Eq]:
+def get_equations(path: Path) -> Equations[AnyExpr]:
     """Get equations."""
-    return Equations[Eq].context_model_validate(
-        obj=loads(EQUATIONS_TOML.read_text("utf-8") if EQUATIONS_TOML.exists() else ""),
-        context=Equations[Eq].get_context(symbols=get_args(Sym)),
+    return Equations[AnyExpr].context_model_validate(
+        obj=loads(path.read_text("utf-8") if path.exists() else ""),
+        context=Equations[AnyExpr].get_context(symbols=get_args(Sym)),
     )
 
 
-def get_solutions() -> dict[Equation, sympy.Expr]:  # noqa: D103
+@dataclass
+class Correlation:
+    """Correlation."""
+
+    expr: sympy.Expr
+    range: Boolean | None = None
+
+
+def get_solutions() -> dict[Equation, Correlation]:  # noqa: D103
     equations = EQUATIONS_TOML
     solutions = SOLUTIONS_TOML
     context = SolvedEquations[str].get_context(
         symbols=get_args(Sym), solve_syms=get_args(SolveSym)
     )
-    return cast(
-        dict[Equation, sympy.Expr],
-        {
-            name: soln["beta"].solutions[0]
-            for name, soln in (
-                SolvedEquations[SolveSym]
-                .context_model_validate(
-                    dict(
-                        equations=loads(
-                            equations.read_text("utf-8") if equations.exists() else ""
-                        ),
-                        solutions=loads(
-                            solutions.read_text("utf-8") if solutions.exists() else ""
-                        ),
+    ranges = get_equations(RANGES_TOML)
+    return {
+        name: Correlation(
+            expr=cast(sympy.Expr, soln["beta"].solutions[0]),
+            range=cast(
+                Boolean,
+                None if ranges[name].sympy == trivial_expr else ranges[name].sympy,
+            ),
+        )
+        for name, soln in (
+            SolvedEquations[SolveSym]
+            .context_model_validate(
+                dict(
+                    equations=loads(
+                        equations.read_text("utf-8") if equations.exists() else ""
                     ),
-                    context=context,
-                )
-                .solutions
-            ).items()
-        },
-    )
+                    solutions=loads(
+                        solutions.read_text("utf-8") if solutions.exists() else ""
+                    ),
+                ),
+                context=context,
+            )
+            .solutions
+        ).items()
+    }
 
 
 def get_correlations() -> dict[Equation, Callable[..., Any]]:
     """Get symbolic functions."""
+    return {name: lambdify_expr(soln.expr) for name, soln in get_solutions().items()}
+
+
+def get_ranges() -> dict[Equation, Callable[..., Any] | None]:
+    """Get ranges."""
     return {
-        name: sympy.lambdify(
-            expr=soln,
-            modules=numpy,
-            args=[s for s in soln.free_symbols if s.name in SYMBOLS],  # type: ignore
-        )
+        name: lambdify_expr(soln.range) if soln.range else None
         for name, soln in get_solutions().items()
     }
+
+
+def lambdify_expr(expr: sympy.Basic) -> Callable[..., Any]:
+    """Get symbolic functions."""
+    return sympy.lambdify(
+        expr=expr,
+        modules=numpy,
+        args=[s for s in expr.free_symbols if s.name in SYMBOLS],  # type: ignore
+    )
 
 
 def florschuetz_chao_1965(bubble_fourier, bubble_jakob):
