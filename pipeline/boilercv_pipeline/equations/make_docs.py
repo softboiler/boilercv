@@ -11,7 +11,7 @@ from cyclopts import App
 from loguru import logger
 from watchfiles import awatch
 
-from boilercv.correlations import GROUPS, RANGES_TOML
+from boilercv.correlations import GROUPS
 from boilercv.correlations.models import Equations, prep_equation_forms
 from boilercv.correlations.types import Corr, Kind, Range
 from boilercv_pipeline.equations import EQUATIONS, SYMS, get_raw_equations_context
@@ -106,12 +106,11 @@ def make_docs():
 
 def get_equations(corr: Corr | Range) -> Equations[str]:
     """Get equations."""
-    equations_path = RANGES_TOML if corr == "range" else EQUATIONS[corr]
     equations = (
         Equations[str]
         .context_model_validate(
             obj=loads(
-                equations_path.read_text("utf-8") if equations_path.exists() else ""
+                EQUATIONS[corr].read_text("utf-8") if EQUATIONS[corr].exists() else ""
             ),
             context=get_raw_equations_context(symbols=SYMS),
         )

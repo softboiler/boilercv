@@ -34,7 +34,13 @@
       "type": "pickString",
       "description": "correlations",
       "default": "",
-      "options": ["beta", "nusselt", "beta --overwrite", "nusselt --overwrite"]
+      "options": [
+        "beta",
+        "nusselt",
+        "beta --overwrite",
+        "nusselt --overwrite",
+        "range"
+      ]
     },
     {
       "id": "version",
@@ -52,7 +58,7 @@
   ],
   "tasks": [
     {
-      "label": "proj: Run correlation/equation generator",
+      "label": "proj: Generate correlation",
       "type": "shell",
       "options": {
         "shell": { "executable": "pwsh", "args": ["-Command"] }
@@ -62,36 +68,12 @@
       "problemMatcher": []
     },
     {
-      "label": "proj: Generate correlation equation docs",
+      "label": "proj: Generate correlation docs",
       "type": "shell",
       "options": {
         "shell": { "executable": "pwsh", "args": ["-Command"] }
       },
-      "dependsOn": [
-        "proj: Generate beta equations",
-        "proj: Generate nusselt equations"
-      ],
-      "dependsOrder": "parallel",
-      "icon": { "id": "file-code" },
-      "problemMatcher": []
-    },
-    {
-      "label": "proj: Generate beta equations",
-      "type": "shell",
-      "options": {
-        "shell": { "executable": "pwsh", "args": ["-Command"] }
-      },
-      "command": "python -m boilercv_pipeline.equations.make_docs beta",
-      "icon": { "id": "file-code" },
-      "problemMatcher": []
-    },
-    {
-      "label": "proj: Generate nusselt equations",
-      "type": "shell",
-      "options": {
-        "shell": { "executable": "pwsh", "args": ["-Command"] }
-      },
-      "command": "python -m boilercv_pipeline.equations.make_docs nusselt",
+      "command": "python -m boilercv_pipeline.equations.make_docs",
       "icon": { "id": "file-code" },
       "problemMatcher": []
     },

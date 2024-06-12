@@ -1,6 +1,7 @@
 """Convert LaTeX equations to SymPy equations."""
 
 from pathlib import Path
+from re import sub
 from shlex import quote, split
 from subprocess import run
 from tomllib import loads
@@ -13,7 +14,7 @@ from tqdm import tqdm
 
 from boilercv.correlations.models import EquationForms, Equations
 from boilercv.correlations.pipes import fold_whitespace
-from boilercv.correlations.types import Corr, Kind
+from boilercv.correlations.types import Corr, Kind, Range
 from boilercv.mappings import Repl, replace, replace_pattern, sync
 from boilercv.morphs.contexts import Defaults
 from boilercv.morphs.morphs import Morph
@@ -38,7 +39,7 @@ def main():  # noqa: D103
 
 
 @APP.default
-def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
+def default(corr: Corr | Range = "beta", overwrite: bool = False):  # noqa: D103
     equations_path = EQUATIONS[corr]
     logger.info("Start converting LaTeX expressions to SymPy expressions.")
     content = equations_path.read_text("utf-8") if equations_path.exists() else ""
@@ -76,25 +77,57 @@ def convert(
     forms: EquationForms[str], symbols: tuple[str, ...], interpreter: Path, script: Path
 ) -> EquationForms[str]:
     """Convert LaTeX equation to SymPy equation."""
-    sanitized_latex = replace_pattern(
+    sanitized = replace_pattern(
         sanitize_forms(forms, symbols, sanitizer=sanitize_and_fold).model_dump(),
         (
             Repl(src="latex", dst="latex", find=find, repl=repl)
-            for find, repl in {r"\\left\(": "(", r"\\right\)": ")"}.items()
+            for find, repl in {
+                r"\\left\(": "(",
+                r"\\right\)": ")",
+                r"\\,": "",
+                r"\\ ": " ",
+            }.items()
         ),
     )["latex"]
+    forms.sympy = (
+        parse_ineq(sanitized, symbols, interpreter, script)
+        if "<" in sanitized
+        else parse_expr(interpreter, script, sanitized)
+    )
+    return sanitize_forms(forms, symbols, sanitizer=sanitize)
+
+
+def parse_ineq(
+    sanitized: str, symbols: tuple[str, ...], interpreter: Path, script: Path
+) -> str:
+    """Parse inequalities."""
+    sep = " , "
+    sanitized = sep.join([
+        sub(r"(.+) < (.+) < (.+)", r"\g<1> < \g<2> & \g<2> < \g<3>", s)
+        for s in sanitized.split(sep)
+    ])
+    sep = " & "
+    return sep.join([
+        f"""({
+            sanitize(
+                {"sympy": parse_expr(interpreter, script, latex)}, symbols
+            ).model_dump()["sympy"]
+        })"""
+        for latex in sanitized.split(sep)
+    ])
+
+
+def parse_expr(interpreter, script, latex):
+    """Parse expression."""
     result = run(
-        args=split(
-            f"{escape(interpreter)} run {escape(script)} {quote(sanitized_latex)}"
-        ),
+        args=split(f"{escape(interpreter)} run {escape(script)} {quote(latex)}"),
         capture_output=True,
         check=False,
         text=True,
     )
     if result.returncode:
         raise RuntimeError(result.stderr)
-    forms.sympy = result.stdout.strip()
-    return sanitize_forms(forms, symbols, sanitizer=sanitize)
+    return result.stdout.strip()
 
 
 def sanitize_and_fold(
@@ -127,7 +160,7 @@ def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, st
         )
         .morph_pipe(
             replace_pattern,
-            (
+            tuple(
                 Repl[Kind](src="sympy", dst="sympy", find=f, repl=r)
                 for f, r in {
                     # ? Unwrapped negative.
@@ -144,7 +177,7 @@ def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, st
                             rf"{sym}\(": rf"{sym}*(",
                         }.items()
                     },
-                }
+                }.items()
             ),
         )
     )
