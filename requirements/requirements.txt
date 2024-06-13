@@ -202,7 +202,7 @@ partd==1.4.2
 pathspec==0.12.1
 pathtools==0.1.2
 pexpect==4.9.0
-pillow==10.0.0
+pillow==10.3.0
 pip-requirements-parser==32.0.1
 pipx==1.6.0
 platformdirs==3.11.0
