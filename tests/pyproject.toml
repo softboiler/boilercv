@@ -20,7 +20,7 @@ dependencies = [
     "cachier @ git+https://github.com/blakeNaccarato/cachier@0892f53dc8fd9fb8a7f959305a1a9ec692876dc0", # Allows `dill` caching
     "matplotlib>=3.7.2",
     "numpy>=1.24.4",
-    "pandas[hdf5,performance]>=2.0.2",
+    "pandas[hdf5,performance]>=2.2.2",
     "pydantic>=2.7.1",
     "seaborn>=0.12.2",
 ]
