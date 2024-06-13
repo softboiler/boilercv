@@ -13,13 +13,12 @@ from numpy import (
     typing,
 )
 from numpy.typing import NBitBase, NDArray
-from pandas import DataFrame, Series
+from pandas import DataFrame
 from xarray import DataArray, Dataset
 
 DA: TypeAlias = DataArray
 DF: TypeAlias = DataFrame
 DS: TypeAlias = Dataset
-DfOrS: TypeAlias = DataFrame | Series  # type: ignore  # pyright 1.1.333
 
 ArrayLike: TypeAlias = typing.ArrayLike
 """Array-like."""

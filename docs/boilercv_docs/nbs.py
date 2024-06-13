@@ -23,8 +23,8 @@ from numpy import set_printoptions
 from pandas import DataFrame, Index, MultiIndex, Series, concat, options
 from seaborn import set_theme
 
-from boilercv.types import DfOrS
 from boilercv_docs import DEPS, DOCS, get_root
+from boilercv_docs.types import DfOrS
 
 FONT_SCALE = 1.3
 """Plot font scale."""

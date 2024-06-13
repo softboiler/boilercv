@@ -2,6 +2,10 @@
 
 from typing import NamedTuple, TypeAlias
 
+from pandas import DataFrame, Series
+
+DfOrS: TypeAlias = DataFrame | Series  # type: ignore  # pyright 1.1.333
+
 # * -------------------------------------------------------------------------------- * #
 # * intersphinx
 
