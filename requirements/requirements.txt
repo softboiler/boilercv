@@ -193,7 +193,7 @@ omegaconf==2.3.0
 opencv-python-headless==4.9.0.80
 orjson==3.10.4
 packaging==24.1
-pandas-stubs==2.2.2.240514
+pandas-stubs==2.2.2.240603
 pandas==2.2.2
 pandocfilters==1.5.1
 param==2.1.0
