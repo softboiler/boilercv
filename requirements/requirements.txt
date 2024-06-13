@@ -329,7 +329,7 @@ tomlkit==0.12.4
 toolz==0.12.1
 tornado==6.4.1
 towncrier==23.11.0
-tqdm==4.66.1
+tqdm==4.66.3
 trackpy==0.6.2
 traitlets==5.14.3
 typer==0.12.3
