@@ -62,7 +62,7 @@ jobs:
       - run: "sphinx-build -EaT docs _site"
       - uses: "actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa" # v3.0.1
   deploy-docs:
-    if: github.event_name != 'pull_request'
+    if: "github.event_name != 'pull_request'"
     needs: "build-docs"
     permissions:
       pages: "write"
@@ -152,7 +152,7 @@ jobs:
     strategy:
       matrix:
         runner:
-          - "macos-13" # ? `pytables` doesn't support `macos-14` yet https://github.com/PyTables/PyTables/pull/1050
+          - "macos-13"
           - "ubuntu-22.04"
           - "windows-2022"
         python:
