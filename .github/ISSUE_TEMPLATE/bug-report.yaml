@@ -8,7 +8,7 @@ body:
       label: "Please check that this bug hasn't been reported before"
       options:
         - required: True
-          label: "I searched [here](https://github.com/blakeNaccarato/boilercv/issues?q=label%3Abug+sort%3Acomments-desc) or [here](https://github.com/search?q=repo%3AblakeNaccarato/boilercv+label%3Abug&type=issues) and couldn't find a similar issue."
+          label: "I searched [here](https://github.com/softboiler/boilercv/issues?q=label%3Abug+sort%3Acomments-desc) or [here](https://github.com/search?q=repo%3Asoftboiler/boilercv+label%3Abug&type=issues) and couldn't find a similar issue."
   - type: "checkboxes"
     id: "latest-version"
     attributes:

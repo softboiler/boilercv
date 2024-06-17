@@ -25,10 +25,10 @@ dependencies = [
 # * Minimal CV flavor needed, but allow `boilercv` to coexist with different flavors
 cv = ["opencv-python-headless>=4.9.0.80"]
 [project.urls]
-Changes = "https://blakeNaccarato.github.io/boilercv/changelog.html"
-Docs = "https://blakeNaccarato.github.io/boilercv"
-Home = "https://github.com/blakeNaccarato/boilercv"
-Tracker = "https://github.com/blakeNaccarato/boilercv/issues"
+Changes = "https://softboiler.github.io/boilercv/changelog.html"
+Docs = "https://softboiler.github.io/boilercv"
+Home = "https://github.com/softboiler/boilercv"
+Tracker = "https://github.com/softboiler/boilercv/issues"
 [[project.authors]]
 name = "Blake Naccarato, Kwang Jin Kim"
 email = "blake.naccarato@gmail.com"
@@ -71,7 +71,7 @@ directory = "changelog"
 filename = "CHANGELOG.md"
 template = "changelog/towncrier_template.md.jinja"
 title_format = ""
-issue_format = "[#{issue}](https://github.com/blakeNaccarato/boilercv/{issue})"
+issue_format = "[#{issue}](https://github.com/softboiler/boilercv/{issue})"
 underlines = ["", "", ""]
 [[tool.towncrier.section]]
 path = ""

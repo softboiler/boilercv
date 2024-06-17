@@ -23,5 +23,5 @@
 
 ## Terms
 
-- [ ] My contribution follows the [contributing guide](<https://github.com/blakeNaccarato/boilercv/blob/main/CONTRIBUTING.md>).
-- [ ] I agree to follow the [code of conduct](<https://github.com/blakeNaccarato/boilercv/blob/main/.github/CODE_OF_CONDUCT.md>).
+- [ ] My contribution follows the [contributing guide](<https://github.com/softboiler/boilercv/blob/main/CONTRIBUTING.md>).
+- [ ] I agree to follow the [code of conduct](<https://github.com/softboiler/boilercv/blob/main/.github/CODE_OF_CONDUCT.md>).

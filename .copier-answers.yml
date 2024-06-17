@@ -8,7 +8,7 @@ project_description: Computer vision routines suitable for nucleate pool boiling
     analysis.
 project_email: blake.naccarato@gmail.com
 project_name: boilercv
-project_owner_github_username: blakeNaccarato
+project_owner_github_username: softboiler
 project_owner_name: Blake Naccarato, Kwang Jin Kim
 project_version: 0.0.1
 python_version: '3.11'
