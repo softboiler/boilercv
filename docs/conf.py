@@ -243,11 +243,12 @@ nitpick_ignore_regex = [
     (r"py:.*", r"docutils\..+"),
     (r"py:.*", r"numpydoc\.docscrape\..+"),
     (r"py:.*", r"_pytest\..+"),
-    (r"py:.*", r"boilercore\..+"),
     (r"py:.*", r"numpy\.typing\..+"),
     (r"py:.*", r"tomlkit\.container\..+"),
-    # ? sympy: https://github.com/sympy/sympy/issues/17619#issuecomment-536781620
-    (r"py:.*", r"sympy\..+"),
+    (  # ? sympy: https://github.com/sympy/sympy/issues/17619#issuecomment-536781620
+        r"py:.*",
+        r"sympy\..+",
+    ),
     (r"py:.*", r"pydantic\..+"),  # ? https://github.com/pydantic/pydantic/issues/1339
     (r"py:.*", r"PySide6\..+"),  # ? https://bugreports.qt.io/browse/PYSIDE-2215
     # ? TypeAlias: https://github.com/sphinx-doc/sphinx/issues/10785
