@@ -1,5 +1,5 @@
 # Binder
-boilercv @ git+https://github.com/blakeNaccarato/boilercv@3e490925341da548d7257b1442992a0e05584189
-boilercore @ git+https://github.com/blakeNaccarato/boilercore@973a0967b0c9922abd47b5f6ec876aac0df6a0c9
+boilercv @ git+https://github.com/softboiler/boilercv@3e490925341da548d7257b1442992a0e05584189
+boilercore @ git+https://github.com/softboiler/boilercore@973a0967b0c9922abd47b5f6ec876aac0df6a0c9
 --requirement requirements/dev.in
 --editable docs/.

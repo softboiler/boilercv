@@ -6,4 +6,4 @@
 	url = https://github.com/blakeNaccarato/pylance-stubs-unofficial.git
 [submodule "boilercore"]
 	path = submodules/boilercore
-	url = https://github.com/blakeNaccarato/boilercore.git
+	url = https://github.com/softboiler/boilercore.git
