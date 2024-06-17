@@ -18,11 +18,11 @@ from boilercv.correlations.pipes import (
 )
 from boilercv.correlations.types import (
     EQ,
+    AnyEquation,
     Eq,
     Equation,
     Expectation,
     Expr,
-    ExtraEquation,
     K,
     Kind,
     S,
@@ -48,7 +48,7 @@ class EquationMetadata(BaseModel):
     """Citekey."""
 
 
-class Metadata(ContextMorph[Equation | ExtraEquation, EquationMetadata]):
+class Metadata(ContextMorph[AnyEquation, EquationMetadata]):
     """Equations."""
 
     @classmethod

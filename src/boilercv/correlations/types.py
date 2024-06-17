@@ -156,6 +156,8 @@ ExtraEquation: TypeAlias = Literal[
     "inaba_et_al_2013",  # Uses custom `epsilon` and void fraction
 ]
 """Extended equation."""
+AnyEquation: TypeAlias = Equation | ExtraEquation
+"""Any equation."""
 
 # * MARK: Serializers
 
