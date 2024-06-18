@@ -37,3 +37,8 @@ def jakob(
 def fourier(liquid_thermal_diffusivity, initial_bubble_diameter, time):
     """Fourier number."""
     return liquid_thermal_diffusivity * time / initial_bubble_diameter**2
+
+
+def nusselt(heat_transfer_coefficient, characteristic_length, thermal_conductivity):
+    """Nusselt number."""
+    return heat_transfer_coefficient * characteristic_length / thermal_conductivity
