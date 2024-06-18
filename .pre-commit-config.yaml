@@ -13,6 +13,7 @@ ci:
     - "pytest-fast-only"
     - "dvc-post-checkout"
     - "dvc-pre-push"
+    - "patch-nbs"
   autoupdate_schedule: "quarterly"
 default_install_hook_types:
   - pre-commit
@@ -93,6 +94,16 @@ repos:
             |scripts/.*
             |src/.*
             |tests/.*
+          )$
+      - id: "patch-nbs"
+        name: "patch-nbs"
+        pass_filenames: false
+        language: "system"
+        entry: |
+          pwsh -Command ". scripts/Initialize-Shell.ps1; python -m boilercv_docs.patch_nbs"
+        files: |
+          (?x)^(
+            docs/.*\.ipynb
           )$
   - repo: "https://github.com/pre-commit/pre-commit-hooks"
     rev: "v4.6.0"
