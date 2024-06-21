@@ -116,12 +116,11 @@
       }
     },
     {
-      "name": "Python: Current file with `--overwrite`",
+      "name": "Python: Debug bootstrapping Python install script",
       "type": "debugpy",
       "request": "launch",
-      "program": "${file}",
-      "args": ["--overwrite"],
-      "console": "internalConsole",
+      "python": "${workspaceFolder}/bin/sys_venv/bin/python",
+      "program": "${workspaceFolder}/scripts/install.py",
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"
