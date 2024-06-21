@@ -20,6 +20,9 @@ dependencies = [
     "pytz>=2023.3",
     "sympy>=1.12",
     "xarray[accel,io,parallel]>=2023.7.0",
+    # ? https://github.com/softboiler/boilercv/issues/213
+    "netcdf4>=1.7.0",
+    "netcdf4!=1.7.1 ; sys_platform == 'linux'",
 ]
 [project.optional-dependencies]
 # * Minimal CV flavor needed, but allow `boilercv` to coexist with different flavors
@@ -49,6 +52,7 @@ ignore_errors = true
 deps = ["pyproject.toml"]
 code = ["src"]
 ignore_undeclared = ["_typeshed"]
+ignore_unused = ["netcdf4"]
 
 [tool.pytest.ini_options]
 addopts = '''
