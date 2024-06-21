@@ -36,7 +36,7 @@ The [data process graph](#data-process-graph) shows the data process, and allows
 
 If you would like to adopt this approach to processing your own data, you may clone this repository and begin swapping logic for your own, or use a similar architecture for your data processing. To run a working example with some actual data from this study, perform the following steps:
 
-1. Clone this repository and open it in your terminal or IDE (e.g. `git clone https://github.com/blakeNaccarato/boilercv.git boilercv`).
+1. Clone this repository and open it in your terminal or IDE (e.g. `git clone https://github.com/softboiler/boilercv.git boilercv`).
 2. Navigate to the clone directory in a terminal window (e.g. `cd boilercv`).
 3. Create a Python 3.10 virtual environment (e.g. `py -3.11 -m venv .venv` on Windows w/ Python 3.11 installed from [python.org](https://www.python.org/)).
 4. Activate the virtual environment (e.g. `.venv/scripts/activate` on Windows).

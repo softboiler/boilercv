@@ -25,5 +25,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 - Freeze requirements used for pipeline reproduction in `repro.txt` for this release
 
-[0.0.1]: https://github.com/blakeNaccarato/boilercv/compare/0.0.0...0.0.1
-[0.0.0]: https://github.com/blakeNaccarato/boilercv/releases/tag/0.0.0
+[0.0.1]: https://github.com/softboiler/boilercv/compare/0.0.0...0.0.1
+[0.0.0]: https://github.com/softboiler/boilercv/releases/tag/0.0.0
