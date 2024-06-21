@@ -1,4 +1,21 @@
 {
   "projectName": "boilercv",
-  "projectOwner": "softboiler"
+  "projectOwner": "softboiler",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "asennain",
+      "name": "asennain",
+      "avatar_url": "https://avatars.githubusercontent.com/u/119456024?v=4",
+      "profile": "https://github.com/asennain",
+      "contributions": [
+        "doc"
+      ]
+    }
+  ]
 }
