@@ -1,21 +1,23 @@
 {
-  "projectName": "boilercv",
-  "projectOwner": "softboiler",
+  "commitConvention": "angular",
+  "commitType": "docs",
+  "contributorsPerLine": 7,
+  "contributorsSortAlphabetically": true,
   "files": [
+    "CONTRIBUTORS.md",
     "README.md"
   ],
-  "commitType": "docs",
-  "commitConvention": "angular",
-  "contributorsPerLine": 7,
+  "projectName": "boilercv",
+  "projectOwner": "softboiler",
   "contributors": [
     {
-      "login": "asennain",
-      "name": "asennain",
       "avatar_url": "https://avatars.githubusercontent.com/u/119456024?v=4",
-      "profile": "https://github.com/asennain",
       "contributions": [
         "doc"
-      ]
+      ],
+      "login": "asennain",
+      "name": "asennain",
+      "profile": "https://github.com/asennain"
     }
   ]
 }

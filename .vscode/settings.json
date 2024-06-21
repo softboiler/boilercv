@@ -122,6 +122,9 @@
   "vsicons.presets.hideExplorerArrows": true,
   "vsicons.dontShowNewVersionMessage": false,
   //! Filetype extensions
+  //* Built-in Markdown support
+  //? Doesn't play nicely with All Contributors HTML
+  "markdown.validate.referenceLinks.enabled": "ignore",
   //* Markdownlint (MD)
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"

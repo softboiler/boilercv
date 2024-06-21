@@ -63,6 +63,7 @@ experiments/e240215_plotting/index
 development
 contributing
 changelog
+contributors
 apidocs/index
 references
 :::
