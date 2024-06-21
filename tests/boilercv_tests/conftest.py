@@ -10,7 +10,6 @@ from pathlib import Path
 from re import fullmatch
 from shutil import rmtree
 from types import SimpleNamespace
-from warnings import resetwarnings
 
 import pytest
 import pytest_harvest
@@ -34,12 +33,7 @@ CASER = "C"
 @pytest.fixture(autouse=True, scope="session")
 def _project_session_path(tmp_path_factory):
     """Set project directory."""
-    path = get_session_path(tmp_path_factory, boilercv)
-    # We only have this for docs, and don't want to test it
-    (path / "data/sources/2023-09-20T17-14-18.nc").unlink()
-    yield
-    # Reset warnings at session teardown to avoid raising on internal warnings
-    resetwarnings()
+    get_session_path(tmp_path_factory, boilercv)
 
 
 # * -------------------------------------------------------------------------------- * #
