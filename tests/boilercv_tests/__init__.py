@@ -7,9 +7,10 @@ from dataclasses import dataclass, field
 from functools import partial
 from itertools import chain
 from pathlib import Path
-from shlex import join, split
+from shlex import join, quote, split
 from shutil import copy
 from subprocess import run
+from sys import executable
 from tempfile import _RandomNameSequence  # type: ignore
 from types import SimpleNamespace
 from typing import Any
@@ -223,8 +224,11 @@ def clean_notebooks(*nbs: Path | str):  # type: ignore  # `nbs` redefined
     """Clean notebooks using pre-commit hooks."""
     nbs: str = join(str(nb) for nb in nbs)
     files = f"--files {nbs}"
+    quote((Path(executable).parent / "pre-commit").as_posix())
     for cmd in [
-        split(f".venv/scripts/pre-commit run {subcmd}")
+        split(
+            f"{quote((Path(executable).parent / 'pre-commit').as_posix())} run {subcmd}"
+        )
         for subcmd in [f"nb-clean {files}", f"ruff {files}", f"ruff-format {files}"]
     ]:
         run(cmd, check=False)  # noqa: S603

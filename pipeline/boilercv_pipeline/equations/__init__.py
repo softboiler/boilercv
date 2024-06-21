@@ -4,6 +4,7 @@ from collections.abc import Callable, Iterable
 from pathlib import Path
 from re import finditer
 from shlex import quote
+from sys import executable
 from typing import cast, get_args
 
 from boilercv.correlations import RANGES_TOML, SYMBOLS, beta, nusselt
@@ -23,7 +24,7 @@ from boilercv.morphs.contexts import Context, Pipe, make_pipelines
 from boilercv.morphs.morphs import Morph
 
 SYMS = tuple(SYMBOLS.keys())
-PIPX = Path(".venv") / "scripts" / "pipx"
+PIPX = Path(executable).parent / "pipx"
 PNGS: dict[Corr, Path] = {"beta": beta.PNGS, "nusselt": nusselt.PNGS}
 EQUATIONS: dict[Corr | Range, Path] = {
     "beta": beta.EQUATIONS_TOML,
