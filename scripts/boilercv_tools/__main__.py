@@ -1,14 +1,16 @@
 """CLI for tools."""
 
-import tomllib
 from collections.abc import Collection
 from pathlib import Path
 from re import finditer, sub
 from shlex import join, split
+from tomllib import loads
 
 from cyclopts import App
 
+from boilercv_tools import add_changes
 from boilercv_tools.sync import PYTEST, check_compilation, escape
+from boilercv_tools.types import ChangeType
 
 APP = App(help_format="markdown")
 """CLI."""
@@ -22,6 +24,12 @@ def main():  # noqa: D103
 def compile(high: bool = False):  # noqa: A001
     """Compile."""
     log(check_compilation(high))
+
+
+@APP.command
+def add_change(change: ChangeType = "change"):
+    """Add change."""
+    add_changes.add_change(change)
 
 
 @APP.command
@@ -59,7 +67,7 @@ def sync_local_dev_configs():
     shadowing. Concurrent test runs are disabled in the local pytest configuration which
     slows down the usual local, granular test workflow.
     """
-    config = tomllib.loads(Path("pyproject.toml").read_text("utf-8"))
+    config = loads(Path("pyproject.toml").read_text("utf-8"))
     pytest = config["tool"]["pytest"]["ini_options"]
     pytest["addopts"] = disable_concurrent_tests(pytest["addopts"])
     PYTEST.write_text(
