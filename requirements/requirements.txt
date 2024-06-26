@@ -176,7 +176,7 @@ nbconvert==7.7.3
 nbformat==5.10.4
 ndindex==1.8
 nest-asyncio==1.6.0
-netcdf4==1.7.1.post1
+netcdf4==1.6.5
 networkx==3.3
 nodeenv==1.9.1
 nptyping==2.5.0
