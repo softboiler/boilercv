@@ -21,8 +21,8 @@ dependencies = [
     "sympy>=1.12",
     "xarray[accel,io,parallel]>=2023.7.0",
     # ? https://github.com/softboiler/boilercv/issues/213
-    "netcdf4>=1.7.0",
-    "netcdf4!=1.7.1 ; sys_platform == 'linux'",
+    "netcdf4>=1.6.5",
+    "netcdf4!=1.7.1.post1 ; sys_platform == 'linux'",
 ]
 [project.optional-dependencies]
 # * Minimal CV flavor needed, but allow `boilercv` to coexist with different flavors

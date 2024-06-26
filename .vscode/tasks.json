@@ -43,17 +43,21 @@
       ]
     },
     {
-      "id": "version",
+      "id": "dependency",
       "type": "promptString",
-      "description": "version",
-      "default": "0.0.1"
+      "description": "Show tree of packages requesting this dependency."
     },
-    // * -------------------------------------------------------------------------- * //
     {
       "id": "templateOptions",
       "description": "Template options.",
       "type": "pickString",
       "options": ["", "-Stay", "-Stay -Prompt", "-Recopy -Prompt"]
+    },
+    {
+      "id": "changeType",
+      "description": "Change type.",
+      "type": "pickString",
+      "options": ["breaking", "deprecation", "change"]
     }
   ],
   "tasks": [
@@ -288,6 +292,20 @@
     // * -------------------------------------------------------------------------- * //
     // * OTHER TASKS * //
 
+    {
+      "label": "task: Generate changelog entry",
+      "type": "shell",
+      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv_tools add-change ${input:changeType}",
+      "icon": { "id": "request-changes" },
+      "problemMatcher": []
+    },
+    {
+      "label": "task: Show tree of packages requesting a dependency",
+      "type": "shell",
+      "command": ". scripts/Initialize-Shell.ps1; pipdeptree --reverse --packages ${input:dependency}",
+      "icon": { "id": "versions" },
+      "problemMatcher": []
+    },
     {
       "label": "task: Run pytest with coverage",
       "type": "shell",
