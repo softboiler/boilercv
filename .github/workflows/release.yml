@@ -34,7 +34,7 @@ jobs:
           name: "python-package-distributions"
           path: "dist/"
   publish-to-pypi:
-    if: startsWith(github.ref, 'refs/tags/')
+    if: github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name)
     name: "Publish Python 🐍 distribution 📦 to PyPI"
     needs: "build"
     permissions:
