@@ -1,6 +1,6 @@
 # `boilercv`
 
-[![DOI](https://zenodo.org/badge/503551174.svg)](https://zenodo.org/badge/latestdoi/503551174) {{ binder }}
+[![DOI](https://zenodo.org/badge/503551174.svg)](https://zenodo.org/badge/latestdoi/503551174) [![All Contributors](https://img.shields.io/github/all-contributors/softboiler/boilercv?color=ee8449&style=flat-square)](../README.md#contributors) {{ binder }}
 
 Computer vision routines suitable for nucleate pool boiling bubble analysis.
 
