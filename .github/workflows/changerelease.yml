@@ -1,5 +1,4 @@
-# Sync GitHub release notes with the changelog
-name: "changerelease"
+name: "Sync GitHub release notes with the changelog"
 on:
   workflow_dispatch:
   push:

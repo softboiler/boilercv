@@ -1,7 +1,8 @@
-# Publish a Python package to PyPI
-name: "release"
+name: "Release to PyPI"
 on:
   workflow_dispatch:
+  push:
+    branches: ["main"]
 defaults:
   run:
     shell: "pwsh"
@@ -9,17 +10,13 @@ env:
   UV_CACHE_DIR: ".cache/uv-cache"
   UV_SYSTEM_PYTHON: "true"
 jobs:
-  release:
+  build:
     strategy:
       matrix:
         runner: ["ubuntu-22.04"]
         python: ["3.11"]
     runs-on: "${{ matrix.runner }}"
     steps:
-      - uses: "dropseed/changerelease@3b121c9e98fa055f59a32b023cb4fd2325f4d9dc" # v1.6.0
-        with:
-          github_token: "${{ secrets.GITHUB_TOKEN }}"
-          tag_prefix: ""
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
@@ -31,7 +28,61 @@ jobs:
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1"
-      - run: ". scripts/Initialize-Shell.ps1; flit publish"
+      - run: ". scripts/Initialize-Shell.ps1; flit build"
+      - uses: "actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808" # v4.3.3
+        with:
+          name: "python-package-distributions"
+          path: "dist/"
+  publish-to-pypi:
+    if: startsWith(github.ref, 'refs/tags/')
+    name: "Publish Python 🐍 distribution 📦 to PyPI"
+    needs: "build"
+    permissions:
+      id-token: "write"
+    strategy:
+      matrix:
+        runner: ["ubuntu-22.04"]
+        python: ["3.11"]
+    runs-on: "${{ matrix.runner }}"
+    environment:
+      name: "release"
+      url: "https://pypi.org/p/boilercv"
+    steps:
+      - uses: "actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e" # v4.1.7
+        with:
+          name: "python-package-distributions"
+          path: "dist/"
+      - uses: "pypa/gh-action-pypi-publish@release/v1"
+  github-release:
+    needs: "publish-to-pypi"
+    permissions:
+      contents: "write"
+      id-token: "write"
+    strategy:
+      matrix:
+        runner: ["ubuntu-22.04"]
+        python: ["3.11"]
+    runs-on: "${{ matrix.runner }}"
+    steps:
+      - uses: "actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e" # v4.1.7
+        with:
+          name: "python-package-distributions"
+          path: "dist/"
+      - uses: "sigstore/gh-action-sigstore-python@v2.1.1"
+        with:
+          inputs: >-
+            ./dist/*.tar.gz
+            ./dist/*.whl
+      - run: >-
+          gh release create
+          '${{ github.ref_name }}'
+          --repo '${{ github.repository }}'
+          --notes ""
         env:
-          FLIT_USERNAME: "__token__"
-          FLIT_PASSWORD: "${{ secrets.PYPI_TOKEN }}"
+          GITHUB_TOKEN: ${{ github.token }}
+      - run: >-
+          gh release upload
+          '${{ github.ref_name }}' dist/**
+          --repo '${{ github.repository }}'
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
