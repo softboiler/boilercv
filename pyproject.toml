@@ -4,7 +4,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "boilercv"
-version = "0.0.1"
+version = "0.0.2"
 description = "Computer vision routines suitable for nucleate pool boiling bubble analysis."
 readme = "README.md"
 license = { file = "LICENSE" }
