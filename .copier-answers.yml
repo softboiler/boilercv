@@ -5,7 +5,7 @@ actions_runner: ubuntu-22.04
 active: true
 github_repo_name: boilercv
 project_description: Computer vision routines suitable for nucleate pool boiling bubble
-    analysis.
+    analysis
 project_email: blake.naccarato@gmail.com
 project_name: boilercv
 project_owner_github_username: softboiler
