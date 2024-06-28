@@ -1,6 +1,6 @@
 [build-system]
-requires = ["hatchling==1.25.0"]
-build-backend = "hatchling.build"
+requires = ["flit_core==3.9.0"]
+build-backend = "flit_core.buildapi"
 
 [project]
 name = "boilercv_pipeline"
