@@ -2,7 +2,6 @@
   "commitConvention": "angular",
   "commitType": "docs",
   "contributorsPerLine": 7,
-  "contributorsSortAlphabetically": true,
   "files": [
     "CONTRIBUTORS.md",
     "README.md"

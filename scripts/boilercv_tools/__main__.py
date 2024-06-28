@@ -9,7 +9,7 @@ from tomllib import loads
 from cyclopts import App
 
 from boilercv_tools import add_changes
-from boilercv_tools.sync import PYTEST, check_compilation, escape
+from boilercv_tools.sync import check_compilation, escape
 from boilercv_tools.types import ChangeType
 
 APP = App(help_format="markdown")
@@ -70,7 +70,7 @@ def sync_local_dev_configs():
     config = loads(Path("pyproject.toml").read_text("utf-8"))
     pytest = config["tool"]["pytest"]["ini_options"]
     pytest["addopts"] = disable_concurrent_tests(pytest["addopts"])
-    PYTEST.write_text(
+    Path("pytest.ini").write_text(
         encoding="utf-8",
         data="\n".join(["[pytest]", *[f"{k} = {v}" for k, v in pytest.items()], ""]),
     )
