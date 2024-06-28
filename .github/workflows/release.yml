@@ -3,8 +3,6 @@ name: "release"
 on:
   release:
     types: ["published"]
-env:
-  UV_SYSTEM_PYTHON: "true"
 jobs:
   release:
     permissions:
@@ -21,8 +19,6 @@ jobs:
       url: "https://pypi.org/p/boilercv"
     steps:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
-        with:
-          submodules: true
       - uses: "actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d" # v5.1.0
         with:
           python-version: "${{ matrix.python }}"
