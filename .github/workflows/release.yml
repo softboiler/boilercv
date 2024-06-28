@@ -57,6 +57,7 @@ jobs:
     permissions:
       contents: "write"
       id-token: "write"
+      attestations: "write"
     strategy:
       matrix:
         runner: ["ubuntu-22.04"]
@@ -67,9 +68,9 @@ jobs:
         with:
           name: "python-package-distributions"
           path: "dist/"
-      - uses: "sigstore/gh-action-sigstore-python@61f6a500bbfdd9a2a339cf033e5421951fbc1cd2" # v2.1.1
+      - uses: actions/attest-build-provenance@bdd51370e0416ac948727f861e03c2f05d32d78e # v1.3.2
         with:
-          inputs: "./dist/*.tar.gz ./dist/*.whl"
+          subject-path: "./dist/*.tar.gz ./dist/*.whl"
       - run: "gh release upload '${{ github.event.release.tag_name }}' dist/**"
         env:
           GITHUB_TOKEN: ${{ github.token }}
