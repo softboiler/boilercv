@@ -70,7 +70,7 @@ jobs:
           path: "dist/"
       - uses: actions/attest-build-provenance@bdd51370e0416ac948727f861e03c2f05d32d78e # v1.3.2
         with:
-          subject-path: "./dist/*.tar.gz ./dist/*.whl"
+          subject-path: "./dist/*.tar.gz, ./dist/*.whl"
       - run: "gh release upload '${{ github.event.release.tag_name }}' dist/**"
         env:
           GITHUB_TOKEN: ${{ github.token }}
