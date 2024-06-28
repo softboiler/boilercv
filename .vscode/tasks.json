@@ -349,7 +349,7 @@
     {
       "label": "task: Bump version",
       "type": "shell",
-      "command": "copier update --vcs-ref=$(git rev-parse HEAD:submodules/template) --defaults --data project_version='${input:version}'; git add .; git commit -m 'Bump version'",
+      "command": "copier update --vcs-ref=$(git rev-parse HEAD:submodules/template) --defaults --data project_version='${input:version}'; git add .; git commit -m 'Bump version'; git push",
       "icon": { "id": "graph-line" },
       "problemMatcher": []
     }
