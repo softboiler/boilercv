@@ -1,4 +1,5 @@
-name: "Run static analysis, tests, and sync"
+# Run static analysis, tests, and sync
+name: "ci"
 concurrency:
   group: "${{ github.workflow }}-${{ github.ref }}"
   cancel-in-progress: True

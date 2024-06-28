@@ -1,4 +1,5 @@
-name: "Test upper-bound project dependencies"
+# Test upper-bound project dependencies
+name: "high"
 on:
   workflow_dispatch:
   schedule:

@@ -1,8 +1,9 @@
-name: "Release to PyPI"
+# Publish release
+name: "release"
 on:
   workflow_dispatch:
-  push:
-    branches: ["main"]
+  release:
+    types: ["published"]
 defaults:
   run:
     shell: "pwsh"
@@ -28,14 +29,12 @@ jobs:
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1"
-      - run: ". scripts/Initialize-Shell.ps1; flit build"
+      - run: ". scripts/Initialize-Shell.ps1; python -m build"
       - uses: "actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808" # v4.3.3
         with:
           name: "python-package-distributions"
           path: "dist/"
-  publish-to-pypi:
-    if: github.ref || format('{0}{1}', 'refs/tags/', github.event.release.tag_name)
-    name: "Publish Python 🐍 distribution 📦 to PyPI"
+  publish:
     needs: "build"
     permissions:
       id-token: "write"
@@ -52,4 +51,25 @@ jobs:
         with:
           name: "python-package-distributions"
           path: "dist/"
-      - uses: "pypa/gh-action-pypi-publish@release/v1"
+      - uses: "pypa/gh-action-pypi-publish@ec4db0b4ddc65acdf4bff5fa45ac92d78b56bdf0" # v1.9.0
+  github-release:
+    needs: "build"
+    permissions:
+      contents: "write"
+      id-token: "write"
+    strategy:
+      matrix:
+        runner: ["ubuntu-22.04"]
+        python: ["3.11"]
+    runs-on: "${{ matrix.runner }}"
+    steps:
+      - uses: "actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e" # v4.1.7
+        with:
+          name: "python-package-distributions"
+          path: "dist/"
+      - uses: "sigstore/gh-action-sigstore-python@61f6a500bbfdd9a2a339cf033e5421951fbc1cd2" # v2.1.1
+        with:
+          inputs: "./dist/*.tar.gz ./dist/*.whl"
+      - run: "gh release upload '${{ github.event.release.tag_name }}' dist/**"
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
