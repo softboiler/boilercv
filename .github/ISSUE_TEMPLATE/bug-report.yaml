@@ -13,10 +13,10 @@ body:
     id: "latest-version"
     attributes:
       label: "Please confirm that this bug affects the latest version"
-      description: "Please verify the issue is present in the latest version by installing it with `pip install boilercv==0.0.4` and checking that the bug is still there"
+      description: "Please verify the issue is present in the latest version by installing it with `pip install boilercv==0.0.5` and checking that the bug is still there"
       options:
         - required: True
-          label: "This bug affects version `0.0.4` of `boilercv`."
+          label: "This bug affects version `0.0.5` of `boilercv`."
   - type: "checkboxes"
     id: "operating-systems"
     attributes:
