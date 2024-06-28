@@ -18,16 +18,16 @@ def apply(
     """Apply functions and conditions recursively to nodes and leaves of a mapping."""
     filtered = dict(deepcopy(mapping))
     marks: list[Any] = []
-    for key in filtered:
-        if isinstance(filtered[key], Mapping):
-            filtered[key] = apply(filtered[key], node_fun, leaf_fun)
-            filtered[key] = node_fun(filtered[key])
-            if not node_cond(filtered[key]):
-                marks.append(key)
+    for k, v in filtered.items():
+        if isinstance(v, Mapping):
+            filtered[k] = apply(filtered[k], node_fun, leaf_fun)
+            filtered[k] = node_fun(filtered[k])
+            if not node_cond(filtered[k]):
+                marks.append(k)
             continue
-        filtered[key] = leaf_fun(filtered[key])
-        if not leaf_cond(filtered[key]):
-            marks.append(key)
+        filtered[k] = leaf_fun(filtered[k])
+        if not leaf_cond(filtered[k]):
+            marks.append(k)
     for mark in marks:
         del filtered[mark]
     return filtered
