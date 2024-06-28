@@ -5,6 +5,11 @@
   "version": "2.0.0",
   "inputs": [
     {
+      "id": "version",
+      "type": "promptString",
+      "description": "Version number."
+    },
+    {
       "id": "stage",
       "type": "pickString",
       "description": "stage",
@@ -338,6 +343,13 @@
       "label": "task: view profile results with snakeviz",
       "type": "shell",
       "command": ". scripts/Initialize-Shell.ps1; snakeviz .prof",
+      "icon": { "id": "graph-line" },
+      "problemMatcher": []
+    },
+    {
+      "label": "task: Release",
+      "type": "shell",
+      "command": "copier update --vcs-ref=$(git rev-parse HEAD:submodules/template) --defaults --data project_version='${input:version}'; git add .; git commit -m 'Bump version'",
       "icon": { "id": "graph-line" },
       "problemMatcher": []
     }

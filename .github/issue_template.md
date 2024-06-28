@@ -10,9 +10,9 @@ Please apply the `bug` label
 
 ### Please confirm that this bug affects the latest version
 
-<!-- Please verify the issue is present in the latest version by installing it with `pip install boilercv==0.0.2` and checking that the bug is still there #} -->
+<!-- Please verify the issue is present in the latest version by installing it with `pip install boilercv==0.0.3` and checking that the bug is still there #} -->
 
-- [ ] This bug affects version `0.0.2` of `boilercv`.
+- [ ] This bug affects version `0.0.3` of `boilercv`.
 
 ### Please indicate which operating system(s) you are using
 
