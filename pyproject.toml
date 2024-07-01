@@ -75,7 +75,7 @@ directory = "changelog"
 filename = "CHANGELOG.md"
 template = "changelog/towncrier_template.md.jinja"
 title_format = ""
-issue_format = "[#{issue}](https://github.com/softboiler/boilercv/{issue})"
+issue_format = "[#{issue}](https://github.com/softboiler/boilercv/issues/{issue})"
 underlines = ["", "", ""]
 [[tool.towncrier.section]]
 path = ""
