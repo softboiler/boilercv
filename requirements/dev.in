@@ -11,8 +11,8 @@ pandas-stubs~=2.2.2
 pipdeptree==2.23.0
 pre-commit==3.7.1
 pyright==1.1.369
-pyside6==6.7.1 ; sys_platform != 'linux' # Missing wheels
-ruff==0.4.10
+pyside6==6.7.2 ; sys_platform != 'linux' # Missing wheels
+ruff==0.5.0
 snakeviz==2.2.0
 sourcery==1.19.0
 towncrier==23.11.0
