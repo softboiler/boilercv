@@ -10,15 +10,6 @@
   "projectOwner": "softboiler",
   "contributors": [
     {
-      "avatar_url": "https://avatars.githubusercontent.com/u/119456024?v=4",
-      "contributions": [
-        "doc"
-      ],
-      "login": "asennain",
-      "name": "asennain",
-      "profile": "https://github.com/asennain"
-    },
-    {
       "login": "blakeNaccarato",
       "name": "Blake Naccarato",
       "avatar_url": "https://avatars.githubusercontent.com/u/20692450?v=4",
@@ -26,6 +17,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "avatar_url": "https://avatars.githubusercontent.com/u/119456024?v=4",
+      "contributions": [
+        "doc"
+      ],
+      "login": "asennain",
+      "name": "asennain",
+      "profile": "https://github.com/asennain"
     }
   ]
 }
