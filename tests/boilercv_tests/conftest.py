@@ -14,12 +14,14 @@ from types import SimpleNamespace
 import pytest
 import pytest_harvest
 from _pytest.python import Function
+from boilercore import filter_certain_warnings
 from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
 from boilercore.testing import get_session_path
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 
 import boilercv
+from boilercv_docs import warning_filters
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
 from boilercv_tests.types import FixtureStore
 
@@ -34,6 +36,12 @@ CASER = "C"
 def _project_session_path(tmp_path_factory):
     """Set project directory."""
     get_session_path(tmp_path_factory, boilercv)
+
+
+@pytest.fixture(autouse=True, scope="session")
+def _filter_certain_warnings():
+    """Filter certain warnings."""
+    filter_certain_warnings(package="boilercv", other_warnings=warning_filters)
 
 
 # * -------------------------------------------------------------------------------- * #

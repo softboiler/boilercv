@@ -14,7 +14,7 @@ from textwrap import dedent
 from typing import Any
 from warnings import catch_warnings, filterwarnings
 
-from boilercore import WarningFilter, filter_certain_warnings
+from boilercore import filter_certain_warnings
 from IPython.display import HTML, display  # type: ignore
 from IPython.utils.capture import capture_output
 from matplotlib.pyplot import style
@@ -23,7 +23,7 @@ from numpy import set_printoptions
 from pandas import DataFrame, Index, MultiIndex, Series, concat, options
 from seaborn import set_theme
 
-from boilercv_docs import DEPS, DOCS, get_root
+from boilercv_docs import DEPS, DOCS, get_root, warning_filters
 from boilercv_docs.types import DfOrS
 
 FONT_SCALE = 1.3
@@ -67,30 +67,9 @@ class Paths:
 def init(font_scale: float = FONT_SCALE) -> Paths:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method
+
     filter_certain_warnings(
-        package="boilercv",
-        other_action="ignore",
-        other_warnings=[
-            WarningFilter(
-                category=FutureWarning,
-                message=r"A grouping was used that is not in the columns of the DataFrame and so was excluded from the result\. This grouping will be included in a future version of pandas\. Add the grouping as a column of the DataFrame to silence this warning\.",
-            ),
-            WarningFilter(
-                category=RuntimeWarning, message=r"invalid value encountered in power"
-            ),
-            WarningFilter(
-                category=RuntimeWarning,
-                message=r"numpy\.ndarray size changed, may indicate binary incompatibility\. Expected \d+ from C header, got \d+ from PyObject",
-            ),
-            WarningFilter(
-                category=UserWarning,
-                message=r"The palette list has more values \(\d+\) than needed \(\d+\), which may not be intended\.",
-            ),
-            WarningFilter(
-                category=UserWarning,
-                message=r"To output multiple subplots, the figure containing the passed axes is being cleared\.",
-            ),
-        ],
+        package="boilercv", other_action="ignore", other_warnings=warning_filters
     )
     root = get_root()
     was_already_at_root = Path().cwd() == root

@@ -31,7 +31,9 @@ COPIER_ANSWERS = ROOT / ".copier-answers.yml"
 # ! Template answers
 ANS = YAML().load(COPIER_ANSWERS.read_text(encoding="utf-8"))
 """Project template answers."""
-AUTHORS = ANS["project_owner_name"]
+PROJECT_OWNER_GITHUB_USERNAME = ANS["project_owner_github_username"]
+"""Name of the project owner."""
+AUTHORS = "Blake Naccarato, Kwang Jin Kim"
 """Authors of the project."""
 USER = ANS["project_owner_github_username"]
 """Host GitHub user or organization for this repository."""
@@ -62,12 +64,7 @@ TIPPY_RTD_URLS = [
     if pkg not in ["python", "pandas", "matplotlib"]
 ]
 """Tippy ReadTheDocs-compatible URLs."""
-REV = (
-    Path("../requirements.txt")
-    .read_text(encoding="utf-8")
-    .splitlines()[1]
-    .split("@")[-1]
-)
+REV = "7cc78e6d87a8603b9633ab0084241b504952f815"
 """Binder revision."""
 
 # ! Setup
@@ -193,7 +190,7 @@ myst_enable_extensions = [
 ]
 myst_heading_anchors = 6
 myst_substitutions = {
-    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/blakeNaccarato/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Ffind_centers.ipynb)"
+    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{PROJECT_OWNER_GITHUB_USERNAME}/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Fplot_tracks.ipynb)"
 }
 # ! BibTeX
 bibtex_bibfiles = dpaths(BIB_TEMPLATE, BIB)
