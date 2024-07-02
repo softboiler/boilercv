@@ -50,7 +50,7 @@ def _filter_certain_warnings():
                 WarningFilter(
                     message="invalid escape sequence",
                     category=category,
-                    module="colorspacious.conversions",
+                    module="colorspacious.comparison",
                 )
                 for category in [DeprecationWarning, SyntaxWarning]
             ],
