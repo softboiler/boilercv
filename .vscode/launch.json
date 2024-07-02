@@ -14,8 +14,7 @@
       "request": "launch",
       "module": "sphinx",
       "args": ["-EaT", "docs", "_site"],
-      "console": "internalConsole",
-      "guiEventLoop": "none"
+      "console": "internalConsole"
     },
     {
       "name": "Python: WRITE",
@@ -27,8 +26,7 @@
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_WRITE": "True"
-      },
-      "guiEventLoop": "none"
+      }
     },
     {
       "name": "Python: PREVIEW",
@@ -40,8 +38,7 @@
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"
-      },
-      "guiEventLoop": "none"
+      }
     },
     {
       "name": "Automatic Python/C++ debugging for OpenCV in WSL",
@@ -62,8 +59,7 @@
       "justMyCode": true,
       "env": {
         "OPENCV_LOG_LEVEL": "DEBUG"
-      },
-      "guiEventLoop": "none"
+      }
     },
     {
       "name": "C++",
@@ -95,8 +91,7 @@
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"
-      },
-      "guiEventLoop": "none"
+      }
     },
     {
       "name": "Python: Current file (interactive terminal)",
@@ -106,8 +101,7 @@
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"
-      },
-      "guiEventLoop": "none"
+      }
     },
     {
       "name": "Python: Current file with args",
@@ -119,8 +113,7 @@
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"
-      },
-      "guiEventLoop": "none"
+      }
     },
     {
       "name": "Python: Debug bootstrapping Python install script",
@@ -131,8 +124,7 @@
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"
-      },
-      "guiEventLoop": "none"
+      }
     },
     {
       "name": "PowerShell: Launch Current File",

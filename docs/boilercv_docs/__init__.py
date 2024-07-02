@@ -55,7 +55,7 @@ warning_filters = [
         WarningFilter(
             message=r"invalid escape sequence",
             category=category,
-            module=r"colorspacious\.comparison",
+            # module=r"colorspacious\.comparison",  # ? CI still complains
         )
         for category in [DeprecationWarning, SyntaxWarning]
     ],
