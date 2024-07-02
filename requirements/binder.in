@@ -5,3 +5,4 @@
 # Binder's implicit additional requirements via JupyterHub as of 2024/07/02
 notebook==7.2.1
 jupyter-resource-usage==1.0.2
+pyzmq==26.0.3
