@@ -66,7 +66,7 @@ REV = (
     Path("../requirements.txt")
     .read_text(encoding="utf-8")
     .splitlines()[1]
-    .split("@")[-1]
+    .split(" @ ")[-1]
 )
 """Binder revision."""
 
