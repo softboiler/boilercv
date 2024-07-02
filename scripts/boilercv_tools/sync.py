@@ -25,7 +25,7 @@ DEPS = (
     *[
         Path(editable["path"]) / "pyproject.toml"
         for editable in finditer(
-            r"(?m)^(?:-e|--editable)\s(?P<path>.+)$", DEV.read_text("utf-8")
+            r"(?m)^(?:-e|--editable)\s[^@]+@\s(?P<path>.+)$", DEV.read_text("utf-8")
         )
     ],
 )
