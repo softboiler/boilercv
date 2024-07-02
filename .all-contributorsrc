@@ -17,6 +17,15 @@
       "login": "asennain",
       "name": "asennain",
       "profile": "https://github.com/asennain"
+    },
+    {
+      "login": "blakeNaccarato",
+      "name": "Blake Naccarato",
+      "avatar_url": "https://avatars.githubusercontent.com/u/20692450?v=4",
+      "profile": "https://www.blakenaccarato.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }
