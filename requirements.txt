@@ -1,5 +1,5 @@
 # Binder
-boilercv @ git+https://github.com/softboiler/boilercv@218feb0bc89428bc672e108c91fde3f53512ed38
+boilercv @ git+https://github.com/softboiler/boilercv@d91971aca9b8aa8447c8c5fea70ec76cbe32bf70
 boilercore @ git+https://github.com/softboiler/boilercore@973a0967b0c9922abd47b5f6ec876aac0df6a0c9
 --editable docs/.
 --editable pipeline/.
