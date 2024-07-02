@@ -37,7 +37,6 @@ def _project_session_path(tmp_path_factory):
     get_session_path(tmp_path_factory, boilercv)
 
 
-# Can't be session scope
 @pytest.fixture(autouse=True, scope="session")
 def _filter_certain_warnings():
     """Filter certain warnings."""
@@ -51,7 +50,7 @@ def _filter_certain_warnings():
                 WarningFilter(
                     message="invalid escape sequence",
                     category=category,
-                    module="colorspacious.conversion",
+                    module="colorspacious.conversions",
                 )
                 for category in [DeprecationWarning, SyntaxWarning]
             ],
