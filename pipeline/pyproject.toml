@@ -17,7 +17,6 @@ dependencies = [
     "loguru>=0.7.0",
     "matplotlib>=3.7.2",
     "numpy>=1.24.4",
-    "opencv-python-headless>=4.9.0.80",
     "pandas[hdf5,performance]>=2.2.2",
     "pillow>=10.3.0",
     "ploomber-engine>=0.0.30",
@@ -36,7 +35,9 @@ dependencies = [
     "watchfiles>=0.22.0",
     "xarray[accel,io,parallel]>=2023.7.0",
 ]
-
+[project.optional-dependencies]
+# * Minimal CV flavor needed, but allow `boilercv` to coexist with different flavors
+cv = ["opencv-python-headless>=4.9.0.80"]
 [tool.fawltydeps]
 deps = ["pipeline/pyproject.toml"]
 code = ["pipeline/boilercv_pipeline"]
@@ -44,5 +45,3 @@ ignore_undeclared = ["boilercore", "boilercv", "PySide6"]
 ignore_unused = [
     "pyarrow", # Used in `boilercv_pipeline.__init__`
 ]
-[tool.fawltydeps.custom_mapping]
-pydantic = ["pydantic", "pydantic_core"]
