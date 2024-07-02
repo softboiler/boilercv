@@ -81,6 +81,12 @@ markers = "slow"
 testpaths = "tests"
 xfail_strict = true
 
+[tool.pytest_env]
+PYTHONIOENCODING = 'utf-8:strict'
+PYTHONUTF8 = 1
+PYTHONWARNDEFAULTENCODING = 1
+PYTHONWARNINGS = "ignore"         # Ignore warnings until explicitly re-enabled in tests
+
 [tool.towncrier]
 directory = "changelog"
 filename = "CHANGELOG.md"

@@ -22,7 +22,7 @@ from boilercore.notebooks.namespaces import get_nb_ns
 from boilercore.paths import get_module_name, get_module_rel, walk_modules
 from cachier import cachier
 from matplotlib.pyplot import style
-from seaborn import color_palette, set_theme
+from seaborn import set_theme
 
 import boilercv
 from boilercv_tests.types import Params
@@ -39,14 +39,8 @@ TEST_TEMP_NBS.mkdir(exist_ok=True)
 
 
 def init():
-    """Initialize test plot formats.
-
-    Implementation copied from `boilercv_docs.init` for now, to avoid circular imports.
-    """
-    set_theme(
-        context="notebook", style="whitegrid", palette="bright", font="sans-serif"
-    )
-    color_palette("deep")
+    """Initialize test plot formats."""
+    set_theme(context="notebook", style="whitegrid", palette="deep", font="sans-serif")
     style.use(style=MPLSTYLE)
 
 

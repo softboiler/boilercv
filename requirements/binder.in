@@ -2,3 +2,6 @@
 --editable boilercv_docs @ docs
 --editable boilercv_pipeline[cv] @ pipeline
 --editable boilercore @ submodules/boilercore
+# Binder's implicit additional requirements via JupyterHub as of 2024/07/02
+notebook==6.5.6
+jupyter-resource-usage==1.0.2

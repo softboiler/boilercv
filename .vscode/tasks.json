@@ -61,7 +61,7 @@
     {
       "id": "ref",
       "type": "promptString",
-      "description": "Commit SHA or other VCS reference.",
+      "description": "Commit SHA or other VCS reference."
     },
     {
       "id": "changeType",
@@ -82,6 +82,13 @@
       "label": "proj: Generate correlation docs",
       "type": "shell",
       "command": "python -m boilercv_pipeline.equations.make_docs",
+      "icon": { "id": "file-code" },
+      "problemMatcher": []
+    },
+    {
+      "label": "proj: Sync local dev configs",
+      "type": "shell",
+      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv_tools sync-local-dev-configs",
       "icon": { "id": "file-code" },
       "problemMatcher": []
     },
