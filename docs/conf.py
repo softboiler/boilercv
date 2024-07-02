@@ -62,7 +62,7 @@ TIPPY_RTD_URLS = [
     if pkg not in ["python", "pandas", "matplotlib"]
 ]
 """Tippy ReadTheDocs-compatible URLs."""
-REV = "888a1313f0149e095bfcecb81cbee971f9eb59d1"
+REV = "7cc78e6d87a8603b9633ab0084241b504952f815"
 """Binder revision."""
 
 # ! Setup
@@ -188,7 +188,7 @@ myst_enable_extensions = [
 ]
 myst_heading_anchors = 6
 myst_substitutions = {
-    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/blakeNaccarato/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Ffind_centers.ipynb)"
+    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/blakeNaccarato/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Fplot_tracks.ipynb)"
 }
 # ! BibTeX
 bibtex_bibfiles = dpaths(BIB_TEMPLATE, BIB)
