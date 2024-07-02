@@ -1,6 +1,6 @@
 pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca
 # ? Missing wheels
-pyside6 == 6.7.1 ; sys_platform == 'linux'
-pyside6-addons == 6.7.1 ; sys_platform == 'linux'
-pyside6-essentials==6.7.1 ; sys_platform == 'linux'
-shiboken6==6.7.1 ; sys_platform == 'linux'
+pyside6 ==6.7.2 ; sys_platform == 'linux'
+pyside6-addons ==6.7.2 ; sys_platform == 'linux'
+pyside6-essentials==6.7.2 ; sys_platform == 'linux'
+shiboken6==6.7.2 ; sys_platform == 'linux'
