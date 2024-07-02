@@ -20,7 +20,7 @@
     "description": "Additionally monitor these files",
     "fileMatch": ["(^|/)requirements/.+$"]
   },
-  "ignorePaths": ["requirements/requirements.txt"],
+  "ignorePaths": ["requirements.txt", "requirements/requirements.txt"],
   "packageRules": [
     {
       "description": "Sync with template",
