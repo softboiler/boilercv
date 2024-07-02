@@ -499,6 +499,7 @@ numpy==1.24.4
     #   numexpr
     #   numpy-groupies
     #   numpydantic
+    #   opencv-python-headless
     #   pandas
     #   pyarrow
     #   pyqtgraph
@@ -520,7 +521,11 @@ numpydoc==1.7.0
     # via boilercv-docs
 omegaconf==2.3.0
     # via hydra-core
-orjson==3.10.5 ; implementation_name == 'cpython'
+opencv-python-headless==4.9.0.80
+    # via
+    #   boilercv
+    #   boilercv-pipeline
+orjson==3.10.6 ; implementation_name == 'cpython'
     # via sqltrie
 packaging==24.1
     # via
