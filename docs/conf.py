@@ -64,7 +64,7 @@ TIPPY_RTD_URLS = [
     if pkg not in ["python", "pandas", "matplotlib"]
 ]
 """Tippy ReadTheDocs-compatible URLs."""
-REV = "11e83a44bd165ad4caabc867e3c45cc5d8333ac0"
+REV = "911bd80d7e5b12fa834f22e20efa6d025af3fe54"
 """Binder revision."""
 
 # ! Setup
