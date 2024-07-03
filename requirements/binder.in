@@ -2,6 +2,7 @@
 --editable boilercv_docs @ docs
 --editable boilercv_pipeline[cv] @ pipeline
 --editable boilercore @ submodules/boilercore
+pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca
 # Binder's implicit additional requirements via JupyterHub as of 2024/07/02
 notebook==7.2.1
 jupyter-resource-usage==1.0.2
