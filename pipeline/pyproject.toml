@@ -7,8 +7,7 @@ name = "boilercv_pipeline"
 version = "0.0.0"
 description = "Data pipeline."
 dependencies = [
-    # TODO: Swap with `pims`
-    "boilercine @ git+https://github.com/blakeNaccarato/boilercine@046ee0146394bebf5693fe0c18bbcea3d3e64fe5",
+    "boilercine>=2024.1.1",
     "cmasher>=1.7.2",
     "colorcet>=3.0.1",
     "copykitten>=1.1.1",
