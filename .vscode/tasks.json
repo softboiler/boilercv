@@ -384,7 +384,7 @@
     {
       "label": "task: Bump version",
       "type": "shell",
-      "command": ". scripts/Initialize-Shell.ps1; copier update --vcs-ref=$(git rev-parse HEAD:submodules/template) --defaults --data project_version='${input:version}'; towncrier build --version '${input:version}'; git add .; git commit -m 'Release ${input:version}'; git tag '${input:version}'",
+      "command": ". scripts/Initialize-Shell.ps1; copier update --vcs-ref=$(git rev-parse HEAD:submodules/template) --defaults --data project_version='${input:version}'; towncrier build --version '${input:version}'; git add .; git commit -m '${input:version}'; git tag --sign -m '${input:version}' '${input:version}'; git push; gh release create --discussion-category='announcements' --notes='' --title='${input:version}' --verify-tag '${input:version}'",
       "icon": { "id": "tag" },
       "problemMatcher": []
     },
