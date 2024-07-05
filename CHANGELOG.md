@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 <!-- towncrier release notes start -->
 
+## [2024.1.3](https://github.com/softboiler/boilercv/tree/2024.1.3)
+
+No significant changes.
+
 ## [2024.1.2](https://github.com/softboiler/boilercv/tree/2024.1.2)
 
 ### Changes
