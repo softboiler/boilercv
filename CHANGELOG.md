@@ -14,6 +14,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) 
 
 <!-- towncrier release notes start -->
 
+## [2024.1.2](https://github.com/softboiler/boilercv/tree/2024.1.2)
+
+### Changes
+
+- Sign commits and tags for releases ([471ce81](https://github.com/softboiler/boilercv/commit/471ce81841bc318e5d7780181355dc0dda8ad658))
+- Resolve two incompatible `numpy` pins in Binder requirements ([#224](https://github.com/softboiler/boilercv/issues/224))
+
 ## [2024.1.1](https://github.com/softboiler/boilercv/tree/2024.1.1)
 
 ### Changes

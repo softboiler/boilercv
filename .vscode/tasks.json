@@ -391,7 +391,7 @@
     {
       "label": "task: Release version",
       "type": "shell",
-      "command": ". scripts/Initialize-Shell.ps1; git tag --sign -m $($version = (Get-Content '.copier-answers.yml' | Select-String -Pattern '^project_owner_github_username:\\s(.+)$').Matches.Groups[1].value) $version; git push; gh release create --discussion-category='announcements' --notes='' --title=$version --verify-tag $version",
+      "command": ". scripts/Initialize-Shell.ps1; $version = (Get-Content '.copier-answers.yml' | Select-String -Pattern '^project_version:\\s(.+)$').Matches.Groups[1].value; git tag --sign -m $version $version; git push; gh release create --discussion-category='announcements' --notes='' --title=$version --verify-tag $version",
       "icon": { "id": "tag" },
       "problemMatcher": []
     },
