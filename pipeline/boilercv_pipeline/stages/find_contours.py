@@ -18,7 +18,7 @@ def main():  # noqa: D103
     for source_name, destination in destinations.items():
         video = bitwise_not(scale_bool(get_dataset(source_name)[VIDEO].values))
         df = get_all_contours(video, method=CHAIN_APPROX_SIMPLE)
-        df.to_hdf(destination, "contours", complib="zlib", complevel=9)
+        df.to_hdf(destination, key="contours", complib="zlib", complevel=9)
 
 
 def get_all_contours(video: Vid, method) -> DF:

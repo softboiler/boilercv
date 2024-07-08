@@ -25,7 +25,7 @@ def main():  # noqa: D103
     df = get_all_contours(
         bitwise_not(scale_bool(video.values)), method=CHAIN_APPROX_SIMPLE
     )
-    df.to_hdf(EXAMPLE_CONTOURS, "contours", complib="zlib", complevel=9)
+    df.to_hdf(EXAMPLE_CONTOURS, key="contours", complib="zlib", complevel=9)
     result: list[Img] = []
     for frame_num, frame in enumerate(video):
         contours: list[ArrInt] = list(  # type: ignore  # pyright 1.1.333

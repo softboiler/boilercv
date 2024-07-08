@@ -121,6 +121,10 @@ exclude = [
     "bin",
     "submodules/template",
     "submodules/typings",
+    "submodules/**/docs",
+    "submodules/**/scripts",
+    "submodules/**/tests",
+    "scripts/**.py",
 ]
 stubPath = "submodules/typings"
 typeCheckingMode = "strict"

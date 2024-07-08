@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable, Iterator, Sequence
 from dataclasses import dataclass, field
 from functools import partial
 from itertools import chain
@@ -31,7 +31,7 @@ PACKAGE = get_module_name(boilercv)
 """Name of the package to test."""
 MPLSTYLE = Path("data/plotting/base.mplstyle")
 """Styling for test plots."""
-NAMER = _RandomNameSequence()
+NAMER: Iterator[str] = _RandomNameSequence()
 """Random name sequence for case files."""
 TEST_TEMP_NBS = Path("docs/temp")
 """Temporary notebooks directory."""

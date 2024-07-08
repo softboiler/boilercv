@@ -169,7 +169,7 @@ class SymbolSolutions(ContextMorph[S, Solutions], Generic[S]):
 
     @classmethod
     def get_context(
-        cls, symbols: Iterable[str], solve_syms: tuple[str, ...] | None = None
+        cls, symbols: Iterable[str], solve_syms: tuple[S, ...] | None = None
     ) -> Context:
         """Get Pydantic context."""
         return cls.compose_defaults(

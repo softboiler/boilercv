@@ -25,7 +25,7 @@ elseif ($Release) { $msg = 'release' }
 "Will run $msg steps" | Write-Progress -Info
 
 'FINDING UV' | Write-Progress
-$uvVersionRe = Get-Content 'requirements/uv.in' | Select-String -Pattern '^uv==(.+)$'
+$uvVersionRe = Get-Content 'requirements/uv.txt' | Select-String -Pattern '^uv==(.+)$'
 $uvVersion = $uvVersionRe.Matches.Groups[1].value
 if (!(Test-Path 'bin/uv*') -or !(bin/uv --version | Select-String $uvVersion)) {
     $Env:CARGO_HOME = '.'
@@ -72,6 +72,7 @@ bin/uv pip install --editable=scripts
 '*** RUNNING PRE-SYNC TASKS' | Write-Progress
 if ($CI) {
     'SYNCING PROJECT WITH TEMPLATE' | Write-Progress
+    boilercv_tools elevate-pyright-warnings
     try {scripts/Sync-Template.ps1 -Stay} catch [System.Management.Automation.NativeCommandExitException] {
         git stash save --include-untracked
         scripts/Sync-Template.ps1 -Stay

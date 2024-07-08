@@ -9,6 +9,51 @@
   ],
   "configurations": [
     {
+      "name": "Python: Current file",
+      "type": "debugpy",
+      "request": "launch",
+      // "purpose": ["debug-in-terminal", "debug-test"],
+      "program": "${file}",
+      "console": "internalConsole",
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
+      "name": "Python: Current file (interactive terminal)",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
+      "name": "Python: Current file with args",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "args": ["${input:input}"],
+      "console": "internalConsole",
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
+      "name": "Python: Debug bootstrapping Python install script",
+      "type": "debugpy",
+      "request": "launch",
+      "python": "${workspaceFolder}/bin/sys_venv/bin/python",
+      "program": "${workspaceFolder}/scripts/install.py",
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
       "name": "Python: Sphinx build docs",
       "type": "debugpy",
       "request": "launch",
@@ -80,51 +125,6 @@
           "ignoreFailures": true
         }
       ]
-    },
-    {
-      "name": "Python: Current file",
-      "type": "debugpy",
-      "request": "launch",
-      // "purpose": ["debug-in-terminal", "debug-test"],
-      "program": "${file}",
-      "console": "internalConsole",
-      "env": {
-        "BOILERCV_DEBUG": "True",
-        "BOILERCV_PREVIEW": "True"
-      }
-    },
-    {
-      "name": "Python: Current file (interactive terminal)",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "env": {
-        "BOILERCV_DEBUG": "True",
-        "BOILERCV_PREVIEW": "True"
-      }
-    },
-    {
-      "name": "Python: Current file with args",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "args": ["${input:input}"],
-      "console": "internalConsole",
-      "env": {
-        "BOILERCV_DEBUG": "True",
-        "BOILERCV_PREVIEW": "True"
-      }
-    },
-    {
-      "name": "Python: Debug bootstrapping Python install script",
-      "type": "debugpy",
-      "request": "launch",
-      "python": "${workspaceFolder}/bin/sys_venv/bin/python",
-      "program": "${workspaceFolder}/scripts/install.py",
-      "env": {
-        "BOILERCV_DEBUG": "True",
-        "BOILERCV_PREVIEW": "True"
-      }
     },
     {
       "name": "PowerShell: Launch Current File",
