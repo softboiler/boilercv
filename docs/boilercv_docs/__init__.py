@@ -5,6 +5,8 @@ from pathlib import Path
 
 from boilercore import WarningFilter
 
+from boilercv_docs.patch_nbs import patch_nbs
+
 DOCS = Path("docs")
 """Docs directory."""
 DEPS = Path("tests/root")
@@ -19,6 +21,7 @@ def chdir_docs() -> Path:
     """Ensure we are in the `docs` directory and return the root directory."""
     root = get_root()
     os.chdir(root / "docs")
+    patch_nbs()
     return root
 
 

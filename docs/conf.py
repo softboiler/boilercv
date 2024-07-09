@@ -10,11 +10,9 @@ from sphinx.application import Sphinx
 from boilercv_docs import DOCS, PYPROJECT, chdir_docs
 from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
 from boilercv_docs.nbs import init_nb_env
-from boilercv_docs.patch_nbs import patch_nbs
 from boilercv_docs.types import IspxMappingValue
 
 # ! Initialization
-patch_nbs()
 ROOT = chdir_docs()
 """Root directory of the project."""
 # ! Paths
@@ -52,10 +50,11 @@ ISPX_MAPPING: dict[str, IspxMappingValue] = {
     "matplotlib": get_url("matplotlib.org"),
     "pytest": get_url("docs.pytest.org/en"),
     "sympy": get_url("docs.sympy.org", latest=True),
-    "colorcet": get_ispx("https://colorcet.holoviz.org/"),
+    "colorcet": get_ispx("https://colorcet.holoviz.org"),
     "cv2": get_ispx("docs.opencv.org/2.4"),
     "pandas": get_ispx("pandas.pydata.org/docs"),
     "python": get_ispx("docs.python.org/3"),
+    "boilercore": IspxMappingValue("https://softboiler.org/boilercore"),
 }
 """Intersphinx mapping."""
 TIPPY_RTD_URLS = [
@@ -250,6 +249,7 @@ nitpick_ignore_regex = [
     (r"py:.*", r"PySide6\..+"),  # ? https://bugreports.qt.io/browse/PYSIDE-2215
     # ? TypeAlias: https://github.com/sphinx-doc/sphinx/issues/10785
     (r"py:class", rf"{PACKAGE}.*\.types\..+"),
+    (r"py:class", r"boilercore.*\.types\..+"),
     (r"py:class", rf"{PACKAGE}_pipeline\.captivate\.previews\..+"),
     (r"py:.*", rf"{PACKAGE}_tests\.test_morphs\..+"),
     # ? Until done with Pydantic v1

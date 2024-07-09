@@ -1,14 +1,19 @@
 """Patch notebooks."""
 
+from os import chdir
 from pathlib import Path
 from textwrap import dedent
 
 from nbformat import NO_CONVERT, NotebookNode, read, write
 
 EXCLUDE_THEBE = [
-    Path(p) for p in ["docs/experiments/e230920_subcool/find_tracks_trackpy.ipynb"]
+    Path(p)
+    for p in [
+        "experiments/e230920_subcool/find_tracks.ipynb",
+        "experiments/e230920_subcool/find_tracks_trackpy.ipynb",
+    ]
 ]
-"""Notebooks to exclude Thebe buttons from."""
+"""Resourcse-intensive notebooks to exclude adding Thebe buttons to."""
 SRC = "source"
 """Cell source key."""
 CODE = "code"
@@ -18,6 +23,7 @@ MD = "markdown"
 
 
 def main():  # noqa: D103
+    chdir("docs")
     patch_nbs()
 
 

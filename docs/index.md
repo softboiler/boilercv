@@ -1,20 +1,8 @@
 # boilercv
 
-[![DOI](https://zenodo.org/badge/503551174.svg)](https://zenodo.org/badge/latestdoi/503551174) [![All Contributors](https://img.shields.io/github/all-contributors/softboiler/boilercv?color=ee8449&style=flat-square)](../README.md#contributors) {{ binder }}
+[![DOI](https://zenodo.org/badge/503551174.svg)](https://zenodo.org/badge/latestdoi/503551174) [![All Contributors](https://img.shields.io/github/all-contributors/softboiler/boilercv?color=ee8449&style=flat-square)](contributors) {{ binder }}
 
 Computer vision routines suitable for nucleate pool boiling bubble analysis.
-
-::::
-:::{code-block} python
-:class: thebe
-print("hello world!")
-:::
-::::
-
-::::
-:::{thebe-button}
-:::
-::::
 
 ## Example
 
@@ -32,20 +20,45 @@ Vapor bubbles with false-color overlay to distinguish detected contours. Contour
 
 The [data process graph](#data-process-graph) shows the data process, and allows for individual steps in the process to be defined indpendently as Python scripts, Jupyter notebooks, or even in other languages like Matlab. The process is defined in `dvc.yaml` as as series of "stages". Each stage has dependencies and outputs. This structure allows the data process graph to be constructed, directly from the `dvc.yaml` file. This separates the concerns of data management, process development, and pipeline orchestration. This project reflects the application of data science best practices to modern engineering wokflows.
 
+## Try it out inside this documentation
+
+If you see a "Run code" button like the one below, you can modify and re-run the code on the page. In any page with collapsed code sources and a "Run code button" you can do the following:
+
+- Click "Run code"
+- Wait until the dialog says "ready"
+- Expand the first code cell on that page by clicking "Show code cell source,"
+- Click "restart & run all"
+
+You will see code cell output in the expanded input cells, and can compare it to the static output beneath it. You may also tweak values in the code and re-run it to get different outputs! Try running code below, then modify the code (e.g. to `1 + 1`) and run it again! Note that it may take awhile for the "ready" dialog to appear if nobody has run code in these docs for awhile.
+
+You may also click the `binder` link at the top of this page to open a JupyterLab instance with runnable Jupyter notebooks, though keep in mind that some notebooks exceed the resources allotted to the binder instance.
+
+::::
+:::{thebe-button}
+:::
+::::
+
+::::
+:::{code-block} python
+:class: thebe
+print("hello world!")
+:::
+::::
+
 ## Usage
 
 If you would like to adopt this approach to processing your own data, you may clone this repository and begin swapping logic for your own, or use a similar architecture for your data processing. To run a working example with some actual data from this study, perform the following steps:
 
 1. Clone this repository and open it in your terminal or IDE (e.g. `git clone https://github.com/softboiler/boilercv.git boilercv`).
 2. Navigate to the clone directory in a terminal window (e.g. `cd boilercv`).
-3. Create a Python 3.10 virtual environment (e.g. `py -3.11 -m venv .venv` on Windows w/ Python 3.11 installed from [python.org](https://www.python.org/)).
+3. Create a Python 3.11 virtual environment (e.g. `py -3.11 -m venv .venv` on Windows w/ Python 3.11 installed from [python.org](https://www.python.org/)).
 4. Activate the virtual environment (e.g. `.venv/scripts/activate` on Windows).
-5. Run `pip install --editable .` to install `boilercv` package in an editable fashion. This step may take awhile.
+5. Run `pip install requirements/requirements.txt` to install `boilercv` and other requirements in an editable fashion.
 6. Delete the top-level `data` directory, then copy the `cloud` folder inside `tests/data` to the root directory. Rename it to `data`.
-7. Copy the `local` folder from `tests/data` to `~/.local` where `~` is your user/home folder (e.g. `C:/Users/<you>/.local` on Windows). Rename it to `boilercv`.
+7. Copy the `data` folder from `tests/root` to the root of the repo.
 8. Run `dvc repro` to execute the data process up to that stage.
 
-The data process should run the following stages: `contours`, `fill`, `filled_preview`, `binarized_preview` and `gray_preview`. You may inspect the actual code that runs during these stages in `src/boilercv/stages`, e.g. `contours.py` contains the logic for the `contours` stage. This example happens to use Python scripts, but you could define a stage in `dvc.yaml` that instead runs Matlab scripts, or any arbitrary action. This approach allows for the data process to be reliably reproduced over time, and for the process to be easily modified and extended in a collaborative effort.
+The data process should run the following stages: `preview_binarized`, `preview_gray`, `find_contours`, `fill`, and `preview_filled`. You may inspect the actual code that runs during these stages in `pipeline/boilercv_pipeline/stages`, e.g. `find_contours.py` contains the logic for the `find_contours` stage. This example happens to use Python scripts, but you could define a stage in `dvc.yaml` that instead runs Matlab scripts, or any arbitrary action. This approach allows for the data process to be reliably reproduced over time, and for the process to be easily modified and extended in a collaborative effort.
 
 There are other details of this process, such as the hosting of data in the `data` folder in a Google Cloud Bucket (alternatively it can be hosted on Google Drive), and more. This has to do with the need to store data (especially large datasets) outside of the repository, and access it in an authenticated fashion.
 
