@@ -11,6 +11,8 @@ tests/plots
 # * -------------------------------------------------------------------------------- * #
 # * Template gitignore
 
+# local workspace extensions directory
+.vscode/extensions
 # uv binary
 bin
 # Locally-compiled dependencies
