@@ -147,10 +147,10 @@ def bounded_ax(img: Img, ax: Axes | None = None) -> Iterator[Axes]:
         bound_ax = ax
     else:
         _, bound_ax = subplots()
-    bound_ax.set_xlim(*xlim)
-    bound_ax.set_ylim(*ylim)
-    bound_ax.invert_yaxis()
-    yield bound_ax
+    bound_ax.set_xlim(*xlim)  # pyright: ignore[reportAttributeAccessIssue]
+    bound_ax.set_ylim(*ylim)  # pyright: ignore[reportAttributeAccessIssue]
+    bound_ax.invert_yaxis()  # pyright: ignore[reportAttributeAccessIssue]
+    yield bound_ax  # pyright: ignore[reportReturnType]
 
 
 def get_image_boundaries(img) -> tuple[tuple[int, int], tuple[int, int]]:
@@ -237,7 +237,7 @@ def get_cat_colorbar(
     palette = get_first_from_palette(palette, num_colors)
     mappable = ScalarMappable(cmap=palette, norm=Normalize(0, num_colors))
     mappable.set_array([])
-    colorbar = ax.figure.colorbar(ax=ax, mappable=mappable, label=col, alpha=alpha)  # pyright: ignore[reportOptionalMemberAccess]  # pyright: 1.1.348  # matplotlib: 3.8.2
+    colorbar = ax.figure.colorbar(ax=ax, mappable=mappable, label=col, alpha=alpha)  # pyright: ignore[reportAttributeAccessIssue, reportOptionalMemberAccess], matplotlib: 3.7.2
     colorbar.set_ticks([])
     return palette.colors, data
 
