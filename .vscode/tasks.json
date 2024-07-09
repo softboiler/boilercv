@@ -72,16 +72,23 @@
   ],
   "tasks": [
     {
+      "label": "proj: Sync Binder requirements",
+      "type": "shell",
+      "command": ". scripts/Initialize-Shell.ps1; uv pip compile --universal --exclude-newer (Get-Date).ToUniversalTime().ToString('o') --python-version 3.11 --resolution lowest-direct requirements/binder.in > requirements.txt",
+      "icon": { "id": "git-commit" },
+      "problemMatcher": []
+    },
+    {
       "label": "proj: Generate correlation",
       "type": "shell",
-      "command": "python ${file} ${input:correlations}",
+      "command": ". scripts/Initialize-Shell.ps1; python ${file} ${input:correlations}",
       "icon": { "id": "file-code" },
       "problemMatcher": []
     },
     {
       "label": "proj: Generate correlation docs",
       "type": "shell",
-      "command": "python -m boilercv_pipeline.equations.make_docs",
+      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv_pipeline.equations.make_docs",
       "icon": { "id": "file-code" },
       "problemMatcher": []
     },
@@ -93,16 +100,16 @@
       "problemMatcher": []
     },
     {
-      "label": "proj: remove empty data folders",
+      "label": "proj: Remove empty data folders",
       "type": "shell",
-      "command": "Get-ChildItem -Path ./data -Recurse -Directory | Where-Object { (Get-ChildItem -Path $_ -Recurse -File | Measure-Object).Count -eq 0 } | Remove-Item -Recurse -Force",
+      "command": ". scripts/Initialize-Shell.ps1; Get-ChildItem -Path ./data -Recurse -Directory | Where-Object { (Get-ChildItem -Path $_ -Recurse -File | Measure-Object).Count -eq 0 } | Remove-Item -Recurse -Force",
       "icon": { "id": "terminal-powershell" },
       "problemMatcher": []
     },
     {
-      "label": "proj: hide notebook inputs",
+      "label": "proj: Hide notebook inputs",
       "type": "shell",
-      "command": "python -m boilercv_docs",
+      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv_docs",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -115,7 +122,7 @@
           "BOILERCV_WRITE": "True"
         }
       },
-      "command": "python ${file}",
+      "command": ". scripts/Initialize-Shell.ps1; python ${file}",
       "icon": { "id": "repo" },
       "problemMatcher": []
     },
@@ -129,7 +136,7 @@
           "BOILERCV_WRITE": "True"
         }
       },
-      "command": "python ${file}",
+      "command": ". scripts/Initialize-Shell.ps1; python ${file}",
       "icon": { "id": "repo" },
       "problemMatcher": []
     },
@@ -139,7 +146,7 @@
       "options": {
         "env": { "BOILERCV_PREVIEW": "True" }
       },
-      "command": "python ${file}",
+      "command": ". scripts/Initialize-Shell.ps1; python ${file}",
       "icon": { "id": "repo" },
       "problemMatcher": []
     },
@@ -149,7 +156,7 @@
       "options": {
         "env": { "BOILERCV_WRITE": "True" }
       },
-      "command": "python ${file}",
+      "command": ". scripts/Initialize-Shell.ps1; python ${file}",
       "icon": { "id": "repo" },
       "problemMatcher": []
     },
@@ -159,7 +166,7 @@
       "options": {
         "env": { "BOILERCV_PREVIEW": "True" }
       },
-      "command": "python -m boilercv.previews.${input:preview}",
+      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv.previews.${input:preview}",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -171,7 +178,7 @@
       "options": {
         "env": { "BOILERCV_DEBUG": "True" }
       },
-      "command": "dvc repro ${input:stage}",
+      "command": ". scripts/Initialize-Shell.ps1; dvc repro ${input:stage}",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -183,7 +190,7 @@
       "options": {
         "env": { "BOILERCV_DEBUG": "True" }
       },
-      "command": "dvc repro --force ${input:stage}",
+      "command": ". scripts/Initialize-Shell.ps1; dvc repro --force ${input:stage}",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -192,7 +199,7 @@
       "dependsOrder": "sequence",
       "dependsOn": ["dvc: sync params"],
       "type": "shell",
-      "command": "dvc repro ${input:stage}",
+      "command": ". scripts/Initialize-Shell.ps1; dvc repro ${input:stage}",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -201,7 +208,7 @@
       "dependsOrder": "sequence",
       "dependsOn": ["dvc: sync params"],
       "type": "shell",
-      "command": "dvc repro --force ${input:stage}",
+      "command": ". scripts/Initialize-Shell.ps1; dvc repro --force ${input:stage}",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -210,14 +217,14 @@
       "dependsOrder": "sequence",
       "dependsOn": ["dvc: sync params"],
       "type": "shell",
-      "command": "(dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/dag.md && . '~/.local/nodeenvs/markdownlint/scripts/activate.ps1' && markdownlint --fix docs/dag.md",
+      "command": ". scripts/Initialize-Shell.ps1; (dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/dag.md && . '~/.local/nodeenvs/markdownlint/scripts/activate.ps1' && markdownlint --fix docs/dag.md",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
     {
       "label": "dvc: sync params",
       "type": "shell",
-      "command": "python -m boilercv_pipeline.models.params",
+      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv_pipeline.models.params",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -228,7 +235,7 @@
     {
       "label": "wsl: Copy PID of Python Debugger",
       "type": "shell",
-      "command": "ps aux | grep python | grep --max-count 1 -- --adapter-access-token | grep --only-matching --perl-regexp 'user\\s+\\d+' | grep --only-matching --perl-regexp '\\d+' | clip.exe",
+      "command": ". scripts/Initialize-Shell.ps1; ps aux | grep python | grep --max-count 1 -- --adapter-access-token | grep --only-matching --perl-regexp 'user\\s+\\d+' | grep --only-matching --perl-regexp '\\d+' | clip.exe",
       "group": {
         "kind": "test",
         "isDefault": true
@@ -296,13 +303,6 @@
       "type": "shell",
       "options": { "shell": { "executable": "bash" } },
       "command": "scripts/Initialize-LinuxMacOS.sh",
-      "icon": { "id": "file-symlink-directory" },
-      "problemMatcher": []
-    },
-    {
-      "label": "setup: Finish initializing machine (cross-platform)",
-      "type": "shell",
-      "command": "scripts/Initialize-Machine.ps1",
       "icon": { "id": "file-symlink-directory" },
       "problemMatcher": []
     },
