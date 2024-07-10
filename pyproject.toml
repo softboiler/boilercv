@@ -219,7 +219,7 @@ reportMissingSuperCall = "none"
 reportPropertyTypeMismatch = "none"
 reportShadowedImports = "none"
 reportUninitializedInstanceVariable = "warning" # Ensure we define instance vars
-reportUnnecessaryTypeIgnoreComment = "error"
+reportUnnecessaryTypeIgnoreComment = "none"
 reportUnusedCallResult = "none"
 
 [tool.ruff]
