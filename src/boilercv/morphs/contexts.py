@@ -358,8 +358,10 @@ class Context(UserDict[str, ContextValueLike]):
         return context if isinstance(context, PipelineContext) else PipelineContext()
 
     def __or__(self, other: Context | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
+        # sourcery skip: remove-redundant-constructor-in-dict-union
+        # ! This Sourcery refactoring results in an infinite loop
         if isinstance(other, Context):
-            merged = dict(self) | other
+            merged = dict(self) | dict(other)
             if (morphs := get_context_value(PipelineContext, self)) is not None and (
                 other_morphs := get_context_value(PipelineContext, other)
             ) is not None:
