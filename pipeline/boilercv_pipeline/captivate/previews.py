@@ -74,7 +74,7 @@ def view_images(images: AllViewable, name: str = "", framerate: int = FRAMERATE_
 
 
 @contextmanager
-def image_viewer(images: AllViewable, name: str = "", framerate: int = FRAMERATE_CONT):  # noqa: C901  # type: ignore  # pyright 1.1.333
+def image_viewer(images: AllViewable, name: str = "", framerate: int = FRAMERATE_CONT):  # noqa: C901  # pyright: ignore[reportRedeclaration]
     """View and interact with images and video."""
     images: NamedViewable = coerce_images(images)
     num_views = len(images)
@@ -184,7 +184,7 @@ def coerce_images(images: AllViewable) -> NamedViewable:
     )
 
 
-def pad_images(images: MultipleViewable) -> MutableViewable:  # type: ignore  # pyright 1.1.333
+def pad_images(images: MultipleViewable) -> MutableViewable:  # pyright: ignore[reportRedeclaration]
     """Pad images to a common size and pack into an array."""
     flat_image = isinstance(images, ndarray | DA) and (
         # One-channel
@@ -203,11 +203,11 @@ def pad_images(images: MultipleViewable) -> MutableViewable:  # type: ignore  # 
         (shapes[["height", "width"]].max() - shapes[["height", "width"]]) // 2
     ).set_axis(axis="columns", labels=["hpad", "wpad"])
     for i, image in enumerate(images):
-        pad: tuple[int, int] = pads.loc[image.shape[:2], :]  # type: ignore  # pyright 1.1.333
+        pad: tuple[int, int] = pads.loc[image.shape[:2], :]  # pyright: ignore[reportAssignmentType]
         hpad, wpad = pad
         zero_pad_for_additional_dims = ((0, 0),) * (image.ndim - 2)
         pad_width = ((hpad, hpad), (wpad, wpad), *zero_pad_for_additional_dims)
-        images[i] = pad(image, pad_width)  # type: ignore  # pyright 1.1.333
+        images[i] = pad(image, pad_width)  # pyright: ignore[reportCallIssue]
     return images
 
 
@@ -256,7 +256,7 @@ def get_image_view(framerate: int = FRAMERATE_CONT) -> ImageView:
 def get_calling_scope_name():
     """Get the name of the calling scope."""
     current_frame = inspect.currentframe()
-    scope_name = current_frame.f_back.f_code.co_name  # type: ignore  # pyright 1.1.333
+    scope_name = current_frame.f_back.f_code.co_name  # pyright: ignore[reportOptionalMemberAccess]
     while scope_name in {
         "image_viewer",
         "view_images",
@@ -272,8 +272,8 @@ def get_calling_scope_name():
         "do_it",
         "process_internal_commands",
     }:
-        current_frame = current_frame.f_back  # type: ignore  # pyright 1.1.333
-        scope_name = current_frame.f_back.f_code.co_name  # type: ignore  # pyright 1.1.333
+        current_frame = current_frame.f_back  # pyright: ignore[reportOptionalMemberAccess]
+        scope_name = current_frame.f_back.f_code.co_name  # pyright: ignore[reportOptionalMemberAccess]
     return scope_name
 
 

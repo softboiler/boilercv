@@ -46,12 +46,12 @@ from boilercv.types import ArrFloat, ArrInt, Img, ImgBool
 
 def convert_image(img: Img, code: int | None = None) -> Img:
     """Convert image format, handling inconsistent type annotations."""
-    return cvtColor(img, code)  # type: ignore  # pyright 1.1.333
+    return cvtColor(img, code)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 
 def apply_mask(img: Img, mask: Img) -> Img:
     """Mask an image, keeping parts where the mask is bright."""
-    return add(img, bitwise_not(mask))  # type: ignore  # pyright 1.1.333
+    return add(img, bitwise_not(mask))  # pyright: ignore[reportReturnType]
 
 
 def pad(img: Img, pad_width: int, value: int) -> Img:
@@ -78,7 +78,7 @@ def pad(img: Img, pad_width: int, value: int) -> Img:
         left=pad_width,
         right=pad_width,
         borderType=BORDER_CONSTANT,
-        value=value,  # type: ignore  # pyright 1.1.333
+        value=value,  # pyright: ignore[reportArgumentType, reportCallIssue]
     )
 
 
@@ -106,7 +106,7 @@ def flood(img: Img) -> ImgBool:
         image=img,
         mask=mask,
         seedPoint=tuple(flip(seed_point)),  # OpenCV expects (x, y)
-        newVal=None,  # type: ignore  # pyright 1.1.333
+        newVal=None,  # pyright: ignore[reportArgumentType, reportCallIssue]
         flags=FLOODFILL_MASK_ONLY,
     )
     # Return the mask in original dimensions
@@ -156,7 +156,7 @@ def transform(img: Img, transforms: Transform | Sequence[Transform]) -> Img:
     # Explicitly pad out the image since cv2.morphologyEx boundary handling is weird
     img = pad(img, pad_width, value=0)
     for transform in transforms:
-        img = morphologyEx(  # type: ignore  # pyright 1.1.333
+        img = morphologyEx(  # pyright: ignore[reportAssignmentType]
             src=img,
             op=transform.op.value,
             kernel=getStructuringElement(MORPH_ELLIPSE, [transform.size] * 2),
@@ -169,7 +169,7 @@ def build_mask_from_polygons(img: Img, contours: Sequence[ArrInt]) -> Img:
     # OpenCV expects contours as shape (N, 1, 2) instead of (N, 2)
     contours = [fliplr(contour).reshape(-1, 1, 2) for contour in contours]
     blank = zeros_like(img)
-    return fillPoly(  # type: ignore  # pyright 1.1.333
+    return fillPoly(  # pyright: ignore[reportReturnType]
         img=blank,
         pts=contours,  # Expects a list of coordinates, we have just one
         color=WHITE3,
@@ -186,7 +186,7 @@ def find_contours(img: Img, method: int = CHAIN_APPROX_NONE) -> list[ArrInt]:
     # Despite images having dims (y, x) and shape (h, w), OpenCV returns contours with
     # dims (point, 1, pair), where dim "pair" has coords (x, y).
     contours = [fliplr(contour.reshape(-1, 2)) for contour in contours]
-    return contours  # type: ignore  # pyright 1.1.347
+    return contours  # pyright: ignore[reportReturnType]
 
 
 def draw_contours(
@@ -203,7 +203,7 @@ def draw_contours(
         image=img,
         contours=contours,
         contourIdx=contour_index,
-        color=color,  # type: ignore  # pyright 1.1.333
+        color=color,  # pyright: ignore[reportArgumentType, reportCallIssue]
         thickness=thickness,
     )
 
@@ -214,4 +214,4 @@ def find_line_segments(img: Img) -> tuple[ArrFloat, LineSegmentDetector]:
     lines, *_ = lsd.detect(img)
     # OpenCV returns line segments as shape (N, 1, 4) instead of (N, 4)
     lines = lines.reshape(-1, 4)
-    return lines, lsd  # type: ignore  # pyright 1.1.333
+    return lines, lsd  # pyright: ignore[reportReturnType]

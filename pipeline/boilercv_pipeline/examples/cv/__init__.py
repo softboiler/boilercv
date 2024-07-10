@@ -33,7 +33,7 @@ def capture_images(path: Path) -> Iterator[Img]:
         read_is_successful, image = video_capture.read()
         if not read_is_successful:
             break
-        yield image  # type: ignore  # pyright 1.1.333
+        yield image  # pyright: ignore[reportReturnType]
 
 
 # * -------------------------------------------------------------------------------- * #

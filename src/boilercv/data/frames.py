@@ -10,10 +10,7 @@ from boilercv.types import DF, ArrayLike
 def df_points(points: ArrayLike, dims: list[str] = YX_PX) -> DF:
     """Build a dataframe from an array of points."""
     return (
-        DataFrame(
-            columns=dims,
-            data=points,  # type: ignore  # pyright 1.1.333
-        )
+        DataFrame(columns=dims, data=points)  # pyright: ignore[reportArgumentType]
         .rename_axis(axis="index", mapper="point")
         .rename_axis(axis="columns", mapper="dim")
     )

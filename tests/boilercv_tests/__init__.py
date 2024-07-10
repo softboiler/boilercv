@@ -11,7 +11,7 @@ from shlex import join, quote, split
 from shutil import copy
 from subprocess import run
 from sys import executable
-from tempfile import _RandomNameSequence  # type: ignore
+from tempfile import _RandomNameSequence  # pyright: ignore[reportAttributeAccessIssue]
 from types import SimpleNamespace
 from typing import Any
 
@@ -214,7 +214,7 @@ class Caser:
         return case
 
 
-def clean_notebooks(*nbs: Path | str):  # type: ignore  # `nbs` redefined
+def clean_notebooks(*nbs: Path | str):  # pyright: ignore[reportRedeclaration]
     """Clean notebooks using pre-commit hooks."""
     nbs: str = join(str(nb) for nb in nbs)
     files = f"--files {nbs}"

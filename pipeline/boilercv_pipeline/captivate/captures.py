@@ -60,7 +60,7 @@ def coerce_input(imgs: Img | ImgBool | DA) -> Img:
         imgs: Image or video to coerce.
     """
     if issubdtype(imgs.dtype, integer):
-        viewable: Img = imgs.values if isinstance(imgs, DA) else imgs  # type: ignore  # pyright 1.1.333
+        viewable: Img = imgs.values if isinstance(imgs, DA) else imgs  # pyright: ignore[reportAssignmentType]
     elif issubdtype(imgs.dtype, bool):
         viewable: Img = (
             scale_bool(imgs.values) if isinstance(imgs, DA) else scale_bool(imgs)

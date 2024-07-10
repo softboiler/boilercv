@@ -139,7 +139,7 @@ def keep_viewer_in_scope():
 def display_dataframe_with_math(df, raw=False):
     """Display a dataframe with MathJax-rendered math."""
     html = df.to_html()
-    raw_html = re.sub(r"\$.*?\$", lambda m: convert_tex_to_html(m[0], raw=True), html)  # type: ignore
+    raw_html = re.sub(r"\$.*?\$", lambda m: convert_tex_to_html(m[0], raw=True), html)  # pyright: ignore[reportArgumentType, reportCallIssue]
     return raw_html if raw else HTML(raw_html)
 
 
@@ -161,7 +161,7 @@ def convert_tex_to_html(html, raw=False):
     os.remove(f.name)  # noqa: PTH107
     # Strip HTML headers to keep only the body with converted math
     m = re.search(r'<body>\n<div class="document">([\s\S]*)</div>\n</body>', fullhtml)
-    raw_html = m[1].strip()  # type: ignore
+    raw_html = m[1].strip()  # pyright: ignore[reportOptionalSubscript]
     # Special case: if we provided a snippet with no HTML markup at all, don't wrap the result
     # in <p> tags
     if (
@@ -185,7 +185,7 @@ def style_df(df: DfOrS, head: bool = False):
     df, truncated = truncate(df, head)
     styler = df.style
     yield styler
-    display(styler.format(get_df_formatter(df, truncated)))  # type: ignore  # pyright 1.1.333
+    display(styler.format(get_df_formatter(df, truncated)))  # pyright: ignore[reportArgumentType]  # pyright 1.1.333
 
 
 def display_dfs(*dfs: DfOrS, head: bool = False):
@@ -198,7 +198,7 @@ def display_dfs(*dfs: DfOrS, head: bool = False):
     """
     for df in dfs:
         df, truncated = truncate(df, head)
-        display(df.style.format(get_df_formatter(df, truncated)))  # type: ignore  # pyright 1.1.333
+        display(df.style.format(get_df_formatter(df, truncated)))  # pyright: ignore[reportArgumentType]  # pyright 1.1.333
 
 
 def get_df_formatter(

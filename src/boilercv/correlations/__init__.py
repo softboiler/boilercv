@@ -116,5 +116,5 @@ def lambdify_expr(expr: sympy.Basic) -> Callable[..., Any]:
     return sympy.lambdify(
         expr=expr,
         modules=numpy,
-        args=[s for s in expr.free_symbols if s.name in SYMBOLS],  # type: ignore
+        args=[s for s in expr.free_symbols if s.name in SYMBOLS],  # pyright: ignore[reportAttributeAccessIssue]
     )

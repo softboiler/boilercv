@@ -34,7 +34,7 @@ def patch_nbs():
     cell. Insert `hide-input` tags to code cells.
     """
     for path in Path("docs").rglob("*.ipynb"):
-        nb: NotebookNode = read(path, NO_CONVERT)  # type: ignore  # pyright 1.1.348,  # nbformat: 5.9.2
+        nb: NotebookNode = read(path, NO_CONVERT)  # pyright: ignore[reportAssignmentType]
         if path not in EXCLUDE_THEBE:
             # ? Patch the first Markdown cell
             i, first = next((i, c) for i, c in enumerate(nb.cells) if c.cell_type == MD)

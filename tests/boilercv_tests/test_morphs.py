@@ -66,41 +66,41 @@ SUB_OTHER = _SubOther(OTHER_DICT)
 def str_unk(i: str
     ): return len(i)
 def _():
-    return SELF.morph_pipe(str_unk)  # type: ignore
+    return SELF.morph_pipe(str_unk)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # ! (str -> Any)
 def str_any(i: str
     ) -> Any: return len(i)
 def _():
-    return SELF.morph_pipe(str_any)  # type: ignore
+    return SELF.morph_pipe(str_any)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # ! (str -> int)
 def str_int(i: str
     ) -> int: return len(i)
 def _():
-    return SELF.morph_pipe(str_int)  # type: ignore
+    return SELF.morph_pipe(str_int)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # ! (str -> Map)
 def str_map(i: str
     ) -> MutableMapping[str, int]: return {i: len(i)}
 def _():
-    return SELF.morph_pipe(str_map)  # type: ignore
+    return SELF.morph_pipe(str_map)  # pyright: ignore[reportArgumentType, reportCallIssue]
 def str_dict(_: str
     ) -> _SelfDict: return SELF_DICT
 def _():
-    return SELF.morph_pipe(str_dict)  # type: ignore
+    return SELF.morph_pipe(str_dict)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # ! (str -> Morph)
 def str_morph(_: str
     ) -> Morph_: return SELF_MORPH
 def _():
-    return SELF.morph_pipe(str_morph)  # type: ignore
+    return SELF.morph_pipe(str_morph)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # ! (str -> Self)
 def str_self(_: str
     ) -> _Self: return SELF
 def _():
-    return SELF.morph_pipe(str_self)  # type: ignore
+    return SELF.morph_pipe(str_self)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # * MARK: ((*[K2, V2] -> R) -> R)
 
@@ -132,7 +132,7 @@ def _():
 def otherdict_str(i: _OtherDict
     ) -> str: return str(i)
 def _():
-    return SELF.morph_pipe(otherdict_str)  # type: ignore
+    return SELF.morph_pipe(otherdict_str)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # ! (Morph -> str)
 def morph_str(i: Morph_
@@ -150,11 +150,11 @@ def _():
 def str_aliased_desc_2(_: str
     ) -> Morph_: return SELF
 def _():
-    return SELF.morph_pipe(str_aliased_desc_2)  # type: ignore
+    return SELF.morph_pipe(str_aliased_desc_2)  # pyright: ignore[reportArgumentType, reportCallIssue]
 def str_desc_2(_: str
-    ) -> _Self: return SELF_MORPH  # type: ignore
+    ) -> _Self: return SELF_MORPH  # pyright: ignore[reportReturnType]
 def _():
-    return SELF.morph_pipe(str_desc_2)  # type: ignore
+    return SELF.morph_pipe(str_desc_2)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # * MARK: Define map-taking functions
 
@@ -246,7 +246,7 @@ def _():
 def other_dict(_: _GenericMorph[Fruit, int]
     ) -> _SelfDict: return SELF_DICT
 def _():
-    return SELF.morph_pipe(other_dict)  # type: ignore
+    return SELF.morph_pipe(other_dict)  # pyright: ignore[reportArgumentType, reportCallIssue]
 
 # * MARK: Key and value functions
 
@@ -295,7 +295,7 @@ take_strs_return_other = [list_str_int]
 if TYPE_CHECKING:
     with suppress(TypeError, ValidationError):
         for f in take_str:
-            v1 = SELF.morph_pipe(f)  # type: ignore
+            v1 = SELF.morph_pipe(f)  # pyright: ignore[reportArgumentType, reportCallIssue]
         for f in take_other_map:
             v2 = SELF.morph_pipe(f)
         for f in return_matching_maps:

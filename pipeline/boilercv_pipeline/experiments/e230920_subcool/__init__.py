@@ -173,10 +173,8 @@ WIDTH = 10
 
 def get_hists(df: DataFrame, groupby: str, cols: list[str]) -> DataFrame:
     """Add sparklines row to the top of a dataframe."""
-    df = df.groupby(groupby, **GBC).agg(**{
-        # type: ignore  # pyright 1.1.333
-        col: NamedAgg(column=col, aggfunc=sparkhist)
-        for col in cols
+    df = df.groupby(groupby, **GBC).agg(**{  # pyright: ignore[reportArgumentType, reportCallIssue]
+        col: NamedAgg(column=col, aggfunc=sparkhist) for col in cols
     })
     # Can't one-shot this because of the comprehension {...: ... for col in hist_cols}
     return df.assign(**{col: df[col].str.center(WIDTH, "▁") for col in cols})

@@ -18,7 +18,7 @@ def test_centers_index(ns):
     assert_index_equal(
         ns.trackpy_centers.columns,
         ns.centers.columns,
-        check_order=False,  # type: ignore  # pyright: 1.1.336, pandas: 2.1.1
+        check_order=False,  # pyright: ignore[reportCallIssue]
     )
 
 

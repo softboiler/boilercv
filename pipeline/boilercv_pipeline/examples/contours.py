@@ -28,10 +28,10 @@ def main():  # noqa: D103
     df.to_hdf(EXAMPLE_CONTOURS, key="contours", complib="zlib", complevel=9)
     result: list[Img] = []
     for frame_num, frame in enumerate(video):
-        contours: list[ArrInt] = list(  # type: ignore  # pyright 1.1.333
-            df.loc[islice[frame_num], :]  # type: ignore  # pyright 1.1.333
+        contours: list[ArrInt] = list(  # pyright: ignore[reportAssignmentType]
+            df.loc[islice[frame_num], :]  # pyright: ignore[reportArgumentType]
             .groupby("contour")
-            .apply(lambda grp: grp.values)  # type: ignore  # pyright 1.1.333
+            .apply(lambda grp: grp.values)  # pyright: ignore[reportAttributeAccessIssue]
         )
         frame_color = repeat(scale_bool(frame.values)[:, :, newaxis], 3, axis=-1)
         result.append(draw_contours(frame_color, contours, thickness=2, color=BLUE))

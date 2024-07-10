@@ -31,7 +31,7 @@ def main():  # noqa: D103
         .isel(frame=frame)
         .values
     )
-    contours: list[ArrInt] = list(  # type: ignore  # pyright 1.1.333
+    contours: list[ArrInt] = list(  # pyright: ignore[reportAssignmentType]
         get_contours_df(_EXAMPLE)
         .loc[frame, :]
         .groupby("contour")
