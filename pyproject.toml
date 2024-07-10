@@ -122,15 +122,10 @@ exclude = [
     "**/.venv",
     "**/.vscode/extensions",
     "**/AppData",
+    "submodules/**",
     "bin",
-    "submodules/stubs",
-    "submodules/template",
-    "submodules/**/docs",
-    "submodules/**/scripts",
-    "submodules/**/tests",
     "scripts/**.py",
 ]
-ignore = ["submodules/boilercore"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true
@@ -224,7 +219,7 @@ reportMissingSuperCall = "none"
 reportPropertyTypeMismatch = "none"
 reportShadowedImports = "none"
 reportUninitializedInstanceVariable = "warning" # Ensure we define instance vars
-reportUnnecessaryTypeIgnoreComment = "none"
+reportUnnecessaryTypeIgnoreComment = "error"
 reportUnusedCallResult = "none"
 
 [tool.ruff]

@@ -98,7 +98,7 @@
   "python.terminal.activateEnvInCurrentTerminal": true,
   //* Pylance
   "python.languageServer": "Pylance",
-  "python.analysis.diagnosticMode": "workspace",
+  "python.analysis.diagnosticMode": "openFilesOnly",
   "python.analysis.typeCheckingMode": "strict",
   "editor.inlayHints.enabled": "offUnlessPressed",
   "python.analysis.autoFormatStrings": true,

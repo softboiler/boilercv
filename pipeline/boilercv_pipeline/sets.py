@@ -146,7 +146,7 @@ def get_contours_df(name: str) -> DF:
     """Load contours from a dataset."""
     unc_cont = PARAMS.paths.uncompressed_contours / f"{name}.h5"
     contour = unc_cont if unc_cont.exists() else PARAMS.paths.contours / f"{name}.h5"
-    contour_df: DF = read_hdf(contour)  # type: ignore  # pyright 1.1.333
+    contour_df: DF = read_hdf(contour)  # pyright: ignore[reportAssignmentType]
     if not unc_cont.exists():
         contour_df.to_hdf(unc_cont, key="contours", complevel=None, complib=None)
     return contour_df
