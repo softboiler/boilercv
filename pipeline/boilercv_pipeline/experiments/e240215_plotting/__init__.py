@@ -1,6 +1,6 @@
 """Palettes."""
 
-from colorcet import colormaps  # pyright: ignore[reportAttributeAccessIssue] 1.1.356
+from colorcet import colormaps  # pyright: ignore[reportAttributeAccessIssue]
 from seaborn import color_palette
 
 WARM_INDICES = [1, 3, 6, 16, 19, 31, 33, 37, 42, 46, 49, 69, 70, 72, 77, 83]

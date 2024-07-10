@@ -26,7 +26,7 @@ def main():  # noqa: D103
                     contours: list[ArrInt] = list(  # type: ignore  # pyright 1.1.333
                         df.loc[frame_num, :]
                         .groupby("contour")
-                        .apply(lambda grp: grp.values)  # type: ignore  # pyright 1.1.333
+                        .apply(lambda grp: grp.values)
                     )
                     video[frame_num, :, :] = draw_contours(
                         scale_bool(frame.values), contours

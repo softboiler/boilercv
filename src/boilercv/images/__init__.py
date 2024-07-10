@@ -70,8 +70,8 @@ def draw_text(image: Img, text: str = "") -> ImgLike:
     p0 = (text_p0[0] - PAD, text_p0[1] - PAD)
     p1 = (text_p0[0] + PAD + font_bbox_width, text_p0[1] + PAD + font_bbox_height)
     draw = ImageDraw.Draw(pil_image)
-    draw.rectangle((p0, p1), fill=rectangle_fill)  # type: ignore  # pyright 1.1.348, pillow 10.2.0
-    draw.text(text_p0, text, font=FONT, fill=font_fill)  # type: ignore  # pyright 1.1.348, pillow 10.2.0
+    draw.rectangle((p0, p1), fill=rectangle_fill)
+    draw.text(text_p0, text, font=FONT, fill=font_fill)
     return asarray(pil_image)
 
 
@@ -86,10 +86,10 @@ def overlay(
         color: Color for the overlay.
         alpha: Alpha value for the overlay. Range: 0-1
     """
-    background = Image.fromarray(image).convert("RGBA")  # pyright: ignore[reportArgumentType] 1.1.356, pillow 10.0.0
+    background = Image.fromarray(image).convert("RGBA")
     objects = Image.fromarray(overlay)
     if overlay.ndim == 2:
-        objects = ImageOps.colorize(objects, WHITE3, color)  # type: ignore  # pyright 1.1.348, pillow 10.2.0
+        objects = ImageOps.colorize(objects, WHITE3, color)
         mask = Image.fromarray(~(overlay * alpha).astype(uint8))
     else:
         avg: Img = mean(overlay, axis=-1)

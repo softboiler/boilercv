@@ -268,10 +268,7 @@ ReturnMismatchedMap: TypeAlias = Callable[..., Mapping[Any, Any]]
 TakeFruitsReturnOther: TypeAlias = Callable[[list[Fruit]], Any]
 TakeIntsReturnOther: TypeAlias = Callable[[list[str]], Any]
 take_str: list[TakeStr] = [str_unk, str_any, str_int, str_map, str_self]
-take_other_map: list[ReturnOther] = [
-    otherdict_str,  # type: ignore
-    str_aliased_desc_2,
-]
+take_other_map: list[ReturnOther] = [otherdict_str, str_aliased_desc_2]
 return_matching_maps: list[ReturnMatchingMap] = [
     str_dict,
     str_morph,

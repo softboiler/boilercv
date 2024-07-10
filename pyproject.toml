@@ -113,6 +113,7 @@ name = "Changes"
 showcontent = true
 
 [tool.pyright]
+stubPath = "submodules/stubs/stubs"
 exclude = [
     "**/node_modules",
     "**/__pycache__",
@@ -122,12 +123,14 @@ exclude = [
     "**/.vscode/extensions",
     "**/AppData",
     "bin",
+    "submodules/stubs",
     "submodules/template",
     "submodules/**/docs",
     "submodules/**/scripts",
     "submodules/**/tests",
     "scripts/**.py",
 ]
+ignore = ["submodules/boilercore"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true

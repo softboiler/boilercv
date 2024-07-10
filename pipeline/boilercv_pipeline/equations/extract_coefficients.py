@@ -45,7 +45,7 @@ def default(corr: Corr = "beta"):  # noqa: D103
         content += f"\n## {group}\n"
         for name, eq in equations.items():
             if GROUPS[name] == group:
-                eq = prep_equation_forms(equations[name])["latex"]  # pyright: ignore[reportArgumentType]
+                eq = prep_equation_forms(equations[name])["latex"]
                 eq = [m.strip() for m in findall(r"[\d \-/.]+", eq) if m.strip()]
                 content += dedent(f"""
                     ### {name}

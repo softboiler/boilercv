@@ -15,11 +15,9 @@ from boilercv_tools.sync import check_compilation, escape
 from boilercv_tools.types import ChangeType
 
 if version_info >= (3, 11):  # noqa: UP036, RUF100
-    from tomllib import loads  # pyright: ignore[reportMissingImports]
+    from tomllib import loads
 else:
-    from toml import (  # pyright: ignore[reportMissingModuleSource, reportMissingImports]
-        loads,
-    )
+    from toml import loads  # pyright: ignore[reportMissingModuleSource]
 
 APP = App(help_format="markdown")
 """CLI."""

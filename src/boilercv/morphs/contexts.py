@@ -66,7 +66,7 @@ class BaseContext:
         -------
             The validated model instance.
         """
-        return cls.model_validate(  # pyright: ignore[reportAttributeAccessIssue]
+        return cls.model_validate(
             obj.model_dump() if isinstance(obj, HasModelDump) else obj or {},
             strict=strict,
             from_attributes=from_attributes,
@@ -131,7 +131,7 @@ class ContextBaseModel(BaseModel, BaseContext):
         pipelines_context = (
             get_context_value(PipelineContext, context) or PipelineContext()
         )
-        pipelines = pipelines_context.get(cls)  # pyright: ignore[reportArgumentType]
+        pipelines = pipelines_context.get(cls)
         if pipelines is None:
             return data
         match mode:
@@ -183,7 +183,7 @@ class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
         pipelines_context = (
             get_context_value(PipelineContext, context) or PipelineContext()
         )
-        pipelines = pipelines_context.get(cls)  # pyright: ignore[reportArgumentType]
+        pipelines = pipelines_context.get(cls)
         if pipelines is None:
             return data
         if mode == "before":
@@ -324,9 +324,7 @@ class PipelineContext(UserDict[Any, Pipelines], ContextValue):
             return type(self)(other) | self
         return NotImplemented
 
-    def __ior__(  # pyright: ignore[reportIncompatibleMethodOverride]
-        self, other: Self | Mapping[Any, Pipelines] | Any
-    ) -> Self:
+    def __ior__(self, other: Self | Mapping[Any, Pipelines] | Any) -> Self:
         self.data = (self | other).data
         return self
 
@@ -361,7 +359,7 @@ class Context(UserDict[str, ContextValueLike]):
 
     def __or__(self, other: Context | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
         if isinstance(other, Context):
-            merged = dict(self) | dict(other)
+            merged = dict(self) | other
             if (morphs := get_context_value(PipelineContext, self)) is not None and (
                 other_morphs := get_context_value(PipelineContext, other)
             ) is not None:
@@ -376,7 +374,7 @@ class Context(UserDict[str, ContextValueLike]):
             return type(self)(other) | self
         return NotImplemented
 
-    def __ior__(self, other: Context | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def __ior__(self, other: Context | Mapping[str, Any] | Any) -> Self:
         self.data = (self | other).data
         return self
 

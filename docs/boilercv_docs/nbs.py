@@ -15,7 +15,7 @@ from typing import Any
 from warnings import catch_warnings, filterwarnings
 
 from boilercore import filter_certain_warnings
-from IPython.display import HTML, display  # type: ignore
+from IPython.display import HTML, display
 from IPython.utils.capture import capture_output
 from matplotlib.pyplot import style
 from myst_parser.parsers.docutils_ import cli_html

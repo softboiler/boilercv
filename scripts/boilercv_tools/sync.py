@@ -15,9 +15,9 @@ from typing import TYPE_CHECKING
 from boilercv_tools.types import Dep, PythonVersion, SubmoduleInfoKind, ops
 
 if version_info >= (3, 11):  # noqa: UP036, RUF100
-    from datetime import UTC  # pyright: ignore[reportAttributeAccessIssue]
+    from datetime import UTC
 else:
-    from datetime import timezone  # pyright: ignore[reportPossiblyUnboundVariable]
+    from datetime import timezone
 
     UTC = timezone.utc  # noqa: UP017, RUF100
 
@@ -253,7 +253,7 @@ def get_subs() -> dict[str, Dep]:
             op=" @ ", rev=f"git+{subs[path]}@{revs[path]}"
         )
         for path in subs
-        if path != "submodules/template"
+        if path not in ["submodules/template", "submodules/stubs"]
     }
 
 

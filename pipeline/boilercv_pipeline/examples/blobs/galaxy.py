@@ -15,7 +15,7 @@ from boilercv_pipeline.examples.blobs import (
 
 
 def main():  # noqa: D103
-    image = data.hubble_deep_field()[0:500, 0:500]  # type: ignore  # pyright 1.1.333
+    image = data.hubble_deep_field()[0:500, 0:500]  # pyright: ignore[reportAttributeAccessIssue]
     image_gray = rgb2gray(image)
     operations = {
         "Laplacian of Gaussian": get_blobs_log,
