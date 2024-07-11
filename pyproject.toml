@@ -114,7 +114,7 @@ showcontent = true
 
 [tool.pyright]
 stubPath = "submodules/stubs/stubs"
-exclude = ["submodules/**", "bin"]
+ignore = ["submodules/**", "bin"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true
