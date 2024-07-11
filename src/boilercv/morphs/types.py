@@ -1,5 +1,8 @@
 """Types used in {mod}`~boilercv.morphs`."""
 
+# TODO: https://github.com/softboiler/boilercv/issues/232
+# pyright:reportInvalidTypeVarUse=none
+
 from collections.abc import Callable, MutableMapping
 from typing import (
     TYPE_CHECKING,

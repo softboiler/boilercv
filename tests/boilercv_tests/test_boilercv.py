@@ -7,7 +7,7 @@ import pytest
 from boilercv_tests import STAGES
 
 
-@pytest.mark.slow()
+@pytest.mark.slow
 @pytest.mark.parametrize("stage", STAGES)
 def test_stages(stage: str):
     """Test that stages can run."""
