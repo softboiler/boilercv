@@ -70,7 +70,7 @@ def _get_ns_attrs(request):
         nb.unlink(missing_ok=True)
 
 
-@pytest.fixture()
+@pytest.fixture
 @pytest_harvest.saved_fixture
 def ns(request, fixture_stores) -> Iterator[SimpleNamespace]:
     """Namespace."""
@@ -154,7 +154,7 @@ def fixture_stores(fixture_store) -> FixtureStores:
 # * Plotting
 
 
-@pytest.fixture()
+@pytest.fixture
 def figs(request, pytestconfig) -> Iterator[list[Figure]]:
     """Append to this list of Matplotlib figures to save them after the test run."""
     plots = Path(pytestconfig.option.plots)
@@ -172,27 +172,27 @@ def figs(request, pytestconfig) -> Iterator[list[Figure]]:
         fig.savefig(path)
 
 
-@pytest.fixture()
+@pytest.fixture
 def plt(plt):
     """Plot."""
     yield plt
     plt.saveas = f"{plt.saveas[:-4]}.png"
 
 
-@pytest.fixture()
+@pytest.fixture
 def fig_ax(plt) -> tuple[Figure, Axis]:
     """Plot figure and axis."""
     fig, ax = plt.subplots()
     return fig, ax
 
 
-@pytest.fixture()
+@pytest.fixture
 def fig(fig_ax) -> Figure:
     """Plot figure."""
     return fig_ax[0]
 
 
-@pytest.fixture()
+@pytest.fixture
 def ax(fig_ax) -> Axis:
     """Plot axis."""
     return fig_ax[1]
