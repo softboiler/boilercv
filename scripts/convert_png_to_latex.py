@@ -25,7 +25,7 @@ from pathlib import Path
 
 from cyclopts import App
 from PIL import Image
-from pix2tex.cli import LatexOCR
+from pix2tex.cli import LatexOCR  # pyright: ignore[reportMissingImports]
 
 APP = App(help_format="markdown")
 """CLI."""

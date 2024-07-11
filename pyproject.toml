@@ -114,7 +114,7 @@ showcontent = true
 
 [tool.pyright]
 stubPath = "submodules/stubs/stubs"
-ignore = ["submodules/**", "bin", "scripts/**"]
+ignore = ["bin", "submodules", "scripts/install.py"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true
@@ -213,7 +213,7 @@ reportUnusedCallResult = "none"
 
 [tool.ruff]
 cache-dir = ".cache/.ruff_cache"
-extend-exclude = ["bin", "submodules"]
+extend-exclude = ["bin", "submodules", "scripts/install.py"]
 extend-include = ["*.ipynb"]
 src = ["src", "docs", "pipeline", "scripts", "tests"]
 output-format = "grouped"

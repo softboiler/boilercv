@@ -1,5 +1,8 @@
 """Types used in {mod}`~boilercv.correlations`."""
 
+# TODO: https://github.com/softboiler/boilercv/issues/232
+# pyright:reportInvalidTypeVarUse=none
+
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
 from pathlib import Path
