@@ -44,8 +44,11 @@ CENTERS = EXP_DATA / "centers"
 OBJECTS = EXP_DATA / "objects"
 """Objects in each frame."""
 TRACKPY_OBJECTS = EXP_DATA / "trackpy_objects"
+"""Objects tracked by TrackPy."""
 TRACKS = EXP_DATA / "tracks"
 """Object tracks."""
+MAE = EXP_DATA / "mae"
+"""Mean absolute error of tracks."""
 
 
 def get_times(strings: Iterable[str]) -> Iterable[datetime]:
