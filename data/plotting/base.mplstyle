@@ -16,4 +16,4 @@ savefig.pad_inches: 0.2
 savefig.transparent: False
 savefig.facecolor: white
 # ? DPI for saving figures only
-savefig.dpi: 300
+savefig.dpi: 600

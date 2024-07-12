@@ -47,7 +47,11 @@ TRACKPY_OBJECTS = EXP_DATA / "trackpy_objects"
 """Objects tracked by TrackPy."""
 TRACKS = EXP_DATA / "tracks"
 """Object tracks."""
+PROCESSED_TRACKS = EXP_DATA / "processed_tracks"
+"""Processed object tracks."""
 MAE = EXP_DATA / "mae"
+"""Mean absolute error of tracks."""
+MERGED_MAE = EXP_DATA / "merged_mae.h5"
 """Mean absolute error of tracks."""
 
 

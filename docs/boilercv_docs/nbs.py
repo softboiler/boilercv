@@ -64,7 +64,7 @@ class Paths:
     deps: Path
 
 
-def init(font_scale: float = FONT_SCALE) -> Paths:
+def init() -> Paths:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
     filter_certain_warnings(
@@ -86,7 +86,6 @@ def init(font_scale: float = FONT_SCALE) -> Paths:
         pass
     else:
         raise RuntimeError("Can't determine notebook environment.")
-    set_display_options(font_scale)
     return paths
 
 
@@ -97,7 +96,7 @@ def copy_deps(src, dst):
     copytree(src / "data", dst / "data", dirs_exist_ok=True)
 
 
-def set_display_options(font_scale):
+def set_display_options(font_scale: float = FONT_SCALE):
     """Set display options."""
     # The triple curly braces in the f-string allows the format function to be
     # dynamically specified by a given float specification. The intent is clearer this
