@@ -78,9 +78,10 @@ def init(font_scale: float = FONT_SCALE) -> Paths:
     paths = Paths(*[p.resolve() for p in (root, root / DOCS, root / DEPS)])
     if _in_binder := environ.get("BINDER_LAUNCH_HOST", False):
         copy_deps(paths.deps, paths.root)
-    if any((
+    elif _in_dev := was_already_at_root:
+        pass
+    elif any((
         _in_ci := environ.get("CI", False),
-        _in_dev := was_already_at_root,
         _in_local_docs := not was_already_at_root,
     )):
         copy_deps(paths.deps, paths.docs)

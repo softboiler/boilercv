@@ -20,10 +20,17 @@ from boilercv.morphs.types import LiteralGenericAlias
 
 _base = Path(__file__).with_suffix(".toml")
 META_TOML = _base.with_stem("meta")
+"""Correlation metadata."""
 RANGES_TOML = _base.with_stem("ranges")
+"""Correlation ranges of applicability."""
+INDEPENDENT_VARIABLES = {"Nu_c": "nusselt", "Fo_0": "bubble_fourier"}
+"""Independent variables.
+
+Should appear first in positional argument lists to facilitate application of
+{func}`~scipy.optimize.curve_fit`.
+"""
 SYMBOLS = {
-    "Nu_c": "nusselt",
-    "Fo_0": "bubble_fourier",
+    **INDEPENDENT_VARIABLES,
     "Ja": "bubble_jakob",
     "Re_b": "bubble_reynolds",
     "Re_b0": "bubble_initial_reynolds",
@@ -33,7 +40,24 @@ SYMBOLS = {
     "alpha": "thermal_diffusivity",
     "pi": "pi",
 }
+"""Symbols.
 
+Independent variables appear first to facilitate application of {func}`~scipy.optimize.curve_fit`.
+"""
+INDEPENDENT_SYMBOL_LABELS = {"Nu_c": "Nusselt number", "Fo_0": "Bubble Fourier number"}
+"""Symbol labels of independent variables."""
+SYMBOL_LABELS = {
+    **INDEPENDENT_SYMBOL_LABELS,
+    "Ja": "Bubble Jakob number",
+    "Re_b": "Bubble Reynolds number",
+    "Re_b0": "Initial bubble Reynolds number",
+    "Pr": "Liquid Prandtl number",
+    "beta": "Dimensionless bubble diameter",
+    "Pe": "Bubble Peclet number",
+    "alpha": "Liquid thermal diffusivity",
+    "pi": "pi",
+}
+"""Symbol labels."""
 GROUPS = {
     k: f"Group {v}"
     for k, v in {
@@ -47,11 +71,12 @@ GROUPS = {
         "yuan_et_al_2009": 4,
         "lucic_mayinger_2010": 3,
         "kim_park_2011": 3,
-        # "inaba_et_al_2013": 5,
+        "inaba_et_al_2013": 5,
         "al_issa_et_al_2014": 3,
         "tang_et_al_2016": 3,
     }.items()
 }
+"""Group numbers for correlations."""
 
 
 def get_equations(path: Path) -> Equations[AnyExpr]:
@@ -116,5 +141,6 @@ def lambdify_expr(expr: sympy.Basic) -> Callable[..., Any]:
     return sympy.lambdify(
         expr=expr,
         modules=numpy,
-        args=[s for s in expr.free_symbols if s.name in SYMBOLS],  # pyright: ignore[reportAttributeAccessIssue]
+        # Make `args` in order of `SYMBOLS` so `scipy.optimize.curve_fit` gets x's first
+        args=[s for s in SYMBOLS if s in {s.name for s in expr.free_symbols}],  # pyright: ignore[reportAttributeAccessIssue]
     )

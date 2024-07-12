@@ -54,6 +54,7 @@ ISPX_MAPPING: dict[str, IspxMappingValue] = {
     "cv2": get_ispx("docs.opencv.org/2.4"),
     "pandas": get_ispx("pandas.pydata.org/docs"),
     "python": get_ispx("docs.python.org/3"),
+    "scipy": get_ispx("docs.scipy.org/doc/scipy"),
     "boilercore": IspxMappingValue("https://softboiler.org/boilercore"),
 }
 """Intersphinx mapping."""
