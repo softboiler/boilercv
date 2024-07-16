@@ -44,8 +44,17 @@ CENTERS = EXP_DATA / "centers"
 OBJECTS = EXP_DATA / "objects"
 """Objects in each frame."""
 TRACKPY_OBJECTS = EXP_DATA / "trackpy_objects"
+"""Objects tracked by TrackPy."""
 TRACKS = EXP_DATA / "tracks"
 """Object tracks."""
+PROCESSED_TRACKS = EXP_DATA / "processed_tracks"
+"""Processed object tracks."""
+MERGED_TRACKS = EXP_DATA / "merged_tracks.h5"
+"""Merged tracks."""
+MAE = EXP_DATA / "mae"
+"""Mean absolute error of tracks."""
+MERGED_MAE = EXP_DATA / "merged_mae.h5"
+"""Mean absolute error of tracks."""
 
 
 def get_times(strings: Iterable[str]) -> Iterable[datetime]:

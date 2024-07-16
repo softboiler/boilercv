@@ -64,10 +64,9 @@ class Paths:
     deps: Path
 
 
-def init(font_scale: float = FONT_SCALE) -> Paths:
+def init() -> Paths:
     """Initialize a documentation notebook."""
-    # sourcery skip: extract-method
-
+    # sourcery skip: extract-method, remove-pass-elif
     filter_certain_warnings(
         package="boilercv", other_action="ignore", other_warnings=warning_filters
     )
@@ -78,15 +77,15 @@ def init(font_scale: float = FONT_SCALE) -> Paths:
     paths = Paths(*[p.resolve() for p in (root, root / DOCS, root / DEPS)])
     if _in_binder := environ.get("BINDER_LAUNCH_HOST", False):
         copy_deps(paths.deps, paths.root)
-    if any((
+    elif any((
         _in_ci := environ.get("CI", False),
-        _in_dev := was_already_at_root,
         _in_local_docs := not was_already_at_root,
     )):
         copy_deps(paths.deps, paths.docs)
+    elif _in_dev := was_already_at_root:
+        pass
     else:
         raise RuntimeError("Can't determine notebook environment.")
-    set_display_options(font_scale)
     return paths
 
 
@@ -97,7 +96,7 @@ def copy_deps(src, dst):
     copytree(src / "data", dst / "data", dirs_exist_ok=True)
 
 
-def set_display_options(font_scale):
+def set_display_options(font_scale: float = FONT_SCALE):
     """Set display options."""
     # The triple curly braces in the f-string allows the format function to be
     # dynamically specified by a given float specification. The intent is clearer this
