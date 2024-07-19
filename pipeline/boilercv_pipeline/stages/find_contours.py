@@ -4,6 +4,7 @@ from cv2 import CHAIN_APPROX_SIMPLE, bitwise_not
 from loguru import logger
 from numpy import empty, insert, vstack
 from pandas import DataFrame
+from tqdm import tqdm
 
 from boilercv.data import VIDEO
 from boilercv.images import scale_bool
@@ -15,7 +16,7 @@ from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
 
 def main():  # noqa: D103
     destinations = get_unprocessed_destinations(PARAMS.paths.contours, ext="h5")
-    for source_name, destination in destinations.items():
+    for source_name, destination in tqdm(destinations.items()):
         video = bitwise_not(scale_bool(get_dataset(source_name)[VIDEO].values))
         df = get_all_contours(video, method=CHAIN_APPROX_SIMPLE)
         df.to_hdf(destination, key="contours", complib="zlib", complevel=9)
