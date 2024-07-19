@@ -166,7 +166,7 @@
       "options": {
         "env": { "BOILERCV_PREVIEW": "True" }
       },
-      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv.previews.${input:preview}",
+      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv_pipeline.previews.${input:preview}",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },

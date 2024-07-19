@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Literal, TypeAlias
 
-from numpy import array, ceil, fliplr, issubdtype, ndarray, ones, sqrt
+from numpy import array, ceil, fliplr, issubdtype, ndarray, ones, pad, sqrt
 from pandas import DataFrame
 from pyqtgraph import (
     GraphicsLayoutWidget,
@@ -203,11 +203,11 @@ def pad_images(images: MultipleViewable) -> MutableViewable:  # pyright: ignore[
         (shapes[["height", "width"]].max() - shapes[["height", "width"]]) // 2
     ).set_axis(axis="columns", labels=["hpad", "wpad"])
     for i, image in enumerate(images):
-        pad: tuple[int, int] = pads.loc[image.shape[:2], :]  # pyright: ignore[reportAssignmentType]
-        hpad, wpad = pad
+        this_pad: tuple[int, int] = pads.loc[image.shape[:2], :]  # pyright: ignore[reportAssignmentType]
+        hpad, wpad = this_pad
         zero_pad_for_additional_dims = ((0, 0),) * (image.ndim - 2)
         pad_width = ((hpad, hpad), (wpad, wpad), *zero_pad_for_additional_dims)
-        images[i] = pad(image, pad_width)  # pyright: ignore[reportCallIssue]
+        images[i] = pad(image, pad_width)
     return images
 
 

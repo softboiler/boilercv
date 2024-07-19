@@ -37,14 +37,14 @@ stages:
     deps:
     - path: data/rois
       hash: md5
-      md5: 1008ab05cc564b0550ca9581de7cd46a.dir
-      size: 196348551
-      nfiles: 321
+      md5: 60b4c08b1ff72659185c21370e994a21.dir
+      size: 206316790
+      nfiles: 338
     - path: data/sources
       hash: md5
-      md5: 6df515c6bcc624a893cf68f9c7ef5112.dir
-      size: 7460869563
-      nfiles: 321
+      md5: a7f6e359ce55e92c99431ce5abfb90be.dir
+      size: 7675745342
+      nfiles: 338
     - path: pipeline/boilercv_pipeline/stages/preview/preview_binarized.py
       hash: md5
       md5: 5add260ed1cfe1a67409487cef656d87
@@ -52,8 +52,8 @@ stages:
     outs:
     - path: data/previews/binarized.nc
       hash: md5
-      md5: 89d743d2211d82197a19ef1c0b752748
-      size: 3494758
+      md5: 27b7bbae38fb358f775664c1064e5c33
+      size: 3571602
   contours:
     cmd: python -m boilercv.stages.contours
     deps:
