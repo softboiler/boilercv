@@ -3,6 +3,7 @@
 import contextlib
 from datetime import datetime
 from pathlib import Path
+from re import match
 
 from loguru import logger
 from tqdm import tqdm
@@ -22,7 +23,12 @@ def main():  # noqa: D103
         destination = PARAMS.paths.large_sources / f"{destination_stem}.nc"
         if destination.exists():
             continue
-        prepare_dataset(source).to_netcdf(path=destination)
+        matched_crop = None
+        for pattern, crop in PARAMS.cine_crops.items():
+            if match(pattern, source.stem):
+                matched_crop = crop
+        dataset = prepare_dataset(source, crop=matched_crop)
+        dataset.to_netcdf(path=destination)
     logger.info("finish convert")
 
 

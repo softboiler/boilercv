@@ -1,2 +1,3 @@
+--editable submodules/boilercine
 --editable submodules/boilercore
 cachier @ git+https://github.com/blakeNaccarato/cachier@db7f394a553a90944ca25c2d687771006e77a024

@@ -23,10 +23,14 @@ from boilercv.data import (
 )
 from boilercv.data.models import Dimension
 from boilercv.types import DA, DS, ArrInt
+from boilercv_pipeline.types import Slicer2D
 
 
 def prepare_dataset(
-    cine_source: Path, num_frames: int | None = None, start_frame: int = 0
+    cine_source: Path,
+    num_frames: int | None = None,
+    start_frame: int = 0,
+    crop: Slicer2D | None = None,
 ) -> DS:
     """Prepare a dataset from a CINE."""
     # Header
@@ -51,6 +55,7 @@ def prepare_dataset(
     )
 
     # Dataset
+    images = get_cine_images(cine_source, num_frames, start_frame)
     ds = assign_ds(
         name=VIDEO,
         long_name="High-speed video data",
@@ -61,7 +66,9 @@ def prepare_dataset(
             Dimension(dim=XPX, long_name="Width", units="px"),
         ),
         fixed_secondary_dims=(time, utc),
-        data=list(get_cine_images(cine_source, num_frames, start_frame)),
+        data=[i[*tuple(slice(*c) for c in crop)] for i in images]
+        if crop
+        else list(images),
     )
     ds[header_da.name] = header_da
     return ds

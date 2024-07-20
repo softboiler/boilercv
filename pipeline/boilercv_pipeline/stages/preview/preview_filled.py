@@ -12,7 +12,8 @@ from boilercv_pipeline.stages.preview import new_videos_to_preview
 def main():  # noqa: D103
     stage = "filled"
     destination = PARAMS.paths.filled_preview
-    with new_videos_to_preview(destination) as videos_to_preview:
+    # TODO: Figure out out-of-order preview frames to avoid reprocessing frames
+    with new_videos_to_preview(destination, reprocess=True) as videos_to_preview:
         for video_name in tqdm(videos_to_preview):
             ds = get_dataset(video_name, stage=stage, num_frames=1)
             videos_to_preview[video_name] = ds[VIDEO].isel({FRAME: 0}).values

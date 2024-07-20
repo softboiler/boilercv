@@ -198,15 +198,20 @@ def pad_images(images: MultipleViewable) -> MutableViewable:  # pyright: ignore[
     ).set_index(["height", "width"], drop=False)
     if len(shapes) == 1:
         return images
-
+    # Subtract shape from largest shape and split the pad evenly
     pads = (
         (shapes[["height", "width"]].max() - shapes[["height", "width"]]) // 2
     ).set_axis(axis="columns", labels=["hpad", "wpad"])
     for i, image in enumerate(images):
-        this_pad: tuple[int, int] = pads.loc[image.shape[:2], :]  # pyright: ignore[reportAssignmentType]
+        this_pad: tuple[int, int] = tuple(pads.loc[image.shape[:2], :])  # pyright: ignore[reportArgumentType, reportAssignmentType]
         hpad, wpad = this_pad
         zero_pad_for_additional_dims = ((0, 0),) * (image.ndim - 2)
-        pad_width = ((hpad, hpad), (wpad, wpad), *zero_pad_for_additional_dims)
+        # If a pad is odd, add an extra to the right/top of the pad
+        pad_width = (
+            (hpad, hpad + hpad % 2),
+            (wpad, wpad + wpad % 2),
+            *zero_pad_for_additional_dims,
+        )
         images[i] = pad(image, pad_width)
     return images
 
