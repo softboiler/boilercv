@@ -10,3 +10,6 @@
 [submodule "boilercine"]
 	path = submodules/boilercine
 	url = https://github.com/softboiler/boilercine.git
+[submodule "cachier"]
+	path = submodules/cachier
+	url = https://github.com/blakeNaccarato/cachier.git
