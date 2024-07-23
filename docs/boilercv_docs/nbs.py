@@ -1,13 +1,12 @@
 """Documentation utilities."""
 
-import io
-import os
-import re
 from collections.abc import Callable
 from contextlib import contextmanager, nullcontext, redirect_stdout
 from dataclasses import dataclass
-from os import chdir, environ
+from io import StringIO
+from os import chdir, environ, remove
 from pathlib import Path
+from re import match, search, sub
 from shutil import copy, copytree
 from tempfile import NamedTemporaryFile
 from textwrap import dedent
@@ -138,7 +137,7 @@ def keep_viewer_in_scope():
 def display_dataframe_with_math(df, raw=False):
     """Display a dataframe with MathJax-rendered math."""
     html = df.to_html()
-    raw_html = re.sub(r"\$.*?\$", lambda m: convert_tex_to_html(m[0], raw=True), html)  # pyright: ignore[reportArgumentType, reportCallIssue]
+    raw_html = sub(r"\$.*?\$", lambda m: convert_tex_to_html(m[0], raw=True), html)  # pyright: ignore[reportArgumentType, reportCallIssue]
     return raw_html if raw else HTML(raw_html)
 
 
@@ -154,20 +153,16 @@ def convert_tex_to_html(html, raw=False):
         f.write(dedent(frontmatter).strip())
         f.write("\n\n")
         f.write(html)
-    with redirect_stdout(io.StringIO()) as sf:
+    with redirect_stdout(StringIO()) as sf:
         cli_html([f.name])
     fullhtml = sf.getvalue()  # Returns a large-ish HTML with the full styling header
-    os.remove(f.name)  # noqa: PTH107
+    remove(f.name)  # noqa: PTH107
     # Strip HTML headers to keep only the body with converted math
-    m = re.search(r'<body>\n<div class="document">([\s\S]*)</div>\n</body>', fullhtml)
+    m = search(r'<body>\n<div class="document">([\s\S]*)</div>\n</body>', fullhtml)
     raw_html = m[1].strip()  # pyright: ignore[reportOptionalSubscript]
     # Special case: if we provided a snippet with no HTML markup at all, don't wrap the result
     # in <p> tags
-    if (
-        "\n" not in html
-        and "<" not in html
-        and (m := re.match(r"<p>(.*)</p>", raw_html))
-    ):
+    if "\n" not in html and "<" not in html and (m := match(r"<p>(.*)</p>", raw_html)):
         raw_html = m[1]
     # Manually display the result as HTML
     return raw_html if raw else HTML(raw_html)
