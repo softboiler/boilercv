@@ -20,7 +20,7 @@ from _pytest.mark.structures import ParameterSet
 from boilercore.hashes import hash_args
 from boilercore.notebooks.namespaces import get_nb_ns
 from boilercore.paths import get_module_name, get_module_rel, walk_modules
-from cachier import cachier
+from cachier import cachier  # pyright: ignore[reportMissingImports]
 from matplotlib.pyplot import style
 from seaborn import set_theme
 
