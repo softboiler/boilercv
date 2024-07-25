@@ -253,8 +253,6 @@ nitpick_ignore_regex = [
     (r"py:class", r"boilercore.*\.types\..+"),
     (r"py:class", rf"{PACKAGE}_pipeline\.captivate\.previews\..+"),
     (r"py:.*", rf"{PACKAGE}_tests\.test_morphs\..+"),
-    # ? Until done with Pydantic v1
-    (r"py:.*", r"pydantic\.v1\..+"),
 ]
 # ! Tippy
 # ? https://sphinx-tippy.readthedocs.io/en/latest/index.html#confval-tippy_anchor_parent_selector

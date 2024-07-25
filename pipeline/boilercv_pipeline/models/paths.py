@@ -4,7 +4,7 @@ from pathlib import Path
 
 from boilercore.models import CreatePathsModel
 from boilercore.paths import get_package_dir, map_stages
-from pydantic.v1 import DirectoryPath, FilePath
+from pydantic import DirectoryPath, FilePath
 
 import boilercv_pipeline
 from boilercv_pipeline import PROJECT_PATH
