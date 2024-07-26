@@ -24,10 +24,10 @@ from cachier import cachier  # pyright: ignore[reportMissingImports]
 from matplotlib.pyplot import style
 from seaborn import set_theme
 
-import boilercv
+import boilercv_pipeline
 from boilercv_tests.types import Params
 
-PACKAGE = get_module_name(boilercv)
+PACKAGE = get_module_name(boilercv_pipeline)
 """Name of the package to test."""
 MPLSTYLE = Path("data/plotting/base.mplstyle")
 """Styling for test plots."""
@@ -64,7 +64,7 @@ def get_cached_nb_ns(
     return get_nb_ns(nb, params, attributes)
 
 
-boilercv_pipeline_dir = Path("pipeline") / f"{PACKAGE}_pipeline"
+boilercv_pipeline_dir = Path("pipeline") / PACKAGE
 STAGES: list[ParameterSet] = []
 for module in walk_modules(boilercv_pipeline_dir):
     if module.startswith("boilercv_pipeline.manual"):

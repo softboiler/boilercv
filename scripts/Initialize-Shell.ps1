@@ -30,6 +30,7 @@ function Set-Env {
             PYRIGHT_PYTHON_PYLANCE_VERSION = '2024.7.1'
             PYDEVD_DISABLE_FILE_VALIDATION = '1'
             PYTHONIOENCODING               = 'utf-8:strict'
+            PYTHONUTF8                     = '1'
             PYTHONWARNDEFAULTENCODING      = '1'
             PYTHONWARNINGS                 = 'ignore'
             COVERAGE_CORE                  = 'sysmon'

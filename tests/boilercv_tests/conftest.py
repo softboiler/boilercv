@@ -20,7 +20,8 @@ from boilercore.testing import get_session_path
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 
-import boilercv
+import boilercv_docs
+import boilercv_pipeline
 from boilercv_docs import warning_filters
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
 from boilercv_tests.types import FixtureStore
@@ -35,13 +36,17 @@ CASER = "C"
 @pytest.fixture(autouse=True, scope="session")
 def _project_session_path(tmp_path_factory):
     """Set project directory."""
-    get_session_path(tmp_path_factory, boilercv)
+    get_session_path(tmp_path_factory, boilercv_pipeline)
 
 
 @pytest.fixture(autouse=True, scope="session")
 def _filter_certain_warnings():
     """Filter certain warnings."""
-    filter_certain_warnings(package="boilercv", other_warnings=warning_filters)
+    filter_certain_warnings(package=boilercv_pipeline, other_warnings=warning_filters)
+    for package in [boilercv_docs, boilercv_pipeline]:
+        filter_certain_warnings(
+            root_action=None, package=package, other_warnings=warning_filters
+        )
 
 
 # * -------------------------------------------------------------------------------- * #

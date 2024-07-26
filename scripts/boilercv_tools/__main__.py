@@ -85,7 +85,7 @@ def sync_local_dev_configs():
 
 def disable_concurrent_tests(addopts: str) -> str:
     """Normalize `addopts` string and disable concurrent pytest tests."""
-    return sub(pattern=r"-n\s*[^\s]+", repl="-n 0", string=join(split(addopts)))
+    return sub(pattern=r"-n\s[^\s]+", repl="-n 0", string=join(split(addopts)))
 
 
 @APP.command

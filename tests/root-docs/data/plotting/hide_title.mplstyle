@@ -1,0 +1,4 @@
+#! DON'T FORMAT ON SAVE OR `axes.titlecolor` WILL CHANGE
+axes.titlepad: 0
+axes.titlesize: xx-small
+axes.titlecolor: "#00000000"

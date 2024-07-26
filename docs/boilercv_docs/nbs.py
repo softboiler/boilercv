@@ -22,7 +22,7 @@ from numpy import set_printoptions
 from pandas import DataFrame, Index, MultiIndex, Series, concat, options
 from seaborn import set_theme
 
-from boilercv_docs import DEPS, DOCS, get_root, warning_filters
+from boilercv_docs import DEPS, DOCS, DOCS_DEPS, get_root, warning_filters
 from boilercv_docs.types import DfOrS
 
 FONT_SCALE = 1.3
@@ -61,6 +61,7 @@ class Paths:
     root: Path
     docs: Path
     deps: Path
+    docs_deps: Path
 
 
 def init() -> Paths:
@@ -73,14 +74,18 @@ def init() -> Paths:
     was_already_at_root = Path().cwd() == root
     if not all((root / check).exists() for check in [DOCS, DEPS]):
         raise RuntimeError("Either documentation or dependencies are missing.")
-    paths = Paths(*[p.resolve() for p in (root, root / DOCS, root / DEPS)])
-    if _in_binder := environ.get("BINDER_LAUNCH_HOST", False):
+    paths = Paths(*[
+        p.resolve() for p in (root, root / DOCS, root / DEPS, root / DOCS_DEPS)
+    ])
+    if _in_tests := environ.get("PYTEST_CURRENT_TEST"):
+        from boilercv_pipeline.models.params import PARAMS  # noqa: PLC0415
+
+        copy_deps(paths.docs_deps, PARAMS.paths.project)
+    elif _in_binder := environ.get("BINDER_LAUNCH_HOST"):
         copy_deps(paths.deps, paths.root)
-    elif any((
-        _in_ci := environ.get("CI", False),
-        _in_local_docs := not was_already_at_root,
-    )):
-        copy_deps(paths.deps, paths.docs)
+        copy_deps(paths.docs_deps, paths.root)
+    elif any((_in_ci := environ.get("CI"), _in_local_docs := not was_already_at_root)):
+        copy_deps(paths.docs_deps, paths.docs)
     elif _in_dev := was_already_at_root:
         pass
     else:

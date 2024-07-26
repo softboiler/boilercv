@@ -11,9 +11,11 @@ DOCS = Path("docs")
 """Docs directory."""
 DEPS = Path("tests/root")
 """Dependencies shared with tests."""
+DOCS_DEPS = Path("tests/root-docs")
+"""Dependencies shared with tests."""
 PYPROJECT = Path("pyproject.toml")
 """Path to `pyproject.toml`."""
-CHECKS = [DOCS, DEPS, PYPROJECT]
+CHECKS = [DOCS, DEPS, DOCS_DEPS, PYPROJECT]
 """Checks for the root directory."""
 
 
@@ -41,6 +43,11 @@ warning_filters = [
     ),
     WarningFilter(
         category=RuntimeWarning, message=r"invalid value encountered in power"
+    ),
+    WarningFilter(
+        # ? https://github.com/pytest-dev/pytest-qt/issues/558#issuecomment-2143975018
+        category=RuntimeWarning,
+        message=r"Failed to disconnect .* from signal",
     ),
     WarningFilter(
         category=RuntimeWarning,

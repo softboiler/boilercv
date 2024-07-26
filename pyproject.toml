@@ -65,7 +65,7 @@ ignore_unused = ["netcdf4"]
 
 [tool.pytest.ini_options]
 # ! https://github.com/pytest-dev/pytest-cov/issues/479#issuecomment-1247444988
-addopts = '''
+addopts = """
     --strict-config
     --strict-markers
     --suppress-no-test-exit-code
@@ -75,17 +75,20 @@ addopts = '''
     -n auto
     --dist=loadfile
     --plots=tests/plots
-'''
+"""
 cache_dir = ".cache/.pytest_cache"
 markers = "slow"
 testpaths = "tests"
 xfail_strict = true
 
 [tool.pytest_env]
-PYTHONIOENCODING = 'utf-8:strict'
-PYTHONUTF8 = 1
-PYTHONWARNDEFAULTENCODING = 1
-PYTHONWARNINGS = "ignore"         # Ignore warnings until explicitly re-enabled in tests
+PYRIGHT_PYTHON_PYLANCE_VERSION = "2024.7.1"
+PYDEVD_DISABLE_FILE_VALIDATION = "1"
+PYTHONIOENCODING = "utf-8:strict"
+PYTHONUTF8 = "1"
+PYTHONWARNDEFAULTENCODING = "1"
+PYTHONWARNINGS = "ignore"                   # Ignore warnings until explicitly re-enabled in tests
+COVERAGE_CORE = "sysmon"
 
 [tool.towncrier]
 directory = "changelog"
