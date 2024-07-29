@@ -74,9 +74,9 @@ stages:
     deps:
     - path: data/contours
       hash: md5
-      md5: 40e9c4859498b337fc7c196b54002561.dir
-      size: 4302672654
-      nfiles: 321
+      md5: 580c3168f9cf0ab979bb776cc14341ac.dir
+      size: 4429746285
+      nfiles: 338
     - path: data/sources
       hash: md5
       md5: bc0ec51a5cccd46c298d78fd5870f466.dir
@@ -89,9 +89,9 @@ stages:
     outs:
     - path: data/filled
       hash: md5
-      md5: 851f3d887be6a2daf3ea25fe136528ef.dir
-      size: 3516069084
-      nfiles: 321
+      md5: dba206aede6ea5a08e834146006cbaed.dir
+      size: 3619381654
+      nfiles: 338
   update_filled_preview:
     cmd: python -m boilercv.stages.update_filled_preview
     deps:
@@ -241,17 +241,17 @@ stages:
     outs:
     - path: data/contours
       hash: md5
-      md5: 40e9c4859498b337fc7c196b54002561.dir
-      size: 4302672654
-      nfiles: 321
+      md5: 580c3168f9cf0ab979bb776cc14341ac.dir
+      size: 4429746285
+      nfiles: 338
   preview_filled:
     cmd: python pipeline/boilercv_pipeline/stages/preview/preview_filled.py
     deps:
     - path: data/filled
       hash: md5
-      md5: 851f3d887be6a2daf3ea25fe136528ef.dir
-      size: 3516069084
-      nfiles: 321
+      md5: dba206aede6ea5a08e834146006cbaed.dir
+      size: 3619381654
+      nfiles: 338
     - path: data/sources
       hash: md5
       md5: bc0ec51a5cccd46c298d78fd5870f466.dir
@@ -264,8 +264,8 @@ stages:
     outs:
     - path: data/previews/filled.nc
       hash: md5
-      md5: 9e4f59da50ec9100f6e78a8ddd5e6225
-      size: 1696535
+      md5: 3a3233045ade8a471679b911d87f5858
+      size: 1694182
   preview_gray:
     cmd: python pipeline/boilercv_pipeline/stages/preview/preview_gray.py
     deps:
@@ -288,9 +288,9 @@ stages:
     deps:
     - path: data/contours
       hash: md5
-      md5: 40e9c4859498b337fc7c196b54002561.dir
-      size: 4302672654
-      nfiles: 321
+      md5: 580c3168f9cf0ab979bb776cc14341ac.dir
+      size: 4429746285
+      nfiles: 338
     - path: pipeline/boilercv_pipeline/stages/find_unobstructed.py
       hash: md5
       md5: 610f35980e37e6c97dd7bb78829ea518
