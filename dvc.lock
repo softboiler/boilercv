@@ -74,9 +74,9 @@ stages:
     deps:
     - path: data/contours
       hash: md5
-      md5: f7e2eaf770793f999ea3cc8ca4045fba.dir
-      size: 4429746285
-      nfiles: 338
+      md5: 40e9c4859498b337fc7c196b54002561.dir
+      size: 4302672654
+      nfiles: 321
     - path: data/sources
       hash: md5
       md5: bc0ec51a5cccd46c298d78fd5870f466.dir
@@ -241,9 +241,9 @@ stages:
     outs:
     - path: data/contours
       hash: md5
-      md5: f7e2eaf770793f999ea3cc8ca4045fba.dir
-      size: 4429746285
-      nfiles: 338
+      md5: 40e9c4859498b337fc7c196b54002561.dir
+      size: 4302672654
+      nfiles: 321
   preview_filled:
     cmd: python pipeline/boilercv_pipeline/stages/preview/preview_filled.py
     deps:
@@ -288,9 +288,9 @@ stages:
     deps:
     - path: data/contours
       hash: md5
-      md5: f7e2eaf770793f999ea3cc8ca4045fba.dir
-      size: 4429746285
-      nfiles: 338
+      md5: 40e9c4859498b337fc7c196b54002561.dir
+      size: 4302672654
+      nfiles: 321
     - path: pipeline/boilercv_pipeline/stages/find_unobstructed.py
       hash: md5
       md5: 610f35980e37e6c97dd7bb78829ea518
