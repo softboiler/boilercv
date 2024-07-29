@@ -89,9 +89,9 @@ stages:
     outs:
     - path: data/filled
       hash: md5
-      md5: c8912675531df4f8c973782c82fd8f18.dir
-      size: 3638762571
-      nfiles: 338
+      md5: 851f3d887be6a2daf3ea25fe136528ef.dir
+      size: 3516069084
+      nfiles: 321
   update_filled_preview:
     cmd: python -m boilercv.stages.update_filled_preview
     deps:
@@ -249,9 +249,9 @@ stages:
     deps:
     - path: data/filled
       hash: md5
-      md5: c8912675531df4f8c973782c82fd8f18.dir
-      size: 3638762571
-      nfiles: 338
+      md5: 851f3d887be6a2daf3ea25fe136528ef.dir
+      size: 3516069084
+      nfiles: 321
     - path: data/sources
       hash: md5
       md5: bc0ec51a5cccd46c298d78fd5870f466.dir
