@@ -32,6 +32,7 @@ paths:
   plot_config: data/plotting
   mpl_base: data/plotting/base.mplstyle
   mpl_hide_title: data/plotting/hide_title.mplstyle
+  modelfunctions: data/models
   experiments: data/experiments
   notebooks: data/notebooks
   rois: data/rois

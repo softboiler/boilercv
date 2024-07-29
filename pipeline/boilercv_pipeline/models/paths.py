@@ -55,6 +55,9 @@ class Paths(CreatePathsModel):
     mpl_base: FilePath = plot_config / "base.mplstyle"
     mpl_hide_title: FilePath = plot_config / "hide_title.mplstyle"
 
+    # * DVC_tracked imports
+    modelfunctions: Path = data / "models"
+
     # * DVC-tracked inputs
     experiments: DirectoryPath = data / "experiments"
     notebooks: DirectoryPath = data / "notebooks"
