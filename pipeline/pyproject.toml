@@ -37,7 +37,7 @@ dependencies = [
 ]
 [project.optional-dependencies]
 # * Minimal CV flavor needed, but allow `boilercv` to coexist with different flavors
-cv = ["opencv-python-headless>=4.9.0.80"]
+cv = ["opencv-python-headless>=4.10.0.84"]
 [tool.fawltydeps]
 deps = ["pipeline/pyproject.toml"]
 code = ["pipeline/boilercv_pipeline"]

@@ -183,10 +183,12 @@ def find_contours(img: Img, method: int = CHAIN_APPROX_NONE) -> list[ArrInt]:
         mode=RETR_EXTERNAL,  # No hierarchy needed because we keep external contours
         method=method,
     )
-    # Despite images having dims (y, x) and shape (h, w), OpenCV returns contours with
-    # dims (point, 1, pair), where dim "pair" has coords (x, y).
-    contours = [fliplr(contour.reshape(-1, 2)) for contour in contours]
-    return contours  # pyright: ignore[reportReturnType]
+    # Images have dims (y, x) and shape (h, w). We want the dims of returned contours to
+    # match that. OpenCV returns a list of contours. Each contour has dims (point, 1,
+    # pair), where "point" are the points making up a contour and "pair" are the (x, y)
+    # coordinates of each point. Reshape each contour to dims (point, pair), then flip
+    # the order of pairs to (x, y).
+    return [fliplr(contour.reshape(-1, 2)) for contour in contours]  # pyright: ignore[reportReturnType]
 
 
 def draw_contours(
@@ -197,11 +199,14 @@ def draw_contours(
     color: int | tuple[int, ...] = WHITE,
 ) -> Img:
     """Draw contours on an image."""
-    # OpenCV expects contours as shape (N, 1, 2) instead of (N, 2)
-    contours = [fliplr(contour).reshape(-1, 1, 2) for contour in contours]
+    # Each contour has dims (point, pair), where "point" are the points making up a
+    # contour and "pair" are the (x, y) coordinates of each point. OpenCV expects each
+    # contour to have dims (point, 1, pair), with "pair" order (x, y). Flip the order of
+    # each contour's pairs to (y, x), then reshape each contour to dims (point, 1,
+    # pair).
     return drawContours(
-        image=img,
-        contours=contours,
+        image=img.copy(),
+        contours=[fliplr(contour).reshape(-1, 1, 2) for contour in contours],
         contourIdx=contour_index,
         color=color,  # pyright: ignore[reportArgumentType, reportCallIssue]
         thickness=thickness,
