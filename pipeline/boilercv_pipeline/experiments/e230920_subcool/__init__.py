@@ -29,7 +29,7 @@ from boilercv_pipeline.models.params import PARAMS
 
 EXP = get_module_name(__spec__ or __file__)
 """Name of this experiment."""
-DAY = "2023-09-20"
+DAY = "2024-07-18"
 """Day of the experiment"""
 EXP_NBS = get_exp(EXP)
 """Path to experiment notebooks."""
@@ -41,6 +41,8 @@ THERMAL_DATA = EXP_DATA / f"{DAY}_thermal.h5"
 """Reduced thermal data for this experiment."""
 CENTERS = EXP_DATA / "centers"
 """Bubble centers."""
+CONTOURS = EXP_DATA / "contours"
+"""Bubble contours."""
 OBJECTS = EXP_DATA / "objects"
 """Objects in each frame."""
 TRACKPY_OBJECTS = EXP_DATA / "trackpy_objects"
@@ -64,7 +66,7 @@ def get_times(strings: Iterable[str]) -> Iterable[datetime]:
             yield dt_fromisolike(match)
 
 
-EXP_TIMES = list(get_times(path.stem for path in TRACKPY_OBJECTS.iterdir()))
+EXP_TIMES = list(get_times(path.stem for path in CONTOURS.iterdir()))
 
 
 def save_df(path: Path, ns: SimpleNamespace):
@@ -213,12 +215,13 @@ class Col:
         self.new = f"{self.new} ({self.new_unit})" if self.new_unit else self.new
 
 
-def transform_cols(df: DataFrame, cols: list[Col]) -> DataFrame:
+def transform_cols(df: DataFrame, cols: list[Col], drop: bool = True) -> DataFrame:
     """Transform dataframe columns."""
-    return df.assign(**{
+    df = df.assign(**{
         col.new: df[col.old] if col.scale == 1 else df[col.old] * col.scale
         for col in cols
-    })[[col.new for col in cols]]
+    })
+    return df[[col.new for col in cols]] if drop else df
 
 
 class Conversion(TypedDict):

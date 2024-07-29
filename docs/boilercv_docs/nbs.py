@@ -7,7 +7,7 @@ from io import StringIO
 from os import chdir, environ, remove
 from pathlib import Path
 from re import match, search, sub
-from shutil import copy, copytree
+from shutil import copy, copytree, rmtree
 from tempfile import NamedTemporaryFile
 from textwrap import dedent
 from typing import Any
@@ -22,7 +22,8 @@ from numpy import set_printoptions
 from pandas import DataFrame, Index, MultiIndex, Series, concat, options
 from seaborn import set_theme
 
-from boilercv_docs import DEPS, DOCS, DOCS_DEPS, get_root, warning_filters
+import boilercv_pipeline
+from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, get_root, warning_filters
 from boilercv_docs.types import DfOrS
 
 FONT_SCALE = 1.3
@@ -59,45 +60,53 @@ class Paths:
     """Paths."""
 
     root: Path
-    docs: Path
-    deps: Path
-    docs_deps: Path
+    docs_root: Path
+    test_data_src: Path
+    docs_data_src: Path
 
 
-def init() -> Paths:
+def init(force_docs: bool = False) -> Paths:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
     filter_certain_warnings(
         package="boilercv", other_action="ignore", other_warnings=warning_filters
     )
     root = get_root()
-    was_already_at_root = Path().cwd() == root
-    if not all((root / check).exists() for check in [DOCS, DEPS]):
+    at_root = Path().cwd() == root
+    if not all((root / check).exists() for check in [DOCS, TEST_DATA]):
         raise RuntimeError("Either documentation or dependencies are missing.")
     paths = Paths(*[
-        p.resolve() for p in (root, root / DOCS, root / DEPS, root / DOCS_DEPS)
+        p.resolve() for p in (root, root / DOCS, root / TEST_DATA, root / DOCS_DATA)
     ])
     if _in_tests := environ.get("PYTEST_CURRENT_TEST"):
         from boilercv_pipeline.models.params import PARAMS  # noqa: PLC0415
 
-        copy_deps(paths.docs_deps, PARAMS.paths.project)
+        # ? Tests monkeypatch project path to an isolated temporary test folder
+        tmp_test_dir = PARAMS.paths.project
+        copy(paths.test_data_src / "params.yaml", tmp_test_dir)
+        copytree(
+            paths.test_data_src / "data", tmp_test_dir / "data", dirs_exist_ok=True
+        )
     elif _in_binder := environ.get("BINDER_LAUNCH_HOST"):
-        copy_deps(paths.deps, paths.root)
-        copy_deps(paths.docs_deps, paths.root)
-    elif any((_in_ci := environ.get("CI"), _in_local_docs := not was_already_at_root)):
-        copy_deps(paths.docs_deps, paths.docs)
-    elif _in_dev := was_already_at_root:
+        boilercv_pipeline.PROJECT_PATH = paths.root
+        copy(paths.test_data_src / "params.yaml", paths.root)
+        copytree(paths.test_data_src / "data", paths.root / "data", dirs_exist_ok=True)
+        copytree(paths.docs_data_src / "data", paths.root / "data", dirs_exist_ok=True)
+    elif any((force_docs, _in_docs := not at_root, _in_ci := environ.get("CI"))):
+        boilercv_pipeline.PROJECT_PATH = paths.docs_root
+        if paths.docs_root != paths.root:
+            rmtree(paths.docs_root / "data", ignore_errors=True)
+            rmtree(paths.docs_root / "temp", ignore_errors=True)
+        chdir(paths.docs_root)
+        copy(paths.docs_data_src / "params.yaml", paths.docs_root)
+        copytree(
+            paths.docs_data_src / "data", paths.docs_root / "data", dirs_exist_ok=True
+        )
+    elif _in_dev := at_root:
         pass
     else:
         raise RuntimeError("Can't determine notebook environment.")
     return paths
-
-
-def copy_deps(src, dst):
-    """Copy dependencies to the destination directory."""
-    chdir(dst)
-    copy(src / "params.yaml", dst)
-    copytree(src / "data", dst / "data", dirs_exist_ok=True)
 
 
 def set_display_options(font_scale: float = FONT_SCALE):

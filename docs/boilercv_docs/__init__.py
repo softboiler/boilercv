@@ -9,13 +9,13 @@ from boilercv_docs.patch_nbs import patch_nbs
 
 DOCS = Path("docs")
 """Docs directory."""
-DEPS = Path("tests/root")
+TEST_DATA = Path("tests/root")
 """Dependencies shared with tests."""
-DOCS_DEPS = Path("tests/root-docs")
+DOCS_DATA = Path("tests/root-docs")
 """Dependencies shared with tests."""
 PYPROJECT = Path("pyproject.toml")
 """Path to `pyproject.toml`."""
-CHECKS = [DOCS, DEPS, DOCS_DEPS, PYPROJECT]
+CHECKS = [DOCS, TEST_DATA, DOCS_DATA, PYPROJECT]
 """Checks for the root directory."""
 
 
@@ -28,11 +28,11 @@ def chdir_docs() -> Path:
 
 
 def get_root() -> Path:
-    """Get the project root directory."""
+    """Look for project root directory starting from current working directory."""
     path = Path().cwd()
     while not all((path / check).exists() for check in CHECKS):
         if path == (path := path.parent):
-            raise RuntimeError("Either documentation or `pyproject.toml` is missing.")
+            raise RuntimeError("Project root directory not found.")
     return path
 
 
