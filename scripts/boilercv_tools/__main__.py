@@ -11,7 +11,8 @@ from tomllib import loads
 from cyclopts import App
 
 from boilercv_tools import add_changes
-from boilercv_tools.sync import check_compilation, escape
+from boilercv_tools.environment import escape, init_shell, run
+from boilercv_tools.sync import check_compilation
 from boilercv_tools.types import ChangeType
 
 if version_info >= (3, 11):  # noqa: UP036, RUF100
@@ -24,6 +25,7 @@ APP = App(help_format="markdown")
 
 
 def main():  # noqa: D103
+    init_shell()
     APP()
 
 
@@ -99,6 +101,26 @@ def elevate_pyright_warnings():
     Path("pyrightconfig.json").write_text(
         encoding="utf-8", data=dumps(pyright, indent=2)
     )
+
+
+@APP.command()
+def build_docs():
+    """Build docs."""
+    run([
+        "sphinx-autobuild",
+        "--show-traceback",
+        "docs _site",
+        *[
+            f"--ignore {p}"
+            for p in [
+                "docs/temp",
+                "docs/data",
+                "**/apidocs",
+                "**/params.yaml",
+                "**/params_schema.json",
+            ]
+        ],
+    ])
 
 
 def log(obj):

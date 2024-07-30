@@ -54,11 +54,11 @@
       }
     },
     {
-      "name": "Python: Sphinx build docs",
+      "name": "Python: Build docs",
       "type": "debugpy",
       "request": "launch",
       "module": "sphinx",
-      "args": ["-EaT", "docs", "_site"],
+      "args": ["-T", "docs", "_site"],
       "console": "internalConsole"
     },
     {

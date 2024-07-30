@@ -2,19 +2,28 @@
 
 from datetime import date
 from hashlib import sha256
+from itertools import chain
+from os import environ
 from pathlib import Path
+from sys import platform
 
 from ruamel.yaml import YAML
 from sphinx.application import Sphinx
 
-from boilercv_docs import DOCS, PYPROJECT, chdir_docs
+from boilercv_docs import DOCS, PYPROJECT, init_docs_build
 from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
 from boilercv_docs.nbs import init_nb_env
 from boilercv_docs.types import IspxMappingValue
 
 # ! Initialization
-ROOT = chdir_docs()
+ROOT = init_docs_build()
 """Root directory of the project."""
+# ! Customize documentation build process from environment variables
+BOILERCV_DOCS_NB_EXECUTION_EXCLUDEPATTERNS = (
+    _patterns.split(";" if platform == "win32" else ":")
+    if (_patterns := environ.get("BOILERCV_DOCS_NB_EXECUTION_EXCLUDEPATTERNS"))
+    else []
+)
 # ! Paths
 STATIC = DOCS / "_static"
 """Static assets folder, used in configs and setup."""
@@ -86,8 +95,11 @@ def add_version_to_css(app: Sphinx, _pagename, _templatename, ctx, _doctree):
     if app.builder.name != "html":
         return
     css = dpath(CSS)
-    if css in ctx.get((k := "css_files"), {}):
-        ctx[k][ctx[k].index(css)] = f"{css}?hash={sha256(CSS.read_bytes()).hexdigest()}"
+    css_files = "css_files"
+    for i, css_file in enumerate(ctx.get(css_files, [])):
+        if css != css_file.filename:
+            continue
+        ctx[css_files][i] = f"{css}?hash={sha256(CSS.read_bytes()).hexdigest()}"
 
 
 def dpaths(*paths: Path, rel: Path = DOCS) -> list[str]:
@@ -198,6 +210,12 @@ bibtex_reference_style = "label"
 bibtex_default_style = "unsrt"
 # ! NB
 nb_execution_mode = "cache"
+nb_execution_excludepatterns = [
+    p.resolve().as_posix()
+    for p in chain.from_iterable([
+        Path().glob(p) for p in BOILERCV_DOCS_NB_EXECUTION_EXCLUDEPATTERNS
+    ])
+]
 nb_execution_raise_on_error = True
 # ! Thebe
 thebe_config = {**COMMON_OPTIONS, "repository_branch": REV, "selector": "div.highlight"}

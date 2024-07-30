@@ -23,7 +23,7 @@ from pandas import DataFrame, Index, MultiIndex, Series, concat, options
 from seaborn import set_theme
 
 import boilercv_pipeline
-from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, get_root, warning_filters
+from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, WARNING_FILTERS, get_root
 from boilercv_docs.types import DfOrS
 
 FONT_SCALE = 1.3
@@ -69,7 +69,7 @@ def init(force_docs: bool = False) -> Paths:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
     filter_certain_warnings(
-        package="boilercv", other_action="ignore", other_warnings=warning_filters
+        package="boilercv", other_action="ignore", other_warnings=WARNING_FILTERS
     )
     root = get_root()
     at_root = Path().cwd() == root
