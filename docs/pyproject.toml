@@ -34,6 +34,7 @@ dependencies = [
     "matplotlib>=3.7.2",
     "numpy>=1.24.4",
     "pandas[hdf5,performance]>=2.2.2",
+    "pydantic>=2.8.2",
     "seaborn>=0.13.2",
     "shapely>=2.0.3",
     "sympy>=1.12",
@@ -46,7 +47,7 @@ dependencies = [
 [tool.fawltydeps]
 deps = ["docs/pyproject.toml"]
 code = ["docs"]
-ignore_undeclared = ["boilercv_pipeline", "boilercv"]
+ignore_undeclared = ["boilercv_pipeline", "boilercv_tools", "boilercv"]
 ignore_unused = [
     # ? Core docs tools or declared as extensions in `conf.py`
     "linkify-it-py",
