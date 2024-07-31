@@ -1,5 +1,4 @@
 paths:
-  project: .
   data: data
   cines: data/cines
   hierarchical_data: data/hierarchical_data
