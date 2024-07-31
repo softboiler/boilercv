@@ -20,9 +20,9 @@ from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 
 import boilercv_pipeline
-from boilercv_docs import filter_boilercv_warnings
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
 from boilercv_tests.types import FixtureStore
+from boilercv_tools.warnings import filter_boilercv_warnings
 
 CASER = "C"
 """Module-level variable in test modules containing notebook cases for that module."""
