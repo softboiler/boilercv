@@ -12,7 +12,6 @@ from sphinx.application import Sphinx
 
 from boilercv_docs import DOCS, PYPROJECT, init_docs_build
 from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
-from boilercv_docs.nbs import init_nb_env
 from boilercv_docs.types import IspxMappingValue
 
 # ! Initialization
@@ -23,6 +22,11 @@ BOILERCV_DOCS_NB_EXECUTION_EXCLUDEPATTERNS = (
     _patterns.split(";" if platform == "win32" else ":")
     if (_patterns := environ.get("BOILERCV_DOCS_NB_EXECUTION_EXCLUDEPATTERNS"))
     else []
+)
+BOILERCV_DOCS_SKIP_AUTODOC = (
+    str(_skip_autodoc).casefold() == "true"
+    if (_skip_autodoc := environ.get("BOILERCV_DOCS_SKIP_AUTODOC"))
+    else False
 )
 # ! Paths
 STATIC = DOCS / "_static"
@@ -81,7 +85,6 @@ REV = "4025524891c4b9a07c9624b6afa37085d4f73cb5"
 
 def setup(app: Sphinx):
     """Add functions to Sphinx setup."""
-    init_nb_env()
     app.connect("html-page-context", add_version_to_css)
 
 
@@ -136,7 +139,7 @@ master_doc = "index"
 language = "en"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/_*.md", "**/_*.ipynb"]
 extensions = [
-    "autodoc2",
+    *([] if BOILERCV_DOCS_SKIP_AUTODOC else ["autodoc2"]),
     "myst_nb",
     "sphinx_design",
     "sphinx_tippy",

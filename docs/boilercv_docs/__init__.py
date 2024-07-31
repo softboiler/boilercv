@@ -54,13 +54,6 @@ WARNING_FILTERS = [
         module="pybtex.plugin",
         message=r"pkg_resources is deprecated as an API\.",
     ),
-    *[
-        WarningFilter(
-            category=DeprecationWarning,
-            message=rf"Deprecated call to `pkg_resources\.declare_namespace\('{ns}'\)`\.",
-        )
-        for ns in ["mpl_toolkits", "sphinxcontrib", "zc"]
-    ],
     WarningFilter(
         category=DeprecationWarning,
         message=r"Deprecated call to `pkg_resources\.declare_namespace\('mpl_toolkits'\)`\.",
@@ -78,6 +71,23 @@ WARNING_FILTERS = [
         module=r"latexcodec\.codec",
         message=r"open_text is deprecated\. Use files\(\) instead",
     ),
+    WarningFilter(
+        category=DeprecationWarning,
+        module=r"nptyping\.typing_",
+        message=r"`.+` is a deprecated alias for `.+`\.",
+    ),
+    WarningFilter(
+        category=DeprecationWarning,
+        module=r"IPython\.core\.pylabtools",
+        message=r"backend2gui is deprecated.",
+    ),
+    *[
+        WarningFilter(
+            category=DeprecationWarning,
+            message=rf"Deprecated call to `pkg_resources\.declare_namespace\('{ns}'\)`\.",
+        )
+        for ns in ["mpl_toolkits", "sphinxcontrib", "zc"]
+    ],
     *[
         WarningFilter(
             category=DeprecationWarning, module=r"pytest_harvest.*", message=message

@@ -1,5 +1,6 @@
 """Patch notebooks."""
 
+from copy import deepcopy
 from os import chdir
 from pathlib import Path
 from textwrap import dedent
@@ -33,8 +34,9 @@ def patch_nbs():
     Patch Thebe buttons in. Insert `parameters` and `thebe-init` tags to the first code
     cell. Insert `hide-input` tags to code cells.
     """
-    for path in Path("docs").rglob("*.ipynb"):
-        nb: NotebookNode = read(path, NO_CONVERT)  # pyright: ignore[reportAssignmentType]
+    for path in Path().rglob("*.ipynb"):
+        orig_nb: NotebookNode = read(path, NO_CONVERT)  # pyright: ignore[reportAssignmentType]
+        nb = deepcopy(orig_nb)
         if path not in EXCLUDE_THEBE:
             # ? Patch the first Markdown cell
             i, first = next((i, c) for i, c in enumerate(nb.cells) if c.cell_type == MD)
@@ -71,7 +73,8 @@ def patch_nbs():
         for i, cell in code_cells:
             nb.cells[i] = insert_tag(cell, ["hide-input"])
         # ? Write the notebook back
-        write(nb, path)
+        if nb != orig_nb:
+            write(nb, path)
 
 
 def insert_tag(cell: NotebookNode, tags_to_insert: list[str]) -> NotebookNode:

@@ -13,7 +13,6 @@ from textwrap import dedent
 from typing import Any
 from warnings import catch_warnings, filterwarnings
 
-from boilercore import filter_certain_warnings
 from IPython.display import HTML, display
 from IPython.utils.capture import capture_output
 from matplotlib.pyplot import style
@@ -23,7 +22,7 @@ from pandas import DataFrame, Index, MultiIndex, Series, concat, options
 from seaborn import set_theme
 
 import boilercv_pipeline
-from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, WARNING_FILTERS, get_root
+from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, filter_boilercv_warnings, get_root
 from boilercv_docs.types import DfOrS
 
 FONT_SCALE = 1.3
@@ -38,23 +37,6 @@ DISPLAY_ROWS = 20
 """The number of rows to display in a dataframe."""
 
 
-def init_nb_env():
-    """Initialize the environment which will be inherited for notebook execution."""
-    for key in [
-        key
-        for key in [
-            "PIP_DISABLE_PIP_VERSION_CHECK",
-            "PYTHONIOENCODING",
-            "PYTHONUTF8",
-            "PYTHONWARNDEFAULTENCODING",
-            "PYTHONWARNINGS",
-        ]
-        if environ.get(key) is not None
-    ]:
-        del environ[key]
-    environ["PYDEVD_DISABLE_FILE_VALIDATION"] = "1"
-
-
 @dataclass
 class Paths:
     """Paths."""
@@ -65,12 +47,10 @@ class Paths:
     docs_data_src: Path
 
 
-def init(force_docs: bool = False) -> Paths:
+def init(force_dev: bool = True) -> Paths:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
-    filter_certain_warnings(
-        package="boilercv", other_action="ignore", other_warnings=WARNING_FILTERS
-    )
+    filter_boilercv_warnings()
     root = get_root()
     at_root = Path().cwd() == root
     if not all((root / check).exists() for check in [DOCS, TEST_DATA]):
@@ -78,7 +58,10 @@ def init(force_docs: bool = False) -> Paths:
     paths = Paths(*[
         p.resolve() for p in (root, root / DOCS, root / TEST_DATA, root / DOCS_DATA)
     ])
-    if _in_tests := environ.get("PYTEST_CURRENT_TEST"):
+    if force_dev:
+        chdir(paths.root)
+        boilercv_pipeline.PROJECT_PATH = paths.root
+    elif _in_tests := environ.get("PYTEST_CURRENT_TEST"):
         from boilercv_pipeline.models.params import PARAMS  # noqa: PLC0415
 
         # ? Tests monkeypatch project path to an isolated temporary test folder
@@ -92,7 +75,7 @@ def init(force_docs: bool = False) -> Paths:
         copy(paths.test_data_src / "params.yaml", paths.root)
         copytree(paths.test_data_src / "data", paths.root / "data", dirs_exist_ok=True)
         copytree(paths.docs_data_src / "data", paths.root / "data", dirs_exist_ok=True)
-    elif any((force_docs, _in_docs := not at_root, _in_ci := environ.get("CI"))):
+    elif any((_in_docs := not at_root, _in_ci := environ.get("CI"))):
         boilercv_pipeline.PROJECT_PATH = paths.docs_root
         if paths.docs_root != paths.root:
             rmtree(paths.docs_root / "data", ignore_errors=True)
