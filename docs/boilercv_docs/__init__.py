@@ -26,8 +26,8 @@ CHECKS = [DOCS, TEST_DATA, DOCS_DATA, PYPROJECT]
 def init_docs_build() -> Path:
     """Initialize shell, ensure we are in `docs`, patch notebooks, return root."""
     filter_boilercv_warnings()
-    init_shell()
     root = get_root()
+    init_shell(root)
     os.chdir(root / "docs")
     patch_nbs()
     return root
@@ -46,11 +46,9 @@ class Settings(BaseSettings):
     """Project parameters."""
 
     model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(  # pyright: ignore[reportIncompatibleVariableOverride]
-        toml_file="env.toml",
         env_file_encoding="utf-8",
-        env_file=".env",
-        env_prefix="BOILERCV_DOCS_",
         env_nested_delimiter="__",
+        env_file=get_root() / ".boilercv_docs.env",
     )
 
     skip_autodoc: bool = False

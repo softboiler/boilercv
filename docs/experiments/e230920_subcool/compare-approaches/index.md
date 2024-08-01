@@ -2,5 +2,5 @@
 
 :::{toctree}
 :hidden:
-./notebooks/nb-2024-07-30-compare-centers
+/notebooks/nb-2024-07-30-compare-centers
 :::
