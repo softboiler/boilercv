@@ -2,10 +2,9 @@
 
 import os
 from pathlib import Path
-from typing import ClassVar
 
 from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, SettingsConfigDict, TomlConfigSettingsSource
 
 from boilercv_docs.patch_nbs import patch_nbs
 from boilercv_tools.environment import init_shell
@@ -43,13 +42,14 @@ def get_root() -> Path:
 
 
 class Settings(BaseSettings):
-    """Project parameters."""
+    """Settings."""
 
-    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(  # pyright: ignore[reportIncompatibleVariableOverride]
-        env_file_encoding="utf-8",
-        env_nested_delimiter="__",
-        env_file=get_root() / ".boilercv_docs.env",
-    )
+    model_config = SettingsConfigDict(toml_file=get_root() / ".boilercv_docs.env.toml")
+
+    @classmethod
+    def settings_customise_sources(cls, settings_cls, **_):  # pyright: ignore[reportIncompatibleMethodOverride]
+        """Customize so that all keys are loaded despite not being model fields."""
+        return (TomlConfigSettingsSource(settings_cls),)
 
     skip_autodoc: bool = False
     nb_execution_excludepatterns: list[str] = Field(default_factory=list)

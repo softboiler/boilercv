@@ -1,23 +1,17 @@
 """Project parameters."""
 
 from pathlib import Path
-from typing import ClassVar
 
 from boilercore.fits import Fit
 from boilercore.models import SynchronizedPathsYamlModel
 from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from boilercv_pipeline import PROJECT_PATH
 from boilercv_pipeline.models.paths import Paths
 
 
-class Params(SynchronizedPathsYamlModel, BaseSettings):
+class Params(SynchronizedPathsYamlModel):
     """Project parameters."""
-
-    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(  # pyright: ignore[reportIncompatibleVariableOverride]
-        env_prefix="BOILERCV_", env_nested_delimiter="__"
-    )
 
     paths: Paths
     fit: Fit = Field(default_factory=Fit, description="Parameters for model fit.")
