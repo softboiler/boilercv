@@ -19,32 +19,22 @@ if ($IsWindows) {
 function Set-Env {
     <#.SYNOPSIS
     Activate virtual environment and set environment variables.#>
-
-    # ? Set environment variables
-    $LocalBin = (Test-Path 'bin') ? (Get-Item 'bin') : (New-Item -ItemType Directory 'bin')
-    $Vars = $Env:GITHUB_ENV ? $(Get-Content $Env:GITHUB_ENV |
-            Select-String -Pattern '^(.+)=.+$' |
-            ForEach-Object { $_.Matches.Groups[1].value }) : @{}
-    foreach ($i in @{
-            PATH                           = "$LocalBin$($IsWindows ? ';' : ':')$Env:PATH"
-            PYRIGHT_PYTHON_PYLANCE_VERSION = '2024.7.1'
-            PYDEVD_DISABLE_FILE_VALIDATION = '1'
-            PYTHONIOENCODING               = 'utf-8:strict'
-            PYTHONUTF8                     = '1'
-            PYTHONWARNDEFAULTENCODING      = '1'
-            PYTHONWARNINGS                 = 'ignore'
-            COVERAGE_CORE                  = 'sysmon'
-        }.GetEnumerator() ) {
-        Set-Item "Env:$($i.Key)" $($i.Value)
-        if ($Env:GITHUB_ENV -and ($i.Key -notin $Vars)) {
-            "$($i.Key)=$($i.Value)" >> $Env:GITHUB_ENV
-        }
-    }
-
     # ? Activate virtual environment if one exists
     if (Test-Path '.venv') {
         if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
     }
-
+    # ? Set environment variables
+    $Vars = $Env:GITHUB_ENV ? $(Get-Content $Env:GITHUB_ENV |
+            Select-String -Pattern '^(.+)=.+$' |
+            ForEach-Object { $_.Matches.Groups[1].value }) : @{}
+    if ((Test-Path '.venv') -or ($Env:GITHUB_ENV)) {
+        foreach ($line in boilercv_tools init-shell) {
+            $Key, $Value = $line -Split '=', 2
+            Set-Item "Env:$Key" $Value
+            if ($Env:GITHUB_ENV -and ($Key -notin $Vars)) {
+                "$Key=$Value" >> $Env:GITHUB_ENV
+            }
+        }
+    }
 }
 Set-Env

@@ -19,6 +19,7 @@ bin
 .comps
 # Ignore local environment modifications
 .env
+.env.toml
 # Ignore `.ruff-cache` just in case, and to grey it out in the sidebar
 .ruff_cache
 # To allow for local variation in type checking without overriding CI

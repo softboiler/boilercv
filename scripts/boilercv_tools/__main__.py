@@ -10,8 +10,8 @@ from tomllib import loads
 
 from cyclopts import App
 
-from boilercv_tools import add_changes
-from boilercv_tools.environment import escape, init_shell, run
+from boilercv_tools import add_changes, environment
+from boilercv_tools.environment import escape, run
 from boilercv_tools.sync import check_compilation
 from boilercv_tools.types import ChangeType
 
@@ -25,8 +25,13 @@ APP = App(help_format="markdown")
 
 
 def main():  # noqa: D103
-    init_shell()
     APP()
+
+
+@APP.command
+def init_shell():
+    """Initialize shell."""
+    log(environment.init_shell())
 
 
 @APP.command

@@ -82,14 +82,14 @@ testpaths = "tests"
 xfail_strict = true
 
 [tool.pytest_env]
+COVERAGE_CORE = "sysmon"
 JUPYTER_PLATFORM_DIRS = "1"
 PYRIGHT_PYTHON_PYLANCE_VERSION = "2024.7.1"
 PYDEVD_DISABLE_FILE_VALIDATION = "1"
 PYTHONIOENCODING = "utf-8:strict"
 PYTHONUTF8 = "1"
 PYTHONWARNDEFAULTENCODING = "1"
-PYTHONWARNINGS = "ignore"                   # Ignore warnings until explicitly re-enabled in tests
-COVERAGE_CORE = "sysmon"
+PYTHONWARNINGS = "ignore"
 
 [tool.towncrier]
 directory = "changelog"

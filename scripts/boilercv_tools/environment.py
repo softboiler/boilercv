@@ -2,28 +2,38 @@
 
 import subprocess
 from collections.abc import Sequence
+from io import StringIO
 from os import environ
 from pathlib import Path
 from shlex import quote, split
 from sys import platform
-from warnings import warn
 
-from _pytest.config import _prepareconfig
 from dotenv import load_dotenv
-from pytest_env.plugin import pytest_load_initial_conftests
+from pydantic_settings import (
+    BaseSettings,
+    PyprojectTomlConfigSettingsSource,
+    SettingsConfigDict,
+    TomlConfigSettingsSource,
+)
 
 
-def init_shell():
+def init_shell() -> str:
     """Initialize shell."""
-    if load_dotenv():
-        warn("Loaded local environment variables from `.env`", stacklevel=2)
-    if ((bin_ := Path("bin").resolve()).exists()) and (path := environ.get("PATH")):
-        environ["PATH"] = f"{bin_}{';' if platform == 'win32' else ':'}{path}"
-    pytest_load_initial_conftests(
-        [],
-        config := _prepareconfig(args=[], plugins=[]),
-        config._parser,  # noqa: SLF001
+    environment = {**Environment().model_dump(), **DevEnvironment().model_dump()}
+    dotenv = "\n".join(
+        f"{k}={v}"
+        for k, v in {
+            **Environment().model_dump(),
+            **DevEnvironment().model_dump(),
+        }.items()
     )
+    load_dotenv(stream=StringIO(dotenv))
+    if ((bin_ := Path("bin").resolve()).exists()) and (path := environ.get("PATH")):
+        environment["PATH"] = environ["PATH"] = (
+            f"{bin_}{';' if platform == 'win32' else ':'}{path}"
+        )
+        dotenv += f"PATH={environment['PATH']}"
+    return dotenv
 
 
 def run(args: str | Sequence[str]):
@@ -39,6 +49,30 @@ def run(args: str | Sequence[str]):
             ])
         ),
     )
+
+
+class Environment(BaseSettings):
+    """Get environment variables from `pyproject.toml:[tool.pytest_env]`."""
+
+    model_config = SettingsConfigDict(
+        extra="allow", pyproject_toml_table_header=("tool", "pytest_env")
+    )
+
+    @classmethod
+    def settings_customise_sources(cls, settings_cls, **_):  # pyright: ignore[reportIncompatibleMethodOverride]
+        """Customize so that all keys are loaded despite not being model fields."""
+        return (PyprojectTomlConfigSettingsSource(settings_cls),)
+
+
+class DevEnvironment(BaseSettings):
+    """Get environment variables from `pyproject.toml:[tool.pytest_env]`."""
+
+    model_config = SettingsConfigDict(extra="allow", toml_file=".env.toml")
+
+    @classmethod
+    def settings_customise_sources(cls, settings_cls, **_):  # pyright: ignore[reportIncompatibleMethodOverride]
+        """Customize so that all keys are loaded despite not being model fields."""
+        return (TomlConfigSettingsSource(settings_cls),)
 
 
 def get_venv_activator():

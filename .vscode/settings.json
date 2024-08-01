@@ -37,7 +37,6 @@
   //! File associations
   "files.associations": {
     ".coveragerc": "ini",
-    ".env": "dotenv",
     ".pylintrc": "ini",
     ".root": "plaintext",
     ".sourcery.yaml": "yaml",

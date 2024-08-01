@@ -2,6 +2,10 @@
 
 import os
 from pathlib import Path
+from typing import ClassVar
+
+from pydantic import Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from boilercv_docs.patch_nbs import patch_nbs
 from boilercv_tools.environment import init_shell
@@ -36,3 +40,22 @@ def get_root() -> Path:
         if path == (path := path.parent):
             raise RuntimeError("Project root directory not found.")
     return path
+
+
+class Settings(BaseSettings):
+    """Project parameters."""
+
+    model_config: ClassVar[SettingsConfigDict] = SettingsConfigDict(  # pyright: ignore[reportIncompatibleVariableOverride]
+        toml_file="env.toml",
+        env_file_encoding="utf-8",
+        env_file=".env",
+        env_prefix="BOILERCV_DOCS_",
+        env_nested_delimiter="__",
+    )
+
+    skip_autodoc: bool = False
+    nb_execution_excludepatterns: list[str] = Field(default_factory=list)
+    force_dev: bool = False
+
+
+settings = Settings()
