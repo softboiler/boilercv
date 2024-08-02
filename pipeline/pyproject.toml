@@ -22,7 +22,6 @@ dependencies = [
     "ploomber-engine>=0.0.30",
     "pyarrow>=14.0.1",
     "pydantic>=2.8.2",
-    "pydantic-settings==2.4.0",
     "pyqtgraph>=0.13.3",
     "ruamel.yaml>=0.17.32",
     "scikit-image>=0.23.1",

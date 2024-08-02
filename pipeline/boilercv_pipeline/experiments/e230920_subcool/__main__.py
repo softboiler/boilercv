@@ -10,11 +10,15 @@ from boilercv_pipeline.models.params import PARAMS
 
 
 def main():  # noqa: D103
-    find_collapse = fold(PARAMS.paths.stages[f"experiments_{EXP}_find_collapse"])
+    find_collapse = fold(
+        PARAMS.package_paths.stages[f"experiments_{EXP}_find_collapse"]
+    )
     if not modified(find_collapse):
         return
     execute_notebook(
-        input_path=fold(PARAMS.paths.stages[f"experiments_{EXP}_get_thermal_data"]),
+        input_path=fold(
+            PARAMS.package_paths.stages[f"experiments_{EXP}_get_thermal_data"]
+        ),
         output_path=None,
     )
     with ProcessPoolExecutor() as executor:

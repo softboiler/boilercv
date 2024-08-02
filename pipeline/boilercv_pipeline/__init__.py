@@ -8,7 +8,7 @@ from typing import Any
 from loguru import logger
 from pandas import set_option
 
-PROJECT_PATH = Path()
+PROJECT_PATH = Path.cwd()
 """Path to the project root, where `params.yaml` will go."""
 
 _debug = environ.get("BOILERCV_DEBUG")

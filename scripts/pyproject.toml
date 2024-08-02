@@ -13,7 +13,7 @@ dependencies = [
     "dulwich==0.22.1",
     "ipython==8.26.0",
     "pipx==1.6.0",
-    "pydantic-settings==2.4.0",
+    "pydantic-settings>=2.4.0",
     "python-dotenv==1.0.1",
     "toml==0.10.2 ; python_version < '3.11'",
 ]

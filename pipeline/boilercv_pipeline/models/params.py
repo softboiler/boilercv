@@ -1,26 +1,21 @@
 """Project parameters."""
 
-from pathlib import Path
-
 from boilercore.fits import Fit
 from boilercore.models import SynchronizedPathsYamlModel
-from pydantic import Field
+from pydantic import Field, FilePath
 
 from boilercv_pipeline import PROJECT_PATH
-from boilercv_pipeline.models.paths import Paths
+from boilercv_pipeline.models.paths import PackagePaths, Paths
 
 
 class Params(SynchronizedPathsYamlModel):
     """Project parameters."""
 
-    paths: Paths
+    source: FilePath = PROJECT_PATH / "params.yaml"
+    paths: Paths = Field(default_factory=Paths)
+    package_paths: PackagePaths = Field(default_factory=PackagePaths)
     fit: Fit = Field(default_factory=Fit, description="Parameters for model fit.")
 
-    def __init__(self, root: Path | None = None, data_file: Path | None = None):
-        root = (root or Path.cwd()).resolve()
-        data_file = data_file or root / "params.yaml"
-        super().__init__(data_file, paths=Paths(root=root))
 
-
-PARAMS = Params(root=PROJECT_PATH)
+PARAMS = Params()
 """All project parameters, including paths."""
