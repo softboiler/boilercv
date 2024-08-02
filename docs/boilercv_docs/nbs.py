@@ -22,7 +22,8 @@ from pandas import DataFrame, Index, MultiIndex, Series, concat, options
 from seaborn import set_theme
 
 import boilercv_pipeline
-from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, get_root, settings
+from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, get_root
+from boilercv_docs.settings import default
 from boilercv_docs.types import DfOrS
 from boilercv_tools.warnings import filter_boilercv_warnings
 
@@ -48,7 +49,7 @@ class Paths:
     docs_data_src: Path
 
 
-def init(force_dev: bool = settings.force_dev) -> Paths:
+def init(force_dev: bool = default.force_dev) -> Paths:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
     filter_boilercv_warnings()

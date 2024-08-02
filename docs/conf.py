@@ -2,14 +2,14 @@
 
 from datetime import date
 from hashlib import sha256
-from itertools import chain
 from pathlib import Path
 
 from ruamel.yaml import YAML
 from sphinx.application import Sphinx
 
-from boilercv_docs import DOCS, PYPROJECT, init_docs_build, settings
+from boilercv_docs import DOCS, PYPROJECT, init_docs_build
 from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
+from boilercv_docs.settings import default
 from boilercv_docs.types import IspxMappingValue
 
 # ! Initialization
@@ -126,7 +126,7 @@ master_doc = "index"
 language = "en"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/_*.md", "**/_*.ipynb"]
 extensions = [
-    *([] if settings.skip_autodoc else ["autodoc2"]),
+    *([] if default.skip_autodoc else ["autodoc2"]),
     "myst_nb",
     "sphinx_design",
     "sphinx_tippy",
@@ -200,12 +200,7 @@ bibtex_reference_style = "label"
 bibtex_default_style = "unsrt"
 # ! NB
 nb_execution_mode = "cache"
-nb_execution_excludepatterns = [
-    p.resolve().as_posix()
-    for p in chain.from_iterable([
-        Path().glob(p) for p in settings.nb_execution_excludepatterns
-    ])
-]
+nb_execution_excludepatterns = default.nb_execution_excludepatterns
 nb_execution_raise_on_error = True
 # ! Thebe
 thebe_config = {**COMMON_OPTIONS, "repository_branch": REV, "selector": "div.highlight"}

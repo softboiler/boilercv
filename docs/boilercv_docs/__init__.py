@@ -3,9 +3,6 @@
 import os
 from pathlib import Path
 
-from pydantic import Field
-from pydantic_settings import BaseSettings, SettingsConfigDict, TomlConfigSettingsSource
-
 from boilercv_docs.patch_nbs import patch_nbs
 from boilercv_tools.environment import init_shell
 from boilercv_tools.warnings import filter_boilercv_warnings
@@ -39,21 +36,3 @@ def get_root() -> Path:
         if path == (path := path.parent):
             raise RuntimeError("Project root directory not found.")
     return path
-
-
-class Settings(BaseSettings):
-    """Settings."""
-
-    model_config = SettingsConfigDict(toml_file=get_root() / ".boilercv_docs.env.toml")
-
-    @classmethod
-    def settings_customise_sources(cls, settings_cls, **_):  # pyright: ignore[reportIncompatibleMethodOverride]
-        """Customize so that all keys are loaded despite not being model fields."""
-        return (TomlConfigSettingsSource(settings_cls),)
-
-    skip_autodoc: bool = False
-    nb_execution_excludepatterns: list[str] = Field(default_factory=list)
-    force_dev: bool = False
-
-
-settings = Settings()

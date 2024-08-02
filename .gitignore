@@ -1,5 +1,8 @@
 # Ignore schema, which has absolute paths that will vary by system
-params_schema.json
+*schema.json
+# Ignore local dev environment settings
+*.env
+settings*.yaml
 # Don't commit local DVC plots
 dvc_plots
 *.ipynb.*
@@ -7,6 +10,8 @@ dvc_plots
 tests/plots
 # Don't commit pytest-harvest temporary storage
 .xdist_harvested/
+# Settings
+?boiler*.toml
 
 # * -------------------------------------------------------------------------------- * #
 # * Template gitignore
@@ -17,9 +22,6 @@ tests/plots
 bin
 # Locally-compiled dependencies
 .comps
-# Ignore local environment modifications
-*.env
-*.env.toml
 # Ignore `.ruff-cache` just in case, and to grey it out in the sidebar
 .ruff_cache
 # To allow for local variation in type checking without overriding CI

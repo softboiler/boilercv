@@ -2,7 +2,9 @@
   // * ----------------------------------------------------------------------------- * #
   //! Schema
   "yaml.schemas": {
-    "params_schema.json": "params.yaml"
+    "params_schema.json": "params.yaml",
+    "docs/boilercv_docs/settings_schema.json": "docs/boilercv_docs/settings.yaml",
+    "docs/boilercv_docs/settings_plugin_schema.json": "docs/boilercv_docs/settings_plugin.yaml"
   },
   // * ----------------------------------------------------------------------------- * #
   //! Terminal
