@@ -49,7 +49,7 @@ class Settings(BaseSettings):
         **_kwds: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Source  settings from init and TOML."""
-        return customise_sources(settings_cls, init_settings, paths.plugin_settings)
+        return customise_sources(settings_cls, init_settings, paths.settings)
 
 
 for path, model in zip(
