@@ -73,7 +73,7 @@ def save_df(path: Path, ns: SimpleNamespace):
     """Save a DataFrame to HDF5 format, handling invalid types."""
     name = path.stem
     getattr(ns, name).to_hdf(
-        (path / f"{name}_{get_path_time(ns.TIME)}.h5"),
+        (path / f"{name}_{get_path_time(ns.p.time)}.h5"),
         key=path.stem,
         complib="zlib",
         complevel=9,

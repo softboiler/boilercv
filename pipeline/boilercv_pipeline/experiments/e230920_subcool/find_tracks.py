@@ -2,6 +2,7 @@
 
 from concurrent.futures import ProcessPoolExecutor
 
+from boilercv_docs.settings import Notebooks
 from boilercv_pipeline.experiments.e230920_subcool import EXP_TIMES, submit_nb_process
 
 
@@ -12,7 +13,7 @@ def main():  # noqa: D103
                 executor=executor,
                 nb="find_tracks",
                 name="tracks",
-                params={"TIME": dt.isoformat()},
+                params={"p": Notebooks(time=dt.isoformat()).model_dump()},
             )
 
 

@@ -199,7 +199,7 @@ bibtex_bibfiles = dpaths(BIB_TEMPLATE, BIB)
 bibtex_reference_style = "label"
 bibtex_default_style = "unsrt"
 # ! NB
-nb_execution_mode = "cache"
+nb_execution_mode = default.nb_execution_mode
 nb_execution_excludepatterns = default.nb_execution_excludepatterns
 nb_execution_raise_on_error = True
 # ! Thebe

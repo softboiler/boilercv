@@ -27,7 +27,7 @@ dependencies = [
     "numpydantic>=1.0.0",
     "pandas[hdf5,performance]>=2.2.2",
     "pillow>=10.3.0",
-    "pydantic>=2.7.1",
+    "pydantic>=2.6.1",
     "pytz>=2023.3",
     "sympy>=1.12",
     "xarray[accel,io,parallel]>=2023.7.0",
@@ -84,7 +84,7 @@ xfail_strict = true
 [tool.pytest_env]
 COVERAGE_CORE = "sysmon"
 JUPYTER_PLATFORM_DIRS = "1"
-PYRIGHT_PYTHON_PYLANCE_VERSION = "2024.7.1"
+PYRIGHT_PYTHON_PYLANCE_VERSION = "2024.6.1"
 PYDEVD_DISABLE_FILE_VALIDATION = "1"
 PYTHONIOENCODING = "utf-8:strict"
 PYTHONUTF8 = "1"
@@ -115,7 +115,14 @@ showcontent = true
 
 [tool.pyright]
 stubPath = "submodules/stubs/stubs"
-ignore = ["bin", "submodules", "scripts/install.py"]
+exclude = [
+    "**/node_modules",
+    "**/__pycache__",
+    "**/.*",
+    "bin",
+    "submodules",
+    "scripts/install.py",
+]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true

@@ -9,7 +9,7 @@ from site import getsitepackages
 from typing import Annotated
 
 from boilercore.paths import get_module_name, get_package_dir
-from pydantic import AfterValidator, BaseModel, Field
+from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -19,6 +19,8 @@ from pydantic_settings import (
 
 import boilercv_docs
 from boilercv_docs import get_root
+from boilercv_docs.types import NbExecutionMode
+from boilercv_pipeline.experiments.e230920_subcool import Col
 
 
 class Constants(BaseModel):
@@ -99,6 +101,53 @@ def remove_stale_autodoc(skip_autodoc: bool) -> bool:
     return skip_autodoc
 
 
+class Columns(BaseModel):
+    """Columns."""
+
+    model_config = ConfigDict(use_attribute_docstrings=True)
+    frame: Col = Col("frame", "Frame #")
+
+
+c = Columns()
+
+
+class Notebooks(BaseModel):
+    """Notebook settings."""
+
+    model_config = ConfigDict(use_attribute_docstrings=True)
+
+    time: str = "2024-07-18T17:44:35"
+    """Example trial timestamp."""
+    scale: float = 1.6
+    """Plot scale."""
+    marker_scale: float = 20
+    """Marker scale."""
+
+    @property
+    def size(self) -> float:
+        """Marker size."""
+        return self.scale * self.marker_scale
+
+    @property
+    def font_scale(self) -> float:
+        """Font scale."""
+        return self.scale
+
+    frame_step: int = 100
+    """Frame step size."""
+    num_frames: int = 8
+    """Last frame to analyze."""
+
+    @property
+    def frames(self) -> slice:
+        """Frames.
+
+        A list that will become a slice. Not a tuple because `ploomber_engine` can't inject
+        tuples. Automatically scale the frame to stop at by the step size.
+        """
+        return slice(*[None, *[self.frame_step * f for f in (self.num_frames - 1, 1)]])
+
+
 class Settings(BaseSettings):
     """Package settings."""
 
@@ -118,8 +167,15 @@ class Settings(BaseSettings):
         ),
     ] = Field(default_factory=list)
     """List of directories relative to `docs` to exclude executing notebooks in."""
+    nb_execution_mode: NbExecutionMode = "cache"
+    """Notebook execution mode.
+
+    https://myst-nb.readthedocs.io/en/stable/computation/execute.html#notebook-execution-modes
+    """
     skip_autodoc: Annotated[bool, AfterValidator(remove_stale_autodoc)] = False
     """Skip the potentially slow process of autodoc generation."""
+
+    notebooks: Notebooks = Notebooks()
 
     @classmethod
     def settings_customise_sources(

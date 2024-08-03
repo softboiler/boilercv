@@ -1,10 +1,15 @@
 """Types."""
 
-from typing import NamedTuple, TypeAlias
+from typing import Literal, NamedTuple, TypeAlias
 
 from pandas import DataFrame, Series
 
 DfOrS: TypeAlias = DataFrame | Series  # pyright: ignore[reportMissingTypeArgument]
+
+# * -------------------------------------------------------------------------------- * #
+# * settings
+
+NbExecutionMode: TypeAlias = Literal["off", "force", "auto", "cache", "inline"]
 
 # * -------------------------------------------------------------------------------- * #
 # * intersphinx

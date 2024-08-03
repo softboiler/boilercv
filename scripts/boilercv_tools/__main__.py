@@ -115,16 +115,7 @@ def build_docs():
         "sphinx-autobuild",
         "--show-traceback",
         "docs _site",
-        *[
-            f"--ignore {p}"
-            for p in [
-                "docs/temp",
-                "docs/data",
-                "**/apidocs",
-                "**/params.yaml",
-                "**/params_schema.json",
-            ]
-        ],
+        *[f"--ignore **/{p}" for p in ["temp", "data", "apidocs", "*schema.json"]],
     ])
 
 
