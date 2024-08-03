@@ -49,7 +49,7 @@ class Paths:
     docs_data_src: Path
 
 
-def init(force_dev: bool = default.force_dev) -> Paths:
+def init(force_dev: bool = default.build.force_dev) -> Paths:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
     filter_boilercv_warnings()

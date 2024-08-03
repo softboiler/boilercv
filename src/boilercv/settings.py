@@ -11,10 +11,9 @@ from pydantic_settings import (
     SettingsConfigDict,
 )
 
-import boilercv_docs
-from boilercv_docs.models import Build
+import boilercv
 
-paths = get_settings_paths(boilercv_docs)
+paths = get_settings_paths(boilercv)
 
 
 class PluginModelConfig(BaseSettings):
@@ -38,7 +37,6 @@ class Settings(BaseSettings):
     """Package settings."""
 
     model_config = SettingsConfigDict(use_attribute_docstrings=True)
-    build: Build = Build()
 
     @classmethod
     def settings_customise_sources(

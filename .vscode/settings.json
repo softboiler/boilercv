@@ -3,8 +3,18 @@
   //! Schema
   "yaml.schemas": {
     "params_schema.json": "params.yaml",
+    // ? `boilercv`
+    "src/boilercv/settings_schema.json": "src/boilercv/settings.yaml",
+    "src/boilercv/settings_plugin_schema.json": "src/boilercv/settings_plugin.yaml",
+    // ? `boilercv_docs`
     "docs/boilercv_docs/settings_schema.json": "docs/boilercv_docs/settings.yaml",
-    "docs/boilercv_docs/settings_plugin_schema.json": "docs/boilercv_docs/settings_plugin.yaml"
+    "docs/boilercv_docs/settings_plugin_schema.json": "docs/boilercv_docs/settings_plugin.yaml",
+    // ? `boilercv_pipeline`
+    "pipeline/boilercv_pipeline/settings_schema.json": "pipeline/boilercv_pipeline/settings.yaml",
+    "pipeline/boilercv_pipeline/settings_plugin_schema.json": "pipeline/boilercv_pipeline/settings_plugin.yaml",
+    // ? `boilercv_tests`
+    "tests/boilercv_tests/settings_schema.json": "tests/boilercv_tests/settings.yaml",
+    "tests/boilercv_tests/settings_plugin_schema.json": "tests/boilercv_tests/settings_plugin.yaml"
   },
   // * ----------------------------------------------------------------------------- * #
   //! Terminal

@@ -1,4 +1,4 @@
-# Ignore schema, which has absolute paths that will vary by system
+# Ignore schema, which have absolute paths that will vary by system
 *schema.json
 # Ignore local dev environment settings
 *.env

@@ -126,7 +126,7 @@ master_doc = "index"
 language = "en"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/_*.md", "**/_*.ipynb"]
 extensions = [
-    *([] if default.skip_autodoc else ["autodoc2"]),
+    *([] if default.build.skip_autodoc else ["autodoc2"]),
     "myst_nb",
     "sphinx_design",
     "sphinx_tippy",
@@ -199,8 +199,8 @@ bibtex_bibfiles = dpaths(BIB_TEMPLATE, BIB)
 bibtex_reference_style = "label"
 bibtex_default_style = "unsrt"
 # ! NB
-nb_execution_mode = default.nb_execution_mode
-nb_execution_excludepatterns = default.nb_execution_excludepatterns
+nb_execution_mode = default.build.nb_execution_mode
+nb_execution_excludepatterns = default.build.nb_execution_excludepatterns
 nb_execution_raise_on_error = True
 # ! Thebe
 thebe_config = {**COMMON_OPTIONS, "repository_branch": REV, "selector": "div.highlight"}
