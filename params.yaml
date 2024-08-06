@@ -46,3 +46,7 @@ package_paths:
     preview_preview_binarized: pipeline/boilercv_pipeline/stages/preview/preview_binarized.py
     preview_preview_filled: pipeline/boilercv_pipeline/stages/preview/preview_filled.py
     preview_preview_gray: pipeline/boilercv_pipeline/stages/preview/preview_gray.py
+  manual_stages:
+    binarize: pipeline/boilercv_pipeline/manual/binarize.py
+    convert: pipeline/boilercv_pipeline/manual/convert.py
+    flatten_data_dir: pipeline/boilercv_pipeline/manual/flatten_data_dir.py

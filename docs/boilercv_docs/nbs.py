@@ -64,10 +64,10 @@ def init(force_dev: bool = default.build.force_dev) -> Paths:
         chdir(paths.root)
         boilercv_pipeline.PROJECT_PATH = paths.root
     elif _in_tests := environ.get("PYTEST_CURRENT_TEST"):
-        from boilercv_pipeline.models.params import PARAMS  # noqa: PLC0415
+        from boilercv_pipeline.config import default  # noqa: PLC0415
 
         # ? Tests monkeypatch project path to an isolated temporary test folder
-        tmp_test_dir = PARAMS.paths.root
+        tmp_test_dir = default.params.paths.root
         copy(paths.test_data_src / "params.yaml", tmp_test_dir)
         copytree(
             paths.test_data_src / "data", tmp_test_dir / "data", dirs_exist_ok=True

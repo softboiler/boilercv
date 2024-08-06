@@ -25,7 +25,7 @@ from matplotlib.pyplot import style
 from seaborn import set_theme
 
 import boilercv_pipeline
-from boilercv_tests.types import Params
+from boilercv_tests.types import Attributes, Params
 
 PACKAGE = get_module_name(boilercv_pipeline)
 """Name of the package to test."""
@@ -52,16 +52,12 @@ def get_nb(exp: Path, name: str) -> Path:
     return (exp / name).with_suffix(".ipynb")
 
 
-NO_PARAMS = {}
-NO_ATTRS = []
-
-
 @cachier(hash_func=partial(hash_args, get_nb_ns), separate_files=True)
 def get_cached_nb_ns(
-    nb: str, params: Params = NO_PARAMS, attributes=NO_ATTRS
+    nb: str, params: Params | None = None, attributes: Attributes | None = None
 ) -> SimpleNamespace:
     """Get cached notebook namespace."""
-    return get_nb_ns(nb, params, attributes)
+    return get_nb_ns(nb, params or {}, attributes or [])
 
 
 boilercv_pipeline_dir = Path("pipeline") / PACKAGE
@@ -181,12 +177,6 @@ def parametrize_by_cases(*cases: Case):
     )
 
 
-EMPTY_DICT = {}
-"""Empty dictionary."""
-EMPTY_LIST = []
-"""Empty list."""
-
-
 @dataclass
 class Caser:
     """Notebook test case generator."""
@@ -198,18 +188,16 @@ class Caser:
         self,
         name: str,
         id: str = "_",  # noqa: A002
-        params: dict[str, Any] = EMPTY_DICT,
-        results: dict[str, Any] | Iterable[Any] = EMPTY_DICT,
-        marks: Sequence[pytest.Mark] = EMPTY_LIST,
+        params: dict[str, Any] | None = None,
+        results: dict[str, Any] | Iterable[Any] | None = None,
+        marks: Sequence[pytest.Mark] | None = None,
     ) -> Case:
         """Add case to experiment."""
-        case = Case(
-            get_nb(self.exp, name),
-            id,
-            params,
-            results if isinstance(results, dict) else dict.fromkeys(results),
-            marks,
-        )
+        if results:
+            results = results if isinstance(results, dict) else dict.fromkeys(results)
+        else:
+            results = {}
+        case = Case(get_nb(self.exp, name), id, params or {}, results, marks or [])
         self.cases.append(case)
         return case
 

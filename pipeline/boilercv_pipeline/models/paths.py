@@ -7,7 +7,6 @@ from boilercore.paths import get_package_dir, map_stages
 from pydantic import DirectoryPath, FilePath
 
 import boilercv_pipeline
-from boilercv_pipeline import PROJECT_PATH
 
 
 def get_sorted_paths(path: Path) -> list[Path]:
@@ -19,7 +18,7 @@ class Paths(CreatePathsModel):
     """Paths relevant to the project."""
 
     # * Roots
-    root: DirectoryPath = PROJECT_PATH / "data"
+    root: DirectoryPath = Path.cwd() / "data"
 
     # * Local inputs
     cines: DirectoryPath = root / "cines"
@@ -82,3 +81,4 @@ class PackagePaths(CreatePathsModel):
     models: DirectoryPath = root / "models"
     paths_module: FilePath = models / "paths.py"
     stages: dict[str, FilePath] = map_stages(root / "stages")
+    manual_stages: dict[str, FilePath] = map_stages(root / "manual")

@@ -4,7 +4,22 @@
     {
       "id": "input",
       "type": "promptString",
-      "description": "Input arguments."
+      "description": "Input."
+    },
+    {
+      "id": "input1",
+      "type": "promptString",
+      "description": "1st arg."
+    },
+    {
+      "id": "input2",
+      "type": "promptString",
+      "description": "2nd arg."
+    },
+    {
+      "id": "input3",
+      "type": "promptString",
+      "description": "3rd arg."
     }
   ],
   "configurations": [
@@ -25,18 +40,6 @@
       "type": "debugpy",
       "request": "launch",
       "program": "${file}",
-      "env": {
-        "BOILERCV_DEBUG": "True",
-        "BOILERCV_PREVIEW": "True"
-      }
-    },
-    {
-      "name": "Python: Current file with args",
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "args": ["${input:input}"],
-      "console": "internalConsole",
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"
@@ -80,6 +83,42 @@
       "program": "${file}",
       "console": "internalConsole",
       "justMyCode": true,
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
+      "name": "Python: Current file with 1 arg",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "args": ["${input:input}"],
+      "console": "internalConsole",
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
+      "name": "Python: Current file with 2 args",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "args": ["${input:input1}", "${input:input2}"],
+      "console": "internalConsole",
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
+      "name": "Python: Current file with 3 args",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "args": ["${input:input1}", "${input:input2}", "${input:input3}"],
+      "console": "internalConsole",
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"

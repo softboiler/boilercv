@@ -9,6 +9,7 @@ description = "Data pipeline."
 dependencies = [
     "boilercine>=2024.1.1",
     "boilercore>=2024.1.3",
+    "cappa>=0.22.2",
     "cmasher>=1.7.2",
     "colorcet>=3.0.1",
     "copykitten>=1.1.1",
@@ -36,6 +37,8 @@ dependencies = [
     "watchfiles>=0.22.0",
     "xarray[accel,io,parallel]>=2023.7.0",
 ]
+[project.scripts]
+"boilercv_pipeline" = "boilercv_pipeline.__main__:main"
 [project.optional-dependencies]
 # * Minimal CV flavor needed, but allow `boilercv` to coexist with different flavors
 cv = ["opencv-python-headless>=4.10.0.84"]

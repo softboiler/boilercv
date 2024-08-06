@@ -8,19 +8,20 @@ from logging import warning
 from os import environ, getpid
 from pathlib import Path
 from re import fullmatch
-from shutil import rmtree
+from shutil import copy, copytree, rmtree
 from types import SimpleNamespace
 
 import pytest
 import pytest_harvest
 from _pytest.python import Function
 from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
-from boilercore.testing import get_session_path
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 
-import boilercv_pipeline
+from boilercv_pipeline.models import Params
+from boilercv_pipeline.models.paths import Paths
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
+from boilercv_tests.config import const
 from boilercv_tests.types import FixtureStore
 from boilercv_tools.warnings import filter_boilercv_warnings
 
@@ -32,12 +33,6 @@ CASER = "C"
 
 
 @pytest.fixture(autouse=True, scope="session")
-def _project_session_path(tmp_path_factory):
-    """Set project directory."""
-    get_session_path(tmp_path_factory, boilercv_pipeline)
-
-
-@pytest.fixture(autouse=True, scope="session")
 def _filter_certain_warnings():
     """Filter certain warnings."""
     filter_boilercv_warnings()
@@ -45,6 +40,21 @@ def _filter_certain_warnings():
 
 # * -------------------------------------------------------------------------------- * #
 # * Notebook namespaces
+
+
+@pytest.fixture
+def _prepare_test_data(tmp_path):
+    """Set project directory."""
+    copy(const.test_params, tmp_path / const.params)
+    copytree(const.test_data_root, tmp_path, dirs_exist_ok=True)
+
+
+@pytest.fixture
+def params(tmp_path, _prepare_test_data):
+    """Set project directory."""
+    return Params(
+        source=tmp_path / const.params, paths=Paths(root=tmp_path / const.data)
+    )
 
 
 @pytest.fixture(scope="module", autouse=True)

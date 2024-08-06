@@ -12,9 +12,10 @@ from pydantic_settings import (
 )
 
 import boilercv_pipeline
+from boilercv_pipeline.models import Params
 from boilercv_pipeline.models.notebooks import Notebooks
 
-paths = get_settings_paths(boilercv_pipeline)
+settings_paths = get_settings_paths(boilercv_pipeline)
 
 
 class PluginModelConfig(BaseSettings):
@@ -31,7 +32,9 @@ class PluginModelConfig(BaseSettings):
         **_kwds: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Source settings from init and TOML."""
-        return customise_sources(settings_cls, init_settings, paths.plugin_settings)
+        return customise_sources(
+            settings_cls, init_settings, settings_paths.plugin_settings
+        )
 
 
 class Settings(BaseSettings):
@@ -49,14 +52,22 @@ class Settings(BaseSettings):
         **_kwds: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Source  settings from init and TOML."""
-        return customise_sources(settings_cls, init_settings, paths.settings)
+        return customise_sources(settings_cls, init_settings, settings_paths.settings)
+
+    @property
+    def params(self):
+        """All project parameters, including paths."""
+        return Params()
 
 
 for path, model in zip(
-    paths.all_dev_settings if paths.in_dev else paths.all_cwd_settings,
+    settings_paths.all_dev_settings
+    if settings_paths.in_dev
+    else settings_paths.all_cwd_settings,
     (PluginModelConfig, Settings),
     strict=True,
 ):
     sync_settings_schema(path, model)
+
 
 default = Settings()

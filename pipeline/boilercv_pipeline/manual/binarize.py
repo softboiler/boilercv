@@ -9,14 +9,16 @@ from boilercv.data.packing import pack
 from boilercv.images import scale_bool
 from boilercv.images.cv import apply_mask, binarize, close_and_erode, flood
 from boilercv.types import DA
-from boilercv_pipeline.models.params import PARAMS
+from boilercv_pipeline.config import default
+from boilercv_pipeline.models import Params
 from boilercv_pipeline.models.paths import get_sorted_paths
 
 
-def main():  # noqa: D103
+def main(params: Params | None = None):  # noqa: D103
+    params = params or default.params
     logger.info("start binarize")
-    for source in tqdm(get_sorted_paths(PARAMS.paths.large_sources)):
-        destination = PARAMS.paths.sources / f"{source.stem}.nc"
+    for source in tqdm(get_sorted_paths(params.paths.large_sources)):
+        destination = params.paths.sources / f"{source.stem}.nc"
         if destination.exists():
             continue
         with open_dataset(source) as ds:
@@ -30,12 +32,12 @@ def main():  # noqa: D103
             binarized: DA = apply_to_img_da(binarize, masked, vectorize=True)
             ds[VIDEO] = pack(binarized)
             ds.to_netcdf(
-                path=PARAMS.paths.sources / source.name,
+                path=params.paths.sources / source.name,
                 encoding={VIDEO: {"zlib": True}},
             )
             ds[ROI] = roi
             ds = ds.drop_vars(VIDEO)
-            ds.to_netcdf(path=PARAMS.paths.rois / source.name)
+            ds.to_netcdf(path=params.paths.rois / source.name)
     logger.info("finish binarize")
 
 

@@ -63,7 +63,6 @@ repos:
         entry: |
           pwsh -Command ". scripts/Initialize-Shell.ps1; fawltydeps --config-file pipeline/pyproject.toml"
         files: "^pipeline/.*$"
-
       - id: "fawltydeps-scripts"
         name: "fawltydeps-scripts"
         pass_filenames: false

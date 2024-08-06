@@ -8,9 +8,9 @@ from xarray import open_dataset
 from boilercv.data import VIDEO
 from boilercv.types import DS
 from boilercv_pipeline.captivate.previews import view_images
-from boilercv_pipeline.models.params import PARAMS
+from boilercv_pipeline.config import default
 
-EXAMPLE = PARAMS.paths.large_sources / "2022-09-14T13-20-54.nc"
+EXAMPLE = default.params.paths.large_sources / "2022-09-14T13-20-54.nc"
 
 
 @contextmanager
@@ -31,11 +31,13 @@ def example_dataset(
         save: Whether to save the file.
     """
     _source = (
-        PARAMS.paths.large_examples / f"{EXAMPLE.stem}_{source}.nc"
+        default.params.paths.large_examples / f"{EXAMPLE.stem}_{source}.nc"
         if source
         else EXAMPLE
     )
-    _destination = PARAMS.paths.large_examples / f"{EXAMPLE.stem}_{destination}.nc"
+    _destination = (
+        default.params.paths.large_examples / f"{EXAMPLE.stem}_{destination}.nc"
+    )
     with open_dataset(_source) as ds:
         original = ds[VIDEO]
         try:

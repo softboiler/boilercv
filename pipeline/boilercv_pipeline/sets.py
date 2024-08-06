@@ -12,12 +12,12 @@ from boilercv.correlations.types import Stage
 from boilercv.data import HEADER, ROI, VIDEO
 from boilercv.data.packing import unpack
 from boilercv.types import DF, DS
-from boilercv_pipeline.models.params import PARAMS
+from boilercv_pipeline.config import default
 from boilercv_pipeline.models.paths import get_sorted_paths
 
 ALL_FRAMES = slice(None)
 """Slice that gets all frames."""
-ALL_STEMS = [source.stem for source in get_sorted_paths(PARAMS.paths.sources)]
+ALL_STEMS = [source.stem for source in get_sorted_paths(default.params.paths.sources)]
 """The stems of all dataset sources."""
 STAGE_DEFAULT = "sources"
 """Default stage to work on."""
@@ -114,7 +114,7 @@ def get_dataset(
             if source.exists()
             else Dataset()
         )
-    roi = PARAMS.paths.rois / f"{name}.nc"
+    roi = default.params.paths.rois / f"{name}.nc"
     with open_dataset(source) as ds, open_dataset(roi) as roi_ds:
         if not unc_source.exists():
             Dataset({VIDEO: ds[VIDEO], HEADER: ds[HEADER]}).to_netcdf(
@@ -130,22 +130,24 @@ def get_dataset(
 def get_stage(name: str, stage: Stage = STAGE_DEFAULT) -> tuple[Path, Path]:
     """Get the paths associated with a particular video name and pipeline stage."""
     if stage == "sources":
-        unc_source = PARAMS.paths.uncompressed_sources / f"{name}.nc"
-        return PARAMS.paths.sources / f"{name}.nc", unc_source
+        unc_source = default.params.paths.uncompressed_sources / f"{name}.nc"
+        return default.params.paths.sources / f"{name}.nc", unc_source
     elif stage == "large_sources":
-        source = unc_source = PARAMS.paths.large_sources / f"{name}.nc"
+        source = unc_source = default.params.paths.large_sources / f"{name}.nc"
         return source, unc_source
     elif stage == "filled":
-        unc_source = PARAMS.paths.uncompressed_filled / f"{name}.nc"
-        return PARAMS.paths.filled / f"{name}.nc", unc_source
+        unc_source = default.params.paths.uncompressed_filled / f"{name}.nc"
+        return default.params.paths.filled / f"{name}.nc", unc_source
     else:
         raise ValueError(f"Unknown stage: {stage}")
 
 
 def get_contours_df(name: str) -> DF:
     """Load contours from a dataset."""
-    unc_cont = PARAMS.paths.uncompressed_contours / f"{name}.h5"
-    contour = unc_cont if unc_cont.exists() else PARAMS.paths.contours / f"{name}.h5"
+    unc_cont = default.params.paths.uncompressed_contours / f"{name}.h5"
+    contour = (
+        unc_cont if unc_cont.exists() else default.params.paths.contours / f"{name}.h5"
+    )
     contour_df: DF = read_hdf(contour)  # pyright: ignore[reportAssignmentType]
     if not unc_cont.exists():
         contour_df.to_hdf(unc_cont, key="contours", complevel=None, complib=None)

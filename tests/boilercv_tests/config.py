@@ -1,10 +1,13 @@
 """Settings."""
 
+from pathlib import Path
+
 from boilercore.settings_models import (
     customise_sources,
     get_settings_paths,
     sync_settings_schema,
 )
+from pydantic import BaseModel
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -12,6 +15,18 @@ from pydantic_settings import (
 )
 
 import boilercv_tests
+
+
+class Constants(BaseModel):
+    """Constants."""
+
+    params: Path = Path("params.yaml")
+    data: Path = Path("data")
+    test_data_root: Path = Path("tests") / "root"
+    test_params: Path = test_data_root / params
+
+
+const = Constants()
 
 paths = get_settings_paths(boilercv_tests)
 

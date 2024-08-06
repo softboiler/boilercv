@@ -1,10 +1,10 @@
 """Track bubbles."""
 
-from boilercv_pipeline.models.params import PARAMS
+from boilercv_pipeline.config import default
 
 
 def main():  # noqa: D103
-    (PARAMS.paths.tracks / "tracks").touch()
+    (default.params.paths.tracks / "tracks").touch()
 
 
 if __name__ == "__main__":

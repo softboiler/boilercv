@@ -7,7 +7,7 @@ from boilercv_pipeline import PREVIEW, WRITE, run_example
 from boilercv_pipeline.captivate import FRAMERATE_PREV
 from boilercv_pipeline.captivate.captures import write_video
 from boilercv_pipeline.captivate.previews import view_images
-from boilercv_pipeline.models.params import PARAMS
+from boilercv_pipeline.config import default
 from boilercv_pipeline.previews.binarized import main as main2
 from boilercv_pipeline.previews.composite import main as main3
 from boilercv_pipeline.previews.filled import main as main4
@@ -20,7 +20,7 @@ for func in (main1, main2, main3, main4):
     results[module_name] = result
     if WRITE:
         module_path = Path(module_name.replace(".", "/").removeprefix("boilercv/"))
-        path = PARAMS.paths.media / module_path
+        path = default.params.paths.media / module_path
         path.parent.mkdir(parents=True, exist_ok=True)
         write_video(path, result, framerate=FRAMERATE_PREV)
 

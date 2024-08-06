@@ -224,7 +224,7 @@
     {
       "label": "dvc: sync params",
       "type": "shell",
-      "command": ". scripts/Initialize-Shell.ps1; python -m boilercv_pipeline.models.params",
+      "command": ". scripts/Initialize-Shell.ps1; boilercv_pipeline sync-params",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -328,6 +328,20 @@
       "label": "task: pre-commit (all)",
       "type": "shell",
       "command": ". scripts/Initialize-Shell.ps1; pre-commit run --all-files --verbose",
+      "icon": { "id": "git-commit" },
+      "problemMatcher": []
+    },
+    {
+      "label": "task: pre-commit (clean notebooks)",
+      "type": "shell",
+      "command": ". scripts/Initialize-Shell.ps1; pre-commit run --all-files nb-clean --verbose",
+      "icon": { "id": "git-commit" },
+      "problemMatcher": []
+    },
+    {
+      "label": "task: pre-commit (clean and format notebooks)",
+      "type": "shell",
+      "command": ". scripts/Initialize-Shell.ps1; pre-commit run --all-files patch-nbs --verbose; pre-commit run --all-files nb-clean --verbose; pre-commit run --all-files ruff --verbose; pre-commit run --all-files ruff-format --verbose",
       "icon": { "id": "git-commit" },
       "problemMatcher": []
     },
