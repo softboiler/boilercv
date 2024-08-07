@@ -1,10 +1,12 @@
 """Settings."""
 
 from boilercore.settings_models import (
+    Paths,
     customise_sources,
     get_settings_paths,
     sync_settings_schema,
 )
+from pydantic import BaseModel, ConfigDict
 from pydantic_settings import (
     BaseSettings,
     PydanticBaseSettingsSource,
@@ -12,10 +14,19 @@ from pydantic_settings import (
 )
 
 import boilercv_pipeline
-from boilercv_pipeline.models import Params
 from boilercv_pipeline.models.notebooks import Notebooks
 
-settings_paths = get_settings_paths(boilercv_pipeline)
+
+class Constants(BaseModel):
+    """Constants."""
+
+    model_config = ConfigDict(use_attribute_docstrings=True)
+    settings_paths: Paths = get_settings_paths(boilercv_pipeline)
+    """Settings paths."""
+
+
+const = Constants()
+"""Constants."""
 
 
 class PluginModelConfig(BaseSettings):
@@ -33,7 +44,7 @@ class PluginModelConfig(BaseSettings):
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Source settings from init and TOML."""
         return customise_sources(
-            settings_cls, init_settings, settings_paths.plugin_settings
+            settings_cls, init_settings, const.settings_paths.plugin_settings
         )
 
 
@@ -52,18 +63,15 @@ class Settings(BaseSettings):
         **_kwds: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Source  settings from init and TOML."""
-        return customise_sources(settings_cls, init_settings, settings_paths.settings)
-
-    @property
-    def params(self):
-        """All project parameters, including paths."""
-        return Params()
+        return customise_sources(
+            settings_cls, init_settings, const.settings_paths.settings
+        )
 
 
 for path, model in zip(
-    settings_paths.all_dev_settings
-    if settings_paths.in_dev
-    else settings_paths.all_cwd_settings,
+    const.settings_paths.all_dev_settings
+    if const.settings_paths.in_dev
+    else const.settings_paths.all_cwd_settings,
     (PluginModelConfig, Settings),
     strict=True,
 ):

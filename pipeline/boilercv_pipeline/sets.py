@@ -1,6 +1,6 @@
 """Datasets."""
 
-from collections.abc import Iterator
+from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -17,8 +17,10 @@ from boilercv_pipeline.models.paths import get_sorted_paths
 
 ALL_FRAMES = slice(None)
 """Slice that gets all frames."""
-ALL_STEMS = [source.stem for source in get_sorted_paths(default.params.paths.sources)]
-"""The stems of all dataset sources."""
+DEFAULT_NAMES = [
+    source.stem for source in get_sorted_paths(default.params.paths.sources)
+]
+"""Default names of all dataset sources."""
 STAGE_DEFAULT = "sources"
 """Default stage to work on."""
 
@@ -55,7 +57,10 @@ def process_datasets(
 
 
 def get_unprocessed_destinations(
-    destination_dir: Path, ext: str = "nc", reprocess: bool = False
+    destination_dir: Path,
+    names: Iterable[str] = DEFAULT_NAMES,
+    ext: str = "nc",
+    reprocess: bool = False,
 ) -> dict[str, Path]:
     """Get destination paths for unprocessed datasets.
 
@@ -65,20 +70,22 @@ def get_unprocessed_destinations(
 
     Parameters
     ----------
+    names
+        Names of the datasets to process.
     destination_dir
-        The desired destination directory.
+        Desired destination directory.
     ext
-        The desired file extension. Default: nc
+        Desired file extension.
     reprocess
-        Whether to reprocess all datasets. Default: False.
+        Reprocess all datasets.
 
     Returns
     -------
-    A mapping of unprocessed dataset names to destinations with the given file
+    A mapping of unprocessed dataset names to destinations with the given file.
     """
     unprocessed_destinations: dict[str, Path] = {}
     ext = ext.lstrip(".")
-    for name in ALL_STEMS:
+    for name in names:
         destination = destination_dir / f"{name}.{ext}"
         if reprocess or not destination.exists():
             unprocessed_destinations[name] = destination

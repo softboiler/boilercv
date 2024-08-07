@@ -1,8 +1,13 @@
 stages:
-  preview_binarized:
-    cmd: "python ${package_paths.stages.preview_preview_binarized}"
+  binarize:
+    cmd: "python ${package_paths.manual_stages.binarize}"
     deps:
-      - "${package_paths.stages.preview_preview_binarized}"
+      - "${paths.large_sources}"
+
+  preview_binarized:
+    cmd: "python ${package_paths.stages.preview_binarized}"
+    deps:
+      - "${package_paths.stages.preview_binarized}"
       - "${paths.rois}"
       - "${paths.sources}"
     outs:
@@ -10,9 +15,9 @@ stages:
           persist: true
 
   preview_gray:
-    cmd: "python ${package_paths.stages.preview_preview_gray}"
+    cmd: "python ${package_paths.stages.preview_gray}"
     deps:
-      - "${package_paths.stages.preview_preview_gray}"
+      - "${package_paths.stages.preview_gray}"
       - "${paths.sources}"
     outs:
       - "${paths.gray_preview}":
@@ -26,7 +31,6 @@ stages:
     outs:
       - "${paths.contours}":
           persist: true
-
   fill:
     cmd: "python ${package_paths.stages.fill}"
     deps:
@@ -38,9 +42,9 @@ stages:
           persist: true
 
   preview_filled:
-    cmd: "python ${package_paths.stages.preview_preview_filled}"
+    cmd: "python ${package_paths.stages.preview_filled}"
     deps:
-      - "${package_paths.stages.preview_preview_filled}"
+      - "${package_paths.stages.preview_filled}"
       - "${paths.sources}"
       - "${paths.filled}"
     outs:

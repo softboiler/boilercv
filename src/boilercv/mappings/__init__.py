@@ -20,8 +20,9 @@ def apply(
     marks: list[Any] = []
     for k, v in filtered.items():
         if isinstance(v, Mapping):
-            filtered[k] = apply(filtered[k], node_fun, leaf_fun)
-            filtered[k] = node_fun(filtered[k])
+            filtered[k] = node_fun(
+                apply(filtered[k], node_fun, leaf_fun, node_cond, leaf_cond)
+            )
             if not node_cond(filtered[k]):
                 marks.append(k)
             continue

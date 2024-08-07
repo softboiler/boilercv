@@ -4,6 +4,8 @@ import pickle
 from collections import defaultdict
 from collections.abc import Iterator
 from dataclasses import dataclass
+from functools import partial
+from importlib import import_module
 from logging import warning
 from os import environ, getpid
 from pathlib import Path
@@ -42,18 +44,29 @@ def _filter_certain_warnings():
 # * Notebook namespaces
 
 
-@pytest.fixture
-def _prepare_test_data(tmp_path):
+# @pytest.fixture(params=STAGES)
+@pytest.fixture(params=["boilercv_pipeline.manual.binarize"])
+def stage(tmp_path, request):
     """Set project directory."""
     copy(const.test_params, tmp_path / const.params)
-    copytree(const.test_data_root, tmp_path, dirs_exist_ok=True)
-
-
-@pytest.fixture
-def params(tmp_path, _prepare_test_data):
-    """Set project directory."""
-    return Params(
-        source=tmp_path / const.params, paths=Paths(root=tmp_path / const.data)
+    module = import_module(request.param)
+    deps = module.Deps(root=tmp_path)
+    outs = module.Outs(root=tmp_path)
+    src_deps = module.Deps(root=const.test_data_root / "data").model_dump()
+    for field, dep in deps.model_dump().items():
+        if field == "root":
+            continue
+        copytree(src_deps[field], dep, dirs_exist_ok=True)
+    src_outs = module.Outs(root=const.test_data_root / "expected").model_dump()
+    for field, dep in outs.model_dump().items():
+        if field == "root":
+            continue
+        copytree(src_outs[field], dep, dirs_exist_ok=True)
+    return partial(
+        module.main,
+        Params(source=tmp_path / const.params, paths=Paths(root=tmp_path / const.data)),
+        deps,
+        outs,
     )
 
 
