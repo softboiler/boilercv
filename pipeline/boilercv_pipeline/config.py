@@ -1,5 +1,8 @@
 """Settings."""
 
+from pathlib import Path
+
+from boilercore.paths import get_package_dir, map_stages
 from boilercore.settings_models import (
     Paths,
     customise_sources,
@@ -14,7 +17,6 @@ from pydantic_settings import (
 )
 
 import boilercv_pipeline
-from boilercv_pipeline.models.notebooks import Notebooks
 
 
 class Constants(BaseModel):
@@ -23,6 +25,10 @@ class Constants(BaseModel):
     model_config = ConfigDict(use_attribute_docstrings=True)
     settings_paths: Paths = get_settings_paths(boilercv_pipeline)
     """Settings paths."""
+    package_dir: Path = get_package_dir(boilercv_pipeline)
+    """Package directory."""
+    stages: dict[str, Path] = map_stages(package_dir / "stages")
+    """Stages."""
 
 
 const = Constants()
@@ -52,7 +58,6 @@ class Settings(BaseSettings):
     """Package settings."""
 
     model_config = SettingsConfigDict(use_attribute_docstrings=True)
-    notebooks: Notebooks = Notebooks()
 
     @classmethod
     def settings_customise_sources(

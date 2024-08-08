@@ -20,8 +20,7 @@ from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 
-from boilercv_pipeline.models import Params
-from boilercv_pipeline.models.paths import Paths
+from boilercv_pipeline.models import Params, Paths
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
 from boilercv_tests.config import const
 from boilercv_tests.types import FixtureStore

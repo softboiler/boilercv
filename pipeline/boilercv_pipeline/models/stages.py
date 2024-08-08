@@ -10,7 +10,7 @@ from yaml import safe_load
 
 from boilercv.mappings import apply
 from boilercv.morphs.morphs import Morph
-from boilercv_pipeline.models.types.generated.stages import ManualStageName, StageName
+from boilercv_pipeline.models.types.generated.stages import ManualStageName, _StageName
 
 
 class OutsConfig(BaseModel):
@@ -32,7 +32,7 @@ class DvcStage(BaseModel):
     """Stage outputs."""
 
 
-class DvcStages(Morph[StageName | ManualStageName, DvcStage]):
+class DvcStages(Morph[_StageName | ManualStageName, DvcStage]):
     """Stages from DVC."""
 
     @classmethod
