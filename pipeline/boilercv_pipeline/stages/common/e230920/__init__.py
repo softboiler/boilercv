@@ -6,11 +6,12 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
+from re import search
 from types import SimpleNamespace
 from typing import Any, TypedDict
 
 from boilercore.notebooks.namespaces import Params, get_nb_ns
-from boilercore.paths import ISOLIKE, dt_fromisolike, get_module_name
+from boilercore.paths import ISOLIKE, dt_fromisolike
 from cmasher import get_sub_cmap
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
@@ -20,42 +21,22 @@ from numpy import any, histogram, sqrt, where
 from pandas import CategoricalDtype, DataFrame, NamedAgg
 from sparklines import sparklines
 
-from boilercv.correlations.types import NbProcess
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, Img
 from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.generated.types.stages import StageName
+from boilercv_pipeline.stages.common.e230920.types import NbProcess, Out
 
-EXP = get_module_name(__spec__ or __file__)
-"""Name of this experiment."""
-DAY = "2024-07-18"
-"""Day of the experiment"""
-EXP_NBS = Path("docs/experiments") / EXP
-"""Path to experiment notebooks."""
-EXP_DATA = default.params.paths.experiments / EXP
-"""Experimental data."""
-ALL_THERMAL_DATA = EXP_DATA / f"{DAY}_all_thermal_data.csv"
-"""All thermal data for this experiment."""
-THERMAL_DATA = EXP_DATA / f"{DAY}_thermal.h5"
-"""Reduced thermal data for this experiment."""
-CENTERS = EXP_DATA / "centers"
-"""Bubble centers."""
-CONTOURS = EXP_DATA / "contours"
-"""Bubble contours."""
-OBJECTS = EXP_DATA / "objects"
-"""Objects in each frame."""
-TRACKPY_OBJECTS = EXP_DATA / "trackpy_objects"
-"""Objects tracked by TrackPy."""
-TRACKS = EXP_DATA / "tracks"
-"""Object tracks."""
-PROCESSED_TRACKS = EXP_DATA / "processed_tracks"
-"""Processed object tracks."""
-MERGED_TRACKS = EXP_DATA / "merged_tracks.h5"
-"""Merged tracks."""
-MAE = EXP_DATA / "mae"
-"""Mean absolute error of tracks."""
-MERGED_MAE = EXP_DATA / "merged_mae.h5"
-"""Mean absolute error of tracks."""
+
+def get_e230920_times(contours: Path = default.paths.contours) -> list[str]:
+    """Get times for the e230920 experiment."""
+    return [
+        dt.isoformat()
+        for dt in get_times([
+            p.stem for p in contours.iterdir() if search(r"^2024-07-18.+$", p.stem)
+        ])
+    ]
 
 
 def get_times(strings: Iterable[str]) -> Iterable[datetime]:
@@ -65,30 +46,26 @@ def get_times(strings: Iterable[str]) -> Iterable[datetime]:
             yield dt_fromisolike(match)
 
 
-EXP_TIMES = list(get_times(path.stem for path in CONTOURS.iterdir()))
-
-
-def save_df(path: Path, ns: SimpleNamespace):
+def save_df(ns: SimpleNamespace, out: Out):
     """Save a DataFrame to HDF5 format, handling invalid types."""
-    name = path.stem
-    getattr(ns, name).to_hdf(
-        (path / f"{name}_{get_path_time(ns.p.time)}.h5"),
-        key=path.stem,
-        complib="zlib",
-        complevel=9,
+    if not out.path:
+        return
+    outs: dict[str, DataFrame] = getattr(ns, out.attr)
+    outs[out.key].to_hdf(
+        out.path / f"{out.stem}.h5", key=out.stem, complib="zlib", complevel=9
     )
 
 
 def submit_nb_process(
     executor: ProcessPoolExecutor,
-    nb: str,
-    name: str,
+    nb: StageName,
     params: Params,
+    out: Out,
     process: NbProcess = save_df,
 ):
     """Submit a notebook process to an executor."""
     return executor.submit(
-        apply_to_nb, nb=nb, name=name, params=params, process=process
+        apply_to_nb, nb=nb, params=params, out=out, process=process
     ).add_done_callback(check_result)
 
 
@@ -97,15 +74,22 @@ def check_result(future: Future[Any]):
     future.result()
 
 
-def apply_to_nb(nb: str, name: str, params: Params, process: NbProcess = save_df):
+def apply_to_nb(
+    nb: StageName,
+    params: Params,
+    out: Out,
+    process: NbProcess = save_df,
+    notebooks: Path = default.docs_paths.e230920_notebooks,
+):
     """Apply a process to a notebook."""
-    (path := EXP_DATA / name).mkdir(exist_ok=True)
-    process(path, get_nb_ns(nb=read_nb(nb), params=params))
+    process(get_nb_ns(nb=read_nb(nb, notebooks), params=params), out)
 
 
-def read_nb(nb: str) -> str:
+def read_nb(
+    nb: StageName, notebooks: Path = default.docs_paths.e230920_notebooks
+) -> str:
     """Read a notebook for this experiment."""
-    return (EXP_NBS / nb).with_suffix(".ipynb").read_text(encoding="utf-8")
+    return (notebooks / nb).with_suffix(".ipynb").read_text(encoding="utf-8")
 
 
 def get_path_time(time: str) -> str:

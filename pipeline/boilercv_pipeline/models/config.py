@@ -2,7 +2,7 @@
 
 from functools import cached_property
 
-from boilercv_pipeline.models import Params, Paths
+from boilercv_pipeline.models import DocsPaths, Params, Paths
 
 
 class Settings:
@@ -17,6 +17,11 @@ class Settings:
     def paths(self) -> Paths:
         """Parameters."""
         return self.params.paths
+
+    @cached_property
+    def docs_paths(self) -> DocsPaths:
+        """Parameters."""
+        return self.params.docs_paths
 
 
 default = Settings()

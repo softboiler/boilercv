@@ -5,8 +5,6 @@
 
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
-from pathlib import Path
-from types import SimpleNamespace
 from typing import (
     TYPE_CHECKING,
     Annotated,
@@ -47,8 +45,6 @@ Range: TypeAlias = Literal["range"]
 LiteralKeys: TypeAlias = _LiteralGenericAlias
 """Keys."""
 # ? Notebook handling
-NbProcess: TypeAlias = Callable[[Path, SimpleNamespace], None]
-"""Notebook process."""
 Stage: TypeAlias = Literal["large_sources", "sources", "filled"]
 """Stage."""
 # ? `numpy` array shapes

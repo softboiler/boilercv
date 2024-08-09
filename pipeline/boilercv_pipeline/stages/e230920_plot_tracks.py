@@ -4,32 +4,39 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
 
+from cappa.base import invoke
+
+from boilercv_pipeline.models.generated.stages.e230920_plot_tracks import (
+    E230920PlotTracks,
+)
+from boilercv_pipeline.models.notebooks import Notebooks
 from boilercv_pipeline.stages.common.e230920 import (
-    EXP_TIMES,
+    get_e230920_times,
     get_path_time,
     submit_nb_process,
 )
+from boilercv_pipeline.stages.common.e230920.types import Out
 
 PLOTS = Path("tests/plots/tracks")
 PLOTS.mkdir(exist_ok=True)
 
 
-def main():  # noqa: D103
+def main(args: E230920PlotTracks):  # noqa: D103
     with ProcessPoolExecutor() as executor:
-        for dt in EXP_TIMES:
+        for dt in get_e230920_times(args.deps.e230920_merged_tracks):
             submit_nb_process(
                 executor=executor,
-                nb="plot_tracks",
-                name="tracks",
-                params={"TIME": dt.isoformat()},
+                nb="e230920_get_mae",
+                out=Out(key="mae", suffix=dt),
+                params={"p": Notebooks(time=dt).model_dump()},
                 process=export_track_plot,
             )
 
 
-def export_track_plot(_path: Path, ns: SimpleNamespace):
+def export_track_plot(ns: SimpleNamespace, _out: Out):
     """Export object centers and sizes."""
     ns.figure.savefig(PLOTS / f"{get_path_time(ns.TIME)}.png")
 
 
 if __name__ == "__main__":
-    main()
+    invoke(E230920PlotTracks)

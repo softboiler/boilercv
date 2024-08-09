@@ -51,17 +51,26 @@ class Paths(DefaultPathsModel):
     modelfunctions: Path = root / "models"
 
     # * DVC-tracked inputs
-    experiments: Path = root / "experiments"
     notebooks: Path = root / "notebooks"
     rois: Path = root / "rois"
     samples: Path = root / "samples"
     sources: Path = root / "sources"
+    e230920_thermal_raw: Path = root / "e230920_thermal_raw.csv"
 
     # * DVC-tracked results
     contours: Path = root / "contours"
     examples: Path = root / "examples"
     filled: Path = root / "filled"
     lifetimes: Path = root / "lifetimes"
+    e230920_thermal: Path = root / "e230920_thermal.h5"
+    e230920_contours: Path = root / "e230920_contours"
+    e230920_objects: Path = root / "e230920_objects"
+    e230920_tracks: Path = root / "e230920_tracks"
+    e230920_processed_tracks: Path = root / "e230920_processed_tracks"
+    e230920_merged_tracks: Path = root / "e230920_merged_tracks.h5"
+    e230920_mae: Path = root / "e230920_mae"
+    e230920_merged_mae: Path = root / "e230920_merged_mae.h5"
+
     # ! Previews
     previews: Path = root / "previews"
     binarized_preview: Path = previews / "binarized_preview.nc"
@@ -76,12 +85,20 @@ class PackagePaths(DefaultPathsModel):
     stages: dict[StageName, FilePath] = const.stages  # pyright: ignore[reportAssignmentType]
 
 
+class DocsPaths(DefaultPathsModel):
+    """Documentation paths."""
+
+    root: DirectoryPath = Path.cwd() / "docs"
+    e230920_notebooks: Path = root / "experiments" / "e230920"
+
+
 class Params(SynchronizedPathsYamlModel):
     """Project parameters."""
 
     source: FilePath = Path.cwd() / "params.yaml"
     paths: Paths = Paths()
     package_paths: PackagePaths = PackagePaths()
+    docs_paths: DocsPaths = DocsPaths()
     fit: Fit = Fit()
 
 

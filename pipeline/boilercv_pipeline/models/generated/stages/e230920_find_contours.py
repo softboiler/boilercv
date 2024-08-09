@@ -18,19 +18,20 @@ class Deps(DefaultPathsModel):
     """Stage dependencies."""
 
     root: Path = Field(default=default.paths.root, exclude=True)
-    large_sources: Path = default.paths.large_sources
+    contours: Path = default.paths.contours
 
 
 class Outs(DefaultPathsModel):
     """Stage outputs."""
 
     root: Path = Field(default=default.paths.root, exclude=True)
-    sources: Path = default.paths.sources
-    rois: Path = default.paths.rois
+    e230920_contours: Path = default.paths.e230920_contours
 
 
-@command(invoke="boilercv_pipeline.stages.binarize.main", default_long=True)
-class Binarize(BaseModel):
+@command(
+    invoke="boilercv_pipeline.stages.e230920_find_contours.main", default_long=True
+)
+class E230920FindContours(BaseModel):
     params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
     deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
     outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()

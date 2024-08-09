@@ -18,19 +18,18 @@ class Deps(DefaultPathsModel):
     """Stage dependencies."""
 
     root: Path = Field(default=default.paths.root, exclude=True)
-    large_sources: Path = default.paths.large_sources
+    e230920_objects: Path = default.paths.e230920_objects
 
 
 class Outs(DefaultPathsModel):
     """Stage outputs."""
 
     root: Path = Field(default=default.paths.root, exclude=True)
-    sources: Path = default.paths.sources
-    rois: Path = default.paths.rois
+    e230920_tracks: Path = default.paths.e230920_tracks
 
 
-@command(invoke="boilercv_pipeline.stages.binarize.main", default_long=True)
-class Binarize(BaseModel):
+@command(invoke="boilercv_pipeline.stages.e230920_find_tracks.main", default_long=True)
+class E230920FindTracks(BaseModel):
     params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
     deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
     outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()

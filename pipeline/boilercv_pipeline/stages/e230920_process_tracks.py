@@ -2,19 +2,30 @@
 
 from concurrent.futures import ProcessPoolExecutor
 
-from boilercv_pipeline.stages.common.e230920 import EXP_TIMES, submit_nb_process
+from cappa.base import invoke
+
+from boilercv_pipeline.models.generated.stages.e230920_process_tracks import (
+    E230920ProcessTracks,
+)
+from boilercv_pipeline.models.notebooks import Notebooks
+from boilercv_pipeline.stages.common.e230920 import get_e230920_times, submit_nb_process
+from boilercv_pipeline.stages.common.e230920.types import Out
 
 
-def main():  # noqa: D103
+def main(args: E230920ProcessTracks):  # noqa: D103
     with ProcessPoolExecutor() as executor:
-        for dt in EXP_TIMES:
+        for dt in get_e230920_times(args.deps.e230920_tracks):
             submit_nb_process(
                 executor=executor,
-                nb="process_tracks",
-                name="processed_tracks",
-                params={"TIME": dt.isoformat()},
+                nb="e230920_process_tracks",
+                out=Out(
+                    key="processed_tracks",
+                    path=args.outs.e230920_processed_tracks,
+                    suffix=dt,
+                ),
+                params={"p": Notebooks(time=dt).model_dump()},
             )
 
 
 if __name__ == "__main__":
-    main()
+    invoke(E230920ProcessTracks)

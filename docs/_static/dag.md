@@ -1,22 +1,43 @@
 ```{mermaid}
-:alt: Data process graph
-:caption: Data process graph
 flowchart TD
- node2["data\rois.dvc"]
- node3["data\sources.dvc"]
- node4["fill"]
- node5["find_contours"]
- node8["preview_binarized"]
- node9["preview_filled"]
- node10["preview_gray"]
- node11["data\examples.dvc"]
- node12["data\samples.dvc"]
- node2-->node8
+ node1["binarize"]
+ node2["convert"]
+ node3["e230920_find_contours"]
+ node4["e230920_find_objects"]
+ node5["e230920_find_tracks"]
+ node6["e230920_get_mae"]
+ node7["e230920_merge_mae"]
+ node8["e230920_merge_tracks"]
+ node9["e230920_plot_tracks"]
+ node10["e230920_process_tracks"]
+ node11["fill"]
+ node12["find_contours"]
+ node13["flatten_data_dir"]
+ node14["preview_binarized"]
+ node15["preview_filled"]
+ node16["preview_gray"]
+ node1-->node11
+ node1-->node12
+ node1-->node14
+ node1-->node15
+ node1-->node16
+ node2-->node1
  node3-->node4
- node3-->node5
- node3-->node8
- node3-->node9
- node3-->node10
- node4-->node9
- node5-->node4
+ node4-->node5
+ node5-->node10
+ node6-->node7
+ node8-->node9
+ node10-->node6
+ node10-->node8
+ node11-->node15
+ node12-->node3
+ node12-->node11
+ node13-->node2
+ node17["e230920_update_thermal_data"]
+ node18["data\examples.dvc"]
+ node19["data\experiments.dvc"]
+ node20["data\notebooks.dvc"]
+ node21["data\samples.dvc"]
+ node22["data\models\modelfun-3.11.dillpickle.dvc"]
+ node23["data\models\modelfun-3.12.dillpickle.dvc"]
 ```

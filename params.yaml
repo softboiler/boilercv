@@ -19,15 +19,23 @@ paths:
   mpl_base: data/plotting/base.mplstyle
   mpl_hide_title: data/plotting/hide_title.mplstyle
   modelfunctions: data/models
-  experiments: data/experiments
   notebooks: data/notebooks
   rois: data/rois
   samples: data/samples
   sources: data/sources
+  e230920_thermal_raw: data/e230920_thermal_raw.csv
   contours: data/contours
   examples: data/examples
   filled: data/filled
   lifetimes: data/lifetimes
+  e230920_thermal: data/e230920_thermal.h5
+  e230920_contours: data/e230920_contours
+  e230920_objects: data/e230920_objects
+  e230920_tracks: data/e230920_tracks
+  e230920_processed_tracks: data/e230920_processed_tracks
+  e230920_merged_tracks: data/e230920_merged_tracks.h5
+  e230920_mae: data/e230920_mae
+  e230920_merged_mae: data/e230920_merged_mae.h5
   previews: data/previews
   binarized_preview: data/previews/binarized_preview.nc
   filled_preview: data/previews/filled_preview.nc
@@ -36,9 +44,20 @@ package_paths:
   stages:
     binarize: pipeline/boilercv_pipeline/stages/binarize.py
     convert: pipeline/boilercv_pipeline/stages/convert.py
+    e230920_find_contours: pipeline/boilercv_pipeline/stages/e230920_find_contours.py
+    e230920_find_objects: pipeline/boilercv_pipeline/stages/e230920_find_objects.py
+    e230920_find_tracks: pipeline/boilercv_pipeline/stages/e230920_find_tracks.py
+    e230920_get_mae: pipeline/boilercv_pipeline/stages/e230920_get_mae.py
+    e230920_merge_mae: pipeline/boilercv_pipeline/stages/e230920_merge_mae.py
+    e230920_merge_tracks: pipeline/boilercv_pipeline/stages/e230920_merge_tracks.py
+    e230920_plot_tracks: pipeline/boilercv_pipeline/stages/e230920_plot_tracks.py
+    e230920_process_tracks: pipeline/boilercv_pipeline/stages/e230920_process_tracks.py
+    e230920_update_thermal_data: pipeline/boilercv_pipeline/stages/e230920_update_thermal_data.py
     fill: pipeline/boilercv_pipeline/stages/fill.py
     find_contours: pipeline/boilercv_pipeline/stages/find_contours.py
     flatten_data_dir: pipeline/boilercv_pipeline/stages/flatten_data_dir.py
     preview_binarized: pipeline/boilercv_pipeline/stages/preview_binarized.py
     preview_filled: pipeline/boilercv_pipeline/stages/preview_filled.py
     preview_gray: pipeline/boilercv_pipeline/stages/preview_gray.py
+docs_paths:
+  e230920_notebooks: docs/experiments/e230920

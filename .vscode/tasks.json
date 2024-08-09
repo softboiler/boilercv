@@ -217,7 +217,7 @@
       "dependsOrder": "sequence",
       "dependsOn": ["dvc: sync params"],
       "type": "shell",
-      "command": ". scripts/Initialize-Shell.ps1; (dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/dag.md && . '~/.local/nodeenvs/markdownlint/scripts/activate.ps1' && markdownlint --fix docs/dag.md",
+      "command": ". scripts/Initialize-Shell.ps1; (dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/_static/dag.md; markdownlint-cli2 docs/_static/dag.md",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },

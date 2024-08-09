@@ -6,7 +6,7 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline import get_parser
+from boilercv_pipeline.models import get_parser
 from boilercv_pipeline.models.config import default
 
 

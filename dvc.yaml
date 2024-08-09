@@ -78,3 +78,81 @@ stages:
     outs:
       - "${paths.filled_preview}":
           persist: true
+
+  e230920_update_thermal_data:
+    cmd: "boilercv_pipeline stages e230920-update-thermal-data"
+    deps:
+      - "${package_paths.stages.e230920_update_thermal_data}"
+      - "${paths.e230920_thermal_raw}"
+    outs:
+      - "${paths.e230920_thermal}":
+          persist: true
+
+  e230920_find_contours:
+    cmd: "boilercv_pipeline stages e230920-find-contours"
+    deps:
+      - "${package_paths.stages.e230920_find_contours}"
+      - "${paths.contours}"
+    outs:
+      - "${paths.e230920_contours}":
+          persist: true
+
+  e230920_find_objects:
+    cmd: "boilercv_pipeline stages e230920-find-objects"
+    deps:
+      - "${package_paths.stages.e230920_find_objects}"
+      - "${paths.e230920_contours}"
+    outs:
+      - "${paths.e230920_objects}":
+          persist: true
+
+  e230920_find_tracks:
+    cmd: "boilercv_pipeline stages e230920-find-tracks"
+    deps:
+      - "${package_paths.stages.e230920_find_tracks}"
+      - "${paths.e230920_objects}"
+    outs:
+      - "${paths.e230920_tracks}":
+          persist: true
+
+  e230920_process_tracks:
+    cmd: "boilercv_pipeline stages e230920-process-tracks"
+    deps:
+      - "${package_paths.stages.e230920_process_tracks}"
+      - "${paths.e230920_tracks}"
+    outs:
+      - "${paths.e230920_processed_tracks}":
+          persist: true
+
+  e230920_merge_tracks:
+    cmd: "boilercv_pipeline stages e230920-merge-tracks"
+    deps:
+      - "${package_paths.stages.e230920_merge_tracks}"
+      - "${paths.e230920_processed_tracks}"
+    outs:
+      - "${paths.e230920_merged_tracks}":
+          persist: true
+
+  e230920_plot_tracks:
+    cmd: "boilercv_pipeline stages e230920-plot-tracks"
+    deps:
+      - "${package_paths.stages.e230920_plot_tracks}"
+      - "${paths.e230920_merged_tracks}"
+
+  e230920_get_mae:
+    cmd: "boilercv_pipeline stages e230920-get-mae"
+    deps:
+      - "${package_paths.stages.e230920_get_mae}"
+      - "${paths.e230920_processed_tracks}"
+    outs:
+      - "${paths.e230920_mae}":
+          persist: true
+
+  e230920_merge_mae:
+    cmd: "boilercv_pipeline stages e230920-merge-mae"
+    deps:
+      - "${package_paths.stages.e230920_merge_mae}"
+      - "${paths.e230920_mae}"
+    outs:
+      - "${paths.e230920_merged_mae}":
+          persist: true

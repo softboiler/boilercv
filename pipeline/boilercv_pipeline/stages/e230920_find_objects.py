@@ -2,20 +2,26 @@
 
 from concurrent.futures import ProcessPoolExecutor
 
+from cappa.base import invoke
+
+from boilercv_pipeline.models.generated.stages.e230920_find_objects import (
+    E230920FindObjects,
+)
 from boilercv_pipeline.models.notebooks import Notebooks
-from boilercv_pipeline.stages.common.e230920 import EXP_TIMES, submit_nb_process
+from boilercv_pipeline.stages.common.e230920 import get_e230920_times, submit_nb_process
+from boilercv_pipeline.stages.common.e230920.types import Out
 
 
-def main():  # noqa: D103
+def main(args: E230920FindObjects):  # noqa: D103
     with ProcessPoolExecutor() as executor:
-        for dt in EXP_TIMES:
+        for dt in get_e230920_times(args.deps.e230920_contours):
             submit_nb_process(
                 executor=executor,
-                nb="find_objects",
-                name="objects",
-                params={"p": Notebooks(time=dt.isoformat()).model_dump()},
+                nb="e230920_find_objects",
+                out=Out(key="objects", path=args.outs.e230920_objects, suffix=dt),
+                params={"p": Notebooks(time=dt).model_dump()},
             )
 
 
 if __name__ == "__main__":
-    main()
+    invoke(E230920FindObjects)
