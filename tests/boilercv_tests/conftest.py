@@ -19,8 +19,9 @@ from _pytest.python import Function
 from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
+from pydantic.alias_generators import to_pascal
 
-from boilercv_pipeline.models import Params, Paths
+from boilercv_pipeline.config import const as boilercv_pipeline_const
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
 from boilercv_tests.config import const
 from boilercv_tests.types import FixtureStore
@@ -43,29 +44,34 @@ def _filter_certain_warnings():
 # * Notebook namespaces
 
 
-# @pytest.fixture(params=STAGES)
-@pytest.fixture(params=["boilercv_pipeline.manual.binarize"])
+@pytest.fixture(params=boilercv_pipeline_const.stages)
 def stage(tmp_path, request):
     """Set project directory."""
     copy(const.test_params, tmp_path / const.params)
-    module = import_module(request.param)
+    module = import_module(f"boilercv_pipeline.models.generated.stages.{request.param}")
     deps = module.Deps(root=tmp_path)
     outs = module.Outs(root=tmp_path)
     src_deps = module.Deps(root=const.test_data_root / "data").model_dump()
     for field, dep in deps.model_dump().items():
-        if field == "root":
+        if dep.suffix:
             continue
         copytree(src_deps[field], dep, dirs_exist_ok=True)
-    src_outs = module.Outs(root=const.test_data_root / "expected").model_dump()
-    for field, dep in outs.model_dump().items():
-        if field == "root":
+    src_outs = module.Outs(root=const.test_data_root / "data").model_dump()
+    (expected := tmp_path / "expected").mkdir()
+    for field, out in outs.model_dump().items():
+        if out.suffix:
+            out.parent.mkdir(exist_ok=True)
+            expected_out = expected / out.relative_to(tmp_path)
+            expected_out.parent.mkdir(exist_ok=True)
+            copy(src_outs[field], expected_out)
             continue
-        copytree(src_outs[field], dep, dirs_exist_ok=True)
+        out.mkdir(exist_ok=True)
+        copytree(src_outs[field], expected / out.name, dirs_exist_ok=True)
     return partial(
-        module.main,
-        Params(source=tmp_path / const.params, paths=Paths(root=tmp_path / const.data)),
-        deps,
-        outs,
+        import_module(f"boilercv_pipeline.stages.{request.param}").main,
+        getattr(module, f"{to_pascal(request.param)}")(
+            params=module.Params(), deps=deps, outs=outs
+        ),
     )
 
 

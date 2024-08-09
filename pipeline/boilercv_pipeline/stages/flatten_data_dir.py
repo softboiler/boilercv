@@ -12,12 +12,16 @@ Directory structure looks like
 from itertools import chain
 from pathlib import Path
 
+from cappa.base import invoke
+
+from boilercv_pipeline import defaults_backend
 from boilercv_pipeline.models import Params
 from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.generated.stages.flatten_data_dir import FlattenDataDir
 
 
-def main(params: Params | None = None):  # noqa: D103
-    params = params or default.params
+def main(_args: FlattenDataDir):  # noqa: D103
+    params = default.params
     source = params.paths.hierarchical_data
     rename_notes(source, params)
     rename_cines(source, params)
@@ -57,4 +61,4 @@ def rename_sheets(source: Path, params: Params):
 
 
 if __name__ == "__main__":
-    main()
+    invoke(FlattenDataDir, backend=defaults_backend)

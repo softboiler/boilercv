@@ -1,5 +1,6 @@
 """Fill bubble contours."""
 
+from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
 from xarray import zeros_like
@@ -9,13 +10,18 @@ from boilercv.data.packing import pack
 from boilercv.images import scale_bool
 from boilercv.images.cv import draw_contours
 from boilercv.types import ArrInt
-from boilercv_pipeline.config import default
+from boilercv_pipeline import defaults_backend
+from boilercv_pipeline.models.generated.stages.fill import Fill
 from boilercv_pipeline.sets import get_contours_df, get_dataset, process_datasets
 
 
-def main():  # noqa: D103
-    destination = default.params.paths.filled
-    with process_datasets(destination) as videos_to_process:
+def main(args: Fill):  # noqa: D103
+    logger.info("Start filling contours")
+    destination = args.outs.filled
+    with process_datasets(
+        destination,
+        names=[source.stem for source in sorted(args.deps.sources.iterdir())],
+    ) as videos_to_process:
         for name in tqdm(videos_to_process):
             df = get_contours_df(name)
             source_ds = get_dataset(name)
@@ -34,9 +40,8 @@ def main():  # noqa: D103
             ds[VIDEO] = pack(video)
             ds = ds.drop_vars(ROI)
             videos_to_process[name] = ds
+    logger.info("Finish filling contours")
 
 
 if __name__ == "__main__":
-    logger.info("Start filling contours")
-    main()
-    logger.info("Finish filling contours")
+    invoke(Fill, backend=defaults_backend)

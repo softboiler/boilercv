@@ -68,7 +68,6 @@ ignore_unused = ["netcdf4"]
 boilercore = ["boilercore"]
 
 [tool.pytest.ini_options]
-# ! https://github.com/pytest-dev/pytest-cov/issues/479#issuecomment-1247444988
 addopts = """
     --strict-config
     --strict-markers
@@ -76,10 +75,10 @@ addopts = """
     --color=yes
     -p no:legacypaths
     -r a
-    -n auto
+    -n 0
     --dist=loadfile
     --plots=tests/plots
-"""
+""" # ? `-n 0` because test suite is currently faster in series
 cache_dir = ".cache/.pytest_cache"
 markers = "slow"
 testpaths = "tests"

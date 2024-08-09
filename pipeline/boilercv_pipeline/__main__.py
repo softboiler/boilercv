@@ -2,7 +2,8 @@
 
 from cappa.base import invoke
 
-from boilercv_pipeline.cli import BoilercvPipeline, defaults_backend
+from boilercv_pipeline import defaults_backend
+from boilercv_pipeline.cli import BoilercvPipeline
 
 
 def main():

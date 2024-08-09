@@ -6,9 +6,8 @@ from re import match
 from shlex import quote
 from subprocess import run
 from textwrap import dedent
-from typing import Any, Self
+from typing import Any, Self, get_args
 
-from copier import get_args
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_pascal
 from yaml import safe_load

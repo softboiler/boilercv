@@ -1,5 +1,6 @@
 """Get bubble contours."""
 
+from cappa.base import invoke
 from cv2 import CHAIN_APPROX_SIMPLE, bitwise_not
 from loguru import logger
 from numpy import empty, insert, vstack
@@ -10,16 +11,23 @@ from boilercv.data import VIDEO
 from boilercv.images import scale_bool
 from boilercv.images.cv import find_contours
 from boilercv.types import DF, Vid
-from boilercv_pipeline.config import default
+from boilercv_pipeline import defaults_backend
+from boilercv_pipeline.models.generated.stages.find_contours import FindContours
 from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
 
 
-def main():  # noqa: D103
-    destinations = get_unprocessed_destinations(default.params.paths.contours, ext="h5")
+def main(args: FindContours):  # noqa: D103
+    logger.info("Start finding contours")
+    destinations = get_unprocessed_destinations(
+        args.outs.contours,
+        names=[source.stem for source in sorted(args.deps.sources.iterdir())],
+        ext="h5",
+    )
     for source_name, destination in tqdm(destinations.items()):
         video = bitwise_not(scale_bool(get_dataset(source_name)[VIDEO].values))
         df = get_all_contours(video, method=CHAIN_APPROX_SIMPLE)
         df.to_hdf(destination, key="contours", complib="zlib", complevel=9)
+    logger.info("Finish finding contours")
 
 
 def get_all_contours(video: Vid, method) -> DF:
@@ -71,6 +79,4 @@ def get_all_contours(video: Vid, method) -> DF:
 
 
 if __name__ == "__main__":
-    logger.info("Start finding contours")
-    main()
-    logger.info("Finish finding contours")
+    invoke(FindContours, backend=defaults_backend)

@@ -16,26 +16,20 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
-from _pytest.mark.structures import ParameterSet
 from boilercore.hashes import hash_args
 from boilercore.notebooks.namespaces import get_nb_ns
-from boilercore.paths import get_module_name, get_module_rel, walk_modules
 from cachier import cachier  # pyright: ignore[reportMissingImports]
 from matplotlib.pyplot import style
 from seaborn import set_theme
 
-import boilercv_pipeline
 from boilercv_tests.types import Attributes, Params
 
-PACKAGE = get_module_name(boilercv_pipeline)
-"""Name of the package to test."""
 MPLSTYLE = Path("data/plotting/base.mplstyle")
 """Styling for test plots."""
 NAMER: Iterator[str] = _RandomNameSequence()
 """Random name sequence for case files."""
-TEST_TEMP_NBS = Path("docs/temp")
+(TEST_TEMP_NBS := Path("docs/temp")).mkdir(exist_ok=True)
 """Temporary notebooks directory."""
-TEST_TEMP_NBS.mkdir(exist_ok=True)
 
 
 def init():
@@ -58,37 +52,6 @@ def get_cached_nb_ns(
 ) -> SimpleNamespace:
     """Get cached notebook namespace."""
     return get_nb_ns(nb, params or {}, attributes or [])
-
-
-boilercv_pipeline_dir = Path("pipeline") / PACKAGE
-STAGES: list[ParameterSet] = []
-for module in walk_modules(boilercv_pipeline_dir):
-    if module.startswith("boilercv_pipeline.manual"):
-        stage = get_module_rel(module, "manual")
-        match stage.split("."):
-            case ("generate_experiment_docs", *_):
-                marks = [pytest.mark.skip(reason="Local-only documentation.")]
-            case ("update_experiments_from_docs", *_):
-                marks = [pytest.mark.skip(reason="Local-only documentation.")]
-            case _:
-                marks = []
-        STAGES.append(
-            pytest.param(module, id=get_module_rel(module, PACKAGE), marks=marks)
-        )
-        continue
-    if not module.startswith("boilercv_pipeline.stages"):
-        continue
-    stage = get_module_rel(module, "stages")
-    match stage.split("."):
-        case ("experiments", "e230920_subcool", *_):
-            marks = [pytest.mark.skip(reason="Test data missing.")]
-        case ("generate_reports", *_):
-            marks = [pytest.mark.skip(reason="Local-only documentation.")]
-        case ("compare_theory" | "find_tracks" | "find_unobstructed", *_):
-            marks = [pytest.mark.skip(reason="Implementation trivially does nothing.")]
-        case _:
-            marks = []
-    STAGES.append(pytest.param(module, id=get_module_rel(module, PACKAGE), marks=marks))
 
 
 @dataclass

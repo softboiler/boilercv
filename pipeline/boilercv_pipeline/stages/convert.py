@@ -5,14 +5,17 @@ from datetime import datetime
 from pathlib import Path
 from re import match
 
+from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
 
+from boilercv_pipeline import defaults_backend
 from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.generated.stages.convert import Convert
 from boilercv_pipeline.video import prepare_dataset
 
 
-def main():  # noqa: D103
+def main(_args: Convert):  # noqa: D103
     logger.info("start convert")
     for source in tqdm(sorted(default.params.paths.cines.iterdir())):
         if dt := get_datetime_from_cine(source):
@@ -39,4 +42,4 @@ def get_datetime_from_cine(path: Path) -> datetime | None:
 
 
 if __name__ == "__main__":
-    main()
+    invoke(Convert, backend=defaults_backend)

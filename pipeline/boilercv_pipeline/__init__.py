@@ -1,10 +1,14 @@
 """Data pipeline."""
 
 from collections.abc import Callable
+from json import loads
 from os import environ
 from pathlib import Path
 from typing import Any
 
+from cappa.command import Command
+from cappa.output import Output
+from cappa.parser import backend
 from loguru import logger
 from pandas import set_option
 
@@ -33,6 +37,9 @@ def init():
     set_option("mode.string_storage", "pyarrow")
 
 
+init()
+
+
 def run_example(func: Callable[..., Any], preview: bool = False) -> tuple[str, Any]:
     """Run an example file, logging the module name containing the function.
 
@@ -46,4 +53,35 @@ def run_example(func: Callable[..., Any], preview: bool = False) -> tuple[str, A
     return module_name, result
 
 
-init()
+def defaults_backend(
+    command: Command[Any],
+    argv: list[str],
+    output: Output,
+    prog: str,
+    provide_completions: bool = False,
+) -> tuple[Any, Command[Any], dict[str, Any]]:
+    """Backend that injects defaults and makes `model_validate` the parse callable."""
+    parser, parsed_command, parsed_args = backend(
+        command=command,
+        argv=argv,
+        output=output,
+        prog=prog,
+        provide_completions=provide_completions,
+    )
+    if (cmds := parsed_args.get("commands")) and cmds["__name__"] != "stages":
+        return parser, parsed_command, parsed_args
+    extra_args = ["help", "completion"]
+    defaults: dict[str, dict[str, Any]] = {}
+    for arg in parsed_command.arguments:
+        if arg.value_name in extra_args:  # pyright: ignore[reportAttributeAccessIssue]
+            continue
+        arg.parse = arg.parse.model_validate  # pyright: ignore[reportAttributeAccessIssue, reportFunctionMemberAccess, reportOptionalMemberAccess]
+        defaults[arg.value_name] = arg.default.model_dump_json()  # pyright: ignore[reportAttributeAccessIssue, reportOptionalMemberAccess]
+    return (
+        parser,
+        parsed_command,
+        {
+            k: loads(v) if isinstance(v, str) else v
+            for k, v in {**defaults, **parsed_args}.items()
+        },
+    )

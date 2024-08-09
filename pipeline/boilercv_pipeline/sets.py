@@ -26,7 +26,7 @@ STAGE_DEFAULT = "sources"
 
 @contextmanager
 def process_datasets(
-    destination_dir: Path, reprocess: bool = False
+    destination_dir: Path, names: Iterable[str] = DEFAULT_NAMES, reprocess: bool = False
 ) -> Iterator[dict[str, Any]]:
     """Get unprocessed dataset names and write them to disk.
 
@@ -43,7 +43,7 @@ def process_datasets(
         reprocess: Whether to reprocess all datasets.
     """
     unprocessed_destinations = get_unprocessed_destinations(
-        destination_dir, reprocess=reprocess
+        destination_dir, names=names, reprocess=reprocess
     )
     datasets_to_process = dict.fromkeys(unprocessed_destinations)
     yield datasets_to_process
