@@ -7,7 +7,7 @@ from boilercore.models import DefaultPathsModel, SynchronizedPathsYamlModel
 from pydantic import DirectoryPath, FilePath
 
 from boilercv_pipeline.config import const
-from boilercv_pipeline.models.types.generated.stages import StageName
+from boilercv_pipeline.models.generated.types.stages import StageName
 
 
 class Paths(DefaultPathsModel):
@@ -61,20 +61,15 @@ class Paths(DefaultPathsModel):
     lifetimes: Path = root / "lifetimes"
     # ! Previews
     previews: Path = root / "previews"
-    binarized_preview: Path = previews / "binarized.nc"
-    filled_preview: Path = previews / "filled.nc"
-    gray_preview: Path = previews / "gray.nc"
+    binarized_preview: Path = previews / "binarized_preview.nc"
+    filled_preview: Path = previews / "filled_preview.nc"
+    gray_preview: Path = previews / "gray_preview.nc"
 
 
 class PackagePaths(DefaultPathsModel):
     """Package paths."""
 
-    # * Git-tracked inputs
-    # ! Package
     root: DirectoryPath = const.package_dir
-    models: DirectoryPath = root / "models"
-    stages_literals: FilePath = models / "types" / "generated" / "stages.py"
-    paths_module: FilePath = models / "paths.py"
     stages: dict[StageName, FilePath] = const.stages  # pyright: ignore[reportAssignmentType]
 
 

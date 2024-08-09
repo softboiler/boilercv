@@ -1,1 +1,0 @@
-"""Manual data processing stages."""

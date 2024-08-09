@@ -1,8 +1,32 @@
 stages:
   binarize:
-    cmd: "python ${package_paths.manual_stages.binarize}"
+    cmd: "boilercv_pipeline stages binarize"
     deps:
       - "${paths.large_sources}"
+    # outs:
+    #   - "${paths.sources}":
+    #       persist: true
+    #   - "${paths.rois}":
+    #       persist: true
+
+  convert:
+    cmd: "python ${package_paths.stages.convert}"
+    deps:
+      - "${paths.cines}"
+
+  flatten_data_dir:
+    cmd: "python ${package_paths.stages.flatten_data_dir}"
+    deps:
+      - "${paths.hierarchical_data}"
+
+  preview_gray:
+    cmd: "python ${package_paths.stages.preview_gray}"
+    deps:
+      - "${package_paths.stages.preview_gray}"
+      - "${paths.sources}"
+    outs:
+      - "${paths.gray_preview}":
+          persist: true
 
   preview_binarized:
     cmd: "python ${package_paths.stages.preview_binarized}"
@@ -12,15 +36,6 @@ stages:
       - "${paths.sources}"
     outs:
       - "${paths.binarized_preview}":
-          persist: true
-
-  preview_gray:
-    cmd: "python ${package_paths.stages.preview_gray}"
-    deps:
-      - "${package_paths.stages.preview_gray}"
-      - "${paths.sources}"
-    outs:
-      - "${paths.gray_preview}":
           persist: true
 
   find_contours:
@@ -50,28 +65,3 @@ stages:
     outs:
       - "${paths.filled_preview}":
           persist: true
-
-  find_unobstructed:
-    cmd: "python ${package_paths.stages.find_unobstructed}"
-    deps:
-      - "${package_paths.stages.find_unobstructed}"
-      - "${paths.contours}"
-    outs:
-      - "${paths.unobstructed}"
-
-  find_tracks:
-    cmd: "python ${package_paths.stages.find_tracks}"
-    deps:
-      - "${package_paths.stages.find_tracks}"
-      - "${paths.unobstructed}"
-    outs:
-      - "${paths.tracks}"
-
-  compare_theory:
-    cmd: "python ${package_paths.stages.compare_theory}"
-    deps:
-      - "${package_paths.stages.compare_theory}"
-      - "${paths.tracks}"
-      # - "${paths.correlations}"
-    outs:
-      - "${paths.lifetimes}"

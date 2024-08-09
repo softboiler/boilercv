@@ -27,7 +27,11 @@ class Constants(BaseModel):
     """Settings paths."""
     package_dir: Path = get_package_dir(boilercv_pipeline)
     """Package directory."""
-    stages: dict[str, Path] = map_stages(package_dir / "stages")
+    stages: dict[str, Path] = {
+        k: v
+        for k, v in map_stages(package_dir / "stages").items()
+        if not k.startswith("common_")
+    }
     """Stages."""
 
 

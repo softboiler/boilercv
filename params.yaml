@@ -28,26 +28,17 @@ paths:
   examples: data/examples
   filled: data/filled
   lifetimes: data/lifetimes
-  tracks: data/tracks
-  unobstructed: data/unobstructed
   previews: data/previews
-  binarized_preview: data/previews/binarized.nc
-  filled_preview: data/previews/filled.nc
-  gray_preview: data/previews/gray.nc
+  binarized_preview: data/previews/binarized_preview.nc
+  filled_preview: data/previews/filled_preview.nc
+  gray_preview: data/previews/gray_preview.nc
 package_paths:
-  models: pipeline/boilercv_pipeline/models
-  stages_literals: pipeline/boilercv_pipeline/models/types/generated/stages.py
-  paths_module: pipeline/boilercv_pipeline/models/paths.py
   stages:
-    compare_theory: pipeline/boilercv_pipeline/stages/compare_theory.py
+    binarize: pipeline/boilercv_pipeline/stages/binarize.py
+    convert: pipeline/boilercv_pipeline/stages/convert.py
     fill: pipeline/boilercv_pipeline/stages/fill.py
     find_contours: pipeline/boilercv_pipeline/stages/find_contours.py
-    find_tracks: pipeline/boilercv_pipeline/stages/find_tracks.py
-    find_unobstructed: pipeline/boilercv_pipeline/stages/find_unobstructed.py
-    preview_binarized: pipeline/boilercv_pipeline/stages/preview/binarized.py
-    preview_filled: pipeline/boilercv_pipeline/stages/preview/filled.py
-    preview_gray: pipeline/boilercv_pipeline/stages/preview/gray.py
-  manual_stages:
-    binarize: pipeline/boilercv_pipeline/manual/binarize.py
-    convert: pipeline/boilercv_pipeline/manual/convert.py
-    flatten_data_dir: pipeline/boilercv_pipeline/manual/flatten_data_dir.py
+    flatten_data_dir: pipeline/boilercv_pipeline/stages/flatten_data_dir.py
+    preview_binarized: pipeline/boilercv_pipeline/stages/preview_binarized.py
+    preview_filled: pipeline/boilercv_pipeline/stages/preview_filled.py
+    preview_gray: pipeline/boilercv_pipeline/stages/preview_gray.py

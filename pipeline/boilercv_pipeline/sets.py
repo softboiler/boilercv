@@ -12,13 +12,12 @@ from boilercv.correlations.types import Stage
 from boilercv.data import HEADER, ROI, VIDEO
 from boilercv.data.packing import unpack
 from boilercv.types import DF, DS
-from boilercv_pipeline.config import default
-from boilercv_pipeline.models.paths import get_sorted_paths
+from boilercv_pipeline.models.config import default
 
 ALL_FRAMES = slice(None)
 """Slice that gets all frames."""
 DEFAULT_NAMES = [
-    source.stem for source in get_sorted_paths(default.params.paths.sources)
+    source.stem for source in sorted(default.params.paths.sources.iterdir())
 ]
 """Default names of all dataset sources."""
 STAGE_DEFAULT = "sources"

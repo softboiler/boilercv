@@ -8,14 +8,13 @@ from re import match
 from loguru import logger
 from tqdm import tqdm
 
-from boilercv_pipeline.config import default
-from boilercv_pipeline.models.paths import get_sorted_paths
+from boilercv_pipeline.models.config import default
 from boilercv_pipeline.video import prepare_dataset
 
 
 def main():  # noqa: D103
     logger.info("start convert")
-    for source in tqdm(get_sorted_paths(default.params.paths.cines)):
+    for source in tqdm(sorted(default.params.paths.cines.iterdir())):
         if dt := get_datetime_from_cine(source):
             destination_stem = dt.isoformat().replace(":", "-")
         else:

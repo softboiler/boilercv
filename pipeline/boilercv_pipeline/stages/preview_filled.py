@@ -6,7 +6,7 @@ from tqdm import tqdm
 from boilercv.data import FRAME, VIDEO
 from boilercv_pipeline.config import default
 from boilercv_pipeline.sets import get_dataset
-from boilercv_pipeline.stages.preview import new_videos_to_preview
+from boilercv_pipeline.stages.common.preview import new_videos_to_preview
 
 
 def main():  # noqa: D103
