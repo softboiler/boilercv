@@ -8,9 +8,9 @@ from boilercv.images import overlay, scale_bool
 from boilercv_pipeline import PREVIEW, WRITE
 from boilercv_pipeline.captivate.captures import write_image
 from boilercv_pipeline.captivate.previews import view_images
-from boilercv_pipeline.config import default
 from boilercv_pipeline.examples.detect_surface import find_boiling_surface
 from boilercv_pipeline.examples.previews import _EXAMPLE
+from boilercv_pipeline.models.config import default
 from boilercv_pipeline.sets import get_dataset
 
 

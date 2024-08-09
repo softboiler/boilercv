@@ -10,7 +10,6 @@ from boilercv.data.packing import pack
 from boilercv.images import cv, scale_bool
 from boilercv.images.cv import apply_mask, close_and_erode, flood
 from boilercv.types import DA
-from boilercv_pipeline import defaults_backend
 from boilercv_pipeline.models.generated.stages.binarize import Binarize
 
 
@@ -40,4 +39,4 @@ def main(args: Binarize):  # noqa: D103
 
 
 if __name__ == "__main__":
-    invoke(Binarize, backend=defaults_backend)
+    invoke(Binarize)

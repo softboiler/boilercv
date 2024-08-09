@@ -100,7 +100,7 @@ def sync_stages():
         (name, const.package_dir / "models" / "generated" / "stages" / f"{name}.py")
         for name in get_args(StageName)
     ]:
-        if stage.exists():
+        if stage.exists() or not stages.get(name):
             continue
         updated_stages.append(stage)
         deps = src_sep.join([
@@ -124,6 +124,7 @@ def sync_stages():
             from cappa.base import command
             from pydantic import BaseModel, Field
 
+            from boilercv_pipeline import get_parser
             from boilercv_pipeline.models.config import default
 
             class Params(BaseModel):
@@ -139,11 +140,11 @@ def sync_stages():
                 root: Path = Field(default=default.paths.root, exclude=True)
                 {outs}
 
-            @command(invoke="boilercv_pipeline.stages.{name}.main")
+            @command(invoke="boilercv_pipeline.stages.{name}.main", default_long=True)
             class {to_pascal(stage.stem)}(BaseModel):
-                params: Annotated[Params, Arg(long=True)] = Params()
-                deps: Annotated[Deps, Arg(long=True)] = Deps()
-                outs: Annotated[Outs, Arg(long=True)] = Outs()
+                params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
+                deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
+                outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
         ''')
         stage.write_text(encoding="utf-8", data=src)
     if not updated_stages:
@@ -156,10 +157,10 @@ def sync_stages():
             "-Command",
             cmd_sep.join([
                 "scripts/Initialize-Shell.ps1;",
-                "ruff check",
+                "ruff format",
                 *paths,
                 ";",
-                "ruff format",
+                "ruff check",
                 *paths,
             ]),
         ],

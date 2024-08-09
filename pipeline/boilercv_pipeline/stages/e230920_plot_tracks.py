@@ -4,7 +4,7 @@ from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
 
-from boilercv_pipeline.experiments.e230920_subcool import (
+from boilercv_pipeline.stages.common.e230920 import (
     EXP_TIMES,
     get_path_time,
     submit_nb_process,

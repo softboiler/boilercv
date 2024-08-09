@@ -2,12 +2,8 @@
 
 from concurrent.futures import ProcessPoolExecutor
 
-from boilercv_pipeline.config import default
-from boilercv_pipeline.experiments.e230920_subcool import (
-    DAY,
-    get_times,
-    submit_nb_process,
-)
+from boilercv_pipeline.models.config import default
+from boilercv_pipeline.stages.common.e230920 import DAY, get_times, submit_nb_process
 
 
 def main():  # noqa: D103

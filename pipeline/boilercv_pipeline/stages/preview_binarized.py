@@ -5,7 +5,6 @@ from loguru import logger
 from tqdm import tqdm
 
 from boilercv.data import FRAME, ROI, VIDEO
-from boilercv_pipeline import defaults_backend
 from boilercv_pipeline.models.generated.stages.preview_binarized import PreviewBinarized
 from boilercv_pipeline.sets import get_dataset
 from boilercv_pipeline.stages.common.preview import new_videos_to_preview
@@ -29,4 +28,4 @@ def main(args: PreviewBinarized):  # noqa: D103
 
 
 if __name__ == "__main__":
-    invoke(PreviewBinarized, backend=defaults_backend)
+    invoke(PreviewBinarized)

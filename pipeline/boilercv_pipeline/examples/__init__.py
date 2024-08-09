@@ -4,7 +4,7 @@ from xarray import open_dataset
 
 from boilercv.data import VIDEO
 from boilercv.types import DA
-from boilercv_pipeline.config import default
+from boilercv_pipeline.models.config import default
 
 EXAMPLE_NUM_FRAMES = 500
 EXAMPLE_VIDEO_NAME = "2022-11-30T13-41-00"

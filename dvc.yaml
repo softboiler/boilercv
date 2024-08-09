@@ -13,11 +13,24 @@ stages:
     cmd: "boilercv_pipeline stages convert"
     deps:
       - "${paths.cines}"
+    # outs:
+    #   - "${paths.large_sources}":
+    #       persist: true
 
   flatten_data_dir:
     cmd: "boilercv_pipeline stages flatten-data-dir"
     deps:
       - "${paths.hierarchical_data}"
+      - "${paths.notes}"
+      - "${paths.cines}"
+      - "${paths.sheets}"
+    # outs:
+    #   - "${paths.notes}":
+    #       persist: true
+    #   - "${paths.cines}":
+    #       persist: true
+    #   - "${paths.sheets}":
+    #       persist: true
 
   preview_gray:
     cmd: "boilercv_pipeline stages preview-gray"

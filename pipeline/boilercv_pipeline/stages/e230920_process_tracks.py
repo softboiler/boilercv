@@ -1,8 +1,8 @@
-"""Get mean absolute error of tracks."""
+"""Process tracks."""
 
 from concurrent.futures import ProcessPoolExecutor
 
-from boilercv_pipeline.experiments.e230920_subcool import EXP_TIMES, submit_nb_process
+from boilercv_pipeline.stages.common.e230920 import EXP_TIMES, submit_nb_process
 
 
 def main():  # noqa: D103
@@ -10,8 +10,8 @@ def main():  # noqa: D103
         for dt in EXP_TIMES:
             submit_nb_process(
                 executor=executor,
-                nb="get_mae",
-                name="mae",
+                nb="process_tracks",
+                name="processed_tracks",
                 params={"TIME": dt.isoformat()},
             )
 

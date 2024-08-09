@@ -9,7 +9,7 @@ from pydantic import AfterValidator, BaseModel, ConfigDict, Field
 
 from boilercv_docs import get_root
 from boilercv_docs.types import NbExecutionMode
-from boilercv_pipeline.experiments.e230920_subcool import Col
+from boilercv_pipeline.stages.common.e230920 import Col
 
 
 def remove_stale_autodoc(skip_autodoc: bool) -> bool:

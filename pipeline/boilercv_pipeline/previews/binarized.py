@@ -8,7 +8,7 @@ from boilercv.types import DA
 from boilercv_pipeline import PREVIEW
 from boilercv_pipeline.captivate import FRAMERATE_PREV
 from boilercv_pipeline.captivate.previews import view_images
-from boilercv_pipeline.config import default
+from boilercv_pipeline.models.config import default
 from boilercv_pipeline.previews import draw_text_da
 
 

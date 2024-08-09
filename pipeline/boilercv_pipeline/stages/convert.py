@@ -9,24 +9,22 @@ from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
 
-from boilercv_pipeline import defaults_backend
-from boilercv_pipeline.models.config import default
 from boilercv_pipeline.models.generated.stages.convert import Convert
 from boilercv_pipeline.video import prepare_dataset
 
 
-def main(_args: Convert):  # noqa: D103
+def main(args: Convert):  # noqa: D103
     logger.info("start convert")
-    for source in tqdm(sorted(default.params.paths.cines.iterdir())):
+    for source in tqdm(sorted(args.deps.cines.iterdir())):
         if dt := get_datetime_from_cine(source):
             destination_stem = dt.isoformat().replace(":", "-")
         else:
             destination_stem = source.stem
-        destination = default.params.paths.large_sources / f"{destination_stem}.nc"
+        destination = args.outs.large_sources / f"{destination_stem}.nc"
         if destination.exists():
             continue
         matched_crop = None
-        for pattern, crop in default.params.cine_crops.items():
+        for pattern, crop in {}.items():  # TODO: Reimplement crop property
             if match(pattern, source.stem):
                 matched_crop = crop
         dataset = prepare_dataset(source, crop=matched_crop)
@@ -42,4 +40,4 @@ def get_datetime_from_cine(path: Path) -> datetime | None:
 
 
 if __name__ == "__main__":
-    invoke(Convert, backend=defaults_backend)
+    invoke(Convert)

@@ -1,5 +1,7 @@
 """Parameter models for this project."""
 
+from collections.abc import Callable
+from json import loads
 from pathlib import Path
 
 from boilercore.fits import Fit
@@ -8,6 +10,7 @@ from pydantic import DirectoryPath, FilePath
 
 from boilercv_pipeline.config import const
 from boilercv_pipeline.models.generated.types.stages import StageName
+from boilercv_pipeline.models.types import Model
 
 
 class Paths(DefaultPathsModel):
@@ -80,3 +83,13 @@ class Params(SynchronizedPathsYamlModel):
     paths: Paths = Paths()
     package_paths: PackagePaths = PackagePaths()
     fit: Fit = Fit()
+
+
+def get_parser(model: type[Model]) -> Callable[[str], Model]:
+    """Get parser for model or JSON-encoded string."""
+
+    def parse(v: Model | str) -> Model:
+        """Parse model or JSON-encoded string."""
+        return model(**loads(v)) if isinstance(v, str) else v
+
+    return parse

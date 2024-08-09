@@ -6,6 +6,7 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import BaseModel, Field
 
+from boilercv_pipeline import get_parser
 from boilercv_pipeline.models.config import default
 
 
@@ -28,8 +29,8 @@ class Outs(DefaultPathsModel):
     filled_preview: Path = default.paths.filled_preview
 
 
-@command(invoke="boilercv_pipeline.stages.preview_filled.main")
+@command(invoke="boilercv_pipeline.stages.preview_filled.main", default_long=True)
 class PreviewFilled(BaseModel):
-    params: Annotated[Params, Arg(long=True)] = Params()
-    deps: Annotated[Deps, Arg(long=True)] = Deps()
-    outs: Annotated[Outs, Arg(long=True)] = Outs()
+    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()

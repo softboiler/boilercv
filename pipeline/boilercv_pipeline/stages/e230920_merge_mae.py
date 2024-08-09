@@ -5,7 +5,7 @@ from types import SimpleNamespace
 
 from boilercore.notebooks.namespaces import get_nb_ns
 
-from boilercv_pipeline.experiments.e230920_subcool import MERGED_MAE, read_nb
+from boilercv_pipeline.stages.common.e230920 import MERGED_MAE, read_nb
 
 PLOTS = Path("tests/plots/mae")
 PLOTS.mkdir(exist_ok=True)

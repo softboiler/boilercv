@@ -1,9 +1,9 @@
-"""Export all tracks for this experiment."""
+"""Export all centers for this experiment."""
 
 from concurrent.futures import ProcessPoolExecutor
 
-from boilercv_pipeline.experiments.e230920_subcool import EXP_TIMES, submit_nb_process
 from boilercv_pipeline.models.notebooks import Notebooks
+from boilercv_pipeline.stages.common.e230920 import EXP_TIMES, submit_nb_process
 
 
 def main():  # noqa: D103
@@ -11,8 +11,8 @@ def main():  # noqa: D103
         for dt in EXP_TIMES:
             submit_nb_process(
                 executor=executor,
-                nb="find_tracks",
-                name="tracks",
+                nb="find_objects",
+                name="objects",
                 params={"p": Notebooks(time=dt.isoformat()).model_dump()},
             )
 

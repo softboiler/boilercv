@@ -11,7 +11,6 @@ from boilercv.data import VIDEO
 from boilercv.images import scale_bool
 from boilercv.images.cv import find_contours
 from boilercv.types import DF, Vid
-from boilercv_pipeline import defaults_backend
 from boilercv_pipeline.models.generated.stages.find_contours import FindContours
 from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
 
@@ -79,4 +78,4 @@ def get_all_contours(video: Vid, method) -> DF:
 
 
 if __name__ == "__main__":
-    invoke(FindContours, backend=defaults_backend)
+    invoke(FindContours)

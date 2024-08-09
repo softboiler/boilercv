@@ -2,7 +2,7 @@
 
 from boilercore.notebooks.namespaces import get_nb_ns
 
-from boilercv_pipeline.experiments.e230920_subcool import EXP_DATA, read_nb
+from boilercv_pipeline.stages.common.e230920 import EXP_DATA, read_nb
 
 
 def main():  # noqa: D103

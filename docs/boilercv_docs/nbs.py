@@ -25,6 +25,7 @@ import boilercv_pipeline
 from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, get_root
 from boilercv_docs.settings import default
 from boilercv_docs.types import DfOrS
+from boilercv_pipeline.models.config import default as boilercv_pipeline_models_default
 from boilercv_tools.warnings import filter_boilercv_warnings
 
 FONT_SCALE = 1.3
@@ -64,10 +65,8 @@ def init(force_dev: bool = default.build.force_dev) -> Paths:
         chdir(paths.root)
         boilercv_pipeline.PROJECT_PATH = paths.root
     elif _in_tests := environ.get("PYTEST_CURRENT_TEST"):
-        from boilercv_pipeline.config import default  # noqa: PLC0415
-
         # ? Tests monkeypatch project path to an isolated temporary test folder
-        tmp_test_dir = default.params.paths.root
+        tmp_test_dir = boilercv_pipeline_models_default.params.paths.root
         copy(paths.test_data_src / "params.yaml", tmp_test_dir)
         copytree(
             paths.test_data_src / "data", tmp_test_dir / "data", dirs_exist_ok=True

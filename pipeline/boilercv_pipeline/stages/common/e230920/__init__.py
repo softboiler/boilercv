@@ -24,14 +24,13 @@ from boilercv.correlations.types import NbProcess
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, Img
-from boilercv_pipeline.config import default
-from boilercv_pipeline.experiments import get_exp
+from boilercv_pipeline.models.config import default
 
 EXP = get_module_name(__spec__ or __file__)
 """Name of this experiment."""
 DAY = "2024-07-18"
 """Day of the experiment"""
-EXP_NBS = get_exp(EXP)
+EXP_NBS = Path("docs/experiments") / EXP
 """Path to experiment notebooks."""
 EXP_DATA = default.params.paths.experiments / EXP
 """Experimental data."""

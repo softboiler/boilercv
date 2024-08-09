@@ -10,7 +10,6 @@ from boilercv.data.packing import pack
 from boilercv.images import scale_bool
 from boilercv.images.cv import draw_contours
 from boilercv.types import ArrInt
-from boilercv_pipeline import defaults_backend
 from boilercv_pipeline.models.generated.stages.fill import Fill
 from boilercv_pipeline.sets import get_contours_df, get_dataset, process_datasets
 
@@ -44,4 +43,4 @@ def main(args: Fill):  # noqa: D103
 
 
 if __name__ == "__main__":
-    invoke(Fill, backend=defaults_backend)
+    invoke(Fill)
