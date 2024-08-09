@@ -10,17 +10,17 @@ stages:
     #       persist: true
 
   convert:
-    cmd: "python ${package_paths.stages.convert}"
+    cmd: "boilercv_pipeline stages convert"
     deps:
       - "${paths.cines}"
 
   flatten_data_dir:
-    cmd: "python ${package_paths.stages.flatten_data_dir}"
+    cmd: "boilercv_pipeline stages flatten_data_dir"
     deps:
       - "${paths.hierarchical_data}"
 
   preview_gray:
-    cmd: "python ${package_paths.stages.preview_gray}"
+    cmd: "boilercv_pipeline stages preview_gray"
     deps:
       - "${package_paths.stages.preview_gray}"
       - "${paths.sources}"
@@ -29,7 +29,7 @@ stages:
           persist: true
 
   preview_binarized:
-    cmd: "python ${package_paths.stages.preview_binarized}"
+    cmd: "boilercv_pipeline stages preview_binarized"
     deps:
       - "${package_paths.stages.preview_binarized}"
       - "${paths.rois}"
@@ -39,7 +39,7 @@ stages:
           persist: true
 
   find_contours:
-    cmd: "python ${package_paths.stages.find_contours}"
+    cmd: "boilercv_pipeline stages find_contours"
     deps:
       - "${package_paths.stages.find_contours}"
       - "${paths.sources}"
@@ -47,7 +47,7 @@ stages:
       - "${paths.contours}":
           persist: true
   fill:
-    cmd: "python ${package_paths.stages.fill}"
+    cmd: "boilercv_pipeline stages fill"
     deps:
       - "${package_paths.stages.fill}"
       - "${paths.sources}"
@@ -57,7 +57,7 @@ stages:
           persist: true
 
   preview_filled:
-    cmd: "python ${package_paths.stages.preview_filled}"
+    cmd: "boilercv_pipeline stages preview_filled"
     deps:
       - "${package_paths.stages.preview_filled}"
       - "${paths.sources}"
