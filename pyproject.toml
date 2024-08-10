@@ -75,7 +75,7 @@ addopts = """
     --color=yes
     -p no:legacypaths
     -r a
-    -n 0
+    -n auto
     --dist=loadfile
     --plots=tests/plots
 """ # ? `-n 0` because test suite is currently faster in series

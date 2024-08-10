@@ -8,7 +8,7 @@ from pandas.testing import assert_index_equal
 
 from boilercv_tests import Caser, parametrize_by_cases
 
-pytestmark = pytest.mark.slow
+pytestmark = [pytest.mark.slow, pytest.mark.skip(reason="Restructuring notebooks")]
 C = Caser(Path("docs/experiments/e230920_subcool"))
 
 

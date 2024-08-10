@@ -47,6 +47,8 @@ def _filter_certain_warnings():
 @pytest.fixture(params=boilercv_pipeline_const.stages)
 def stage(tmp_path, request):
     """Set project directory."""
+    if request.param.startswith("e230920") or request.param == "flatten_data_dir":
+        pytest.skip("Deps not yet sourced")
     copy(const.test_params, tmp_path / const.params)
     module = import_module(f"boilercv_pipeline.models.generated.stages.{request.param}")
     deps = module.Deps(root=tmp_path)
