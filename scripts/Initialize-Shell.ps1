@@ -24,15 +24,17 @@ function Set-Env {
         if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
     }
     # ? Set environment variables
-    $Vars = $Env:GITHUB_ENV ? $(Get-Content $Env:GITHUB_ENV |
+    $EnvFile = $Env:GITHUB_ENV ? $Env:GITHUB_ENV : '.env'
+    if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
+    $Vars = $(Get-Content $EnvFile |
             Select-String -Pattern '^(.+)=.+$' |
-            ForEach-Object { $_.Matches.Groups[1].value }) : @{}
-    if ((Test-Path '.venv') -or ($Env:GITHUB_ENV)) {
+            ForEach-Object { $_.Matches.Groups[1].value })
+    if (Get-Command -Name 'boilercv_tools' -ErrorAction 'Ignore') {
         foreach ($line in boilercv_tools init-shell) {
             $Key, $Value = $line -Split '=', 2
             Set-Item "Env:$Key" $Value
-            if ($Env:GITHUB_ENV -and ($Key -notin $Vars)) {
-                "$Key=$Value" >> $Env:GITHUB_ENV
+            if (($Key -ne 'PATH') -and ($Key -notin $Vars)) {
+                "$Key=$Value" >> $EnvFile
             }
         }
     }
