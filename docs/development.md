@@ -2,5 +2,5 @@
 
 ## Data process graph
 
-:::{include} _static/dag-23-06-13.md
+:::{include} _static/dag-2024-08-09-minimal.md
 :::

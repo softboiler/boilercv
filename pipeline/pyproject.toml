@@ -39,6 +39,7 @@ dependencies = [
     "pyyaml>=6.0.2",
 ]
 [project.scripts]
+"boilercv-pipeline" = "boilercv_pipeline.__main__:main"
 "boilercv_pipeline" = "boilercv_pipeline.__main__:main"
 [project.optional-dependencies]
 # * Minimal CV flavor needed, but allow `boilercv` to coexist with different flavors

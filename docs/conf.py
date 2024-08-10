@@ -127,6 +127,7 @@ language = "en"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/_*.md", "**/_*.ipynb"]
 extensions = [
     *([] if default.build.skip_autodoc else ["autodoc2"]),
+    "cappa.ext.docutils",
     "myst_nb",
     "sphinx_design",
     "sphinx_tippy",

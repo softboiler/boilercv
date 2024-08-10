@@ -77,6 +77,7 @@ development
 contributing
 changelog
 contributors
+cli
 apidocs/index
 references
 :::

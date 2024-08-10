@@ -1,4 +1,4 @@
-"""Settings."""
+"""Configuration."""
 
 from boilercore.settings_models import (
     customise_sources,

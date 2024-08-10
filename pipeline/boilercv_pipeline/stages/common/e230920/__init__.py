@@ -19,6 +19,7 @@ from matplotlib.colors import Colormap, Normalize
 from matplotlib.pyplot import subplots
 from numpy import any, histogram, sqrt, where
 from pandas import CategoricalDtype, DataFrame, NamedAgg
+from pydantic import BaseModel, ConfigDict
 from sparklines import sparklines
 
 from boilercv.images import scale_bool
@@ -196,6 +197,13 @@ class Col:
         self.new = self.new or self.old
         self.new_unit = self.new_unit or self.old_unit
         self.new = f"{self.new} ({self.new_unit})" if self.new_unit else self.new
+
+
+class Columns(BaseModel):
+    """Columns."""
+
+    model_config = ConfigDict(use_attribute_docstrings=True)
+    frame: Col = Col("frame", "Frame #")
 
 
 def transform_cols(df: DataFrame, cols: list[Col], drop: bool = True) -> DataFrame:

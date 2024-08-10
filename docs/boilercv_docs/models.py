@@ -5,11 +5,10 @@ from pathlib import Path
 from shutil import rmtree
 from typing import Annotated
 
-from pydantic import AfterValidator, BaseModel, ConfigDict, Field
+from pydantic import AfterValidator, BaseModel
 
 from boilercv_docs import get_root
 from boilercv_docs.types import NbExecutionMode
-from boilercv_pipeline.stages.common.e230920 import Col
 
 
 def remove_stale_autodoc(skip_autodoc: bool) -> bool:
@@ -17,13 +16,6 @@ def remove_stale_autodoc(skip_autodoc: bool) -> bool:
     if skip_autodoc:
         rmtree(get_root() / "docs" / "apidocs", ignore_errors=True)
     return skip_autodoc
-
-
-class Columns(BaseModel):
-    """Columns."""
-
-    model_config = ConfigDict(use_attribute_docstrings=True)
-    frame: Col = Col("frame", "Frame #")
 
 
 class Build(BaseModel):
@@ -41,9 +33,9 @@ class Build(BaseModel):
                 ])
             ]
         ),
-    ] = Field(default_factory=list)
+    ] = ["experiments", "notebooks"]
     """List of directories relative to `docs` to exclude executing notebooks in."""
-    nb_execution_mode: NbExecutionMode = "cache"
+    nb_execution_mode: NbExecutionMode = "off"
     """Notebook execution mode.
 
     https://myst-nb.readthedocs.io/en/stable/computation/execute.html#notebook-execution-modes
