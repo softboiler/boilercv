@@ -123,7 +123,12 @@ jobs:
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1"
-      - run: "fawltydeps"
+      - run: |
+          pre-commit run fawltydeps-src
+          pre-commit run fawltydeps-docs
+          pre-commit run fawltydeps-pipeline
+          pre-commit run fawltydeps-scripts
+          pre-commit run fawltydeps-tests
   pyright:
     needs: "sync"
     strategy:
