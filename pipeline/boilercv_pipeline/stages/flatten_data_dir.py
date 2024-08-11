@@ -9,15 +9,45 @@ Directory structure looks like
         └───video
 """
 
+from __future__ import annotations
+
 from itertools import chain
 from pathlib import Path
+from typing import Annotated
 
-from cappa.base import invoke
+from boilercore.models import DefaultPathsModel
+from cappa.arg import Arg
+from cappa.base import command, invoke
+from pydantic import BaseModel, Field
 
-from boilercv_pipeline.models.generated.stages.flatten_data_dir import FlattenDataDir
+from boilercv_pipeline.models import get_parser
+from boilercv_pipeline.models.config import default
 
 
-def main(args: FlattenDataDir):  # noqa: D103
+class Params(BaseModel):
+    """Stage parameters."""
+
+
+class Deps(DefaultPathsModel):
+    """Stage dependencies."""
+
+    root: Path = Field(default=default.paths.root, exclude=True)
+    hierarchical_data: Path = default.paths.hierarchical_data
+    notes: Path = default.paths.notes
+    cines: Path = default.paths.cines
+    sheets: Path = default.paths.sheets
+
+
+class Outs(DefaultPathsModel):
+    """Stage outputs."""
+
+    root: Path = Field(default=default.paths.root, exclude=True)
+    notes: Path = default.paths.notes
+    cines: Path = default.paths.cines
+    sheets: Path = default.paths.sheets
+
+
+def main(args: FlattenDataDir):
     source = args.deps.hierarchical_data
     rename_notes(source, args.outs.notes)
     rename_cines(source, args.outs.cines)
@@ -48,6 +78,13 @@ def rename_sheets(source: Path, sheets: Path):
     data = [trial / "data" for trial in sorted(source.iterdir()) if trial.is_dir()]
     for sheet in sorted(chain.from_iterable(trial.glob("*.csv") for trial in data)):
         sheet.rename(sheets / sheet.name.removeprefix("results_"))
+
+
+@command(invoke=main, default_long=True)
+class FlattenDataDir(BaseModel):
+    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
 
 
 if __name__ == "__main__":

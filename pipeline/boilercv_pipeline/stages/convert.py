@@ -1,19 +1,44 @@
 """Convert all CINEs to NetCDF."""
 
+from __future__ import annotations
+
 import contextlib
 from datetime import datetime
 from pathlib import Path
 from re import match
+from typing import Annotated
 
-from cappa.base import invoke
+from boilercore.models import DefaultPathsModel
+from cappa.arg import Arg
+from cappa.base import command, invoke
 from loguru import logger
+from pydantic import BaseModel, Field
 from tqdm import tqdm
 
-from boilercv_pipeline.models.generated.stages.convert import Convert
+from boilercv_pipeline.models import get_parser
+from boilercv_pipeline.models.config import default
 from boilercv_pipeline.video import prepare_dataset
 
 
-def main(args: Convert):  # noqa: D103
+class Params(BaseModel):
+    """Stage parameters."""
+
+
+class Deps(DefaultPathsModel):
+    """Stage dependencies."""
+
+    root: Path = Field(default=default.paths.root, exclude=True)
+    cines: Path = default.paths.cines
+
+
+class Outs(DefaultPathsModel):
+    """Stage outputs."""
+
+    root: Path = Field(default=default.paths.root, exclude=True)
+    large_sources: Path = default.paths.large_sources
+
+
+def main(args: Convert):
     logger.info("start convert")
     for source in tqdm(sorted(args.deps.cines.iterdir())):
         if dt := get_datetime_from_cine(source):
@@ -37,6 +62,15 @@ def get_datetime_from_cine(path: Path) -> datetime | None:
     with contextlib.suppress(ValueError):
         return datetime.strptime(path.stem, r"Y%Y%m%dH%H%M%S")
     return None
+
+
+@command(invoke=main, default_long=True)
+class Convert(BaseModel):
+    """Convert."""
+
+    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
 
 
 if __name__ == "__main__":

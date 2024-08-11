@@ -5,14 +5,14 @@ from dataclasses import dataclass
 from cappa.base import command
 from cappa.subcommand import Subcommands
 
-from boilercv_pipeline.models.generated.stages.binarize import Binarize
-from boilercv_pipeline.models.generated.stages.convert import Convert
-from boilercv_pipeline.models.generated.stages.fill import Fill
-from boilercv_pipeline.models.generated.stages.find_contours import FindContours
-from boilercv_pipeline.models.generated.stages.flatten_data_dir import FlattenDataDir
-from boilercv_pipeline.models.generated.stages.preview_binarized import PreviewBinarized
-from boilercv_pipeline.models.generated.stages.preview_filled import PreviewFilled
-from boilercv_pipeline.models.generated.stages.preview_gray import PreviewGray
+from boilercv_pipeline.stages.binarize import Binarize
+from boilercv_pipeline.stages.convert import Convert
+from boilercv_pipeline.stages.fill import Fill
+from boilercv_pipeline.stages.find_contours import FindContours
+from boilercv_pipeline.stages.flatten_data_dir import FlattenDataDir
+from boilercv_pipeline.stages.preview_binarized import PreviewBinarized
+from boilercv_pipeline.stages.preview_filled import PreviewFilled
+from boilercv_pipeline.stages.preview_gray import PreviewGray
 
 
 @command(invoke="boilercv_pipeline.models.Params")

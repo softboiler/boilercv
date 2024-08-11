@@ -1,7 +1,15 @@
 """Binarize videos and export their ROIs."""
 
-from cappa.base import invoke
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Annotated
+
+from boilercore.models import DefaultPathsModel
+from cappa.arg import Arg
+from cappa.base import command, invoke
 from loguru import logger
+from pydantic import BaseModel, Field
 from tqdm import tqdm
 from xarray import open_dataset
 
@@ -10,10 +18,30 @@ from boilercv.data.packing import pack
 from boilercv.images import cv, scale_bool
 from boilercv.images.cv import apply_mask, close_and_erode, flood
 from boilercv.types import DA
-from boilercv_pipeline.models.generated.stages.binarize import Binarize
+from boilercv_pipeline.models import get_parser
+from boilercv_pipeline.models.config import default
 
 
-def main(args: Binarize):  # noqa: D103
+class Params(BaseModel):
+    """Stage parameters."""
+
+
+class Deps(DefaultPathsModel):
+    """Stage dependencies."""
+
+    root: Path = Field(default=default.paths.root, exclude=True)
+    large_sources: Path = default.paths.large_sources
+
+
+class Outs(DefaultPathsModel):
+    """Stage outputs."""
+
+    root: Path = Field(default=default.paths.root, exclude=True)
+    sources: Path = default.paths.sources
+    rois: Path = default.paths.rois
+
+
+def main(args: Binarize):
     logger.info("start binarize")
     for source in tqdm(sorted(args.deps.large_sources.iterdir())):
         destination = args.outs.sources / f"{source.stem}.nc"
@@ -36,6 +64,15 @@ def main(args: Binarize):  # noqa: D103
             ds = ds.drop_vars(VIDEO)
             ds.to_netcdf(path=args.outs.rois / source.name)
     logger.info("finish binarize")
+
+
+@command(invoke=main, default_long=True)
+class Binarize(BaseModel):
+    """Binarize."""
+
+    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
 
 
 if __name__ == "__main__":

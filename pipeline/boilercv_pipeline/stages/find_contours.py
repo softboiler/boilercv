@@ -1,21 +1,48 @@
 """Get bubble contours."""
 
-from cappa.base import invoke
+from __future__ import annotations
+
+from pathlib import Path
+from typing import Annotated
+
+from boilercore.models import DefaultPathsModel
+from cappa.arg import Arg
+from cappa.base import command, invoke
 from cv2 import CHAIN_APPROX_SIMPLE, bitwise_not
 from loguru import logger
 from numpy import empty, insert, vstack
 from pandas import DataFrame
+from pydantic import BaseModel, Field
 from tqdm import tqdm
 
 from boilercv.data import VIDEO
 from boilercv.images import scale_bool
 from boilercv.images.cv import find_contours
 from boilercv.types import DF, Vid
-from boilercv_pipeline.models.generated.stages.find_contours import FindContours
+from boilercv_pipeline.models import get_parser
+from boilercv_pipeline.models.config import default
 from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
 
 
-def main(args: FindContours):  # noqa: D103
+class Params(BaseModel):
+    """Stage parameters."""
+
+
+class Deps(DefaultPathsModel):
+    """Stage dependencies."""
+
+    root: Path = Field(default=default.paths.root, exclude=True)
+    sources: Path = default.paths.sources
+
+
+class Outs(DefaultPathsModel):
+    """Stage outputs."""
+
+    root: Path = Field(default=default.paths.root, exclude=True)
+    contours: Path = default.paths.contours
+
+
+def main(args: FindContours):
     logger.info("Start finding contours")
     destinations = get_unprocessed_destinations(
         args.outs.contours,
@@ -75,6 +102,13 @@ def get_all_contours(video: Vid, method) -> DF:
     return DataFrame(
         all_contours, columns=["frame", "contour", "ypx", "xpx"]
     ).set_index(["frame", "contour"])
+
+
+@command(invoke=main, default_long=True)
+class FindContours(BaseModel):
+    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
 
 
 if __name__ == "__main__":

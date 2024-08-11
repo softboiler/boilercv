@@ -165,6 +165,3 @@ def sync_stages():
             ]),
         ],
     )
-
-
-sync_stages()
