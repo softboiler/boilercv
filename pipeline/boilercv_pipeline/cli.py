@@ -66,44 +66,49 @@ class Stage:
     ]
 
 
-class Stages(BaseModel):
-    """Stages."""
+def generate_dvc_yaml(root: Path | None = None):
+    """Generate `dvc.yaml`."""
+    root = root or Path.cwd()
 
-    binarize: Binarize = Binarize()
-    convert: Convert = Convert()
-    flatten_data_dir: FlattenDataDir = FlattenDataDir()
-    preview_gray: PreviewGray = PreviewGray()
-    preview_binarized: PreviewBinarized = PreviewBinarized()
-    find_contours: FindContours = FindContours()
-    fill: Fill = Fill()
-    preview_filled: PreviewFilled = PreviewFilled()
-    e230920_update_thermal_data: E230920UpdateThermalData = E230920UpdateThermalData()
-    e230920_find_contours: E230920FindContours = E230920FindContours()
-    e230920_find_objects: E230920FindObjects = E230920FindObjects()
-    e230920_find_tracks: E230920FindTracks = E230920FindTracks()
-    e230920_process_tracks: E230920ProcessTracks = E230920ProcessTracks()
-    e230920_merge_tracks: E230920MergeTracks = E230920MergeTracks()
-    e230920_plot_tracks: E230920PlotTracks = E230920PlotTracks()
-    e230920_get_mae: E230920GetMae = E230920GetMae()
-    e230920_merge_mae: E230920MergeMae = E230920MergeMae()
+    class Stages(BaseModel):
+        """Stages."""
 
+        binarize: Binarize = Binarize()
+        convert: Convert = Convert()
+        flatten_data_dir: FlattenDataDir = FlattenDataDir()
+        preview_gray: PreviewGray = PreviewGray()
+        preview_binarized: PreviewBinarized = PreviewBinarized()
+        find_contours: FindContours = FindContours()
+        fill: Fill = Fill()
+        preview_filled: PreviewFilled = PreviewFilled()
+        e230920_update_thermal_data: E230920UpdateThermalData = (
+            E230920UpdateThermalData()
+        )
+        e230920_find_contours: E230920FindContours = E230920FindContours()
+        e230920_find_objects: E230920FindObjects = E230920FindObjects()
+        e230920_find_tracks: E230920FindTracks = E230920FindTracks()
+        e230920_process_tracks: E230920ProcessTracks = E230920ProcessTracks()
+        e230920_merge_tracks: E230920MergeTracks = E230920MergeTracks()
+        e230920_plot_tracks: E230920PlotTracks = E230920PlotTracks()
+        e230920_get_mae: E230920GetMae = E230920GetMae()
+        e230920_merge_mae: E230920MergeMae = E230920MergeMae()
 
-cwd = Path.cwd()
-stages: dict[str, Any] = {}
-for stage, stage_value in Stages().model_dump().items():
-    for paths, paths_value in stage_value.items():
-        stage_value[paths] = [
-            apply_to_paths(path, lambda path: path.relative_to(cwd).as_posix())
-            for path in paths_value.values()
-        ]
-    stage_value["outs"] = [{out: {"persist": True}} for out in stage_value["outs"]]
-    stages[stage] = {
-        "cmd": f"boilercv_pipeline stage {stage.replace('_', '-')}",
-        **stage_value,
-    }
-(cwd / "dvc2.yaml").write_text(
-    encoding="utf-8", data=safe_dump(sort_keys=False, indent=2, data={"stages": stages})
-)
+    stages: dict[str, Any] = {}
+    for stage, stage_value in Stages().model_dump().items():
+        for paths, paths_value in stage_value.items():
+            stage_value[paths] = [
+                apply_to_paths(path, lambda path: path.relative_to(root).as_posix())
+                for path in paths_value.values()
+            ]
+        stage_value["outs"] = [{out: {"persist": True}} for out in stage_value["outs"]]
+        stages[stage] = {
+            "cmd": f"boilercv_pipeline stage {stage.replace('_', '-')}",
+            **stage_value,
+        }
+    (root / "dvc.yaml").write_text(
+        encoding="utf-8",
+        data=safe_dump(sort_keys=False, indent=2, data={"stages": stages}),
+    )
 
 
 @dataclass
