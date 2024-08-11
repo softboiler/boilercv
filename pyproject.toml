@@ -122,6 +122,7 @@ exclude = [
     "**/node_modules",
     "**/__pycache__",
     "**/.*",
+    ".cache",
     "bin",
     "submodules",
     "scripts/install.py",
