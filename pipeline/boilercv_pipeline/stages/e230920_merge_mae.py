@@ -17,20 +17,12 @@ from boilercv_pipeline.models.config import default
 from boilercv_pipeline.stages.common.e230920 import read_nb
 
 
-class Params(BaseModel):
-    """Stage parameters."""
-
-
 class Deps(DefaultPathsModel):
-    """Stage dependencies."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     e230920_mae: Path = default.paths.e230920_mae
 
 
 class Outs(DefaultPathsModel):
-    """Stage outputs."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     e230920_merged_mae: Path = default.paths.e230920_merged_mae
 
@@ -59,9 +51,8 @@ def plot_and_merge_mae(ns: SimpleNamespace, args: E230920MergeMae):
 
 @command(invoke=main, default_long=True)
 class E230920MergeMae(BaseModel):
-    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

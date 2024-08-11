@@ -18,20 +18,12 @@ from boilercv_pipeline.stages.common.e230920 import get_e230920_times, submit_nb
 from boilercv_pipeline.stages.common.e230920.types import Out
 
 
-class Params(BaseModel):
-    """Stage parameters."""
-
-
 class Deps(DefaultPathsModel):
-    """Stage dependencies."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     e230920_tracks: Path = default.paths.e230920_tracks
 
 
 class Outs(DefaultPathsModel):
-    """Stage outputs."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     e230920_processed_tracks: Path = default.paths.e230920_processed_tracks
 
@@ -53,9 +45,8 @@ def main(args: E230920ProcessTracks):
 
 @command(invoke=main, default_long=True)
 class E230920ProcessTracks(BaseModel):
-    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

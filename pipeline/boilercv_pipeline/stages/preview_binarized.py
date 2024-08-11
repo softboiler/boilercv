@@ -19,21 +19,13 @@ from boilercv_pipeline.sets import get_dataset
 from boilercv_pipeline.stages.common.preview import new_videos_to_preview
 
 
-class Params(BaseModel):
-    """Stage parameters."""
-
-
 class Deps(DefaultPathsModel):
-    """Stage dependencies."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     rois: Path = default.paths.rois
     sources: Path = default.paths.sources
 
 
 class Outs(DefaultPathsModel):
-    """Stage outputs."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     binarized_preview: Path = default.paths.binarized_preview
 
@@ -57,9 +49,8 @@ def main(args: PreviewBinarized):
 
 @command(invoke=main, default_long=True)
 class PreviewBinarized(BaseModel):
-    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

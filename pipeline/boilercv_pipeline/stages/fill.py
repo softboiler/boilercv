@@ -23,21 +23,13 @@ from boilercv_pipeline.models.config import default
 from boilercv_pipeline.sets import get_contours_df, get_dataset, process_datasets
 
 
-class Params(BaseModel):
-    """Stage parameters."""
-
-
 class Deps(DefaultPathsModel):
-    """Stage dependencies."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     sources: Path = default.paths.sources
     contours: Path = default.paths.contours
 
 
 class Outs(DefaultPathsModel):
-    """Stage outputs."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     filled: Path = default.paths.filled
 
@@ -72,9 +64,8 @@ def main(args: Fill):
 
 @command(invoke=main, default_long=True)
 class Fill(BaseModel):
-    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

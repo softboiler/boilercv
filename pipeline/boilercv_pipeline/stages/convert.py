@@ -20,20 +20,12 @@ from boilercv_pipeline.models.config import default
 from boilercv_pipeline.video import prepare_dataset
 
 
-class Params(BaseModel):
-    """Stage parameters."""
-
-
 class Deps(DefaultPathsModel):
-    """Stage dependencies."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     cines: Path = default.paths.cines
 
 
 class Outs(DefaultPathsModel):
-    """Stage outputs."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     large_sources: Path = default.paths.large_sources
 
@@ -66,11 +58,8 @@ def get_datetime_from_cine(path: Path) -> datetime | None:
 
 @command(invoke=main, default_long=True)
 class Convert(BaseModel):
-    """Convert."""
-
-    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

@@ -24,20 +24,12 @@ from boilercv_pipeline.models.config import default
 from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
 
 
-class Params(BaseModel):
-    """Stage parameters."""
-
-
 class Deps(DefaultPathsModel):
-    """Stage dependencies."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     sources: Path = default.paths.sources
 
 
 class Outs(DefaultPathsModel):
-    """Stage outputs."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     contours: Path = default.paths.contours
 
@@ -106,9 +98,8 @@ def get_all_contours(video: Vid, method) -> DF:
 
 @command(invoke=main, default_long=True)
 class FindContours(BaseModel):
-    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

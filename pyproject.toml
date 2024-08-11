@@ -315,7 +315,9 @@ convention = "numpy"
     "SLF001", # Allow private member access in generated types
 ]
 "pipeline/boilercv_pipeline/stages/*.py" = [
-    "D10", # Allow missing docstrings in top-level stages
+    # ? Allow missing docstrings in top-level stages
+    "D101",
+    "D103",
 ]
 "tests/**" = [
     "ARG001", # Allow unused arguments

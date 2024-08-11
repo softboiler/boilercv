@@ -24,13 +24,7 @@ from boilercv_pipeline.models import get_parser
 from boilercv_pipeline.models.config import default
 
 
-class Params(BaseModel):
-    """Stage parameters."""
-
-
 class Deps(DefaultPathsModel):
-    """Stage dependencies."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     hierarchical_data: Path = default.paths.hierarchical_data
     notes: Path = default.paths.notes
@@ -39,8 +33,6 @@ class Deps(DefaultPathsModel):
 
 
 class Outs(DefaultPathsModel):
-    """Stage outputs."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     notes: Path = default.paths.notes
     cines: Path = default.paths.cines
@@ -82,9 +74,8 @@ def rename_sheets(source: Path, sheets: Path):
 
 @command(invoke=main, default_long=True)
 class FlattenDataDir(BaseModel):
-    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

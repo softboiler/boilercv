@@ -22,20 +22,12 @@ from boilercv_pipeline.models import get_parser
 from boilercv_pipeline.models.config import default
 
 
-class Params(BaseModel):
-    """Stage parameters."""
-
-
 class Deps(DefaultPathsModel):
-    """Stage dependencies."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     large_sources: Path = default.paths.large_sources
 
 
 class Outs(DefaultPathsModel):
-    """Stage outputs."""
-
     root: Path = Field(default=default.paths.root, exclude=True)
     sources: Path = default.paths.sources
     rois: Path = default.paths.rois
@@ -68,11 +60,8 @@ def main(args: Binarize):
 
 @command(invoke=main, default_long=True)
 class Binarize(BaseModel):
-    """Binarize."""
-
-    params: Annotated[Params, Arg(parse=get_parser(Params))] = Params()
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps))] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Outs))] = Outs()
+    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
+    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":
