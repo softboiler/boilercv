@@ -22,6 +22,7 @@ from boilercv_pipeline.video import prepare_dataset
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=default.paths.root, exclude=True)
+    stage: Path = Path(__file__)
     cines: Path = default.paths.cines
 
 

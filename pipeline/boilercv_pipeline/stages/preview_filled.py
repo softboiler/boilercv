@@ -21,6 +21,7 @@ from boilercv_pipeline.stages.common.preview import new_videos_to_preview
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=default.paths.root, exclude=True)
+    stage: Path = Path(__file__)
     sources: Path = default.paths.sources
     filled: Path = default.paths.filled
 

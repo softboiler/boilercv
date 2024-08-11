@@ -26,6 +26,7 @@ from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=default.paths.root, exclude=True)
+    stage: Path = Path(__file__)
     sources: Path = default.paths.sources
 
 

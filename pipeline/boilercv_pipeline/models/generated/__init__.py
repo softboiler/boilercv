@@ -1,1 +1,1 @@
-"""Generated stages."""
+"""Generated code."""

@@ -24,6 +24,7 @@ from boilercv_pipeline.models.config import default
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=default.paths.root, exclude=True)
+    stage: Path = Path(__file__)
     large_sources: Path = default.paths.large_sources
 
 

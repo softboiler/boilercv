@@ -26,6 +26,7 @@ from boilercv_pipeline.models.config import default
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=default.paths.root, exclude=True)
+    stage: Path = Path(__file__)
     hierarchical_data: Path = default.paths.hierarchical_data
     notes: Path = default.paths.notes
     cines: Path = default.paths.cines

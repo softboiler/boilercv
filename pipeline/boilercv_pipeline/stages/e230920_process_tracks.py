@@ -20,6 +20,7 @@ from boilercv_pipeline.stages.common.e230920.types import Out
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=default.paths.root, exclude=True)
+    stage: Path = Path(__file__)
     e230920_tracks: Path = default.paths.e230920_tracks
 
 

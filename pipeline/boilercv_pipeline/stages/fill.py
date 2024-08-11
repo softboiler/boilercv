@@ -25,6 +25,7 @@ from boilercv_pipeline.sets import get_contours_df, get_dataset, process_dataset
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=default.paths.root, exclude=True)
+    stage: Path = Path(__file__)
     sources: Path = default.paths.sources
     contours: Path = default.paths.contours
 
