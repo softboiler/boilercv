@@ -38,12 +38,13 @@ dependencies = [
     "xarray[accel,io,parallel]>=2023.7.0",
     "pyyaml>=6.0.2",
 ]
-[project.scripts]
-"boilercv-pipeline" = "boilercv_pipeline.__main__:main"
-"boilercv_pipeline" = "boilercv_pipeline.__main__:main"
 [project.optional-dependencies]
 # * Minimal CV flavor needed, but allow `boilercv` to coexist with different flavors
 cv = ["opencv-python-headless>=4.10.0.84"]
+[project.scripts]
+"boilercv-pipeline" = "boilercv_pipeline.__main__:main"
+"boilercv_pipeline" = "boilercv_pipeline.__main__:main"
+
 [tool.fawltydeps]
 deps = ["pipeline/pyproject.toml"]
 code = ["pipeline/boilercv_pipeline"]
