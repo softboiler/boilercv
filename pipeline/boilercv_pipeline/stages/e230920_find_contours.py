@@ -18,7 +18,7 @@ from boilercv_pipeline.stages.common.e230920.types import Out
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=paths.paths.root, exclude=True)
-    stage: Path = Path(__file__)
+    stage: DirectoryPath = Path(__file__).parent
     contours: Path = paths.paths.contours
 
 

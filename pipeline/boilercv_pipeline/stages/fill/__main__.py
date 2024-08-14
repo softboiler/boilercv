@@ -1,15 +1,5 @@
-"""Fill bubble contours."""
-
-from __future__ import annotations
-
-from pathlib import Path
-from typing import Annotated
-
-from boilercore.models import DefaultPathsModel
-from cappa.arg import Arg
-from cappa.base import command, invoke
+from cappa.base import invoke
 from loguru import logger
-from pydantic import BaseModel, Field
 from tqdm import tqdm
 from xarray import zeros_like
 
@@ -18,20 +8,8 @@ from boilercv.data.packing import pack
 from boilercv.images import scale_bool
 from boilercv.images.cv import draw_contours
 from boilercv.types import ArrInt
-from boilercv_pipeline.models.paths import get_parser, paths
 from boilercv_pipeline.sets import get_contours_df, get_dataset, process_datasets
-
-
-class Deps(DefaultPathsModel):
-    root: Path = Field(default=paths.paths.root, exclude=True)
-    stage: Path = Path(__file__)
-    sources: Path = paths.paths.sources
-    contours: Path = paths.paths.contours
-
-
-class Outs(DefaultPathsModel):
-    root: Path = Field(default=paths.paths.root, exclude=True)
-    filled: Path = paths.paths.filled
+from boilercv_pipeline.stages.fill import Fill
 
 
 def main(args: Fill):
@@ -60,12 +38,6 @@ def main(args: Fill):
             ds = ds.drop_vars(ROI)
             videos_to_process[name] = ds
     logger.info("Finish filling contours")
-
-
-@command(invoke=main, default_long=True)
-class Fill(BaseModel):
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

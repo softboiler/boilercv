@@ -17,7 +17,7 @@ from boilercv_pipeline.stages.common.e230920 import read_nb
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=paths.paths.root, exclude=True)
-    stage: Path = Path(__file__)
+    stage: DirectoryPath = Path(__file__).parent
     e230920_thermal_raw: Path = paths.paths.e230920_thermal_raw
 
 

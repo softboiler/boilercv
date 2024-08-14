@@ -1,37 +1,16 @@
-"""Get bubble contours."""
-
-from __future__ import annotations
-
-from pathlib import Path
-from typing import Annotated
-
-from boilercore.models import DefaultPathsModel
-from cappa.arg import Arg
-from cappa.base import command, invoke
+from cappa.base import invoke
 from cv2 import CHAIN_APPROX_SIMPLE, bitwise_not
 from loguru import logger
 from numpy import empty, insert, vstack
 from pandas import DataFrame
-from pydantic import BaseModel, Field
 from tqdm import tqdm
 
 from boilercv.data import VIDEO
 from boilercv.images import scale_bool
 from boilercv.images.cv import find_contours
 from boilercv.types import DF, Vid
-from boilercv_pipeline.models.paths import get_parser, paths
 from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
-
-
-class Deps(DefaultPathsModel):
-    root: Path = Field(default=paths.paths.root, exclude=True)
-    stage: Path = Path(__file__)
-    sources: Path = paths.paths.sources
-
-
-class Outs(DefaultPathsModel):
-    root: Path = Field(default=paths.paths.root, exclude=True)
-    contours: Path = paths.paths.contours
+from boilercv_pipeline.stages.find_contours import FindContours
 
 
 def main(args: FindContours):
@@ -94,12 +73,6 @@ def get_all_contours(video: Vid, method) -> DF:
     return DataFrame(
         all_contours, columns=["frame", "contour", "ypx", "xpx"]
     ).set_index(["frame", "contour"])
-
-
-@command(invoke=main, default_long=True)
-class FindContours(BaseModel):
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

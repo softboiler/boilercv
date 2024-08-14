@@ -1,42 +1,9 @@
-"""Flatten the data directory structure.
-
-Directory structure looks like
-
-    data
-    └───YYYY-MM-DD
-        ├───data
-        ├───notes
-        └───video
-"""
-
-from __future__ import annotations
-
 from itertools import chain
 from pathlib import Path
-from typing import Annotated
 
-from boilercore.models import DefaultPathsModel
-from cappa.arg import Arg
-from cappa.base import command, invoke
-from pydantic import BaseModel, Field
+from cappa.base import invoke
 
-from boilercv_pipeline.models.paths import get_parser, paths
-
-
-class Deps(DefaultPathsModel):
-    root: Path = Field(default=paths.paths.root, exclude=True)
-    stage: Path = Path(__file__)
-    hierarchical_data: Path = paths.paths.hierarchical_data
-    notes: Path = paths.paths.notes
-    cines: Path = paths.paths.cines
-    sheets: Path = paths.paths.sheets
-
-
-class Outs(DefaultPathsModel):
-    root: Path = Field(default=paths.paths.root, exclude=True)
-    notes: Path = paths.paths.notes
-    cines: Path = paths.paths.cines
-    sheets: Path = paths.paths.sheets
+from boilercv_pipeline.stages.flatten_data_dir import FlattenDataDir
 
 
 def main(args: FlattenDataDir):
@@ -70,12 +37,6 @@ def rename_sheets(source: Path, sheets: Path):
     data = [trial / "data" for trial in sorted(source.iterdir()) if trial.is_dir()]
     for sheet in sorted(chain.from_iterable(trial.glob("*.csv") for trial in data)):
         sheet.rename(sheets / sheet.name.removeprefix("results_"))
-
-
-@command(invoke=main, default_long=True)
-class FlattenDataDir(BaseModel):
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

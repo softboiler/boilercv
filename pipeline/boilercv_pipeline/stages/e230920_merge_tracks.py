@@ -17,7 +17,7 @@ from boilercv_pipeline.stages.common.e230920 import get_e230920_times
 
 class Deps(DefaultPathsModel):
     root: Path = Field(default=paths.paths.root, exclude=True)
-    stage: Path = Path(__file__)
+    stage: DirectoryPath = Path(__file__).parent
     e230920_processed_tracks: Path = paths.paths.e230920_processed_tracks
 
 

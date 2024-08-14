@@ -6,21 +6,23 @@ from cappa.base import command
 from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.contexts import ContextsMergeModel
-from boilercv_pipeline.models.paths import DataDir, MatchedPaths, paths
+from boilercv_pipeline.models.paths import DataDir, DataFile, MatchedPaths, paths
 
 
 class Deps(MatchedPaths):
     stage: DirectoryPath = Path(__file__).parent
-    cines: DataDir = paths.cines
+    sources: DataDir = paths.sources
 
 
 class Outs(MatchedPaths):
-    large_sources: DataDir = paths.large_sources
+    binarized_preview: DataFile = paths.binarized_preview
 
 
-@command(default_long=True, invoke="boilercv_pipeline.stages.convert.__main__.main")
-class Convert(ContextsMergeModel):
-    """Convert CINEs to NetCDF."""
+@command(
+    default_long=True, invoke="boilercv_pipeline.stages.preview_binarized.__main__.main"
+)
+class PreviewBinarized(ContextsMergeModel):
+    """Update previews for the binarization stage."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
     outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)

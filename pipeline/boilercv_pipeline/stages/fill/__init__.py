@@ -11,16 +11,17 @@ from boilercv_pipeline.models.paths import DataDir, MatchedPaths, paths
 
 class Deps(MatchedPaths):
     stage: DirectoryPath = Path(__file__).parent
-    cines: DataDir = paths.cines
+    sources: DataDir = paths.sources
+    contours: DataDir = paths.contours
 
 
 class Outs(MatchedPaths):
-    large_sources: DataDir = paths.large_sources
+    filled: DataDir = paths.filled
 
 
-@command(default_long=True, invoke="boilercv_pipeline.stages.convert.__main__.main")
-class Convert(ContextsMergeModel):
-    """Convert CINEs to NetCDF."""
+@command(default_long=True, invoke="boilercv_pipeline.stages.fill.__main__.main")
+class Fill(ContextsMergeModel):
+    """Fill bubble contours."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
     outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)

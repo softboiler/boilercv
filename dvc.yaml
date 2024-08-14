@@ -1,85 +1,64 @@
 stages:
-  # flatten_data_dir:
-  #   cmd: "boilercv-pipeline stage flatten-data-dir"
-  #   deps:
-  #     - "${paths.hierarchical_data}"
-  #     - "${paths.notes}"
-  #     - "${paths.cines}"
-  #     - "${paths.sheets}"
-  # outs:
-  #   - "${paths.notes}":
-  #       persist: true
-  #   - "${paths.cines}":
-  #       persist: true
-  #   - "${paths.sheets}":
-  #       persist: true
-
   convert:
-    cmd: "boilercv-pipeline stage convert"
+    cmd: boilercv-pipeline stage convert
     deps:
       - pipeline/boilercv_pipeline/stages/convert
-      - "${paths.cines}"
+      - data/cines
     outs:
-      - "${paths.large_sources}":
+      - data/large_sources:
           persist: true
+          cache: false
           push: false
-
   binarize:
-    cmd: "boilercv-pipeline stage binarize"
+    cmd: boilercv-pipeline stage binarize
     deps:
       - pipeline/boilercv_pipeline/stages/binarize
-      - "${paths.large_sources}"
+      - data/large_sources
     outs:
-      - "${paths.sources}":
+      - data/sources:
           persist: true
-      - "${paths.rois}":
+      - data/rois:
           persist: true
-
   preview_gray:
-    cmd: "boilercv-pipeline stage preview-gray"
+    cmd: boilercv-pipeline stage preview-gray
     deps:
-      - "${package_paths.stages.preview_gray}"
-      - "${paths.sources}"
+      - pipeline/boilercv_pipeline/stages/preview_gray
+      - data/large_sources
     outs:
-      - "${paths.gray_preview}":
+      - data/previews/gray_preview.nc:
           persist: true
-
   preview_binarized:
-    cmd: "boilercv-pipeline stage preview-binarized"
+    cmd: boilercv-pipeline stage preview-binarized
     deps:
-      - "${package_paths.stages.preview_binarized}"
-      - "${paths.rois}"
-      - "${paths.sources}"
+      - pipeline/boilercv_pipeline/stages/preview_binarized
+      - data/sources
     outs:
-      - "${paths.binarized_preview}":
+      - data/previews/binarized_preview.nc:
           persist: true
-
   find_contours:
-    cmd: "boilercv-pipeline stage find-contours"
+    cmd: boilercv-pipeline stage find-contours
     deps:
-      - "${package_paths.stages.find_contours}"
-      - "${paths.sources}"
+      - pipeline/boilercv_pipeline/stages/find_contours
+      - data/sources
     outs:
-      - "${paths.contours}":
+      - data/contours:
           persist: true
   fill:
-    cmd: "boilercv-pipeline stage fill"
+    cmd: boilercv-pipeline stage fill
     deps:
-      - "${package_paths.stages.fill}"
-      - "${paths.sources}"
-      - "${paths.contours}"
+      - pipeline/boilercv_pipeline/stages/fill
+      - data/sources
+      - data/contours
     outs:
-      - "${paths.filled}":
+      - data/filled:
           persist: true
-
   preview_filled:
-    cmd: "boilercv-pipeline stage preview-filled"
+    cmd: boilercv-pipeline stage preview-filled
     deps:
-      - "${package_paths.stages.preview_filled}"
-      - "${paths.sources}"
-      - "${paths.filled}"
+      - pipeline/boilercv_pipeline/stages/preview_filled
+      - data/filled
     outs:
-      - "${paths.filled_preview}":
+      - data/previews/filled_preview.nc:
           persist: true
 
   # e230920_update_thermal_data:
