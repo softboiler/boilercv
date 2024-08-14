@@ -19,6 +19,7 @@ def get_config(**kwds: Unpack[ConfigDict]) -> PluginConfigDict[DefaultPluginSett
         **DefaultPluginConfigDict(
             plugin_settings=DefaultPluginSettings(contexts=Contexts())
         ),
+        "validate_default": True,
         **kwds,
     }
 
@@ -26,7 +27,7 @@ def get_config(**kwds: Unpack[ConfigDict]) -> PluginConfigDict[DefaultPluginSett
 class ContextsBaseModel(BaseModel):
     """Base model with default context."""
 
-    model_config: ClassVar[DefaultPluginConfigDict] = get_config(validate_default=True)  # pyright: ignore[reportIncompatibleVariableOverride]
+    model_config: ClassVar[DefaultPluginConfigDict] = get_config()  # pyright: ignore[reportIncompatibleVariableOverride]
     _contexts_parent: Contexts = Contexts()
 
     @classmethod

@@ -1,15 +1,11 @@
 """Binarize videos and export their ROIs."""
 
-from __future__ import annotations
-
 from pathlib import Path
-from typing import Annotated
+from typing import Any, ClassVar
 
-from boilercore.models import DefaultPathsModel
-from cappa.arg import Arg
-from cappa.base import command, invoke
+from cappa.base import command, parse
 from loguru import logger
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, FilePath, ValidationInfo, field_validator
 from tqdm import tqdm
 from xarray import open_dataset
 
@@ -18,26 +14,50 @@ from boilercv.data.packing import pack
 from boilercv.images import cv, scale_bool
 from boilercv.images.cv import apply_mask, close_and_erode, flood
 from boilercv.types import DA
-from boilercv_pipeline.models import get_parser
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.contexts import ContextsBaseModel
+from boilercv_pipeline.models.config import default, get_kind
+from boilercv_pipeline.root_contexts import DataDir, get_config
+from boilercv_pipeline.root_contexts.types import RootConfigDict
 
 
-class Deps(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
-    stage: Path = Path(__file__)
-    large_sources: Path = default.paths.large_sources
+class MatchedPaths(ContextsBaseModel):
+    model_config: ClassVar[RootConfigDict] = get_config()  # pyright: ignore[reportIncompatibleVariableOverride]
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def validate_paths(cls, value: Any, info: ValidationInfo) -> Any:
+        """Model field type matches the default type."""
+        if (
+            (field_name := info.field_name)
+            and (field_info := cls.model_fields.get(field_name))
+            and (kind := get_kind(field_info, default.kind_validators))
+            and (value not in default.kinds[kind])
+        ):
+            raise ValueError(
+                f"Stage {cls.__name__} has path '{value}' of kind {kind} that doesn't match default paths."
+            )
+        return value
 
 
-class Outs(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
-    sources: Path = default.paths.sources
-    rois: Path = default.paths.rois
+class Deps(MatchedPaths):
+    stage: FilePath = Path(__file__)
+    large_sources: DataDir = default.paths.large_sources
 
 
-def main(args: Binarize):
+class Outs(MatchedPaths):
+    sources: DataDir = default.paths.sources
+    rois: DataDir = default.paths.rois
+
+
+@command
+class Binarize(BaseModel): ...
+
+
+def main(_params: Binarize, deps: Deps | None = None, outs: Outs | None = None):
+    deps, outs = (deps or Deps(), outs or Outs())
     logger.info("start binarize")
-    for source in tqdm(sorted(args.deps.large_sources.iterdir())):
-        destination = args.outs.sources / f"{source.stem}.nc"
+    for source in tqdm(sorted(deps.large_sources.iterdir())):
+        destination = outs.sources / f"{source.stem}.nc"
         if destination.exists():
             continue
         with open_dataset(source) as ds:
@@ -51,19 +71,13 @@ def main(args: Binarize):
             binarized: DA = apply_to_img_da(cv.binarize, masked, vectorize=True)
             ds[VIDEO] = pack(binarized)
             ds.to_netcdf(
-                path=args.outs.sources / source.name, encoding={VIDEO: {"zlib": True}}
+                path=outs.sources / source.name, encoding={VIDEO: {"zlib": True}}
             )
             ds[ROI] = roi
             ds = ds.drop_vars(VIDEO)
-            ds.to_netcdf(path=args.outs.rois / source.name)
+            ds.to_netcdf(path=outs.rois / source.name)
     logger.info("finish binarize")
 
 
-@command(invoke=main, default_long=True)
-class Binarize(BaseModel):
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
-
-
 if __name__ == "__main__":
-    invoke(Binarize)
+    main(parse(Binarize))

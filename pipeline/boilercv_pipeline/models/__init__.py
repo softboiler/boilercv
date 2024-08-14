@@ -4,102 +4,9 @@ from collections.abc import Callable
 from json import loads
 from pathlib import Path
 
-from boilercore.fits import Fit
-from boilercore.models import DefaultPathsModel, SynchronizedPathsYamlModel
-from pydantic import DirectoryPath, FilePath
-
-from boilercv_pipeline.config import const
-from boilercv_pipeline.models.generated.types.stages import StageName
+from boilercv_pipeline.contexts import ContextsBaseModel
 from boilercv_pipeline.models.types import Model
-
-
-class Paths(DefaultPathsModel):
-    """Paths relevant to the project."""
-
-    # * Roots
-    root: Path = Path.cwd() / "data"
-
-    # * Local inputs
-    cines: Path = root / "cines"
-    hierarchical_data: Path = root / "hierarchical_data"
-    large_examples: Path = root / "large_examples"
-    large_sources: Path = root / "large_sources"
-    notes: Path = root / "notes"
-    profiles: Path = root / "profiles"
-    sheets: Path = root / "sheets"
-    # ! Uncompressed data
-    uncompressed_contours: Path = root / "uncompressed_contours"
-    uncompressed_filled: Path = root / "uncompressed_filled"
-    uncompressed_sources: Path = root / "uncompressed_sources"
-    # ! Examples
-    example_cines: Path = root / "example_cines"
-    large_example_cine: Path = example_cines / "2022-01-06T16-57-31.cine"
-
-    # * Local results
-    docx: Path = root / "docx"
-    html: Path = root / "html"
-    md: Path = root / "md"
-    media: Path = root / "media"
-
-    # * Git-tracked inputs
-    # ! Plotting config
-    plot_config: Path = root / "plotting"
-    mpl_base: Path = plot_config / "base.mplstyle"
-    mpl_hide_title: Path = plot_config / "hide_title.mplstyle"
-
-    # * DVC_tracked imports
-    modelfunctions: Path = root / "models"
-
-    # * DVC-tracked inputs
-    notebooks: Path = root / "notebooks"
-    rois: Path = root / "rois"
-    samples: Path = root / "samples"
-    sources: Path = root / "sources"
-    e230920_thermal_raw: Path = root / "e230920_thermal_raw.csv"
-
-    # * DVC-tracked results
-    contours: Path = root / "contours"
-    examples: Path = root / "examples"
-    filled: Path = root / "filled"
-    lifetimes: Path = root / "lifetimes"
-    e230920_thermal: Path = root / "e230920_thermal.h5"
-    e230920_contours: Path = root / "e230920_contours"
-    e230920_objects: Path = root / "e230920_objects"
-    e230920_tracks: Path = root / "e230920_tracks"
-    e230920_processed_tracks: Path = root / "e230920_processed_tracks"
-    e230920_merged_tracks: Path = root / "e230920_merged_tracks.h5"
-    e230920_mae: Path = root / "e230920_mae"
-    e230920_merged_mae: Path = root / "e230920_merged_mae.h5"
-
-    # ! Previews
-    previews: Path = root / "previews"
-    binarized_preview: Path = previews / "binarized_preview.nc"
-    filled_preview: Path = previews / "filled_preview.nc"
-    gray_preview: Path = previews / "gray_preview.nc"
-
-
-class PackagePaths(DefaultPathsModel):
-    """Package paths."""
-
-    root: DirectoryPath = const.package_dir
-    stages: dict[StageName, FilePath] = const.stages  # pyright: ignore[reportAssignmentType]
-
-
-class DocsPaths(DefaultPathsModel):
-    """Documentation paths."""
-
-    root: DirectoryPath = Path.cwd() / "docs"
-    e230920_notebooks: Path = root / "experiments" / "e230920"
-
-
-class Params(SynchronizedPathsYamlModel):
-    """Project parameters."""
-
-    source: FilePath = Path.cwd() / "params.yaml"
-    paths: Paths = Paths()
-    package_paths: PackagePaths = PackagePaths()
-    docs_paths: DocsPaths = DocsPaths()
-    fit: Fit = Fit()
+from boilercv_pipeline.root_contexts import DataDir, DataFile, DocsDir
 
 
 def get_parser(model: type[Model]) -> Callable[[str], Model]:
@@ -110,3 +17,67 @@ def get_parser(model: type[Model]) -> Callable[[str], Model]:
         return model(**loads(v)) if isinstance(v, str) else v
 
     return parse
+
+
+class Paths(ContextsBaseModel):
+    """Paths relevant to the project."""
+
+    # * Local inputs
+    cines: DataDir = Path("cines")
+    hierarchical_data: DataDir = Path("hierarchical_data")
+    large_examples: DataDir = Path("large_examples")
+    large_sources: DataDir = Path("large_sources")
+    notes: DataDir = Path("notes")
+    profiles: DataDir = Path("profiles")
+    sheets: DataDir = Path("sheets")
+    # ! Uncompressed data
+    uncompressed_contours: DataDir = Path("uncompressed_contours")
+    uncompressed_filled: DataDir = Path("uncompressed_filled")
+    uncompressed_sources: DataDir = Path("uncompressed_sources")
+    # ! Examples
+    example_cines: DataDir = Path("example_cines")
+    large_example_cine: DataFile = example_cines / "2022-01-06T16-57-31.cine"
+
+    # * Local results
+    docx: DataDir = Path("docx")
+    html: DataDir = Path("html")
+    md: DataDir = Path("md")
+    media: DataDir = Path("media")
+
+    # * Git-tracked inputs
+    # ! Plotting config
+    plot_config: DataDir = Path("plotting")
+    mpl_base: DataFile = plot_config / "base.mplstyle"
+    mpl_hide_title: DataFile = plot_config / "hide_title.mplstyle"
+
+    # * DVC_tracked imports
+    modelfunctions: DataDir = Path("models")
+
+    # * DVC-tracked inputs
+    notebooks: DataDir = Path("notebooks")
+    rois: DataDir = Path("rois")
+    samples: DataDir = Path("samples")
+    sources: DataDir = Path("sources")
+    e230920_thermal_raw: DataFile = Path("e230920_thermal_raw.csv")
+
+    # * DVC-tracked results
+    contours: DataDir = Path("contours")
+    examples: DataDir = Path("examples")
+    filled: DataDir = Path("filled")
+    lifetimes: DataDir = Path("lifetimes")
+    e230920_thermal: DataFile = Path("e230920_thermal.h5")
+    e230920_contours: DataDir = Path("e230920_contours")
+    e230920_objects: DataDir = Path("e230920_objects")
+    e230920_tracks: DataDir = Path("e230920_tracks")
+    e230920_processed_tracks: DataDir = Path("e230920_processed_tracks")
+    e230920_merged_tracks: DataFile = Path("e230920_merged_tracks.h5")
+    e230920_mae: DataDir = Path("e230920_mae")
+    e230920_merged_mae: DataFile = Path("e230920_merged_mae.h5")
+
+    # ! Previews
+    previews: DataDir = Path("previews")
+    binarized_preview: DataFile = previews / "binarized_preview.nc"
+    filled_preview: DataFile = previews / "filled_preview.nc"
+    gray_preview: DataFile = previews / "gray_preview.nc"
+
+    e230920_notebooks: DocsDir = Path("experiments") / "e230920"
