@@ -7,7 +7,7 @@ from boilercv_pipeline.captivate import FRAMERATE_CONT
 from boilercv_pipeline.captivate.captures import write_video
 from boilercv_pipeline.captivate.previews import view_images
 from boilercv_pipeline.examples.previews import _EXAMPLE, _NUM_FRAMES
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.previews import compose_da
 from boilercv_pipeline.sets import get_dataset
 
@@ -22,10 +22,10 @@ def main():  # noqa: D103
         view_images(bubbles.isel(frame=0))
         view_images(highlighted_bubbles, framerate=FRAMERATE_CONT)
     if WRITE:
-        write_video(default.params.paths.media / "binarized", source)
-        write_video(default.params.paths.media / "bubbles", bubbles, preview_frame=True)
+        write_video(paths.params.paths.media / "binarized", source)
+        write_video(paths.params.paths.media / "bubbles", bubbles, preview_frame=True)
         write_video(
-            default.params.paths.media / "binarized_highlighted", highlighted_bubbles
+            paths.params.paths.media / "binarized_highlighted", highlighted_bubbles
         )
 
 

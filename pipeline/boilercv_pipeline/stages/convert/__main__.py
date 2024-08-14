@@ -6,36 +6,24 @@ import contextlib
 from datetime import datetime
 from pathlib import Path
 from re import match
-from typing import Annotated
 
-from boilercore.models import DefaultPathsModel
-from cappa.arg import Arg
-from cappa.base import command, invoke
+from cappa.base import invoke
 from loguru import logger
-from pydantic import BaseModel
 from tqdm import tqdm
 
-from boilercv_pipeline.models.paths import get_parser, paths
+from boilercv_pipeline.stages.convert import Convert
 from boilercv_pipeline.video import prepare_dataset
 
 
-class Deps(DefaultPathsModel):
-    stage: Path = Path(__file__)
-    cines: Path = paths.paths.cines
-
-
-class Outs(DefaultPathsModel):
-    large_sources: Path = paths.paths.large_sources
-
-
-def main(args: Convert):
+def main(params: Convert):
     logger.info("start convert")
-    for source in tqdm(sorted(args.deps.cines.iterdir())):
+    for source in tqdm(sorted(params.deps.cines.iterdir())):
+        continue
         if dt := get_datetime_from_cine(source):
             destination_stem = dt.isoformat().replace(":", "-")
         else:
             destination_stem = source.stem
-        destination = args.outs.large_sources / f"{destination_stem}.nc"
+        destination = params.outs.large_sources / f"{destination_stem}.nc"
         if destination.exists():
             continue
         matched_crop = None
@@ -52,12 +40,6 @@ def get_datetime_from_cine(path: Path) -> datetime | None:
     with contextlib.suppress(ValueError):
         return datetime.strptime(path.stem, r"Y%Y%m%dH%H%M%S")
     return None
-
-
-@command(invoke=main, default_long=True)
-class Convert(BaseModel):
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

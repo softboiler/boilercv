@@ -25,12 +25,12 @@ from sparklines import sparklines
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, Img
-from boilercv_pipeline.models.config import default
 from boilercv_pipeline.models.generated.types.stages import StageName
+from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.stages.common.e230920.types import NbProcess, Out
 
 
-def get_e230920_times(contours: Path = default.paths.contours) -> list[str]:
+def get_e230920_times(contours: Path = paths.paths.contours) -> list[str]:
     """Get times for the e230920 experiment."""
     return [
         dt.isoformat()
@@ -80,15 +80,13 @@ def apply_to_nb(
     params: Params,
     out: Out,
     process: NbProcess = save_df,
-    notebooks: Path = default.docs_paths.e230920_notebooks,
+    notebooks: Path = paths.docs_paths.e230920_notebooks,
 ):
     """Apply a process to a notebook."""
     process(get_nb_ns(nb=read_nb(nb, notebooks), params=params), out)
 
 
-def read_nb(
-    nb: StageName, notebooks: Path = default.docs_paths.e230920_notebooks
-) -> str:
+def read_nb(nb: StageName, notebooks: Path = paths.docs_paths.e230920_notebooks) -> str:
     """Read a notebook for this experiment."""
     return (notebooks / nb).with_suffix(".ipynb").read_text(encoding="utf-8")
 

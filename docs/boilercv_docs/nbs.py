@@ -25,7 +25,7 @@ import boilercv_pipeline
 from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, get_root
 from boilercv_docs.settings import default
 from boilercv_docs.types import DfOrS
-from boilercv_pipeline.models.config import default as boilercv_pipeline_models_default
+from boilercv_pipeline.models.paths import paths as boilercv_pipeline_models_default
 from boilercv_tools.warnings import filter_boilercv_warnings
 
 FONT_SCALE = 1.3

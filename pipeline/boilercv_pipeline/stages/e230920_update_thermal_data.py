@@ -11,20 +11,19 @@ from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.models import get_parser
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.paths import get_parser, paths
 from boilercv_pipeline.stages.common.e230920 import read_nb
 
 
 class Deps(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
+    root: Path = Field(default=paths.paths.root, exclude=True)
     stage: Path = Path(__file__)
-    e230920_thermal_raw: Path = default.paths.e230920_thermal_raw
+    e230920_thermal_raw: Path = paths.paths.e230920_thermal_raw
 
 
 class Outs(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
-    e230920_thermal: Path = default.paths.e230920_thermal
+    root: Path = Field(default=paths.paths.root, exclude=True)
+    e230920_thermal: Path = paths.paths.e230920_thermal
 
 
 def main(args: E230920UpdateThermalData):

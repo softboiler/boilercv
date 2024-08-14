@@ -18,21 +18,20 @@ from boilercv.data.packing import pack
 from boilercv.images import scale_bool
 from boilercv.images.cv import draw_contours
 from boilercv.types import ArrInt
-from boilercv_pipeline.models import get_parser
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.paths import get_parser, paths
 from boilercv_pipeline.sets import get_contours_df, get_dataset, process_datasets
 
 
 class Deps(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
+    root: Path = Field(default=paths.paths.root, exclude=True)
     stage: Path = Path(__file__)
-    sources: Path = default.paths.sources
-    contours: Path = default.paths.contours
+    sources: Path = paths.paths.sources
+    contours: Path = paths.paths.contours
 
 
 class Outs(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
-    filled: Path = default.paths.filled
+    root: Path = Field(default=paths.paths.root, exclude=True)
+    filled: Path = paths.paths.filled
 
 
 def main(args: Fill):

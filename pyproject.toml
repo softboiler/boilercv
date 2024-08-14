@@ -143,7 +143,7 @@ enableExperimentalFeatures = false
 reportMissingModuleSource = "warning"
 # Default "error" in strict
 reportMissingImports = "warning"
-reportInvalidTypeForm = "warning"
+reportInvalidTypeForm = "none"                 # Works fine in BaseModels
 reportUndefinedVariable = "warning"
 reportAssertAlwaysTrue = "warning"
 reportInvalidStringEscapeSequence = "warning"
@@ -318,10 +318,9 @@ convention = "numpy"
     "PYI047", # Allow unused private generated types
     "SLF001", # Allow private member access in generated types
 ]
-"pipeline/boilercv_pipeline/stages/*.py" = [
-    # ? Allow missing docstrings in top-level stages
-    "D101",
-    "D103",
+"pipeline/boilercv_pipeline/stages/**/*.py" = [
+    # ? Allow missing docstrings in stage implementations
+    "D10",
 ]
 "tests/**" = [
     "ARG001", # Allow unused arguments

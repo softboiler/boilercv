@@ -11,20 +11,19 @@ from cappa.base import command, invoke
 from pandas import concat, read_hdf
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.models import get_parser
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.paths import get_parser, paths
 from boilercv_pipeline.stages.common.e230920 import get_e230920_times
 
 
 class Deps(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
+    root: Path = Field(default=paths.paths.root, exclude=True)
     stage: Path = Path(__file__)
-    e230920_processed_tracks: Path = default.paths.e230920_processed_tracks
+    e230920_processed_tracks: Path = paths.paths.e230920_processed_tracks
 
 
 class Outs(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
-    e230920_merged_tracks: Path = default.paths.e230920_merged_tracks
+    root: Path = Field(default=paths.paths.root, exclude=True)
+    e230920_merged_tracks: Path = paths.paths.e230920_merged_tracks
 
 
 def main(args: E230920MergeTracks):

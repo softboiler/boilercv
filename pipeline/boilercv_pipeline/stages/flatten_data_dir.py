@@ -20,24 +20,23 @@ from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.models import get_parser
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.paths import get_parser, paths
 
 
 class Deps(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
+    root: Path = Field(default=paths.paths.root, exclude=True)
     stage: Path = Path(__file__)
-    hierarchical_data: Path = default.paths.hierarchical_data
-    notes: Path = default.paths.notes
-    cines: Path = default.paths.cines
-    sheets: Path = default.paths.sheets
+    hierarchical_data: Path = paths.paths.hierarchical_data
+    notes: Path = paths.paths.notes
+    cines: Path = paths.paths.cines
+    sheets: Path = paths.paths.sheets
 
 
 class Outs(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
-    notes: Path = default.paths.notes
-    cines: Path = default.paths.cines
-    sheets: Path = default.paths.sheets
+    root: Path = Field(default=paths.paths.root, exclude=True)
+    notes: Path = paths.paths.notes
+    cines: Path = paths.paths.cines
+    sheets: Path = paths.paths.sheets
 
 
 def main(args: FlattenDataDir):

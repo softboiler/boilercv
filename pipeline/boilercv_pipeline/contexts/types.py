@@ -1,9 +1,10 @@
 """Types."""
 
-from typing import Any, Generic, Protocol, TypeAlias, TypedDict, TypeVar
+from typing import Any, Generic, Protocol, TypeVar
 
 import pydantic
 from pydantic import ConfigDict
+from typing_extensions import TypedDict
 
 
 class AnyTypedDict(TypedDict):
@@ -26,7 +27,7 @@ class PluginConfigDict(ConfigDict, Generic[PluginSettings_T]):
     plugin_settings: PluginSettings_T  # pyright: ignore[reportIncompatibleVariableOverride]
 
 
-class CtxValidationInfo(pydantic.ValidationInfo, Protocol[Contexts_T]):
+class ValidationInfo(pydantic.ValidationInfo, Protocol[Contexts_T]):
     """Pydantic validation info with a guaranteed context."""
 
     @property
@@ -37,8 +38,3 @@ class ContextsPluginSettings(TypedDict, Generic[Contexts_T]):
     """Context model Pydantic plugin settings."""
 
     contexts: Contexts_T
-
-
-AnyCtxValidationInfo: TypeAlias = CtxValidationInfo[Contexts]
-DefaultPluginSettings: TypeAlias = ContextsPluginSettings[Contexts]
-DefaultPluginConfigDict: TypeAlias = PluginConfigDict[DefaultPluginSettings]

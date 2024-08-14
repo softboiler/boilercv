@@ -10,14 +10,14 @@ from boilercv_pipeline.captivate.captures import write_image
 from boilercv_pipeline.captivate.previews import view_images
 from boilercv_pipeline.examples.detect_surface import find_boiling_surface
 from boilercv_pipeline.examples.previews import _EXAMPLE
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.sets import get_dataset
 
 
 def main():  # noqa: D103
     ds = get_dataset(_EXAMPLE)
     gray = (
-        open_dataset(default.params.paths.gray_preview)[VIDEO]
+        open_dataset(paths.params.paths.gray_preview)[VIDEO]
         .sel(video_name=_EXAMPLE)
         .values
     )
@@ -30,7 +30,7 @@ def main():  # noqa: D103
     )
 
     filled = (
-        open_dataset(default.params.paths.filled_preview)[VIDEO]
+        open_dataset(paths.params.paths.filled_preview)[VIDEO]
         .sel(video_name=_EXAMPLE)
         .values
     )
@@ -41,8 +41,8 @@ def main():  # noqa: D103
     if PREVIEW:
         view_images(highlighted_bubbles)
     if WRITE:
-        write_image(default.params.paths.media / "roi", highlighted_roi)
-        write_image(default.params.paths.media / "composite", highlighted_bubbles)
+        write_image(paths.params.paths.media / "roi", highlighted_roi)
+        write_image(paths.params.paths.media / "composite", highlighted_bubbles)
 
 
 if __name__ == "__main__":

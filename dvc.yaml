@@ -1,24 +1,27 @@
 stages:
-  binarize:
-    cmd: "boilercv_pipeline stages binarize"
-    deps:
-      - "${paths.large_sources}"
-    # outs:
-    #   - "${paths.sources}":
-    #       persist: true
-    #   - "${paths.rois}":
-    #       persist: true
-
   convert:
-    cmd: "boilercv_pipeline stages convert"
+    cmd: "boilercv-pipeline stage convert"
     deps:
+      - pipeline/boilercv_pipeline/stages/convert
       - "${paths.cines}"
-    # outs:
-    #   - "${paths.large_sources}":
-    #       persist: true
+    outs:
+      - "${paths.large_sources}":
+          persist: true
+          push: false
+
+  binarize:
+    cmd: "boilercv-pipeline stage binarize"
+    deps:
+      - pipeline/boilercv_pipeline/stages/binarize
+      - "${paths.large_sources}"
+    outs:
+      - "${paths.sources}":
+          persist: true
+      - "${paths.rois}":
+          persist: true
 
   flatten_data_dir:
-    cmd: "boilercv_pipeline stages flatten-data-dir"
+    cmd: "boilercv-pipeline stage flatten-data-dir"
     deps:
       - "${paths.hierarchical_data}"
       - "${paths.notes}"
@@ -33,7 +36,7 @@ stages:
     #       persist: true
 
   preview_gray:
-    cmd: "boilercv_pipeline stages preview-gray"
+    cmd: "boilercv-pipeline stage preview-gray"
     deps:
       - "${package_paths.stages.preview_gray}"
       - "${paths.sources}"
@@ -42,7 +45,7 @@ stages:
           persist: true
 
   preview_binarized:
-    cmd: "boilercv_pipeline stages preview-binarized"
+    cmd: "boilercv-pipeline stage preview-binarized"
     deps:
       - "${package_paths.stages.preview_binarized}"
       - "${paths.rois}"
@@ -52,7 +55,7 @@ stages:
           persist: true
 
   find_contours:
-    cmd: "boilercv_pipeline stages find-contours"
+    cmd: "boilercv-pipeline stage find-contours"
     deps:
       - "${package_paths.stages.find_contours}"
       - "${paths.sources}"
@@ -60,7 +63,7 @@ stages:
       - "${paths.contours}":
           persist: true
   fill:
-    cmd: "boilercv_pipeline stages fill"
+    cmd: "boilercv-pipeline stage fill"
     deps:
       - "${package_paths.stages.fill}"
       - "${paths.sources}"
@@ -70,7 +73,7 @@ stages:
           persist: true
 
   preview_filled:
-    cmd: "boilercv_pipeline stages preview-filled"
+    cmd: "boilercv-pipeline stage preview-filled"
     deps:
       - "${package_paths.stages.preview_filled}"
       - "${paths.sources}"
@@ -80,7 +83,7 @@ stages:
           persist: true
 
   e230920_update_thermal_data:
-    cmd: "boilercv_pipeline stages e230920-update-thermal-data"
+    cmd: "boilercv-pipeline stage e230920-update-thermal-data"
     deps:
       - "${package_paths.stages.e230920_update_thermal_data}"
       - "${paths.e230920_thermal_raw}"
@@ -89,7 +92,7 @@ stages:
           persist: true
 
   e230920_find_contours:
-    cmd: "boilercv_pipeline stages e230920-find-contours"
+    cmd: "boilercv-pipeline stage e230920-find-contours"
     deps:
       - "${package_paths.stages.e230920_find_contours}"
       - "${paths.contours}"
@@ -98,7 +101,7 @@ stages:
           persist: true
 
   e230920_find_objects:
-    cmd: "boilercv_pipeline stages e230920-find-objects"
+    cmd: "boilercv-pipeline stage e230920-find-objects"
     deps:
       - "${package_paths.stages.e230920_find_objects}"
       - "${paths.e230920_contours}"
@@ -107,7 +110,7 @@ stages:
           persist: true
 
   e230920_find_tracks:
-    cmd: "boilercv_pipeline stages e230920-find-tracks"
+    cmd: "boilercv-pipeline stage e230920-find-tracks"
     deps:
       - "${package_paths.stages.e230920_find_tracks}"
       - "${paths.e230920_objects}"
@@ -116,7 +119,7 @@ stages:
           persist: true
 
   e230920_process_tracks:
-    cmd: "boilercv_pipeline stages e230920-process-tracks"
+    cmd: "boilercv-pipeline stage e230920-process-tracks"
     deps:
       - "${package_paths.stages.e230920_process_tracks}"
       - "${paths.e230920_tracks}"
@@ -125,7 +128,7 @@ stages:
           persist: true
 
   e230920_merge_tracks:
-    cmd: "boilercv_pipeline stages e230920-merge-tracks"
+    cmd: "boilercv-pipeline stage e230920-merge-tracks"
     deps:
       - "${package_paths.stages.e230920_merge_tracks}"
       - "${paths.e230920_processed_tracks}"
@@ -134,13 +137,13 @@ stages:
           persist: true
 
   e230920_plot_tracks:
-    cmd: "boilercv_pipeline stages e230920-plot-tracks"
+    cmd: "boilercv-pipeline stage e230920-plot-tracks"
     deps:
       - "${package_paths.stages.e230920_plot_tracks}"
       - "${paths.e230920_merged_tracks}"
 
   e230920_get_mae:
-    cmd: "boilercv_pipeline stages e230920-get-mae"
+    cmd: "boilercv-pipeline stage e230920-get-mae"
     deps:
       - "${package_paths.stages.e230920_get_mae}"
       - "${paths.e230920_processed_tracks}"
@@ -149,7 +152,7 @@ stages:
           persist: true
 
   e230920_merge_mae:
-    cmd: "boilercv_pipeline stages e230920-merge-mae"
+    cmd: "boilercv-pipeline stage e230920-merge-mae"
     deps:
       - "${package_paths.stages.e230920_merge_mae}"
       - "${paths.e230920_mae}"

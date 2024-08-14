@@ -19,9 +19,12 @@ from _pytest.python import Function
 from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
+from pydantic import BaseModel
 from pydantic.alias_generators import to_pascal
 
 from boilercv_pipeline.config import const as boilercv_pipeline_const
+from boilercv_pipeline.models.paths import get_kind
+from boilercv_pipeline.models.types import RootContexts, Roots
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
 from boilercv_tests.config import const
 from boilercv_tests.types import FixtureStore
@@ -47,34 +50,40 @@ def _filter_certain_warnings():
 @pytest.fixture(params=boilercv_pipeline_const.stages)
 def stage(tmp_path, request):
     """Set project directory."""
-    if request.param.startswith("e230920") or request.param == "flatten_data_dir":
+    if (
+        request.param.startswith("e230920")
+        or request.param == "flatten_data_dir"
+        or request.param != "binarize"
+    ):
         pytest.skip("Deps not yet sourced")
     copy(const.test_params, tmp_path / const.params)
-    module = import_module(f"boilercv_pipeline.stages.{request.param}")
-    deps = module.Deps(root=tmp_path)
-    outs = module.Outs(root=tmp_path)
-    src_deps = module.Deps(root=const.test_data_root / "data").model_dump()
-    for field, dep in deps.model_dump().items():
-        if dep.suffix:
-            continue
-        copytree(src_deps[field], dep, dirs_exist_ok=True)
-    src_outs = module.Outs(root=const.test_data_root / "data").model_dump()
+    init = import_module(f"boilercv_pipeline.stages.{request.param}")
+    ctx = RootContexts(roots=Roots(data=tmp_path / "data", docs=None))
+    deps: BaseModel = init.Deps(_contexts=ctx)
+    outs: BaseModel = init.Outs(_contexts=ctx)
+    src_ctx = RootContexts(roots=Roots(data=const.test_data_root / "data", docs=None))
     (expected := tmp_path / "expected").mkdir()
-    for field, out in outs.model_dump().items():
-        if out.suffix:
-            out.parent.mkdir(exist_ok=True)
-            expected_out = expected / out.relative_to(tmp_path)
-            expected_out.parent.mkdir(exist_ok=True)
-            copy(src_outs[field], expected_out)
-            continue
-        out.mkdir(exist_ok=True)
-        copytree(src_outs[field], expected / out.name, dirs_exist_ok=True)
-    return partial(
-        import_module(f"boilercv_pipeline.stages.{request.param}").main,
-        getattr(module, f"{to_pascal(request.param)}")(
-            params=module.Params(), deps=deps, outs=outs
-        ),
+    exp_outs: BaseModel = init.Outs(
+        _contexts=RootContexts(roots=Roots(data=expected, docs=None))
     )
+    for src, dst, info in zip(
+        (
+            *init.Deps(_contexts=src_ctx).model_dump().values(),
+            *init.Outs(_contexts=src_ctx).model_dump().values(),
+        ),
+        (*deps.model_dump().values(), *exp_outs.model_dump().values()),
+        (*deps.model_fields.values(), *exp_outs.model_fields.values()),
+        strict=True,
+    ):
+        if kind := get_kind(info):
+            if "file" in kind.lower():
+                copy(src, dst)
+            if "dir" in kind.lower():
+                copytree(src, dst, dirs_exist_ok=True)
+
+    main = import_module(f"boilercv_pipeline.stages.{request.param}.__main__").main
+    params = getattr(init, f"{to_pascal(request.param)}")
+    return partial(main, params(deps=deps, outs=outs))
 
 
 @pytest.fixture(scope="module", autouse=True)

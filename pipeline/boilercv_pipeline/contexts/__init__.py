@@ -1,60 +1,50 @@
 """Contexts."""
 
-from typing import Any, ClassVar, Literal, Self, Unpack
+from collections.abc import Mapping
+from typing import Any, ClassVar, Literal, Self
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from pydantic.main import IncEx
 
 from boilercv_pipeline.contexts.types import (
     Contexts,
-    DefaultPluginConfigDict,
-    DefaultPluginSettings,
+    ContextsPluginSettings,
     PluginConfigDict,
 )
 
-
-def get_config(**kwds: Unpack[ConfigDict]) -> PluginConfigDict[DefaultPluginSettings]:
-    """Pydantic model config with root context."""
-    return {
-        **DefaultPluginConfigDict(
-            plugin_settings=DefaultPluginSettings(contexts=Contexts())
-        ),
-        "validate_default": True,
-        **kwds,
-    }
+_CONTEXTS = "_contexts"
+"""Contexts attribute name."""
+MODEL_CONFIG = "model_config"
+"""Model config attribute name."""
+PLUGIN_SETTINGS = "plugin_settings"
+"""Model config plugin settings key."""
+CONTEXTS = "contexts"
+"""Plugin settings contexts key."""
 
 
-class ContextsBaseModel(BaseModel):
-    """Base model with default context."""
+class ContextsModel(BaseModel):
+    """Model that guarantees a dictionary context is available during validation."""
 
-    model_config: ClassVar[DefaultPluginConfigDict] = get_config()  # pyright: ignore[reportIncompatibleVariableOverride]
-    _contexts_parent: Contexts = Contexts()
+    model_config: ClassVar[PluginConfigDict[ContextsPluginSettings[Contexts]]] = (  # pyright: ignore[reportIncompatibleVariableOverride]
+        PluginConfigDict(
+            validate_default=True,
+            plugin_settings=ContextsPluginSettings(contexts=Contexts()),
+        )
+    )
+    _contexts: Contexts = Contexts()
 
     @classmethod
     def contexts_merge(cls, other: Contexts | None = None) -> Contexts:
-        """Combine contexts from config and optionally other contexts."""
-        contexts = cls.model_config["plugin_settings"]["contexts"]
+        """Merge contexts from config with other contexts."""
+        contexts = cls.model_config[PLUGIN_SETTINGS][CONTEXTS]
         return {**contexts, **other} if other else contexts
 
-    def __init__(self, /, **data: Any) -> None:
-        contexts = self.contexts_merge(data.get("_contexts_parent"))
-        for field, info in self.model_fields.items():
-            if (
-                (annotation := info.annotation)
-                and (model_config := getattr(annotation, "model_config", None))
-                and (
-                    model_config.get("plugin_settings", {}).get("contexts", {})
-                    is not None
-                )
-            ):
-                value = data.get(field) or {}
-                if isinstance(value, ContextsBaseModel):
-                    value._contexts_parent = contexts  # noqa: SLF001
-                else:
-                    data[field] = {**value, "_contexts_parent": contexts}
+    def __init__(self, /, **data: Any):
+        contexts = self.contexts_merge(data.get(_CONTEXTS))
         self.__pydantic_validator__.validate_python(
             data, self_instance=self, context=contexts
         )
+        self._contexts = contexts
 
     def model_dump(
         self,
@@ -154,3 +144,28 @@ class ContextsBaseModel(BaseModel):
         return super().model_validate_strings(
             obj, strict=strict, context=cls.contexts_merge(context)
         )
+
+
+class ContextsMergeModel(ContextsModel):
+    """Contexts model that merges contexts to sub-values."""
+
+    def __init__(self, /, **data: Any) -> None:
+        contexts = self.contexts_merge(data.get(_CONTEXTS))
+        for field, info in self.model_fields.items():
+            if (
+                plugin_settings := (
+                    getattr(info.annotation, MODEL_CONFIG, {}).get(PLUGIN_SETTINGS, {})
+                )
+            ) and isinstance(
+                (inner_contexts := plugin_settings.get(CONTEXTS)), Mapping
+            ):
+                inner_contexts = {**inner_contexts, **contexts}
+                value = data.get(field) or {}
+                if isinstance(value, ContextsModel):
+                    value._contexts = inner_contexts  # pyright: ignore[reportAttributeAccessIssue]  # noqa: SLF001
+                else:
+                    data[field] = {**value, _CONTEXTS: inner_contexts}
+        self.__pydantic_validator__.validate_python(
+            data, self_instance=self, context=contexts
+        )
+        self._contexts = contexts

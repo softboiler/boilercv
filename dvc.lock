@@ -380,21 +380,48 @@ stages:
       size: 10710
       nfiles: 7
   binarize:
-    cmd: boilercv_pipeline stages binarize
+    cmd: boilercv-pipeline stage binarize
     deps:
     - path: data/large_sources
       hash: md5
-      md5: 7b8a403d748e246a942b1cd5024e7337.dir
-      size: 30612132016
-      nfiles: 18
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: pipeline/boilercv_pipeline/stages/binarize
+      hash: md5
+      md5: b86fddb01eb41f0c8f393c80377a4727.dir
+      size: 2305
+      nfiles: 2
+    outs:
+    - path: data/rois
+      hash: md5
+      md5: 9ede92f5c57be51658a18083bcf34c45.dir
+      size: 206003854
+      nfiles: 338
+    - path: data/sources
+      hash: md5
+      md5: cf2b91e85b6e420d9e355d7b37bd2df2.dir
+      size: 7515647028
+      nfiles: 337
   convert:
-    cmd: boilercv_pipeline stages convert
+    cmd: boilercv-pipeline stage convert
     deps:
     - path: data/cines
       hash: md5
-      md5: 8b3bc76a95c0b113c9b7a7e5c966dcc1.dir
-      size: 34082561760
-      nfiles: 17
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: pipeline/boilercv_pipeline/stages/convert
+      hash: md5
+      md5: 2a68bd5a146ed764bb4c5accceedcbe0.dir
+      size: 2131
+      nfiles: 2
+    outs:
+    - path: data/large_sources
+      hash: md5
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
   flatten_data_dir:
     cmd: boilercv_pipeline stages flatten-data-dir
     deps:

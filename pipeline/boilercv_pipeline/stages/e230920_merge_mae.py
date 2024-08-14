@@ -12,20 +12,19 @@ from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.models import get_parser
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.paths import get_parser, paths
 from boilercv_pipeline.stages.common.e230920 import read_nb
 
 
 class Deps(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
+    root: Path = Field(default=paths.paths.root, exclude=True)
     stage: Path = Path(__file__)
-    e230920_mae: Path = default.paths.e230920_mae
+    e230920_mae: Path = paths.paths.e230920_mae
 
 
 class Outs(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
-    e230920_merged_mae: Path = default.paths.e230920_merged_mae
+    root: Path = Field(default=paths.paths.root, exclude=True)
+    e230920_merged_mae: Path = paths.paths.e230920_merged_mae
 
 
 PLOTS = Path("tests/plots/mae")

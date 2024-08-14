@@ -13,21 +13,20 @@ from pydantic import BaseModel, Field
 from tqdm import tqdm
 
 from boilercv.data import FRAME, VIDEO
-from boilercv_pipeline.models import get_parser
-from boilercv_pipeline.models.config import default
+from boilercv_pipeline.models.paths import get_parser, paths
 from boilercv_pipeline.sets import get_dataset
 from boilercv_pipeline.stages.common.preview import new_videos_to_preview
 
 
 class Deps(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
+    root: Path = Field(default=paths.paths.root, exclude=True)
     stage: Path = Path(__file__)
-    sources: Path = default.paths.sources
+    sources: Path = paths.paths.sources
 
 
 class Outs(DefaultPathsModel):
-    root: Path = Field(default=default.paths.root, exclude=True)
-    gray_preview: Path = default.paths.gray_preview
+    root: Path = Field(default=paths.paths.root, exclude=True)
+    gray_preview: Path = paths.paths.gray_preview
 
 
 def main(args: PreviewGray):
