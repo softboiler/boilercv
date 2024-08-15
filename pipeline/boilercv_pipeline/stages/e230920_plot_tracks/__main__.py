@@ -5,33 +5,17 @@ from __future__ import annotations
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Annotated
 
-from boilercore.models import DefaultPathsModel
-from cappa.arg import Arg
-from cappa.base import command, invoke
-from pydantic import BaseModel, DirectoryPath, Field
+from cappa.base import invoke
 
-from boilercv_pipeline.models import get_parser
 from boilercv_pipeline.models.notebooks import Notebooks
-from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.stages.common.e230920 import (
     get_e230920_times,
     get_path_time,
     submit_nb_process,
 )
 from boilercv_pipeline.stages.common.e230920.types import Out
-
-
-class Deps(DefaultPathsModel):
-    root: Path = Field(default=paths.paths.root, exclude=True)
-    stage: DirectoryPath = Path(__file__).parent
-    e230920_merged_tracks: Path = paths.paths.e230920_merged_tracks
-
-
-class Outs(DefaultPathsModel):
-    root: Path = Field(default=paths.paths.root, exclude=True)
-
+from boilercv_pipeline.stages.e230920_plot_tracks import E230920PlotTracks
 
 PLOTS = Path("tests/plots/tracks")
 PLOTS.mkdir(exist_ok=True)
@@ -52,12 +36,6 @@ def main(args: E230920PlotTracks):
 def export_track_plot(ns: SimpleNamespace, _out: Out):
     """Export object centers and sizes."""
     ns.figure.savefig(PLOTS / f"{get_path_time(ns.TIME)}.png")
-
-
-@command(invoke=main, default_long=True)
-class E230920PlotTracks(BaseModel):
-    deps: Annotated[Deps, Arg(parse=get_parser(Deps), hidden=True)] = Deps()
-    outs: Annotated[Outs, Arg(parse=get_parser(Deps), hidden=True)] = Outs()
 
 
 if __name__ == "__main__":

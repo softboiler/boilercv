@@ -30,7 +30,7 @@ from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.stages.common.e230920.types import NbProcess, Out
 
 
-def get_e230920_times(contours: Path = paths.paths.contours) -> list[str]:
+def get_e230920_times(contours: Path = paths.contours) -> list[str]:
     """Get times for the e230920 experiment."""
     return [
         dt.isoformat()
