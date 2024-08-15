@@ -48,7 +48,7 @@ def main():  # noqa: D103
         show()
         view_images(composed)
     if WRITE:
-        path = paths.params.paths.media / "examples" / _EXAMPLE / "multicolor"
+        path = paths.media / "examples" / _EXAMPLE / "multicolor"
         path.parent.mkdir(parents=True, exist_ok=True)
         write_image(path, composed)
 

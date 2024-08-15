@@ -318,6 +318,10 @@ convention = "numpy"
     "PYI047", # Allow unused private generated types
     "SLF001", # Allow private member access in generated types
 ]
+"pipeline/boilercv_pipeline/manual/**/*.py" = [
+    # ? Allow missing docstrings in stage implementations
+    "D10",
+]
 "pipeline/boilercv_pipeline/stages/**/*.py" = [
     # ? Allow missing docstrings in stage implementations
     "D10",

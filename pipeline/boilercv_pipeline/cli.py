@@ -32,12 +32,7 @@ from boilercv_pipeline.stages.preview_filled import PreviewFilled
 from boilercv_pipeline.stages.preview_gray import PreviewGray
 
 
-@command(invoke="boilercv_pipeline.models.Params")
-class SyncParams:
-    """Synchronize parameters."""
-
-
-@command(invoke="boilercv_pipeline.models.types.generated.sync_stages")
+@command(invoke="boilercv_pipeline.models.generated.types.sync_stages")
 class SyncStagesLiterals:
     """Sync stages literals."""
 
@@ -66,79 +61,84 @@ class Stage:
     ]
 
 
-def generate_dvc_yaml(root: Path | None = None):
+@command(name="sync-dvc")
+class SyncDVC:
     """Generate `dvc.yaml`."""
-    root = root or Path.cwd()
 
-    class Stages(ContextsMergeModel):
-        """Stages."""
+    root: Path = Path.cwd()
 
-        convert: Convert = Field(default_factory=Convert)
-        binarize: Binarize = Field(default_factory=Binarize)
-        preview_gray: PreviewGray = Field(default_factory=PreviewGray)
-        preview_binarized: PreviewBinarized = Field(default_factory=PreviewBinarized)
-        find_contours: FindContours = Field(default_factory=FindContours)
-        fill: Fill = Field(default_factory=Fill)
-        preview_filled: PreviewFilled = Field(default_factory=PreviewFilled)
-        # e230920_update_thermal_data: E230920UpdateThermalData = Field(
-        #     default_factory=E230920UpdateThermalData
-        # )
-        # e230920_find_contours: E230920FindContours = Field(
-        #     default_factory=E230920FindContours
-        # )
-        # e230920_find_objects: E230920FindObjects = Field(
-        #     default_factory=E230920FindObjects
-        # )
-        # e230920_find_tracks: E230920FindTracks = Field(
-        #     default_factory=E230920FindTracks
-        # )
-        # e230920_process_tracks: E230920ProcessTracks = Field(
-        #     default_factory=E230920ProcessTracks
-        # )
-        # e230920_merge_tracks: E230920MergeTracks = Field(
-        #     default_factory=E230920MergeTracks
-        # )
-        # e230920_plot_tracks: E230920PlotTracks = Field(
-        #     default_factory=E230920PlotTracks
-        # )
-        # e230920_get_mae: E230920GetMae = Field(default_factory=E230920GetMae)
-        # e230920_merge_mae: E230920MergeMae = Field(default_factory=E230920MergeMae)
+    def __call__(self):
+        """Sync `dvc.yaml`."""
 
-    stages: dict[str, Any] = {}
-    for stage, stage_value in Stages().model_dump().items():
-        for paths, paths_value in stage_value.items():
-            stage_value[paths] = [
-                apply_to_paths(
-                    path,
-                    lambda path: (
-                        path.relative_to(root) if path.is_absolute() else path
-                    ).as_posix(),
-                )
-                for path in paths_value.values()
-            ]
-        stage_value["outs"] = [
-            (
-                {out: {"persist": True, "cache": False, "push": False}}
-                if out in ["data/cines", "data/large_sources"]
-                else {out: {"persist": True}}
+        class Stages(ContextsMergeModel):
+            """Stages."""
+
+            convert: Convert = Field(default_factory=Convert)
+            binarize: Binarize = Field(default_factory=Binarize)
+            preview_gray: PreviewGray = Field(default_factory=PreviewGray)
+            preview_binarized: PreviewBinarized = Field(
+                default_factory=PreviewBinarized
             )
-            for out in stage_value["outs"]
-        ]
-        stages[stage] = {
-            "cmd": f"boilercv-pipeline stage {stage.replace('_', '-')}",
-            **stage_value,
-        }
-    (root / "dvc.yaml").write_text(
-        encoding="utf-8",
-        data=safe_dump(sort_keys=False, indent=2, data={"stages": stages}),
-    )
+            find_contours: FindContours = Field(default_factory=FindContours)
+            fill: Fill = Field(default_factory=Fill)
+            preview_filled: PreviewFilled = Field(default_factory=PreviewFilled)
+            # e230920_update_thermal_data: E230920UpdateThermalData = Field(
+            #     default_factory=E230920UpdateThermalData
+            # )
+            # e230920_find_contours: E230920FindContours = Field(
+            #     default_factory=E230920FindContours
+            # )
+            # e230920_find_objects: E230920FindObjects = Field(
+            #     default_factory=E230920FindObjects
+            # )
+            # e230920_find_tracks: E230920FindTracks = Field(
+            #     default_factory=E230920FindTracks
+            # )
+            # e230920_process_tracks: E230920ProcessTracks = Field(
+            #     default_factory=E230920ProcessTracks
+            # )
+            # e230920_merge_tracks: E230920MergeTracks = Field(
+            #     default_factory=E230920MergeTracks
+            # )
+            # e230920_plot_tracks: E230920PlotTracks = Field(
+            #     default_factory=E230920PlotTracks
+            # )
+            # e230920_get_mae: E230920GetMae = Field(default_factory=E230920GetMae)
+            # e230920_merge_mae: E230920MergeMae = Field(default_factory=E230920MergeMae)
 
-
-generate_dvc_yaml()
+        stages: dict[str, Any] = {}
+        for stage, stage_value in Stages().model_dump().items():
+            for paths, paths_value in stage_value.items():
+                stage_value[paths] = [
+                    apply_to_paths(
+                        path,
+                        lambda path: (
+                            path.relative_to(self.root) if path.is_absolute() else path
+                        ).as_posix(),
+                    )
+                    for path in paths_value.values()
+                ]
+            stage_value["outs"] = [
+                (
+                    {out: {"persist": True, "cache": False, "push": False}}
+                    if out in ["data/cines", "data/large_sources"]
+                    else {out: {"persist": True}}
+                )
+                for out in stage_value["outs"]
+            ]
+            stages[stage] = {
+                "cmd": f"boilercv-pipeline stage {stage.replace('_', '-')}",
+                **stage_value,
+            }
+        dvc = self.root / "dvc.yaml"
+        dvc.write_text(
+            encoding="utf-8",
+            data=safe_dump(sort_keys=False, indent=2, data={"stages": stages}),
+        )
 
 
 @dataclass
 class BoilercvPipeline:
     """Pipeline."""
 
-    commands: Subcommands[SyncParams | SyncStagesLiterals | Stage]
+    commands: Subcommands[SyncDVC | SyncStagesLiterals | Stage]

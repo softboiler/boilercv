@@ -50,11 +50,7 @@ def _filter_certain_warnings():
 @pytest.fixture(params=boilercv_pipeline_const.stages)
 def stage(tmp_path, request):
     """Set project directory."""
-    if (
-        request.param.startswith("e230920")
-        or request.param == "flatten_data_dir"
-        or request.param != "binarize"
-    ):
+    if request.param.startswith("e230920"):
         pytest.skip("Deps not yet sourced")
     copy(const.test_params, tmp_path / const.params)
     init = import_module(f"boilercv_pipeline.stages.{request.param}")
@@ -80,7 +76,6 @@ def stage(tmp_path, request):
                 copy(src, dst)
             if "dir" in kind.lower():
                 copytree(src, dst, dirs_exist_ok=True)
-
     main = import_module(f"boilercv_pipeline.stages.{request.param}.__main__").main
     params = getattr(init, f"{to_pascal(request.param)}")
     return partial(main, params(deps=deps, outs=outs))

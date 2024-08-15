@@ -12,7 +12,7 @@ from boilercv_pipeline.previews import draw_text_da
 
 
 def main(preview: bool = PREVIEW) -> DA:  # noqa: D103
-    with open_dataset(paths.params.paths.gray_preview) as ds:
+    with open_dataset(paths.gray_preview) as ds:
         da = draw_text_da(ds[VIDEO])
     if preview:
         view_images(da, framerate=FRAMERATE_PREV)

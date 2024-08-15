@@ -6,13 +6,8 @@ from boilercv_pipeline.video import prepare_dataset
 
 
 def main():  # noqa: D103
-    destination = (
-        paths.params.paths.large_examples
-        / f"{paths.params.paths.large_example_cine.stem}.nc"
-    )
-    ds = prepare_dataset(
-        paths.params.paths.large_example_cine, num_frames=EXAMPLE_NUM_FRAMES
-    )
+    destination = paths.large_examples / f"{paths.large_example_cine.stem}.nc"
+    ds = prepare_dataset(paths.large_example_cine, num_frames=EXAMPLE_NUM_FRAMES)
     ds.to_netcdf(path=destination)
 
 

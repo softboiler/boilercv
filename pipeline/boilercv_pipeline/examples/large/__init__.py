@@ -10,7 +10,7 @@ from boilercv.types import DS
 from boilercv_pipeline.captivate.previews import view_images
 from boilercv_pipeline.models.paths import paths
 
-EXAMPLE = paths.params.paths.large_sources / "2022-09-14T13-20-54.nc"
+EXAMPLE = paths.large_sources / "2022-09-14T13-20-54.nc"
 
 
 @contextmanager
@@ -31,13 +31,9 @@ def example_dataset(
         save: Whether to save the file.
     """
     _source = (
-        paths.params.paths.large_examples / f"{EXAMPLE.stem}_{source}.nc"
-        if source
-        else EXAMPLE
+        paths.large_examples / f"{EXAMPLE.stem}_{source}.nc" if source else EXAMPLE
     )
-    _destination = (
-        paths.params.paths.large_examples / f"{EXAMPLE.stem}_{destination}.nc"
-    )
+    _destination = paths.large_examples / f"{EXAMPLE.stem}_{destination}.nc"
     with open_dataset(_source) as ds:
         original = ds[VIDEO]
         try:

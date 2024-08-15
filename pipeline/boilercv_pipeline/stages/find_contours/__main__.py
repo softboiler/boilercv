@@ -13,15 +13,19 @@ from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
 from boilercv_pipeline.stages.find_contours import FindContours
 
 
-def main(args: FindContours):
+def main(params: FindContours):
     logger.info("Start finding contours")
     destinations = get_unprocessed_destinations(
-        args.outs.contours,
-        names=[source.stem for source in sorted(args.deps.sources.iterdir())],
-        ext="h5",
+        params.outs.contours, sources=params.deps.sources, ext="h5"
     )
     for source_name, destination in tqdm(destinations.items()):
-        video = bitwise_not(scale_bool(get_dataset(source_name)[VIDEO].values))
+        video = bitwise_not(
+            scale_bool(
+                get_dataset(
+                    source_name, sources=params.deps.sources, rois=params.deps.rois
+                )[VIDEO].values
+            )
+        )
         df = get_all_contours(video, method=CHAIN_APPROX_SIMPLE)
         df.to_hdf(destination, key="contours", complib="zlib", complevel=9)
     logger.info("Finish finding contours")

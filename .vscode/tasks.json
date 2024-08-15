@@ -172,8 +172,6 @@
     },
     {
       "label": "dvc: repro (debug)",
-      "dependsOrder": "sequence",
-      "dependsOn": ["dvc: sync params"],
       "type": "shell",
       "options": {
         "env": { "BOILERCV_DEBUG": "True" }
@@ -184,8 +182,6 @@
     },
     {
       "label": "dvc: repro force (debug)",
-      "dependsOrder": "sequence",
-      "dependsOn": ["dvc: sync params"],
       "type": "shell",
       "options": {
         "env": { "BOILERCV_DEBUG": "True" }
@@ -196,8 +192,6 @@
     },
     {
       "label": "dvc: repro",
-      "dependsOrder": "sequence",
-      "dependsOn": ["dvc: sync params"],
       "type": "shell",
       "command": ". scripts/Initialize-Shell.ps1; dvc repro ${input:stage}",
       "icon": { "id": "graph" },
@@ -205,8 +199,6 @@
     },
     {
       "label": "dvc: repro force",
-      "dependsOrder": "sequence",
-      "dependsOn": ["dvc: sync params"],
       "type": "shell",
       "command": ". scripts/Initialize-Shell.ps1; dvc repro --force ${input:stage}",
       "icon": { "id": "graph" },
@@ -214,17 +206,15 @@
     },
     {
       "label": "dvc: dag",
-      "dependsOrder": "sequence",
-      "dependsOn": ["dvc: sync params"],
       "type": "shell",
       "command": ". scripts/Initialize-Shell.ps1; (dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/_static/dag.md; markdownlint-cli2 docs/_static/dag.md",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
     {
-      "label": "dvc: sync params",
+      "label": "dvc: sync",
       "type": "shell",
-      "command": ". scripts/Initialize-Shell.ps1; boilercv_pipeline sync-params",
+      "command": ". scripts/Initialize-Shell.ps1; boilercv_pipeline sync-dvc",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },

@@ -12,16 +12,17 @@ from boilercv_pipeline.sets import get_contours_df, get_dataset, process_dataset
 from boilercv_pipeline.stages.fill import Fill
 
 
-def main(args: Fill):
+def main(params: Fill):
     logger.info("Start filling contours")
-    destination = args.outs.filled
+    destination = params.outs.filled
     with process_datasets(
-        destination,
-        names=[source.stem for source in sorted(args.deps.sources.iterdir())],
+        destination, sources=params.deps.sources
     ) as videos_to_process:
         for name in tqdm(videos_to_process):
-            df = get_contours_df(name)
-            source_ds = get_dataset(name)
+            df = get_contours_df(name, contours=params.deps.contours)
+            source_ds = get_dataset(
+                name, sources=params.deps.sources, rois=params.deps.rois
+            )
             ds = zeros_like(source_ds, dtype=source_ds[VIDEO].dtype)
             video = ds[VIDEO]
             if not df.empty:

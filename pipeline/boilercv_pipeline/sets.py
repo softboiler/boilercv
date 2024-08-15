@@ -1,6 +1,6 @@
 """Datasets."""
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -16,15 +16,13 @@ from boilercv_pipeline.models.paths import paths
 
 ALL_FRAMES = slice(None)
 """Slice that gets all frames."""
-DEFAULT_NAMES = [source.stem for source in sorted(paths.params.paths.sources.iterdir())]
-"""Default names of all dataset sources."""
 STAGE_DEFAULT = "sources"
 """Default stage to work on."""
 
 
 @contextmanager
 def process_datasets(
-    destination_dir: Path, names: Iterable[str] = DEFAULT_NAMES, reprocess: bool = False
+    destination_dir: Path, reprocess: bool = False, sources: Path = paths.sources
 ) -> Iterator[dict[str, Any]]:
     """Get unprocessed dataset names and write them to disk.
 
@@ -41,7 +39,7 @@ def process_datasets(
         reprocess: Whether to reprocess all datasets.
     """
     unprocessed_destinations = get_unprocessed_destinations(
-        destination_dir, names=names, reprocess=reprocess
+        destination_dir, sources=sources, reprocess=reprocess
     )
     datasets_to_process = dict.fromkeys(unprocessed_destinations)
     yield datasets_to_process
@@ -55,9 +53,9 @@ def process_datasets(
 
 def get_unprocessed_destinations(
     destination_dir: Path,
-    names: Iterable[str] = DEFAULT_NAMES,
     ext: str = "nc",
     reprocess: bool = False,
+    sources: Path = paths.sources,
 ) -> dict[str, Path]:
     """Get destination paths for unprocessed datasets.
 
@@ -75,6 +73,8 @@ def get_unprocessed_destinations(
         Desired file extension.
     reprocess
         Reprocess all datasets.
+    sources
+        Directory of sources to be processed.
 
     Returns
     -------
@@ -82,16 +82,18 @@ def get_unprocessed_destinations(
     """
     unprocessed_destinations: dict[str, Path] = {}
     ext = ext.lstrip(".")
-    for name in names:
+    for name in [source.stem for source in sorted(sources.iterdir())]:
         destination = destination_dir / f"{name}.{ext}"
         if reprocess or not destination.exists():
             unprocessed_destinations[name] = destination
     return unprocessed_destinations
 
 
-def inspect_dataset(name: str, stage: Stage = STAGE_DEFAULT) -> DS:
+def inspect_dataset(
+    name: str, stage: Stage = STAGE_DEFAULT, sources: Path = paths.sources
+) -> DS:
     """Inspect a video dataset."""
-    cmp_source, unc_source = get_stage(name, stage)
+    cmp_source, unc_source = get_stage(name, sources)
     source = unc_source if unc_source.exists() else cmp_source
     if stage == "large_sources":
         return open_dataset(source) if source.exists() else Dataset()
@@ -104,12 +106,14 @@ def get_dataset(
     num_frames: int = 0,
     frame: slice = ALL_FRAMES,
     stage: Stage = STAGE_DEFAULT,
+    sources: Path = paths.sources,
+    rois: Path = paths.rois,
 ) -> DS:
     """Load a video dataset."""
     # Can't use `xarray.open_mfdataset` because it requires dask
     # Unpacking is incompatible with dask
     frame = slice_frames(num_frames, frame)
-    cmp_source, unc_source = get_stage(name, stage)
+    cmp_source, unc_source = get_stage(name, sources)
     source = unc_source if unc_source.exists() else cmp_source
     if stage == "large_sources":
         ds = open_dataset(source)
@@ -118,7 +122,7 @@ def get_dataset(
             if source.exists()
             else Dataset()
         )
-    roi = paths.params.paths.rois / f"{name}.nc"
+    roi = rois / f"{name}.nc"
     with open_dataset(source) as ds, open_dataset(roi) as roi_ds:
         if not unc_source.exists():
             Dataset({VIDEO: ds[VIDEO], HEADER: ds[HEADER]}).to_netcdf(
@@ -131,27 +135,22 @@ def get_dataset(
         })
 
 
-def get_stage(name: str, stage: Stage = STAGE_DEFAULT) -> tuple[Path, Path]:
+def get_stage(name: str, sources: Path) -> tuple[Path, Path]:
     """Get the paths associated with a particular video name and pipeline stage."""
-    if stage == "sources":
-        unc_source = paths.params.paths.uncompressed_sources / f"{name}.nc"
-        return paths.params.paths.sources / f"{name}.nc", unc_source
-    elif stage == "large_sources":
-        source = unc_source = paths.params.paths.large_sources / f"{name}.nc"
-        return source, unc_source
-    elif stage == "filled":
-        unc_source = paths.params.paths.uncompressed_filled / f"{name}.nc"
-        return paths.params.paths.filled / f"{name}.nc", unc_source
-    else:
-        raise ValueError(f"Unknown stage: {stage}")
-
-
-def get_contours_df(name: str) -> DF:
-    """Load contours from a dataset."""
-    unc_cont = paths.params.paths.uncompressed_contours / f"{name}.h5"
-    contour = (
-        unc_cont if unc_cont.exists() else paths.params.paths.contours / f"{name}.h5"
+    source = sources / f"{name}.nc"
+    (uncompressed := sources.with_name(f"uncompressed_{sources.name}")).mkdir(
+        parents=True, exist_ok=True
     )
+    return source, uncompressed / f"{name}.nc"
+
+
+def get_contours_df(name: str, contours: Path = paths.contours) -> DF:
+    """Load contours from a dataset."""
+    (
+        uncompressed_contours := contours.with_name(f"uncompressed_{contours.name}")
+    ).mkdir(parents=True, exist_ok=True)
+    unc_cont = uncompressed_contours / f"{name}.h5"
+    contour = unc_cont if unc_cont.exists() else contours / f"{name}.h5"
     contour_df: DF = read_hdf(contour)  # pyright: ignore[reportAssignmentType]
     if not unc_cont.exists():
         contour_df.to_hdf(unc_cont, key="contours", complevel=None, complib=None)

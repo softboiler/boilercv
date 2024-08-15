@@ -21,7 +21,7 @@ def main():  # noqa: D103
     if PREVIEW:
         view_images(highlighted_bubbles, framerate=FRAMERATE_CONT)
     if WRITE:
-        path = paths.params.paths.media / "examples" / _EXAMPLE / "gray_highlighted"
+        path = paths.media / "examples" / _EXAMPLE / "gray_highlighted"
         path.parent.mkdir(parents=True, exist_ok=True)
         write_video(path, highlighted_bubbles, preview_frame=True)
 

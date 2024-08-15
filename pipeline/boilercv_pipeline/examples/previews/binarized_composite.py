@@ -22,11 +22,9 @@ def main():  # noqa: D103
         view_images(bubbles.isel(frame=0))
         view_images(highlighted_bubbles, framerate=FRAMERATE_CONT)
     if WRITE:
-        write_video(paths.params.paths.media / "binarized", source)
-        write_video(paths.params.paths.media / "bubbles", bubbles, preview_frame=True)
-        write_video(
-            paths.params.paths.media / "binarized_highlighted", highlighted_bubbles
-        )
+        write_video(paths.media / "binarized", source)
+        write_video(paths.media / "bubbles", bubbles, preview_frame=True)
+        write_video(paths.media / "binarized_highlighted", highlighted_bubbles)
 
 
 if __name__ == "__main__":

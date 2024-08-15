@@ -1,6 +1,6 @@
 """Update previews for various stages."""
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
@@ -11,15 +11,16 @@ from boilercv.data import VIDEO, VIDEO_NAME, XPX, YPX, assign_ds
 from boilercv.data.models import Dimension
 from boilercv.types import DS
 from boilercv_pipeline.captivate.previews import pad_images
-from boilercv_pipeline.sets import DEFAULT_NAMES
+from boilercv_pipeline.models.paths import paths
 
 
 @contextmanager
 def new_videos_to_preview(
-    destination: Path, reprocess: bool = False, names: Iterable[str] = DEFAULT_NAMES
+    destination: Path, reprocess: bool = False, sources: Path = paths.sources
 ) -> Iterator[dict[str, Any]]:
     """Get empty mapping of new videos to preview and write to disk."""
     # Yield a mapping of new video names to previews, to be populated by the user
+    names = [source.stem for source in sorted(sources.iterdir())]
     if reprocess:
         # Reprocess all names
         new_video_names = names

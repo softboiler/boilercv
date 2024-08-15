@@ -16,11 +16,7 @@ from boilercv_pipeline.sets import get_dataset
 
 def main():  # noqa: D103
     ds = get_dataset(_EXAMPLE)
-    gray = (
-        open_dataset(paths.params.paths.gray_preview)[VIDEO]
-        .sel(video_name=_EXAMPLE)
-        .values
-    )
+    gray = open_dataset(paths.gray_preview)[VIDEO].sel(video_name=_EXAMPLE).values
     roi = ds[ROI].values
     highlighted_roi = overlay(gray, scale_bool(roi), color=BLUE, alpha=0.2)
 
@@ -29,11 +25,7 @@ def main():  # noqa: D103
         highlighted_roi, scale_bool(surface), color=RED, alpha=1
     )
 
-    filled = (
-        open_dataset(paths.params.paths.filled_preview)[VIDEO]
-        .sel(video_name=_EXAMPLE)
-        .values
-    )
+    filled = open_dataset(paths.filled_preview)[VIDEO].sel(video_name=_EXAMPLE).values
     highlighted_bubbles = overlay(
         highlighted_surface, scale_bool(filled), color=GREEN, alpha=0.4
     )
@@ -41,8 +33,8 @@ def main():  # noqa: D103
     if PREVIEW:
         view_images(highlighted_bubbles)
     if WRITE:
-        write_image(paths.params.paths.media / "roi", highlighted_roi)
-        write_image(paths.params.paths.media / "composite", highlighted_bubbles)
+        write_image(paths.media / "roi", highlighted_roi)
+        write_image(paths.media / "composite", highlighted_bubbles)
 
 
 if __name__ == "__main__":

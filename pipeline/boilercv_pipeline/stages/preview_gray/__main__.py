@@ -8,17 +8,17 @@ from boilercv_pipeline.stages.common.preview import new_videos_to_preview
 from boilercv_pipeline.stages.preview_gray import PreviewGray
 
 
-def main(args: PreviewGray):
+def main(params: PreviewGray):
     logger.info("Start updating gray preview")
     stage = "large_sources"
-    destination = args.outs.gray_preview
+    destination = params.outs.gray_preview
     with new_videos_to_preview(
-        destination,
-        names=[source.stem for source in sorted(args.deps.sources.iterdir())],
-        reprocess=True,
+        destination, reprocess=True, sources=params.deps.large_sources
     ) as videos_to_preview:
         for video_name in tqdm(videos_to_preview):
-            if ds := get_dataset(video_name, stage=stage, num_frames=1):
+            if ds := get_dataset(
+                video_name, stage=stage, num_frames=1, sources=params.deps.large_sources
+            ):
                 videos_to_preview[video_name] = ds[VIDEO].isel({FRAME: 0}).values
     logger.info("Finish updating gray preview")
 

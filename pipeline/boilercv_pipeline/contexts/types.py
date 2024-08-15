@@ -1,10 +1,9 @@
 """Types."""
 
-from typing import Any, Generic, Protocol, TypeVar
+from typing import Any, Generic, Protocol, TypedDict, TypeVar
 
 import pydantic
 from pydantic import ConfigDict
-from typing_extensions import TypedDict
 
 
 class AnyTypedDict(TypedDict):

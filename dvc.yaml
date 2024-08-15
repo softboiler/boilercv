@@ -32,6 +32,7 @@ stages:
     deps:
       - pipeline/boilercv_pipeline/stages/preview_binarized
       - data/sources
+      - data/rois
     outs:
       - data/previews/binarized_preview.nc:
           persist: true
@@ -40,6 +41,7 @@ stages:
     deps:
       - pipeline/boilercv_pipeline/stages/find_contours
       - data/sources
+      - data/rois
     outs:
       - data/contours:
           persist: true
@@ -48,6 +50,7 @@ stages:
     deps:
       - pipeline/boilercv_pipeline/stages/fill
       - data/sources
+      - data/rois
       - data/contours
     outs:
       - data/filled:
@@ -56,7 +59,8 @@ stages:
     cmd: boilercv-pipeline stage preview-filled
     deps:
       - pipeline/boilercv_pipeline/stages/preview_filled
-      - data/filled
+      - data/sources
+      - data/rois
     outs:
       - data/previews/filled_preview.nc:
           persist: true

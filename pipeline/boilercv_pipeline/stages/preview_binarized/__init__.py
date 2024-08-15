@@ -12,6 +12,7 @@ from boilercv_pipeline.models.paths import DataDir, DataFile, MatchedPaths, path
 class Deps(MatchedPaths):
     stage: DirectoryPath = Path(__file__).parent
     sources: DataDir = paths.sources
+    rois: DataDir = paths.rois
 
 
 class Outs(MatchedPaths):

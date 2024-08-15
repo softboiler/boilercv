@@ -59,12 +59,12 @@ DocsFile = Annotated[
 
 
 def get_config(
-    data: Path | None = None, docs: Path | None = None
+    roots: Roots | None = None,
 ) -> PluginConfigDict[ContextsPluginSettings[RootContexts]]:
     """Get config for paths contexts."""
     return PluginConfigDict(
         plugin_settings=ContextsPluginSettings(
-            contexts=RootContexts(roots=Roots(data=data, docs=docs))
+            contexts=RootContexts(roots=roots or Roots())
         )
     )
 
@@ -179,7 +179,7 @@ kinds = get_kinds(paths)
 class MatchedPaths(PathsContexts):
     """Paths that ensures matches with default path types."""
 
-    model_config = get_config(data=Path("data"), docs=Path("docs"))
+    model_config = get_config(Roots(data=Path("data"), docs=Path("docs")))
 
     @field_validator("*", mode="before")
     @classmethod
