@@ -7,7 +7,7 @@ from pydantic import BaseModel
 
 Model = TypeVar("Model", bound=BaseModel)
 """Model type."""
-Kind = Literal["DataDir", "DataFile", "DocsDir", "DocsFile", "other"]
+Kind = Literal["DataDir", "DataFile", "DocsDir", "DocsFile"]
 """File or directory kind."""
 Kinds: TypeAlias = dict[Path, Kind]
 """Paths and their kinds."""
