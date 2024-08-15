@@ -1,7 +1,3 @@
-"""Merge tracks."""
-
-from __future__ import annotations
-
 from cappa.base import invoke
 from pandas import concat, read_hdf
 

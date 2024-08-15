@@ -1,7 +1,3 @@
-"""Export correlation plots for tracks."""
-
-from __future__ import annotations
-
 from concurrent.futures import ProcessPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace

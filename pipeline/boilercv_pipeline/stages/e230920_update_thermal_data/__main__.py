@@ -1,7 +1,3 @@
-"""Update thermal data for the experiment."""
-
-from __future__ import annotations
-
 from boilercore.notebooks.namespaces import get_nb_ns
 from cappa.base import invoke
 

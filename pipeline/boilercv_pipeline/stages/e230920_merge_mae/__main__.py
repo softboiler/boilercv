@@ -1,7 +1,3 @@
-"""Plot mean absolute error of tracks."""
-
-from __future__ import annotations
-
 from pathlib import Path
 from types import SimpleNamespace
 

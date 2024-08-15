@@ -1,7 +1,3 @@
-"""Process tracks."""
-
-from __future__ import annotations
-
 from concurrent.futures import ProcessPoolExecutor
 
 from cappa.base import invoke

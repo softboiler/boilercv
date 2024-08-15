@@ -1,5 +1,3 @@
-"""Merge tracks."""
-
 from pathlib import Path
 from typing import Annotated
 
@@ -21,6 +19,8 @@ class Outs(StagePaths):
 
 @command(invoke="boilercv_pipeline.stages..__main__.main", default_long=True)
 class E230920MergeTracks(BaseModel):
+    """Merge tracks."""
+
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
     outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
 

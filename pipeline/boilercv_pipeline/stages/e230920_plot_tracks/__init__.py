@@ -1,5 +1,3 @@
-"""Export correlation plots for tracks."""
-
 from pathlib import Path
 from types import SimpleNamespace
 from typing import Annotated
@@ -32,6 +30,8 @@ def export_track_plot(ns: SimpleNamespace, _out: Out):
 
 @command(invoke="boilercv_pipeline.stages..__main__.main", default_long=True)
 class E230920PlotTracks(BaseModel):
+    """Export correlation plots for tracks."""
+
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
     outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
 
