@@ -9,9 +9,10 @@ from boilercore.models import DefaultPathsModel
 from cappa.arg import Arg
 from cappa.base import command, invoke
 from pandas import concat, read_hdf
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 
-from boilercv_pipeline.models.paths import get_parser, paths
+from boilercv_pipeline.models import get_parser
+from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.stages.common.e230920 import get_e230920_times
 
 

@@ -5,21 +5,22 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.contexts import ContextsMergeModel
-from boilercv_pipeline.models.paths import DataDir, MatchedPaths, paths
+from boilercv_pipeline.context import ContextMergeModel
+from boilercv_pipeline.models.paths import StagePaths, paths
+from boilercv_pipeline.models.types.runtime import DataDir
 
 
-class Deps(MatchedPaths):
+class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
     cines: DataDir = paths.cines
 
 
-class Outs(MatchedPaths):
+class Outs(StagePaths):
     large_sources: DataDir = paths.large_sources
 
 
 @command(default_long=True, invoke="boilercv_pipeline.stages.convert.__main__.main")
-class Convert(ContextsMergeModel):
+class Convert(ContextMergeModel):
     """Convert CINEs to NetCDF."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)

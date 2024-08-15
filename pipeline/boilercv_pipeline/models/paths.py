@@ -1,84 +1,21 @@
 """Parameter models for this project."""
 
-from collections import defaultdict
-from collections.abc import Callable
-from functools import partial
-from json import loads
 from pathlib import Path
-from typing import Annotated, Any, ClassVar
 
-from pydantic import AfterValidator, field_validator
-from pydantic.fields import FieldInfo
-
-from boilercv_pipeline.contexts import ContextsModel
-from boilercv_pipeline.contexts.types import (
-    ContextsPluginSettings,
-    PluginConfigDict,
-    ValidationInfo,
+from boilercv_pipeline.models.types.runtime import (
+    BoilercvPipelineCtxModel,
+    DataDir,
+    DataFile,
+    DocsDir,
+    Roots,
+    get_boilercv_pipeline_config,
 )
-from boilercv_pipeline.models.types import Kind, Model, RootContexts, Roots
 
 
-def get_parser(model: type[Model]) -> Callable[[str], Model]:
-    """Get parser for model or JSON-encoded string."""
+class Paths(BoilercvPipelineCtxModel):
+    """Pipeline paths."""
 
-    def parse(v: Model | str) -> Model:
-        """Parse model or JSON-encoded string."""
-        return model(**loads(v)) if isinstance(v, str) else v
-
-    return parse
-
-
-def make_directory(
-    path: Path, info: ValidationInfo[RootContexts], key: str, file: bool
-) -> Path:
-    """Make directory."""
-    if not path.is_absolute() and (root := getattr(info.context["roots"], key, None)):
-        path = root / path
-        directory = path.parent if file else path
-        directory.mkdir(exist_ok=True, parents=True)
-    return path
-
-
-DataDir = Annotated[
-    Path, AfterValidator(partial(make_directory, key="data", file=False))
-]
-"""Data directory path made upon validation."""
-DataFile = Annotated[
-    Path, AfterValidator(partial(make_directory, key="data", file=True))
-]
-"""Data file path made upon validation."""
-DocsDir = Annotated[
-    Path, AfterValidator(partial(make_directory, key="docs", file=False))
-]
-"""Docs directory path made upon validation."""
-DocsFile = Annotated[
-    Path, AfterValidator(partial(make_directory, key="docs", file=True))
-]
-"""Docs file path made upon validation."""
-
-
-def get_config(
-    roots: Roots | None = None,
-) -> PluginConfigDict[ContextsPluginSettings[RootContexts]]:
-    """Get config for paths contexts."""
-    return PluginConfigDict(
-        plugin_settings=ContextsPluginSettings(
-            contexts=RootContexts(roots=roots or Roots())
-        )
-    )
-
-
-class PathsContexts(ContextsModel):
-    """Paths that ensures matches with default path types."""
-
-    model_config: ClassVar[PluginConfigDict[ContextsPluginSettings[RootContexts]]] = (  # pyright: ignore[reportIncompatibleVariableOverride]
-        get_config()
-    )
-
-
-class Paths(PathsContexts):
-    """Paths relevant to the project."""
+    model_config = get_boilercv_pipeline_config(track_kinds=True)
 
     # * Local inputs
     cines: DataDir = Path("cines")
@@ -142,56 +79,11 @@ class Paths(PathsContexts):
 
 
 paths = Paths()
-kind_validators: dict[tuple[str, bool], Kind] = {
-    ("data", False): "DataDir",
-    ("data", True): "DataFile",
-    ("docs", False): "DocsDir",
-    ("docs", True): "DocsFile",
-}
 
 
-def get_kind(field_info: FieldInfo) -> Kind | None:
-    """Get kind."""
-    if (
-        (all_metadata := field_info.metadata)
-        and (isinstance(meta := all_metadata[0], AfterValidator))
-        and (kwds := getattr(meta.func, "keywords", None))
-    ):
-        return kind_validators.get(tuple(kwds.values()))  # pyright: ignore[reportArgumentType]
+class StagePaths(BoilercvPipelineCtxModel):
+    """Paths for stages."""
 
-
-def get_kinds(paths: Paths) -> dict[Kind, list[Any]]:
-    """Get kinds."""
-    kinds = defaultdict(list)
-    for info, value in zip(
-        paths.model_fields.values(), paths.model_dump().values(), strict=True
-    ):
-        if kind := get_kind(info):
-            kinds[kind].append(value)
-            continue
-        kinds["other"].append(value)
-    return kinds
-
-
-kinds = get_kinds(paths)
-
-
-class MatchedPaths(PathsContexts):
-    """Paths that ensures matches with default path types."""
-
-    model_config = get_config(Roots(data=Path("data"), docs=Path("docs")))
-
-    @field_validator("*", mode="before")
-    @classmethod
-    def validate_paths(cls, value: Any, info: ValidationInfo[RootContexts]) -> Any:
-        """Model field type matches the default type."""
-        if (
-            (field_name := info.field_name)
-            and (field_info := cls.model_fields.get(field_name))
-            and (kind := get_kind(field_info))
-            and (value not in kinds[kind])
-        ):
-            raise ValueError(
-                f"Stage {cls.__name__} has path '{value}' of kind {kind} that doesn't match default paths."
-            )
-        return value
+    model_config = get_boilercv_pipeline_config(
+        Roots(data=Path("data"), docs=Path("docs")), kinds_from=paths, track_kinds=True
+    )

@@ -9,9 +9,10 @@ from boilercore.models import DefaultPathsModel
 from boilercore.notebooks.namespaces import get_nb_ns
 from cappa.arg import Arg
 from cappa.base import command, invoke
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, DirectoryPath, Field
 
-from boilercv_pipeline.models.paths import get_parser, paths
+from boilercv_pipeline.models import get_parser
+from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.stages.common.e230920 import read_nb
 
 

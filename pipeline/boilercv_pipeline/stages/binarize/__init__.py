@@ -5,22 +5,23 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.contexts import ContextsMergeModel
-from boilercv_pipeline.models.paths import DataDir, MatchedPaths, paths
+from boilercv_pipeline.context import ContextMergeModel
+from boilercv_pipeline.models.paths import StagePaths, paths
+from boilercv_pipeline.models.types.runtime import DataDir
 
 
-class Deps(MatchedPaths):
+class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
     large_sources: DataDir = paths.large_sources
 
 
-class Outs(MatchedPaths):
+class Outs(StagePaths):
     sources: DataDir = paths.sources
     rois: DataDir = paths.rois
 
 
 @command(default_long=True, invoke="boilercv_pipeline.stages.binarize.__main__.main")
-class Binarize(ContextsMergeModel):
+class Binarize(ContextMergeModel):
     """Binarize videos and export their ROIs."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)

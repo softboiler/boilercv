@@ -10,7 +10,7 @@ from cappa.subcommand import Subcommands
 from pydantic import Field
 from yaml import safe_dump
 
-from boilercv_pipeline.contexts import ContextsMergeModel
+from boilercv_pipeline.context import ContextMergeModel
 from boilercv_pipeline.stages.binarize import Binarize
 from boilercv_pipeline.stages.convert import Convert
 
@@ -70,7 +70,7 @@ class SyncDVC:
     def __call__(self):
         """Sync `dvc.yaml`."""
 
-        class Stages(ContextsMergeModel):
+        class Stages(ContextMergeModel):
             """Stages."""
 
             convert: Convert = Field(default_factory=Convert)

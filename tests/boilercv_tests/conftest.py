@@ -19,12 +19,10 @@ from _pytest.python import Function
 from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
-from pydantic import BaseModel
 from pydantic.alias_generators import to_pascal
 
 from boilercv_pipeline.config import const as boilercv_pipeline_const
-from boilercv_pipeline.models.paths import get_kind
-from boilercv_pipeline.models.types import RootContexts, Roots
+from boilercv_pipeline.models.types.runtime import Roots, get_boilercv_pipeline_context
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
 from boilercv_tests.config import const
 from boilercv_tests.types import FixtureStore
@@ -41,44 +39,6 @@ CASER = "C"
 def _filter_certain_warnings():
     """Filter certain warnings."""
     filter_boilercv_warnings()
-
-
-# * -------------------------------------------------------------------------------- * #
-# * Notebook namespaces
-
-
-@pytest.fixture(params=boilercv_pipeline_const.stages)
-def stage(tmp_path, request):
-    """Set project directory."""
-    if request.param.startswith("e230920"):
-        pytest.skip("Deps not yet sourced")
-    copy(const.test_params, tmp_path / const.params)
-    init = import_module(f"boilercv_pipeline.stages.{request.param}")
-    ctx = RootContexts(roots=Roots(data=tmp_path / "data", docs=None))
-    deps: BaseModel = init.Deps(_contexts=ctx)
-    outs: BaseModel = init.Outs(_contexts=ctx)
-    src_ctx = RootContexts(roots=Roots(data=const.test_data_root / "data", docs=None))
-    (expected := tmp_path / "expected").mkdir()
-    exp_outs: BaseModel = init.Outs(
-        _contexts=RootContexts(roots=Roots(data=expected, docs=None))
-    )
-    for src, dst, info in zip(
-        (
-            *init.Deps(_contexts=src_ctx).model_dump().values(),
-            *init.Outs(_contexts=src_ctx).model_dump().values(),
-        ),
-        (*deps.model_dump().values(), *exp_outs.model_dump().values()),
-        (*deps.model_fields.values(), *exp_outs.model_fields.values()),
-        strict=True,
-    ):
-        if kind := get_kind(info):
-            if "file" in kind.lower():
-                copy(src, dst)
-            if "dir" in kind.lower():
-                copytree(src, dst, dirs_exist_ok=True)
-    main = import_module(f"boilercv_pipeline.stages.{request.param}.__main__").main
-    params = getattr(init, f"{to_pascal(request.param)}")
-    return partial(main, params(deps=deps, outs=outs))
 
 
 @pytest.fixture(scope="module", autouse=True)
@@ -101,6 +61,47 @@ def _get_ns_attrs(request):
     yield
     for nb in [c.clean_path for c in cases if c.clean_path]:
         nb.unlink(missing_ok=True)
+
+
+# * -------------------------------------------------------------------------------- * #
+# * Notebook namespaces
+
+
+@pytest.fixture(params=boilercv_pipeline_const.stages)
+def stage(tmp_path, request):
+    """Set project directory."""
+    if request.param.startswith("e230920"):
+        pytest.skip("Deps not yet sourced")
+    (expected := tmp_path / const.expected).mkdir()
+    module = f"boilercv_pipeline.stages.{request.param}"
+    params = {
+        kind: getattr(import_module(module), f"{to_pascal(request.param)}")(
+            _context=get_boilercv_pipeline_context(roots=roots)
+        )
+        for kind, roots in {
+            "src": Roots(data=const.test_data_root / const.data, docs=None),
+            "dst": Roots(data=tmp_path / const.data, docs=None),
+            "exp": Roots(data=expected, docs=None),
+        }.items()
+    }
+    paths = {
+        kind: {
+            "deps": p.deps.model_dump().values(),
+            "outs": p.outs.model_dump().values(),
+        }
+        for kind, p in params.items()
+    }
+    for src, dst in (
+        *zip(paths["src"]["deps"], paths["dst"]["deps"], strict=True),
+        *zip(paths["src"]["outs"], paths["exp"]["outs"], strict=True),
+    ):
+        if src is dst:
+            continue
+        if src.is_file():
+            copy(src, dst)
+        if src.is_dir():
+            copytree(src, dst, dirs_exist_ok=True)
+    return partial(import_module(f"{module}.__main__").main, params["dst"])
 
 
 @pytest.fixture

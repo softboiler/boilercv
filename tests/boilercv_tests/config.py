@@ -20,10 +20,9 @@ import boilercv_tests
 class Constants(BaseModel):
     """Constants."""
 
-    params: Path = Path("params.yaml")
     data: Path = Path("data")
+    expected: Path = Path("expected")
     test_data_root: Path = Path("tests") / "root"
-    test_params: Path = test_data_root / params
 
 
 const = Constants()

@@ -5,23 +5,24 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.contexts import ContextsMergeModel
-from boilercv_pipeline.models.paths import DataDir, MatchedPaths, paths
+from boilercv_pipeline.context import ContextMergeModel
+from boilercv_pipeline.models.paths import StagePaths, paths
+from boilercv_pipeline.models.types.runtime import DataDir
 
 
-class Deps(MatchedPaths):
+class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
     sources: DataDir = paths.sources
     rois: DataDir = paths.rois
     contours: DataDir = paths.contours
 
 
-class Outs(MatchedPaths):
+class Outs(StagePaths):
     filled: DataDir = paths.filled
 
 
 @command(default_long=True, invoke="boilercv_pipeline.stages.fill.__main__.main")
-class Fill(ContextsMergeModel):
+class Fill(ContextMergeModel):
     """Fill bubble contours."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
