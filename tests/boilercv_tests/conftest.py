@@ -70,7 +70,12 @@ def _get_ns_attrs(request):
 @pytest.fixture(params=boilercv_pipeline_const.stages)
 def stage(tmp_path, request):
     """Set project directory."""
-    if request.param.startswith("e230920"):
+    if request.param in [
+        "e230920_merge_mae",
+        "e230920_merge_tracks",
+        "e230920_plot_tracks",
+        "e230920_update_thermal_data",
+    ]:
         pytest.skip("Deps not yet sourced")
     (expected := tmp_path / const.expected).mkdir()
     module = f"boilercv_pipeline.stages.{request.param}"
