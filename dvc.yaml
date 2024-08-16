@@ -68,10 +68,10 @@ stages:
     cmd: boilercv-pipeline stage e230920-update-thermal-data
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_update_thermal_data
-      - data/e230920_thermal_raw.csv
-    outs:
-      - data/e230920_thermal.h5:
-          persist: true
+      # - data/e230920_thermal_raw.csv
+    # outs:
+    #   - data/e230920_thermal.h5:
+    #       persist: true
   e230920_find_contours:
     cmd: boilercv-pipeline stage e230920-find-contours
     deps:
@@ -109,14 +109,14 @@ stages:
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_merge_tracks
       - data/e230920_processed_tracks
-    outs:
-      - data/e230920_merged_tracks.h5:
-          persist: true
+    # outs:
+    #   - data/e230920_merged_tracks.h5:
+    #       persist: true
   e230920_plot_tracks:
     cmd: boilercv-pipeline stage e230920-plot-tracks
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_plot_tracks
-      - data/e230920_merged_tracks.h5
+      # - data/e230920_merged_tracks.h5
     outs: []
   e230920_get_mae:
     cmd: boilercv-pipeline stage e230920-get-mae
@@ -131,6 +131,6 @@ stages:
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_merge_mae
       - data/e230920_mae
-    outs:
-      - data/e230920_merged_mae.h5:
-          persist: true
+    # outs:
+    #   - data/e230920_merged_mae.h5:
+    #       persist: true
