@@ -3,22 +3,27 @@ from typing import Annotated
 
 from cappa.arg import Arg
 from cappa.base import command, invoke
-from pydantic import BaseModel, DirectoryPath, Field
+from pydantic import DirectoryPath, Field
 
+from boilercv_pipeline.context import ContextMergeModel
 from boilercv_pipeline.models.paths import StagePaths, paths
+from boilercv_pipeline.models.types.runtime import DataDir, DataFile
 
 
 class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
-    e230920_processed_tracks: Path = paths.e230920_processed_tracks
+    e230920_processed_tracks: DataDir = paths.e230920_processed_tracks
 
 
 class Outs(StagePaths):
-    e230920_merged_tracks: Path = paths.e230920_merged_tracks
+    e230920_merged_tracks: DataFile = paths.e230920_merged_tracks
 
 
-@command(invoke="boilercv_pipeline.stages..__main__.main", default_long=True)
-class E230920MergeTracks(BaseModel):
+@command(
+    invoke="boilercv_pipeline.stages.e230920_merge_tracks.__main__.main",
+    default_long=True,
+)
+class E230920MergeTracks(ContextMergeModel):
     """Merge tracks."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)

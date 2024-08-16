@@ -2,22 +2,39 @@
 flowchart TD
  node1["binarize"]
  node2["convert"]
- node3["fill"]
- node4["find_contours"]
- node5["preview_binarized"]
- node6["preview_filled"]
- node7["preview_gray"]
- node1-->node3
- node1-->node4
- node1-->node5
- node1-->node6
+ node3["e230920_find_contours"]
+ node4["e230920_find_objects"]
+ node5["e230920_find_tracks"]
+ node6["e230920_get_mae"]
+ node7["e230920_merge_mae"]
+ node8["e230920_merge_tracks"]
+ node9["e230920_plot_tracks"]
+ node10["e230920_process_tracks"]
+ node11["fill"]
+ node12["find_contours"]
+ node13["preview_binarized"]
+ node14["preview_filled"]
+ node15["preview_gray"]
+ node1-->node11
+ node1-->node12
+ node1-->node13
+ node1-->node14
  node2-->node1
- node2-->node7
- node4-->node3
- node8["data\examples.dvc"]
- node9["data\experiments.dvc"]
- node10["data\notebooks.dvc"]
- node11["data\samples.dvc"]
- node12["data\models\modelfun-3.11.dillpickle.dvc"]
- node13["data\models\modelfun-3.12.dillpickle.dvc"]
+ node2-->node15
+ node3-->node4
+ node4-->node5
+ node5-->node10
+ node6-->node7
+ node8-->node9
+ node10-->node6
+ node10-->node8
+ node12-->node3
+ node12-->node11
+ node16["e230920_update_thermal_data"]
+ node17["data\examples.dvc"]
+ node18["data\experiments.dvc"]
+ node19["data\notebooks.dvc"]
+ node20["data\samples.dvc"]
+ node21["data\models\modelfun-3.11.dillpickle.dvc"]
+ node22["data\models\modelfun-3.12.dillpickle.dvc"]
 ```

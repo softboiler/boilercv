@@ -3,26 +3,30 @@ from typing import Annotated
 
 from cappa.arg import Arg
 from cappa.base import command, invoke
-from pydantic import BaseModel, DirectoryPath, Field
+from pydantic import DirectoryPath, Field
 
+from boilercv_pipeline.context import ContextMergeModel
 from boilercv_pipeline.models.paths import StagePaths, paths
+from boilercv_pipeline.models.types.runtime import DataDir, DataFile
 
 
 class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
-    e230920_mae: Path = paths.e230920_mae
+    e230920_mae: DataDir = paths.e230920_mae
 
 
 class Outs(StagePaths):
-    e230920_merged_mae: Path = paths.e230920_merged_mae
+    e230920_merged_mae: DataFile = paths.e230920_merged_mae
 
 
 PLOTS = Path("tests/plots/mae")
 PLOTS.mkdir(exist_ok=True)
 
 
-@command(invoke="boilercv_pipeline.stages..__main__.main", default_long=True)
-class E230920MergeMae(BaseModel):
+@command(
+    invoke="boilercv_pipeline.stages.e230920_merge_mae.__main__.main", default_long=True
+)
+class E230920MergeMae(ContextMergeModel):
     """Plot mean absolute error of tracks."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
