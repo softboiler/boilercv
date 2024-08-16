@@ -3,11 +3,11 @@
 from pathlib import Path
 
 from boilercv_pipeline.models.types.runtime import (
+    ROOTED,
     BoilercvPipelineCtxModel,
     DataDir,
     DataFile,
     DocsDir,
-    Roots,
     get_boilercv_pipeline_config,
 )
 
@@ -85,5 +85,5 @@ class StagePaths(BoilercvPipelineCtxModel):
     """Paths for stages."""
 
     model_config = get_boilercv_pipeline_config(
-        Roots(data=Path("data"), docs=Path("docs")), kinds_from=paths, track_kinds=True
+        ROOTED, kinds_from=paths, track_kinds=True
     )

@@ -1,32 +1,34 @@
 stages:
+  skip_cloud:
+    cmd: boilercv-pipeline stage skip-cloud
+    outs:
+      - data/cines: &id001
+          persist: true
+          cache: false
+          push: false
   convert:
     cmd: boilercv-pipeline stage convert
     deps:
       - pipeline/boilercv_pipeline/stages/convert
       - data/cines
     outs:
-      - data/large_sources:
-          persist: true
-          cache: false
-          push: false
+      - data/large_sources: *id001
   binarize:
     cmd: boilercv-pipeline stage binarize
     deps:
       - pipeline/boilercv_pipeline/stages/binarize
       - data/large_sources
     outs:
-      - data/sources:
+      - data/sources: &id002
           persist: true
-      - data/rois:
-          persist: true
+      - data/rois: *id002
   preview_gray:
     cmd: boilercv-pipeline stage preview-gray
     deps:
       - pipeline/boilercv_pipeline/stages/preview_gray
       - data/large_sources
     outs:
-      - data/previews/gray_preview.nc:
-          persist: true
+      - data/previews/gray_preview.nc: *id002
   preview_binarized:
     cmd: boilercv-pipeline stage preview-binarized
     deps:
@@ -34,8 +36,7 @@ stages:
       - data/sources
       - data/rois
     outs:
-      - data/previews/binarized_preview.nc:
-          persist: true
+      - data/previews/binarized_preview.nc: *id002
   find_contours:
     cmd: boilercv-pipeline stage find-contours
     deps:
@@ -43,8 +44,7 @@ stages:
       - data/sources
       - data/rois
     outs:
-      - data/contours:
-          persist: true
+      - data/contours: *id002
   fill:
     cmd: boilercv-pipeline stage fill
     deps:
@@ -53,8 +53,7 @@ stages:
       - data/rois
       - data/contours
     outs:
-      - data/filled:
-          persist: true
+      - data/filled: *id002
   preview_filled:
     cmd: boilercv-pipeline stage preview-filled
     deps:
@@ -62,56 +61,49 @@ stages:
       - data/sources
       - data/rois
     outs:
-      - data/previews/filled_preview.nc:
-          persist: true
+      - data/previews/filled_preview.nc: *id002
   e230920_update_thermal_data:
     cmd: boilercv-pipeline stage e230920-update-thermal-data
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_update_thermal_data
       # - data/e230920_thermal_raw.csv
     # outs:
-    #   - data/e230920_thermal.h5:
-    #       persist: true
+    #   - data/e230920_thermal.h5: *id002
   e230920_find_contours:
     cmd: boilercv-pipeline stage e230920-find-contours
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_find_contours
       - data/contours
     outs:
-      - data/e230920_contours:
-          persist: true
+      - data/e230920_contours: *id002
   e230920_find_objects:
     cmd: boilercv-pipeline stage e230920-find-objects
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_find_objects
       - data/e230920_contours
     outs:
-      - data/e230920_objects:
-          persist: true
+      - data/e230920_objects: *id002
   e230920_find_tracks:
     cmd: boilercv-pipeline stage e230920-find-tracks
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_find_tracks
       - data/e230920_objects
     outs:
-      - data/e230920_tracks:
-          persist: true
+      - data/e230920_tracks: *id002
   e230920_process_tracks:
     cmd: boilercv-pipeline stage e230920-process-tracks
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_process_tracks
       - data/e230920_tracks
     outs:
-      - data/e230920_processed_tracks:
-          persist: true
+      - data/e230920_processed_tracks: *id002
   e230920_merge_tracks:
     cmd: boilercv-pipeline stage e230920-merge-tracks
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_merge_tracks
       - data/e230920_processed_tracks
     # outs:
-    #   - data/e230920_merged_tracks.h5:
-    #       persist: true
+    #   - data/e230920_merged_tracks.h5: *id002
   e230920_plot_tracks:
     cmd: boilercv-pipeline stage e230920-plot-tracks
     deps:
@@ -123,14 +115,12 @@ stages:
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_get_mae
       - data/e230920_processed_tracks
-    outs:
-      - data/e230920_mae:
-          persist: true
+    # outs:
+    #   - data/e230920_mae: *id002
   e230920_merge_mae:
     cmd: boilercv-pipeline stage e230920-merge-mae
     deps:
       - pipeline/boilercv_pipeline/stages/e230920_merge_mae
       - data/e230920_mae
     # outs:
-    #   - data/e230920_merged_mae.h5:
-    #       persist: true
+    #   - data/e230920_merged_mae.h5: *id002

@@ -53,8 +53,8 @@ stages:
     outs:
     - path: data/previews/binarized_preview.nc
       hash: md5
-      md5: 8bd4ffe876400bafe16b6bfb5186aed5
-      size: 3563554
+      md5: 110a974e30b571d84fcd64f42c2a35ff
+      size: 3531010
   contours:
     cmd: python -m boilercv.stages.contours
     deps:
@@ -272,14 +272,14 @@ stages:
       nfiles: 337
     - path: pipeline/boilercv_pipeline/stages/preview_filled
       hash: md5
-      md5: df1810541d82cccfce380b6e14e99fad.dir
-      size: 2078
+      md5: 663085119fb9df5bf07b27638bde403e.dir
+      size: 2079
       nfiles: 2
     outs:
     - path: data/previews/filled_preview.nc
       hash: md5
-      md5: 3a3233045ade8a471679b911d87f5858
-      size: 1694182
+      md5: cd6009f6b2dcc849e0f3b763362c18a4
+      size: 3034872
   preview_gray:
     cmd: boilercv-pipeline stage preview-gray
     deps:
@@ -399,9 +399,9 @@ stages:
     deps:
     - path: data/large_sources
       hash: md5
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: 658d0528ed596161c3a269f67587f41f.dir
+      size: 30563612808
+      nfiles: 17
     - path: pipeline/boilercv_pipeline/stages/binarize
       hash: md5
       md5: 3bf96aa62c73da1c4ca03ccb3770df45.dir
@@ -423,9 +423,9 @@ stages:
     deps:
     - path: data/cines
       hash: md5
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: e4d560c3ffae8d28dae3c8ddedbb3c18.dir
+      size: 34034068416
+      nfiles: 16
     - path: pipeline/boilercv_pipeline/stages/convert
       hash: md5
       md5: 6524d0411c381d05ed605291dcac83ec.dir
@@ -434,9 +434,9 @@ stages:
     outs:
     - path: data/large_sources
       hash: md5
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: 658d0528ed596161c3a269f67587f41f.dir
+      size: 30563612808
+      nfiles: 17
   flatten_data_dir:
     cmd: boilercv_pipeline stages flatten-data-dir
     deps:
@@ -582,3 +582,11 @@ stages:
       md5: c92647cda55f35e4f05685b0e22f60da.dir
       size: 1903
       nfiles: 2
+  skip_cloud:
+    cmd: boilercv-pipeline stage skip-cloud
+    outs:
+    - path: data/cines
+      hash: md5
+      md5: e4d560c3ffae8d28dae3c8ddedbb3c18.dir
+      size: 34034068416
+      nfiles: 16

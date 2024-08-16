@@ -7,12 +7,11 @@ from boilercv.types import DA
 from boilercv_pipeline import PREVIEW
 from boilercv_pipeline.captivate import FRAMERATE_PREV
 from boilercv_pipeline.captivate.previews import view_images
-from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.previews import draw_text_da
+from boilercv_pipeline.previews import draw_text_da, rooted_paths
 
 
 def main(preview: bool = PREVIEW) -> DA:  # noqa: D103
-    with open_dataset(paths.gray_preview) as ds:
+    with open_dataset(rooted_paths.gray_preview) as ds:
         da = draw_text_da(ds[VIDEO])
     if preview:
         view_images(da, framerate=FRAMERATE_PREV)

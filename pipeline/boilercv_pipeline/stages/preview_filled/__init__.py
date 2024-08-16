@@ -21,7 +21,7 @@ class Outs(StagePaths):
 
 
 @command(
-    default_long=True, invoke="boilercv_pipeline.stages.previe_filled.__main__.main"
+    default_long=True, invoke="boilercv_pipeline.stages.preview_filled.__main__.main"
 )
 class PreviewFilled(ContextMergeModel):
     """Update previews for the filled contours stage."""

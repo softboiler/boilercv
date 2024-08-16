@@ -27,6 +27,10 @@ class Roots(BaseModel):
     """Docs."""
 
 
+ROOTED = Roots(data=Path("data"), docs=Path("docs"))
+"""Paths rooted to their directories."""
+
+
 class BoilercvPipelineCtx(BaseModel):
     """Root directory context."""
 

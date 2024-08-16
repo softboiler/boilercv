@@ -7,8 +7,7 @@ from boilercv_pipeline.captivate import FRAMERATE_CONT
 from boilercv_pipeline.captivate.captures import write_video
 from boilercv_pipeline.captivate.previews import view_images
 from boilercv_pipeline.examples.previews import _EXAMPLE, _NUM_FRAMES
-from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.previews import compose_da
+from boilercv_pipeline.previews import compose_da, rooted_paths
 from boilercv_pipeline.sets import get_dataset
 
 
@@ -21,7 +20,7 @@ def main():  # noqa: D103
     if PREVIEW:
         view_images(highlighted_bubbles, framerate=FRAMERATE_CONT)
     if WRITE:
-        path = paths.media / "examples" / _EXAMPLE / "gray_highlighted"
+        path = rooted_paths.media / "examples" / _EXAMPLE / "gray_highlighted"
         path.parent.mkdir(parents=True, exist_ok=True)
         write_video(path, highlighted_bubbles, preview_frame=True)
 

@@ -7,7 +7,7 @@ from typing import Any
 from boilercore.models import apply_to_paths
 from cappa.base import command
 from cappa.subcommand import Subcommands
-from pydantic import Field
+from pydantic import BaseModel, Field
 from yaml import safe_dump
 
 from boilercv_pipeline.context import ContextMergeModel
@@ -29,6 +29,25 @@ from boilercv_pipeline.stages.find_contours import FindContours
 from boilercv_pipeline.stages.preview_binarized import PreviewBinarized
 from boilercv_pipeline.stages.preview_filled import PreviewFilled
 from boilercv_pipeline.stages.preview_gray import PreviewGray
+from boilercv_pipeline.stages.skip_cloud import SkipCloud
+
+
+class Constants(BaseModel):
+    """Constants."""
+
+    dvc_out_config: dict[str, bool] = {"persist": True}
+    """Default `dvc.yaml` configuration for `outs`."""
+    skip_cloud: list[str] = ["data/cines", "data/large_sources"]
+    """These paths are too large and unwieldy to cache or push to cloud storage."""
+    dvc_out_skip_cloud_config: dict[str, bool] = {
+        "persist": True,
+        "cache": False,
+        "push": False,
+    }
+    """Default `dvc.yaml` configuration for `outs` that skip the cloud."""
+
+
+const = Constants()
 
 
 @command(invoke="boilercv_pipeline.models.generated.types.sync_stages")
@@ -42,6 +61,7 @@ class Stage:
 
     commands: Subcommands[
         Binarize
+        | SkipCloud
         | Convert
         | E230920FindContours
         | E230920FindObjects
@@ -72,6 +92,7 @@ class SyncDVC:
         class Stages(ContextMergeModel):
             """Stages."""
 
+            skip_cloud: SkipCloud = Field(default_factory=SkipCloud)
             convert: Convert = Field(default_factory=Convert)
             binarize: Binarize = Field(default_factory=Binarize)
             preview_gray: PreviewGray = Field(default_factory=PreviewGray)
@@ -119,9 +140,9 @@ class SyncDVC:
                 ]
             stage_value["outs"] = [
                 (
-                    {out: {"persist": True, "cache": False, "push": False}}
-                    if out in ["data/cines", "data/large_sources"]
-                    else {out: {"persist": True}}
+                    {out: const.dvc_out_skip_cloud_config}
+                    if out in const.skip_cloud
+                    else {out: const.dvc_out_config}
                 )
                 for out in stage_value["outs"]
             ]
