@@ -71,6 +71,7 @@ def _get_ns_attrs(request):
 def stage(tmp_path, request):
     """Set project directory."""
     if request.param in [
+        "skip_cloud",
         "e230920_merge_mae",
         "e230920_merge_tracks",
         "e230920_plot_tracks",
