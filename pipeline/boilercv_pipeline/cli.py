@@ -17,13 +17,11 @@ from boilercv_pipeline.stages.e230920_find_contours import E230920FindContours
 from boilercv_pipeline.stages.e230920_find_objects import E230920FindObjects
 from boilercv_pipeline.stages.e230920_find_tracks import E230920FindTracks
 from boilercv_pipeline.stages.e230920_get_mae import E230920GetMae
+from boilercv_pipeline.stages.e230920_get_thermal_data import E230920GetThermalData
 from boilercv_pipeline.stages.e230920_merge_mae import E230920MergeMae
 from boilercv_pipeline.stages.e230920_merge_tracks import E230920MergeTracks
 from boilercv_pipeline.stages.e230920_plot_tracks import E230920PlotTracks
 from boilercv_pipeline.stages.e230920_process_tracks import E230920ProcessTracks
-from boilercv_pipeline.stages.e230920_update_thermal_data import (
-    E230920UpdateThermalData,
-)
 from boilercv_pipeline.stages.fill import Fill
 from boilercv_pipeline.stages.find_contours import FindContours
 from boilercv_pipeline.stages.preview_binarized import PreviewBinarized
@@ -50,11 +48,6 @@ class Constants(BaseModel):
 const = Constants()
 
 
-@command(invoke="boilercv_pipeline.models.generated.types.sync_stages")
-class SyncStagesLiterals:
-    """Sync stages literals."""
-
-
 @dataclass
 class Stage:
     """Stage."""
@@ -71,7 +64,7 @@ class Stage:
         | E230920MergeTracks
         | E230920PlotTracks
         | E230920ProcessTracks
-        | E230920UpdateThermalData
+        | E230920GetThermalData
         | Fill
         | FindContours
         | PreviewBinarized
@@ -102,8 +95,8 @@ class SyncDVC:
             find_contours: FindContours = Field(default_factory=FindContours)
             fill: Fill = Field(default_factory=Fill)
             preview_filled: PreviewFilled = Field(default_factory=PreviewFilled)
-            e230920_update_thermal_data: E230920UpdateThermalData = Field(
-                default_factory=E230920UpdateThermalData
+            e230920_update_thermal_data: E230920GetThermalData = Field(
+                default_factory=E230920GetThermalData
             )
             e230920_find_contours: E230920FindContours = Field(
                 default_factory=E230920FindContours
@@ -161,4 +154,4 @@ class SyncDVC:
 class BoilercvPipeline:
     """Pipeline."""
 
-    commands: Subcommands[SyncDVC | SyncStagesLiterals | Stage]
+    commands: Subcommands[SyncDVC | Stage]

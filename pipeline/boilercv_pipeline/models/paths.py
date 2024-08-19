@@ -1,13 +1,15 @@
 """Parameter models for this project."""
 
 from pathlib import Path
+from typing import get_args
 
+from boilercv_pipeline.models.generated.types.stages import StageName
 from boilercv_pipeline.models.types.runtime import (
     ROOTED,
     BoilercvPipelineCtxModel,
     DataDir,
     DataFile,
-    DocsDir,
+    DocsFile,
     get_boilercv_pipeline_config,
 )
 
@@ -45,37 +47,39 @@ class Paths(BoilercvPipelineCtxModel):
     mpl_base: DataFile = plot_config / "base.mplstyle"
     mpl_hide_title: DataFile = plot_config / "hide_title.mplstyle"
 
-    # * DVC_tracked imports
+    # * DVC-tracked imports
     modelfunctions: DataDir = Path("models")
 
     # * DVC-tracked inputs
-    notebooks: DataDir = Path("notebooks")
+    notebooks: dict[StageName, DocsFile] = {  # noqa: RUF012
+        stage_name: Path("notebooks") / f"{stage_name}.ipynb"
+        for stage_name in get_args(StageName)
+    }
     rois: DataDir = Path("rois")
     samples: DataDir = Path("samples")
     sources: DataDir = Path("sources")
-    e230920_thermal_raw: DataFile = Path("e230920_thermal_raw.csv")
+    e230920: DataDir = Path("e230920")
+    e230920_thermal_raw: DataFile = e230920 / Path("thermal_raw.csv")
 
     # * DVC-tracked results
     contours: DataDir = Path("contours")
     examples: DataDir = Path("examples")
     filled: DataDir = Path("filled")
     lifetimes: DataDir = Path("lifetimes")
-    e230920_thermal: DataFile = Path("e230920_thermal.h5")
-    e230920_contours: DataDir = Path("e230920_contours")
-    e230920_objects: DataDir = Path("e230920_objects")
-    e230920_tracks: DataDir = Path("e230920_tracks")
-    e230920_processed_tracks: DataDir = Path("e230920_processed_tracks")
-    e230920_merged_tracks: DataFile = Path("e230920_merged_tracks.h5")
-    e230920_mae: DataDir = Path("e230920_mae")
-    e230920_merged_mae: DataFile = Path("e230920_merged_mae.h5")
+    e230920_thermal: DataFile = e230920 / Path("thermal.h5")
+    e230920_contours: DataDir = e230920 / Path("contours")
+    e230920_objects: DataDir = e230920 / Path("objects")
+    e230920_tracks: DataDir = e230920 / Path("tracks")
+    e230920_processed_tracks: DataDir = e230920 / Path("processed_tracks")
+    e230920_merged_tracks: DataFile = e230920 / Path("merged_tracks.h5")
+    e230920_mae: DataDir = e230920 / Path("mae")
+    e230920_merged_mae: DataFile = e230920 / Path("merged_mae.h5")
 
     # ! Previews
     previews: DataDir = Path("previews")
     binarized_preview: DataFile = previews / "binarized_preview.nc"
     filled_preview: DataFile = previews / "filled_preview.nc"
     gray_preview: DataFile = previews / "gray_preview.nc"
-
-    e230920_notebooks: DocsDir = Path("experiments") / "e230920"
 
 
 paths = Paths()

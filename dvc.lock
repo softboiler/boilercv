@@ -248,8 +248,8 @@ stages:
       nfiles: 337
     - path: pipeline/boilercv_pipeline/stages/find_contours
       hash: md5
-      md5: 0a7bbc50f0293e4c26b5712e6624aa55.dir
-      size: 4252
+      md5: 1e6604edbe1bec6956c5160352dcc8e4.dir
+      size: 2052
       nfiles: 2
     outs:
     - path: data/contours
@@ -285,9 +285,9 @@ stages:
     deps:
     - path: data/large_sources
       hash: md5
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: 658d0528ed596161c3a269f67587f41f.dir
+      size: 30563612808
+      nfiles: 17
     - path: pipeline/boilercv_pipeline/stages/preview_gray
       hash: md5
       md5: d7d0c0e1948650c4ee458ce2b42e1867.dir
@@ -448,11 +448,24 @@ stages:
   e230920_update_thermal_data:
     cmd: boilercv-pipeline stage e230920-update-thermal-data
     deps:
-    - path: pipeline/boilercv_pipeline/stages/e230920_update_thermal_data
+    - path: data/e230920/thermal_raw.csv
       hash: md5
-      md5: cb8d0ce4eaa58df709eaa75122faeecf.dir
-      size: 1446
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: docs/notebooks/e230920_get_thermal_data.ipynb
+      hash: md5
+      md5: 7d031f1ec18637fdedbe55103bac75dd
+      size: 3996
+    - path: pipeline/boilercv_pipeline/stages/e230920_get_thermal_data
+      hash: md5
+      md5: 9b61c0cbab32b545d62fbe3e15a8c069.dir
+      size: 1515
       nfiles: 2
+    outs:
+    - path: data/e230920/thermal.h5
+      hash: md5
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
   e230920_find_contours:
     cmd: boilercv-pipeline stage e230920-find-contours
     deps:
@@ -467,7 +480,7 @@ stages:
       size: 1760
       nfiles: 2
     outs:
-    - path: data/e230920_contours
+    - path: data/e230920/contours
       hash: md5
       md5: 3a2ee8e6557ddaf6863fb775e9d6e96d.dir
       size: 4952829
@@ -475,18 +488,22 @@ stages:
   e230920_find_objects:
     cmd: boilercv-pipeline stage e230920-find-objects
     deps:
-    - path: data/e230920_contours
+    - path: data/e230920/contours
       hash: md5
       md5: 3a2ee8e6557ddaf6863fb775e9d6e96d.dir
       size: 4952829
       nfiles: 1
+    - path: docs/notebooks/e230920_find_objects.ipynb
+      hash: md5
+      md5: 0267d44ee4b86261eb29d315566472b6
+      size: 9263
     - path: pipeline/boilercv_pipeline/stages/e230920_find_objects
       hash: md5
-      md5: 2b7d8ef0cf99d062a4c58a2f497a8302.dir
-      size: 1807
+      md5: 3459093a1d3c2c8fd18c96e3f1abd3f9.dir
+      size: 1938
       nfiles: 2
     outs:
-    - path: data/e230920_objects
+    - path: data/e230920/objects
       hash: md5
       md5: 66999f56d1c941db5759ef90fea0f819.dir
       size: 23387
@@ -494,18 +511,22 @@ stages:
   e230920_find_tracks:
     cmd: boilercv-pipeline stage e230920-find-tracks
     deps:
-    - path: data/e230920_objects
+    - path: data/e230920/objects
       hash: md5
       md5: 66999f56d1c941db5759ef90fea0f819.dir
       size: 23387
       nfiles: 1
+    - path: docs/notebooks/e230920_find_tracks.ipynb
+      hash: md5
+      md5: 08a33f7c1ee4c7a9e9cf975757f20be6
+      size: 6885
     - path: pipeline/boilercv_pipeline/stages/e230920_find_tracks
       hash: md5
-      md5: e7bc41f6908d4013c626cc761cc0e13c.dir
-      size: 1791
+      md5: f0f03e2e6b98343fedd1c7062993f8c8.dir
+      size: 1887
       nfiles: 2
     outs:
-    - path: data/e230920_tracks
+    - path: data/e230920/tracks
       hash: md5
       md5: 7928af79ae134ab997ec4658d2c503cb.dir
       size: 33326
@@ -513,18 +534,22 @@ stages:
   e230920_process_tracks:
     cmd: boilercv-pipeline stage e230920-process-tracks
     deps:
-    - path: data/e230920_tracks
+    - path: data/e230920/tracks
       hash: md5
       md5: 7928af79ae134ab997ec4658d2c503cb.dir
       size: 33326
       nfiles: 1
+    - path: docs/notebooks/e230920_process_tracks.ipynb
+      hash: md5
+      md5: 82c7b9f6479b2a7f85b8fc387fb6ca84
+      size: 8616
     - path: pipeline/boilercv_pipeline/stages/e230920_process_tracks
       hash: md5
-      md5: e016dc1920a89b02d80f2eed2ba080ad.dir
-      size: 1875
+      md5: 93a317c61ae0ae397df6bb479ea85825.dir
+      size: 1971
       nfiles: 2
     outs:
-    - path: data/e230920_processed_tracks
+    - path: data/e230920/processed_tracks
       hash: md5
       md5: d751713988987e9331980363e24189ce.dir
       size: 0
@@ -532,7 +557,7 @@ stages:
   e230920_merge_tracks:
     cmd: boilercv-pipeline stage e230920-merge-tracks
     deps:
-    - path: data/e230920_processed_tracks
+    - path: data/e230920/processed_tracks
       hash: md5
       md5: d751713988987e9331980363e24189ce.dir
       size: 0
@@ -542,29 +567,46 @@ stages:
       md5: 5fd2253c62b2c82114ae3bb19ffd3312.dir
       size: 1697
       nfiles: 2
+    outs:
+    - path: data/e230920/merged_tracks.h5
+      hash: md5
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
   e230920_plot_tracks:
     cmd: boilercv-pipeline stage e230920-plot-tracks
     deps:
+    - path: data/e230920/merged_tracks.h5
+      hash: md5
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
+    - path: docs/notebooks/e230920_plot_tracks.ipynb
+      hash: md5
+      md5: ffa3a35525c6943c49e75368075958fd
+      size: 24131
     - path: pipeline/boilercv_pipeline/stages/e230920_plot_tracks
       hash: md5
-      md5: 78b309caa7b3d62533eb82cd3d5b192b.dir
-      size: 2443
+      md5: e43230ed923894ceb6c5678b58a949b8.dir
+      size: 2539
       nfiles: 2
   e230920_get_mae:
     cmd: boilercv-pipeline stage e230920-get-mae
     deps:
-    - path: data/e230920_processed_tracks
+    - path: data/e230920/processed_tracks
       hash: md5
       md5: d751713988987e9331980363e24189ce.dir
       size: 0
       nfiles: 0
+    - path: docs/notebooks/e230920_get_mae.ipynb
+      hash: md5
+      md5: ec8d0a82fa37bc3ee48359d2a959d544
+      size: 13351
     - path: pipeline/boilercv_pipeline/stages/e230920_get_mae
       hash: md5
-      md5: 69567e69513cc2a80cc33e9f0eece8e6.dir
-      size: 1765
+      md5: c8673f549af8000d300b9fdbed96cf81.dir
+      size: 1861
       nfiles: 2
     outs:
-    - path: data/e230920_mae
+    - path: data/e230920/mae
       hash: md5
       md5: d751713988987e9331980363e24189ce.dir
       size: 0
@@ -572,16 +614,21 @@ stages:
   e230920_merge_mae:
     cmd: boilercv-pipeline stage e230920-merge-mae
     deps:
-    - path: data/e230920_mae
+    - path: data/e230920/mae
       hash: md5
       md5: d751713988987e9331980363e24189ce.dir
       size: 0
       nfiles: 0
     - path: pipeline/boilercv_pipeline/stages/e230920_merge_mae
       hash: md5
-      md5: c92647cda55f35e4f05685b0e22f60da.dir
-      size: 1903
+      md5: adcd106424d3ff16e381ebf1c3c23408.dir
+      size: 1856
       nfiles: 2
+    outs:
+    - path: data/e230920/merged_mae.h5
+      hash: md5
+      md5: d41d8cd98f00b204e9800998ecf8427e
+      size: 0
   skip_cloud:
     cmd: boilercv-pipeline stage skip-cloud
     outs:

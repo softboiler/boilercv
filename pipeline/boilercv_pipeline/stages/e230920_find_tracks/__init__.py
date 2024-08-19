@@ -7,11 +7,12 @@ from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.context import ContextMergeModel
 from boilercv_pipeline.models.paths import StagePaths, paths
-from boilercv_pipeline.models.types.runtime import DataDir
+from boilercv_pipeline.models.types.runtime import DataDir, DocsFile
 
 
 class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
+    nb: DocsFile = paths.notebooks[stage.stem]  # pyright: ignore[reportArgumentType]
     e230920_objects: DataDir = paths.e230920_objects
 
 

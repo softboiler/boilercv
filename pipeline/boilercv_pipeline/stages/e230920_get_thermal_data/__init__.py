@@ -7,11 +7,12 @@ from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.context import ContextMergeModel
 from boilercv_pipeline.models.paths import StagePaths, paths
-from boilercv_pipeline.models.types.runtime import DataFile
+from boilercv_pipeline.models.types.runtime import DataFile, DocsFile
 
 
 class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
+    nb: DocsFile = paths.notebooks[stage.stem]  # pyright: ignore[reportArgumentType]
     e230920_thermal_raw: DataFile = paths.e230920_thermal_raw
 
 
@@ -23,7 +24,7 @@ class Outs(StagePaths):
     default_long=True,
     invoke="boilercv_pipeline.stages.e230920_update_thermal_data.__main__.main",
 )
-class E230920UpdateThermalData(ContextMergeModel):
+class E230920GetThermalData(ContextMergeModel):
     """Update thermal data for the experiment."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)

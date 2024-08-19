@@ -8,6 +8,8 @@ from typing import Any
 from loguru import logger
 from pandas import set_option
 
+from boilercv_pipeline.models.generated import types
+
 PROJECT_PATH = Path.cwd()
 """Path to the project root, where `params.yaml` will go."""
 
@@ -25,12 +27,13 @@ BUILD_DOCS = str(_build_docs).casefold() == "true" if _build_docs else False
 
 
 def init():
-    """Initialize `boilercv`."""
+    """Initialize {mod}`~boilercv_pipeline`."""
     if DEBUG:
         logger.add(sink="boilercv.log")
     set_option("mode.copy_on_write", True)
     set_option("mode.chained_assignment", "raise")
     set_option("mode.string_storage", "pyarrow")
+    types.init()
 
 
 init()

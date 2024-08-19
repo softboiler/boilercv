@@ -8,7 +8,7 @@ from boilercv_pipeline.stages.common.e230920 import read_nb
 from boilercv_pipeline.stages.e230920_merge_mae import E230920MergeMae
 
 PLOTS = Path("tests/plots/mae")
-PLOTS.mkdir(exist_ok=True)
+PLOTS.mkdir(parents=True, exist_ok=True)
 
 
 def main(args: E230920MergeMae):

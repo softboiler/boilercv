@@ -8,13 +8,14 @@ from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.context import ContextMergeModel
 from boilercv_pipeline.models.paths import StagePaths, paths
-from boilercv_pipeline.models.types.runtime import DataFile
+from boilercv_pipeline.models.types.runtime import DataFile, DocsFile
 from boilercv_pipeline.stages.common.e230920 import get_path_time
 from boilercv_pipeline.stages.common.e230920.types import Out
 
 
 class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
+    nb: DocsFile = paths.notebooks[stage.stem]  # pyright: ignore[reportArgumentType]
     e230920_merged_tracks: DataFile = paths.e230920_merged_tracks
 
 

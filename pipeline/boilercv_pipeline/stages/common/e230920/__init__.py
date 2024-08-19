@@ -80,13 +80,13 @@ def apply_to_nb(
     params: Params,
     out: Out,
     process: NbProcess = save_df,
-    notebooks: Path = paths.e230920_notebooks,
+    notebooks: Path = paths.notebooks,
 ):
     """Apply a process to a notebook."""
     process(get_nb_ns(nb=read_nb(nb, notebooks), params=params), out)
 
 
-def read_nb(nb: StageName, notebooks: Path = paths.e230920_notebooks) -> str:
+def read_nb(nb: StageName, notebooks: Path = paths.notebooks) -> str:
     """Read a notebook for this experiment."""
     return (notebooks / nb).with_suffix(".ipynb").read_text(encoding="utf-8")
 

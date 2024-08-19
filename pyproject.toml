@@ -315,16 +315,15 @@ convention = "numpy"
     "D1", # Don't require docstrings
 ]
 "pipeline/boilercv_pipeline/models/generated/types/**/*.py" = [
+    "D10",    # Allow missing docstrings in generated types
     "PYI047", # Allow unused private generated types
     "SLF001", # Allow private member access in generated types
 ]
 "pipeline/boilercv_pipeline/manual/**/*.py" = [
-    # ? Allow missing docstrings in stage implementations
-    "D10",
+    "D10", # Allow missing docstrings in stage implementations
 ]
 "pipeline/boilercv_pipeline/stages/**/*.py" = [
-    # ? Allow missing docstrings in stage implementations
-    "D10",
+    "D10", # Allow missing docstrings in stage implementations
 ]
 "tests/**" = [
     "ARG001", # Allow unused arguments

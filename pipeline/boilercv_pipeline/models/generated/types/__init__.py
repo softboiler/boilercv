@@ -10,6 +10,11 @@ from astroid import AnnAssign, Const, Subscript, Tuple, extract_node
 from boilercv_pipeline.config import const
 
 
+def init():
+    """Initialize stages."""
+    sync_stages()
+
+
 def sync_stages():
     """Sync generated types prior to their import and usage in models."""
     stages_literals = const.package_dir / "models" / "generated" / "types" / "stages.py"
@@ -57,3 +62,7 @@ def sync_stages():
                 ]),
             ],
         )
+
+
+if __name__ == "__main__":
+    init()
