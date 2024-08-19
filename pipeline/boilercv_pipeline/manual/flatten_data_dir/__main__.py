@@ -3,7 +3,7 @@ from pathlib import Path
 
 from cappa.base import invoke
 
-from boilercv_pipeline.stages.flatten_data_dir import FlattenDataDir
+from boilercv_pipeline.manual.flatten_data_dir import FlattenDataDir
 
 
 def main(args: FlattenDataDir):

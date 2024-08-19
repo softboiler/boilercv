@@ -23,7 +23,7 @@ class Outs(StagePaths):
 
 
 @command(
-    default_long=True, invoke="boilercv_pipeline.stages.flatten_data_dir.__main__.main"
+    default_long=True, invoke="boilercv_pipeline.manual.flatten_data_dir.__main__.main"
 )
 class FlattenDataDir(ContextMergeModel):
     """Flatten the data directory structure.

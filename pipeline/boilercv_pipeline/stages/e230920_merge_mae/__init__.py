@@ -19,10 +19,6 @@ class Outs(StagePaths):
     e230920_merged_mae: DataFile = paths.e230920_merged_mae
 
 
-PLOTS = Path("tests/plots/mae")
-PLOTS.mkdir(exist_ok=True)
-
-
 @command(
     invoke="boilercv_pipeline.stages.e230920_merge_mae.__main__.main", default_long=True
 )
