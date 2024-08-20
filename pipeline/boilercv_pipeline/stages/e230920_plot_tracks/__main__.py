@@ -6,8 +6,8 @@ from cappa.base import invoke
 
 from boilercv_pipeline.models.notebooks import Notebooks
 from boilercv_pipeline.stages.common.e230920 import (
-    get_e230920_times,
     get_path_time,
+    get_times,
     submit_nb_process,
 )
 from boilercv_pipeline.stages.common.e230920.types import Out
@@ -17,9 +17,9 @@ PLOTS = Path("tests/plots/tracks")
 PLOTS.mkdir(exist_ok=True)
 
 
-def main(args: E230920PlotTracks):
+def main(params: E230920PlotTracks):
     with ProcessPoolExecutor() as executor:
-        for dt in get_e230920_times(args.deps.e230920_merged_tracks):
+        for dt in get_times(params.deps.e230920_merged_tracks, params.pattern):
             submit_nb_process(
                 executor=executor,
                 nb="e230920_get_mae",

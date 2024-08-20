@@ -5,7 +5,6 @@ from typing import get_args
 
 from boilercv_pipeline.models.generated.types.stages import StageName
 from boilercv_pipeline.models.types.runtime import (
-    ROOTED,
     BoilercvPipelineCtxModel,
     DataDir,
     DataFile,
@@ -51,7 +50,7 @@ class Paths(BoilercvPipelineCtxModel):
     modelfunctions: DataDir = Path("models")
 
     # * DVC-tracked inputs
-    notebooks: dict[StageName, DocsFile] = {  # noqa: RUF012
+    notebooks: dict[str | StageName, DocsFile] = {  # noqa: RUF012
         stage_name: Path("notebooks") / f"{stage_name}.ipynb"
         for stage_name in get_args(StageName)
     }
@@ -83,11 +82,3 @@ class Paths(BoilercvPipelineCtxModel):
 
 
 paths = Paths()
-
-
-class StagePaths(BoilercvPipelineCtxModel):
-    """Paths for stages."""
-
-    model_config = get_boilercv_pipeline_config(
-        ROOTED, kinds_from=paths, track_kinds=True
-    )

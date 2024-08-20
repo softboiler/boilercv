@@ -1,26 +1,20 @@
 """Types."""
 
-from collections.abc import Callable
-from dataclasses import dataclass
-from pathlib import Path
-from types import SimpleNamespace
-from typing import TypeAlias
+from typing import TypeVar
+
+from pandas import DataFrame
+from pydantic import BaseModel
 
 
-@dataclass
-class Out:
-    """Output."""
-
-    key: str
-    path: Path | None = None
-    suffix: str = ""
-    attr: str = "outs"
-
-    @property
-    def stem(self):
-        """Name."""
-        return f"{self.key}_{self.suffix}"
+class NbOuts(BaseModel):
+    """Notebook outputs."""
 
 
-NbProcess: TypeAlias = Callable[[SimpleNamespace, Out], None]
-"""Notebook process."""
+NbOuts_T = TypeVar("NbOuts_T", bound=NbOuts, covariant=True)
+"""Notebook outs type."""
+
+
+class DfNbOuts(NbOuts, arbitrary_types_allowed=True):
+    """Notebook outputs with `df`."""
+
+    df: DataFrame

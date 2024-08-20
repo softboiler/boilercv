@@ -7,7 +7,8 @@ from cappa.base import command, invoke
 from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.context import ContextMergeModel
-from boilercv_pipeline.models.paths import StagePaths, paths
+from boilercv_pipeline.models.paths import paths
+from boilercv_pipeline.models.stages import StagePaths
 from boilercv_pipeline.models.types.runtime import DataFile, DocsFile
 from boilercv_pipeline.stages.common.e230920 import get_path_time
 from boilercv_pipeline.stages.common.e230920.types import Out
@@ -15,7 +16,7 @@ from boilercv_pipeline.stages.common.e230920.types import Out
 
 class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
-    nb: DocsFile = paths.notebooks[stage.stem]  # pyright: ignore[reportArgumentType]
+    nb: DocsFile = paths.notebooks[stage.stem]
     e230920_merged_tracks: DataFile = paths.e230920_merged_tracks
 
 
@@ -31,7 +32,10 @@ def export_track_plot(ns: SimpleNamespace, _out: Out):
     ns.figure.savefig(PLOTS / f"{get_path_time(ns.TIME)}.png")
 
 
-@command(invoke="boilercv_pipeline.stages..__main__.main", default_long=True)
+@command(
+    invoke="boilercv_pipeline.stages.e230920_plot_tracks.__main__.main",
+    default_long=True,
+)
 class E230920PlotTracks(ContextMergeModel):
     """Export correlation plots for tracks."""
 

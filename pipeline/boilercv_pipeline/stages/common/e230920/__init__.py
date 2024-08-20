@@ -1,16 +1,14 @@
 """Subcooled bubble collapse experiment."""
 
-from collections.abc import Iterable, Iterator
+from collections.abc import Iterator
 from concurrent.futures import Future, ProcessPoolExecutor
 from contextlib import contextmanager
 from dataclasses import dataclass
-from datetime import datetime
 from pathlib import Path
 from re import search
-from types import SimpleNamespace
 from typing import Any, TypedDict
 
-from boilercore.notebooks.namespaces import Params, get_nb_ns
+from boilercore.notebooks.namespaces import get_nb_ns
 from boilercore.paths import ISOLIKE, dt_fromisolike
 from cmasher import get_sub_cmap
 from matplotlib.axes import Axes
@@ -25,70 +23,44 @@ from sparklines import sparklines
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, Img
-from boilercv_pipeline.models.generated.types.stages import StageName
-from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.stages.common.e230920.types import NbProcess, Out
+from boilercv_pipeline.models.stages import AnyE230920Params, AnyNbParams
+from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, NbOuts, NbOuts_T
 
 
-def get_e230920_times(contours: Path = paths.contours) -> list[str]:
-    """Get times for the e230920 experiment."""
+def get_times(directory: Path, pattern: str) -> list[str]:
+    """Get timestamps from a pattern-filtered directory."""
     return [
-        dt.isoformat()
-        for dt in get_times([
-            p.stem for p in contours.iterdir() if search(r"^2024-07-18.+$", p.stem)
-        ])
+        dt_fromisolike(match).isoformat()
+        for path in directory.iterdir()
+        if (match := ISOLIKE.search(path.stem)) and search(pattern, path.stem)
     ]
 
 
-def get_times(strings: Iterable[str]) -> Iterable[datetime]:
-    """Get ISO-like timestamps."""
-    for string in strings:
-        if match := ISOLIKE.search(string):
-            yield dt_fromisolike(match)
+def submit_nb_process(
+    executor: ProcessPoolExecutor, params: AnyNbParams, outs: type[NbOuts_T] = NbOuts
+) -> Future[NbOuts_T]:
+    """Submit a notebook process to an executor."""
+    return executor.submit(apply_to_nb, params=params, outs=outs)
 
 
-def save_df(ns: SimpleNamespace, out: Out):
-    """Save a DataFrame to HDF5 format, handling invalid types."""
-    if not out.path:
-        return
-    outs: dict[str, DataFrame] = getattr(ns, out.attr)
-    outs[out.key].to_hdf(
-        out.path / f"{out.stem}.h5", key=out.stem, complib="zlib", complevel=9
+def apply_to_nb(params: AnyNbParams, outs: type[NbOuts_T] = NbOuts) -> NbOuts_T:
+    """Apply a process to a notebook."""
+    return outs(
+        **get_nb_ns(
+            nb=params.deps.nb.read_text(encoding="utf-8"),
+            params={"PARAMS": params.model_dump_json()},
+        ).outs
     )
 
 
-def submit_nb_process(
-    executor: ProcessPoolExecutor,
-    nb: StageName,
-    params: Params,
-    out: Out,
-    process: NbProcess = save_df,
-):
-    """Submit a notebook process to an executor."""
-    return executor.submit(
-        apply_to_nb, nb=nb, params=params, out=out, process=process
-    ).add_done_callback(check_result)
-
-
-def check_result(future: Future[Any]):
-    """Resolve a future, reporting an exception if there is one."""
-    future.result()
-
-
-def apply_to_nb(
-    nb: StageName,
-    params: Params,
-    out: Out,
-    process: NbProcess = save_df,
-    notebooks: Path = paths.notebooks,
-):
-    """Apply a process to a notebook."""
-    process(get_nb_ns(nb=read_nb(nb, notebooks), params=params), out)
-
-
-def read_nb(nb: StageName, notebooks: Path = paths.notebooks) -> str:
-    """Read a notebook for this experiment."""
-    return (notebooks / nb).with_suffix(".ipynb").read_text(encoding="utf-8")
+def save_df(future: Future[DfNbOuts], params: AnyE230920Params):
+    """Save a DataFrame to HDF5 format."""
+    future.result().df.to_hdf(
+        params.outs.dfs / f"{params.outs.dfs.stem}_{params.time.replace(':', '-')}.h5",
+        key=params.outs.dfs.stem,
+        complib="zlib",
+        complevel=9,
+    )
 
 
 def get_path_time(time: str) -> str:

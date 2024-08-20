@@ -1,33 +1,32 @@
 from pathlib import Path
-from typing import Annotated
 
-from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.context import ContextMergeModel
-from boilercv_pipeline.models.paths import StagePaths, paths
-from boilercv_pipeline.models.types.runtime import DataDir
+from boilercv_pipeline.models.paths import paths
+from boilercv_pipeline.models.stages import DfsOuts, E230920Params, NbDeps
+from boilercv_pipeline.models.types.runtime import DataDir, DocsFile
 
 
-class Deps(StagePaths):
+class Deps(NbDeps):
     stage: DirectoryPath = Path(__file__).parent
+    nb: DocsFile = paths.notebooks[stage.stem]
     contours: DataDir = paths.contours
 
 
-class Outs(StagePaths):
-    e230920_contours: DataDir = paths.e230920_contours
+class Outs(DfsOuts):
+    dfs: DataDir = paths.e230920_contours
 
 
 @command(
     invoke="boilercv_pipeline.stages.e230920_find_contours.__main__.main",
     default_long=True,
 )
-class E230920FindContours(ContextMergeModel):
-    """Export all contours for this experiment."""
+class E230920FindContours(E230920Params[Deps, Outs]):
+    """Update thermal data for the experiment."""
 
-    deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
-    outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
+    deps: Deps = Field(default_factory=Deps)
+    outs: Outs = Field(default_factory=Outs)
 
 
 if __name__ == "__main__":

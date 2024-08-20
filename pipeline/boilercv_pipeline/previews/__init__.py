@@ -10,7 +10,8 @@ from boilercv.images import draw_text, overlay
 from boilercv.types import DA, DS
 from boilercv_pipeline import DEBUG
 from boilercv_pipeline.models.paths import Paths
-from boilercv_pipeline.models.types.runtime import ROOTED, get_boilercv_pipeline_context
+from boilercv_pipeline.models.stages import ROOTED
+from boilercv_pipeline.models.types.runtime import get_boilercv_pipeline_context
 from boilercv_pipeline.sets import slice_frames
 
 _NUM_FRAMES = 100 if DEBUG else 0
