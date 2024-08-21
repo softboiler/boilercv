@@ -23,8 +23,8 @@ from sparklines import sparklines
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, Img
-from boilercv_pipeline.models.stages import AnyE230920Params, AnyNbParams
-from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, NbOuts, NbOuts_T
+from boilercv_pipeline.models.stages import AnyParams
+from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, Model
 
 
 def get_times(directory: Path, pattern: str) -> list[str]:
@@ -36,28 +36,28 @@ def get_times(directory: Path, pattern: str) -> list[str]:
     ]
 
 
+def get_time(path: Path) -> str:
+    """Get timestamp from a path."""
+    return match.group() if (match := ISOLIKE.search(path.stem)) else ""
+
+
 def submit_nb_process(
-    executor: ProcessPoolExecutor, params: AnyNbParams, outs: type[NbOuts_T] = NbOuts
-) -> Future[NbOuts_T]:
+    executor: ProcessPoolExecutor, nb: str, params: AnyParams, outs: type[Model]
+) -> Future[Model]:
     """Submit a notebook process to an executor."""
-    return executor.submit(apply_to_nb, params=params, outs=outs)
+    return executor.submit(apply_to_nb, nb=nb, params=params, outs=outs)
 
 
-def apply_to_nb(params: AnyNbParams, outs: type[NbOuts_T] = NbOuts) -> NbOuts_T:
+def apply_to_nb(nb: str, params: AnyParams, outs: type[Model]) -> Model:
     """Apply a process to a notebook."""
-    return outs(
-        **get_nb_ns(
-            nb=params.deps.nb.read_text(encoding="utf-8"),
-            params={"PARAMS": params.model_dump_json()},
-        ).outs
-    )
+    return outs(**get_nb_ns(nb=nb, params={"PARAMS": params.model_dump_json()}).outs)
 
 
-def save_df(future: Future[DfNbOuts], params: AnyE230920Params):
+def save_df(future: Future[DfNbOuts], dfs: Path, dep: Path):
     """Save a DataFrame to HDF5 format."""
     future.result().df.to_hdf(
-        params.outs.dfs / f"{params.outs.dfs.stem}_{params.time.replace(':', '-')}.h5",
-        key=params.outs.dfs.stem,
+        dfs / f"{dfs.stem}_{time}.h5" if (time := get_time(dep)) else f"{dfs.stem}.h5",
+        key=dfs.stem,
         complib="zlib",
         complevel=9,
     )

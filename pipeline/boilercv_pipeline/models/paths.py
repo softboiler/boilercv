@@ -66,7 +66,6 @@ class Paths(BoilercvPipelineCtxModel):
     filled: DataDir = Path("filled")
     lifetimes: DataDir = Path("lifetimes")
     e230920_thermal: DataFile = e230920 / Path("thermal.h5")
-    e230920_contours: DataDir = e230920 / Path("contours")
     e230920_objects: DataDir = e230920 / Path("objects")
     e230920_tracks: DataDir = e230920 / Path("tracks")
     e230920_processed_tracks: DataDir = e230920 / Path("processed_tracks")

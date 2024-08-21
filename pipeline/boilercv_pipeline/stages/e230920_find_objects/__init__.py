@@ -1,35 +1,46 @@
 from pathlib import Path
-from typing import Annotated
 
-from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.context import ContextMergeModel
+from boilercv_pipeline.models.deps import DaDepDir, DfDepDir
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stages import StagePaths
+from boilercv_pipeline.models.stages import Params, StagePaths
 from boilercv_pipeline.models.types.runtime import DataDir, DocsFile
+
+INCLUDE_PATTERNS: list[str] = [r"^2024-07-18.+$"]
+
+
+class Contours(DfDepDir):
+    path: DataDir = paths.contours
+    include_patterns: list[str] = INCLUDE_PATTERNS
+
+
+class Filled(DaDepDir):
+    path: DataDir = paths.filled
+    include_patterns: list[str] = INCLUDE_PATTERNS
 
 
 class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
-    e230920_contours: DataDir = paths.e230920_contours
+    contours: Contours = Field(default_factory=Contours)
+    filled: Filled = Field(default_factory=Filled)
 
 
 class Outs(StagePaths):
-    e230920_objects: DataDir = paths.e230920_objects
+    dfs: DataDir = paths.e230920_objects
 
 
 @command(
     invoke="boilercv_pipeline.stages.e230920_find_objects.__main__.main",
     default_long=True,
 )
-class E230920FindObjects(ContextMergeModel):
-    """Export all centers for this experiment."""
+class E230920FindObjects(Params[Deps, Outs]):
+    """Find objects."""
 
-    deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
-    outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
+    deps: Deps = Field(default_factory=Deps)
+    outs: Outs = Field(default_factory=Outs)
 
 
 if __name__ == "__main__":

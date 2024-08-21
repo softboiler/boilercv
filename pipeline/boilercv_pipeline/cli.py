@@ -13,7 +13,6 @@ from yaml import safe_dump
 from boilercv_pipeline.context import ContextMergeModel
 from boilercv_pipeline.stages.binarize import Binarize
 from boilercv_pipeline.stages.convert import Convert
-from boilercv_pipeline.stages.e230920_find_contours import E230920FindContours
 from boilercv_pipeline.stages.e230920_find_objects import E230920FindObjects
 from boilercv_pipeline.stages.e230920_find_tracks import E230920FindTracks
 from boilercv_pipeline.stages.e230920_get_mae import E230920GetMae
@@ -56,7 +55,6 @@ class Stage:
         Binarize
         | SkipCloud
         | Convert
-        | E230920FindContours
         | E230920FindObjects
         | E230920FindTracks
         | E230920GetMae
@@ -98,8 +96,8 @@ class SyncDVC:
             e230920_update_thermal_data: E230920GetThermalData = Field(
                 default_factory=E230920GetThermalData
             )
-            e230920_find_contours: E230920FindContours = Field(
-                default_factory=E230920FindContours
+            e230920_find_contours: E230920FindObjects = Field(
+                default_factory=E230920FindObjects
             )
             e230920_find_objects: E230920FindObjects = Field(
                 default_factory=E230920FindObjects

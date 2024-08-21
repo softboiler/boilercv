@@ -28,6 +28,7 @@ def pack(da: DA) -> DA:
             keep_attrs=True,
         )
         .rename({XPX: XPX_PACKED})
+        .assign_coords({XPX_PACKED: lambda da: da[XPX_PACKED].values})
         .rename(f"{VIDEO}_{PACKED}")
     )
 
@@ -45,6 +46,7 @@ def unpack(da: DA) -> DA:
             keep_attrs=True,
         )
         .rename({XPX_PACKED: XPX})
+        .assign_coords({XPX: lambda da: da[XPX].values})
         .rename(VIDEO)
         .astype(bool)
     )

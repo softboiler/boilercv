@@ -9,11 +9,15 @@ from pandas import read_hdf
 from xarray import Dataset, open_dataset
 
 from boilercv.correlations.types import Stage
-from boilercv.data import HEADER, ROI, VIDEO
+from boilercv.data import FRAME, HEADER, ROI, VIDEO, XPX, YPX
 from boilercv.data.packing import unpack
 from boilercv.types import DF, DS
-from boilercv_pipeline.models.paths import paths
+from boilercv_pipeline.models.paths import Paths
+from boilercv_pipeline.models.stages import ROOTED
+from boilercv_pipeline.models.types.runtime import get_boilercv_pipeline_context
 
+ROOTED_PATHS = Paths(_context=get_boilercv_pipeline_context(ROOTED))
+"""Paths rooted to their directories."""
 ALL_FRAMES = slice(None)
 """Slice that gets all frames."""
 STAGE_DEFAULT = "sources"
@@ -22,7 +26,7 @@ STAGE_DEFAULT = "sources"
 
 @contextmanager
 def process_datasets(
-    destination_dir: Path, reprocess: bool = False, sources: Path = paths.sources
+    destination_dir: Path, reprocess: bool = False, sources: Path = ROOTED_PATHS.sources
 ) -> Iterator[dict[str, Any]]:
     """Get unprocessed dataset names and write them to disk.
 
@@ -55,7 +59,7 @@ def get_unprocessed_destinations(
     destination_dir: Path,
     ext: str = "nc",
     reprocess: bool = False,
-    sources: Path = paths.sources,
+    sources: Path = ROOTED_PATHS.sources,
 ) -> dict[str, Path]:
     """Get destination paths for unprocessed datasets.
 
@@ -90,7 +94,7 @@ def get_unprocessed_destinations(
 
 
 def inspect_dataset(
-    name: str, stage: Stage = STAGE_DEFAULT, sources: Path = paths.sources
+    name: str, stage: Stage = STAGE_DEFAULT, sources: Path = ROOTED_PATHS.sources
 ) -> DS:
     """Inspect a video dataset."""
     cmp_source, unc_source = get_stage(name, sources)
@@ -106,8 +110,8 @@ def get_dataset(
     num_frames: int = 0,
     frame: slice = ALL_FRAMES,
     stage: Stage = STAGE_DEFAULT,
-    sources: Path = paths.sources,
-    rois: Path = paths.rois,
+    sources: Path = ROOTED_PATHS.sources,
+    rois: Path = ROOTED_PATHS.rois,
 ) -> DS:
     """Load a video dataset."""
     # Can't use `xarray.open_mfdataset` because it requires dask
@@ -135,6 +139,28 @@ def get_dataset(
         })
 
 
+def get_dataset2(path: Path, slices: dict[str, slice] | None = None) -> DS:
+    """Load a video dataset."""
+    # Can't use `xarray.open_mfdataset` because it requires dask
+    # Unpacking is incompatible with dask
+    slices = slices or {}
+    cmp_source, unc_source = get_stage(path.stem, path.parent)
+    source = unc_source if unc_source.exists() else cmp_source
+    video = open_dataset(source)[VIDEO]
+    if not unc_source.exists():
+        Dataset({VIDEO: video}).to_netcdf(
+            path=unc_source, encoding={VIDEO: {"zlib": False}}
+        )
+    return Dataset({
+        VIDEO: unpack(
+            video.sel({
+                FRAME: slices.get("frame", slice(None)),
+                YPX: slices.get(YPX, slice(None)),
+            })
+        ).sel({XPX: slices.get(XPX, slice(None))})
+    })
+
+
 def get_stage(name: str, sources: Path) -> tuple[Path, Path]:
     """Get the paths associated with a particular video name and pipeline stage."""
     source = sources / f"{name}.nc"
@@ -144,7 +170,7 @@ def get_stage(name: str, sources: Path) -> tuple[Path, Path]:
     return source, uncompressed / f"{name}.nc"
 
 
-def get_contours_df(name: str, contours: Path = paths.contours) -> DF:
+def get_contours_df(name: str, contours: Path = ROOTED_PATHS.contours) -> DF:
     """Load contours from a dataset."""
     (
         uncompressed_contours := contours.with_name(f"uncompressed_{contours.name}")

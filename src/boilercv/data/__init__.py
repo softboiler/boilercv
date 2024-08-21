@@ -61,7 +61,7 @@ VIDEO_NAME = "video_name"
 
 LENGTH = "um"
 """Length dimension units."""
-SAMPLE_DIAMETER_UM = 9_525_000
+SAMPLE_DIAMETER_UM = 9_525
 """Sample diameter in micrometers."""
 
 islice = IndexSlice

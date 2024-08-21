@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
@@ -14,7 +16,8 @@ from boilercv_pipeline.stages.binarize import Binarize
 def main(params: Binarize):
     logger.info("start binarize")
     for source in tqdm(sorted(params.deps.large_sources.iterdir())):
-        destination = params.outs.sources / f"{source.stem}.nc"
+        source = Path(r"data/large_sources/2023-09-20T17-14-18.nc")
+        destination = params.outs.sources / source.name
         if destination.exists():
             continue
         with open_dataset(source) as ds:
@@ -27,9 +30,7 @@ def main(params: Binarize):
             )
             binarized: DA = apply_to_img_da(cv.binarize, masked, vectorize=True)
             ds[VIDEO] = pack(binarized)
-            ds.to_netcdf(
-                path=params.outs.sources / source.name, encoding={VIDEO: {"zlib": True}}
-            )
+            ds.to_netcdf(path=destination, encoding={VIDEO: {"zlib": True}})
             ds[ROI] = roi
             ds = ds.drop_vars(VIDEO)
             ds.to_netcdf(path=params.outs.rois / source.name)
