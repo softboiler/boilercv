@@ -5,9 +5,8 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stages import StagePaths
+from boilercv_pipeline.models.stages import Params, StagePaths
 from boilercv_pipeline.models.types.runtime import DataDir
 
 
@@ -23,7 +22,7 @@ class Outs(StagePaths):
 
 
 @command(default_long=True, invoke="boilercv_pipeline.stages.fill.__main__.main")
-class Fill(ContextModel):
+class Fill(Params[Deps, Outs]):
     """Fill bubble contours."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)

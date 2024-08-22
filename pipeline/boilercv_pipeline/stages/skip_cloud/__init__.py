@@ -4,10 +4,12 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import Field
 
-from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stages import StagePaths
+from boilercv_pipeline.models.stages import Params, StagePaths
 from boilercv_pipeline.models.types.runtime import DataDir
+
+
+class Deps(StagePaths): ...
 
 
 class Outs(StagePaths):
@@ -15,7 +17,7 @@ class Outs(StagePaths):
 
 
 @command(default_long=True, invoke="boilercv_pipeline.stages.skip_cloud.__main__.main")
-class SkipCloud(ContextModel):
+class SkipCloud(Params[Deps, Outs]):
     """The outs of this stage are too large and unwieldy to cache or push to cloud storage."""
 
     outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)

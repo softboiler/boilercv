@@ -66,19 +66,28 @@ def _get_ns_attrs(request):
 
 
 @pytest.fixture(params=boilercv_pipeline_const.stages)
-def stage(request):
+def stage(tmp_path, request):
     """Set project directory."""
     if request.param == "skip_cloud" or (
         request.param != "e230920_find_objects" and request.param.startswith("e230920_")
     ):
         pytest.skip("Deps not yet sourced")
+    docs = boilercv_pipeline_const.docs
     module = f"boilercv_pipeline.stages.{request.param}"
+    init = import_module(module)
+    Deps = init.Deps  # noqa: N806
+    Outs = init.Outs  # noqa: N806
+    Params = getattr(init, f"{to_pascal(request.param)}")  # noqa: N806
+    main = import_module(f"{module}.__main__").main
     return partial(
-        import_module(f"{module}.__main__").main,
-        getattr(import_module(module), f"{to_pascal(request.param)}")(
-            context=get_boilercv_pipeline_context(
-                roots=Roots(data=const.data, docs=boilercv_pipeline_const.docs)
-            )
+        main,
+        Params(
+            deps=Deps(
+                context=get_boilercv_pipeline_context(Roots(data=const.data, docs=docs))
+            ),
+            outs=Outs(
+                context=get_boilercv_pipeline_context(Roots(data=tmp_path, docs=docs))
+            ),
         ),
     )
 
