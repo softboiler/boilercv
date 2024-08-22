@@ -4,15 +4,23 @@ from __future__ import annotations
 
 from functools import cached_property, partial
 from pathlib import Path
-from typing import Annotated, ClassVar, TypeAlias
+from typing import Annotated, Any, ClassVar, TypeAlias
 
-from pydantic import AfterValidator, BaseModel, Field, computed_field
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    Field,
+    SerializerFunctionWrapHandler,
+    WrapSerializer,
+    computed_field,
+)
 
-from boilercv_pipeline.context import ContextMergeModel
+from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.context.types import (
     Context,
     ContextPluginSettings,
     PluginConfigDict,
+    SerializationInfo,
     ValidationInfo,
 )
 from boilercv_pipeline.models.types import Kind, Kinds
@@ -54,6 +62,9 @@ BoilercvPipelineConfigDict: TypeAlias = PluginConfigDict[
     ContextPluginSettings[BoilercvPipelineCtxDict]
 ]
 BoilercvPipelineValidationInfo: TypeAlias = ValidationInfo[BoilercvPipelineCtxDict]
+BoilercvPipelineSerializationInfo: TypeAlias = SerializationInfo[
+    BoilercvPipelineCtxDict
+]
 
 
 def get_boilercv_pipeline_context(
@@ -64,7 +75,7 @@ def get_boilercv_pipeline_context(
     """Context for {mod}`~boilercv_pipeline`."""
     ctx_from: BoilercvPipelineCtxDict = getattr(
         kinds_from,
-        "_context",
+        "context",
         BoilercvPipelineCtxDict(boilercv_pipeline=BoilercvPipelineCtx()),
     )
     return BoilercvPipelineCtxDict(
@@ -91,12 +102,13 @@ def get_boilercv_pipeline_config(
     )
 
 
-class BoilercvPipelineCtxModel(ContextMergeModel):
+class BoilercvPipelineCtxModel(ContextModel):
     """Context model for {mod}`~boilercv_pipeline`."""
 
     model_config: ClassVar[BoilercvPipelineConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
         get_boilercv_pipeline_config()
     )
+    _context_handlers: ClassVar = {"boilercv_pipeline": BoilercvPipelineCtx}
 
 
 kinds: dict[Kind, tuple[str, bool]] = {
@@ -111,25 +123,44 @@ make_path_args: dict[tuple[str, bool], Kind] = {v: k for k, v in kinds.items()}
 
 
 def make_path(
-    key: str, file: bool, path: Path, info: BoilercvPipelineValidationInfo
+    path: Path, info: BoilercvPipelineValidationInfo, key: str, file: bool
 ) -> Path:
     """Check path kind and make a directory and its parents or a file's parents."""
     ctx = info.context["boilercv_pipeline"]
-    if ctx.check_kinds and make_path_args[(key, file)] not in ctx.kinds[path]:
+    root = getattr(ctx.roots, key, None)
+    if root:
+        path = (root.resolve() / path) if path.is_absolute() else root / path
+        (path.parent if file else path).mkdir(exist_ok=True, parents=True)
+    if (
+        ctx.check_kinds
+        and make_path_args[(key, file)]
+        not in ctx.kinds[path.relative_to(root) if root else path]
+    ):
         raise ValueError("Path kind not as expected.")
     if ctx.track_kinds:
         ctx.kinds[path] = make_path_args[(key, file)]
-    if (root := getattr(ctx.roots, key, None)) and not path.is_absolute():
-        path = root / path
-        (path.parent if file else path).mkdir(exist_ok=True, parents=True)
     return path
 
 
-DataDir = Annotated[Path, AfterValidator(partial(make_path, *kinds["DataDir"]))]
+def ser_path(value: Any, nxt: SerializerFunctionWrapHandler) -> Any:
+    """Resolve paths and serialize POSIX-style."""
+    return nxt(value.as_posix()) if isinstance(value, Path) else nxt(value)
+
+
+def AnnotatedPath(kind: Kind):  # noqa: N802
+    """Make partial."""
+    key, file = kinds[kind]
+    return [
+        AfterValidator(partial(make_path, key=key, file=file)),
+        WrapSerializer(ser_path),
+    ]
+
+
+DataDir = Annotated[Path, *AnnotatedPath("DataDir")]
 """Data directory path made upon validation."""
-DataFile = Annotated[Path, AfterValidator(partial(make_path, *kinds["DataFile"]))]
+DataFile = Annotated[Path, *AnnotatedPath("DataFile")]
 """Data file path made upon validation."""
-DocsDir = Annotated[Path, AfterValidator(partial(make_path, *kinds["DocsDir"]))]
+DocsDir = Annotated[Path, *AnnotatedPath("DocsDir")]
 """Docs directory path made upon validation."""
-DocsFile = Annotated[Path, AfterValidator(partial(make_path, *kinds["DocsFile"]))]
+DocsFile = Annotated[Path, *AnnotatedPath("DocsFile")]
 """Docs file path made upon validation."""

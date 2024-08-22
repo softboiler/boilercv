@@ -10,7 +10,7 @@ from cappa.subcommand import Subcommands
 from pydantic import BaseModel, Field
 from yaml import safe_dump
 
-from boilercv_pipeline.context import ContextMergeModel
+from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.stages.binarize import Binarize
 from boilercv_pipeline.stages.convert import Convert
 from boilercv_pipeline.stages.e230920_find_objects import E230920FindObjects
@@ -80,7 +80,7 @@ class SyncDVC:
     def __call__(self):
         """Sync `dvc.yaml`."""
 
-        class Stages(ContextMergeModel):
+        class Stages(ContextModel):
             """Stages."""
 
             skip_cloud: SkipCloud = Field(default_factory=SkipCloud)

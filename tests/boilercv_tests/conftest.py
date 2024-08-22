@@ -10,7 +10,7 @@ from logging import warning
 from os import environ, getpid
 from pathlib import Path
 from re import fullmatch
-from shutil import copy, copytree, rmtree
+from shutil import rmtree
 from types import SimpleNamespace
 
 import pytest
@@ -31,8 +31,7 @@ from boilercv_tools.warnings import filter_boilercv_warnings
 CASER = "C"
 """Module-level variable in test modules containing notebook cases for that module."""
 
-# * -------------------------------------------------------------------------------- * #
-# * Autouse
+# * MARK: Autouse
 
 
 @pytest.fixture(autouse=True, scope="session")
@@ -63,51 +62,25 @@ def _get_ns_attrs(request):
         nb.unlink(missing_ok=True)
 
 
-# * -------------------------------------------------------------------------------- * #
-# * Notebook namespaces
+# * MARK: Notebook namespaces
 
 
 @pytest.fixture(params=boilercv_pipeline_const.stages)
-def stage(tmp_path, request):
+def stage(request):
     """Set project directory."""
-    if request.param in [
-        "skip_cloud",
-        "e230920_merge_mae",
-        "e230920_merge_tracks",
-        "e230920_plot_tracks",
-        "e230920_update_thermal_data",
-    ]:
-        pytest.skip("Deps not yet sourced")
-    (expected := tmp_path / const.expected).mkdir()
-    module = f"boilercv_pipeline.stages.{request.param}"
-    params = {
-        kind: getattr(import_module(module), f"{to_pascal(request.param)}")(
-            _context=get_boilercv_pipeline_context(roots=roots)
-        )
-        for kind, roots in {
-            "src": Roots(data=const.test_data_root / const.data, docs=None),
-            "dst": Roots(data=tmp_path / const.data, docs=None),
-            "exp": Roots(data=expected, docs=None),
-        }.items()
-    }
-    paths = {
-        kind: {
-            "deps": p.deps.model_dump().values(),
-            "outs": p.outs.model_dump().values(),
-        }
-        for kind, p in params.items()
-    }
-    for src, dst in (
-        *zip(paths["src"]["deps"], paths["dst"]["deps"], strict=True),
-        *zip(paths["src"]["outs"], paths["exp"]["outs"], strict=True),
+    if request.param == "skip_cloud" or (
+        request.param != "e230920_find_objects" and request.param.startswith("e230920_")
     ):
-        if src is dst:
-            continue
-        if src.is_file():
-            copy(src, dst)
-        if src.is_dir():
-            copytree(src, dst, dirs_exist_ok=True)
-    return partial(import_module(f"{module}.__main__").main, params["dst"])
+        pytest.skip("Deps not yet sourced")
+    module = f"boilercv_pipeline.stages.{request.param}"
+    return partial(
+        import_module(f"{module}.__main__").main,
+        getattr(import_module(module), f"{to_pascal(request.param)}")(
+            context=get_boilercv_pipeline_context(
+                roots=Roots(data=const.data, docs=boilercv_pipeline_const.docs)
+            )
+        ),
+    )
 
 
 @pytest.fixture
@@ -129,8 +102,7 @@ def ns(request, fixture_stores) -> Iterator[SimpleNamespace]:
     )
 
 
-# * -------------------------------------------------------------------------------- * #
-# * Harvest
+# * MARK: Harvest
 
 
 @dataclass
@@ -190,8 +162,7 @@ def fixture_stores(fixture_store) -> FixtureStores:
     )
 
 
-# * -------------------------------------------------------------------------------- * #
-# * Plotting
+# * MARK: Plotting
 
 
 @pytest.fixture
@@ -238,10 +209,9 @@ def ax(fig_ax) -> Axis:
     return fig_ax[1]
 
 
-# * -------------------------------------------------------------------------------- * #
-# * Harvest hooks
-# *   https://github.com/smarie/python-pytest-harvest/issues/46#issuecomment-742367746
-# *   https://smarie.github.io/python-pytest-harvest/#pytest-x-dist
+# * MARK: Harvest hooks
+# * https://github.com/smarie/python-pytest-harvest/issues/46#issuecomment-742367746
+# * https://smarie.github.io/python-pytest-harvest/#pytest-x-dist
 
 HARVEST_ROOT = Path(".xdist_harvested")
 """Root directory for harvested results."""

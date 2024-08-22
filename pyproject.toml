@@ -323,7 +323,8 @@ convention = "numpy"
     "D10", # Allow missing docstrings in stage implementations
 ]
 "**/stages/**/*.py" = [
-    "D10", # Allow missing docstrings in stage implementations
+    "D10",    # Allow missing docstrings in stage implementations
+    "RUF012", # Disable this heuristic for Pydantic models with defaults
 ]
 "tests/**" = [
     "ARG001", # Allow unused arguments

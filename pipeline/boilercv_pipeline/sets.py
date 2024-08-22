@@ -16,7 +16,7 @@ from boilercv_pipeline.models.paths import Paths
 from boilercv_pipeline.models.stages import ROOTED
 from boilercv_pipeline.models.types.runtime import get_boilercv_pipeline_context
 
-ROOTED_PATHS = Paths(_context=get_boilercv_pipeline_context(ROOTED))
+ROOTED_PATHS = Paths(context=get_boilercv_pipeline_context(ROOTED))
 """Paths rooted to their directories."""
 ALL_FRAMES = slice(None)
 """Slice that gets all frames."""
@@ -177,6 +177,21 @@ def get_contours_df(name: str, contours: Path = ROOTED_PATHS.contours) -> DF:
     ).mkdir(parents=True, exist_ok=True)
     unc_cont = uncompressed_contours / f"{name}.h5"
     contour = unc_cont if unc_cont.exists() else contours / f"{name}.h5"
+    contour_df: DF = read_hdf(contour)  # pyright: ignore[reportAssignmentType]
+    if not unc_cont.exists():
+        contour_df.to_hdf(unc_cont, key="contours", complevel=None, complib=None)
+    return contour_df
+
+
+def get_contours_df2(path: Path) -> DF:
+    """Load contours from a dataset."""
+    (
+        uncompressed_contours := path.parent.with_name(
+            f"uncompressed_{path.parent.name}"
+        )
+    ).mkdir(parents=True, exist_ok=True)
+    unc_cont = uncompressed_contours / path.name
+    contour = unc_cont if unc_cont.exists() else path
     contour_df: DF = read_hdf(contour)  # pyright: ignore[reportAssignmentType]
     if not unc_cont.exists():
         contour_df.to_hdf(unc_cont, key="contours", complevel=None, complib=None)

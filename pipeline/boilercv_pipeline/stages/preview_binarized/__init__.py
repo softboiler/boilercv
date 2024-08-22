@@ -5,7 +5,7 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.context import ContextMergeModel
+from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stages import StagePaths
 from boilercv_pipeline.models.types.runtime import DataDir, DataFile
@@ -24,7 +24,7 @@ class Outs(StagePaths):
 @command(
     default_long=True, invoke="boilercv_pipeline.stages.preview_binarized.__main__.main"
 )
-class PreviewBinarized(ContextMergeModel):
+class PreviewBinarized(ContextModel):
     """Update previews for the binarization stage."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)

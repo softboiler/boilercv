@@ -3,71 +3,131 @@
 from datetime import date
 from hashlib import sha256
 from pathlib import Path
+from typing import Annotated
 
+from pydantic import BaseModel, Field
 from ruamel.yaml import YAML
 from sphinx.application import Sphinx
 
-from boilercv_docs import DOCS, PYPROJECT, init_docs_build
+from boilercv_docs.config import default
 from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
-from boilercv_docs.settings import default
+from boilercv_docs.models import rooted_paths
+from boilercv_docs.patch_nbs import patch_nbs
 from boilercv_docs.types import IspxMappingValue
+from boilercv_tools.environment import init_shell
+from boilercv_tools.warnings import filter_boilercv_warnings
 
-# ! Initialization
-ROOT = init_docs_build()
-"""Root directory of the project."""
-# ! Paths
-STATIC = DOCS / "_static"
-"""Static assets folder, used in configs and setup."""
-CSS = STATIC / "local.css"
-"""Local CSS file, used in configs and setup."""
-BIB_TEMPLATE = DOCS / "refs-template.bib"
-"""Project template bibliography file."""
-BIB = DOCS / "refs.bib"
-"""Bibliography file."""
-COPIER_ANSWERS = ROOT / ".copier-answers.yml"
-"""Copier answers file."""
-# ! Template answers
-ANS = YAML().load(COPIER_ANSWERS.read_text(encoding="utf-8"))
-"""Project template answers."""
-PROJECT_OWNER_GITHUB_USERNAME = ANS["project_owner_github_username"]
-"""Name of the project owner."""
-AUTHORS = "Blake Naccarato, Kwang Jin Kim"
-"""Authors of the project."""
-USER = ANS["project_owner_github_username"]
-"""Host GitHub user or organization for this repository."""
-REPO = ANS["github_repo_name"]
-"""GitHub repository name."""
-PACKAGE = ANS["project_name"]
-"""Package name."""
-VERSION = ANS["project_version"]
-"""Package version."""
-# ! Intersphinx and related
-ISPX_MAPPING: dict[str, IspxMappingValue] = {
-    **{pkg: get_rtd(pkg) for pkg in ["myst_parser", "nbformat", "numpydoc", "tomlkit"]},
-    **{pkg: get_rtd(pkg, latest=True) for pkg in ["pyqtgraph"]},
-    "jupyterbook": get_url("jupyterbook.org/en"),
-    "numpy": get_url("numpy.org/doc"),
-    "matplotlib": get_url("matplotlib.org"),
-    "pytest": get_url("docs.pytest.org/en"),
-    "sympy": get_url("docs.sympy.org", latest=True),
-    "colorcet": get_ispx("https://colorcet.holoviz.org"),
-    "cv2": get_ispx("docs.opencv.org/2.4"),
-    "pandas": get_ispx("pandas.pydata.org/docs"),
-    "python": get_ispx("docs.python.org/3"),
-    "scipy": get_ispx("docs.scipy.org/doc/scipy"),
-    "boilercore": IspxMappingValue("https://softboiler.org/boilercore"),
-}
-"""Intersphinx mapping."""
-TIPPY_RTD_URLS = [
-    ispx.url
-    for pkg, ispx in ISPX_MAPPING.items()
-    if pkg not in ["python", "pandas", "matplotlib"]
-]
-"""Tippy ReadTheDocs-compatible URLs."""
-REV = "4025524891c4b9a07c9624b6afa37085d4f73cb5"
-"""Binder revision."""
+# * MARK: Helper functions
 
-# ! Setup
+
+def init_docs_build() -> Path:
+    """Initialize shell, ensure we are in `docs`, patch notebooks, return root."""
+    filter_boilercv_warnings()
+    init_shell(rooted_paths.root)
+    patch_nbs()
+    return rooted_paths.root
+
+
+def dpaths(*paths: Path, rel: Path = rooted_paths.docs) -> list[str]:
+    """Get the string-representation of paths relative to docs for Sphinx config.
+
+    Parameters
+    ----------
+    paths
+        Paths to convert.
+    rel
+        Relative path to convert to. Defaults to the 'docs' directory.
+    """
+    return [dpath(path, rel) for path in paths]
+
+
+def dpath(path: Path, rel: Path = rooted_paths.docs) -> str:
+    """Get the string-representation of a path relative to docs for Sphinx config.
+
+    Parameters
+    ----------
+    path
+        Path to convert.
+    rel
+        Relative path to convert to. Defaults to the 'docs' directory.
+    """
+    return path.relative_to(rel).as_posix()
+
+
+# * MARK: Constants
+
+
+class Answers(BaseModel, extra="ignore"):
+    """Answers."""
+
+    user: Annotated[str, Field(alias="project_owner_github_username")]
+    """Name of the project owner."""
+    repo: Annotated[str, Field(alias="github_repo_name")]
+    """GitHub repository name."""
+    package: Annotated[str, Field(alias="project_name")]
+    """Package name."""
+    version: Annotated[str, Field(alias="project_version")]
+    """Package version."""
+
+
+class Constants(BaseModel):
+    """Constants."""
+
+    root: Path = init_docs_build()
+    """Root directory of the project."""
+    static: Path = rooted_paths.docs / "_static"
+    """Static assets folder, used in configs and setup."""
+    css: Path = static / "local.css"
+    """Local CSS file, used in configs and setup."""
+    bib_template: Path = rooted_paths.docs / "refs-template.bib"
+    """Project template bibliography file."""
+    bib: Path = rooted_paths.docs / "refs.bib"
+    """Bibliography file."""
+    copier_answers: Path = root / ".copier-answers.yml"
+    """Copier answers file."""
+    authors: str = "Blake Naccarato, Kwang Jin Kim"
+    """Authors of the project."""
+    # * MARK:  Template answers
+    ans: Answers = Answers(**YAML().load(copier_answers.read_text(encoding="utf-8")))
+    """Project template answers."""
+    ispx_mapping: dict[str, IspxMappingValue] = {
+        **{
+            pkg: get_rtd(pkg)
+            for pkg in ["myst_parser", "nbformat", "numpydoc", "tomlkit"]
+        },
+        **{pkg: get_rtd(pkg, latest=True) for pkg in ["pyqtgraph"]},
+        "jupyterbook": get_url("jupyterbook.org/en"),
+        "numpy": get_url("numpy.org/doc"),
+        "matplotlib": get_url("matplotlib.org"),
+        "pytest": get_url("docs.pytest.org/en"),
+        "sympy": get_url("docs.sympy.org", latest=True),
+        "colorcet": get_ispx("https://colorcet.holoviz.org"),
+        "cv2": get_ispx("docs.opencv.org/2.4"),
+        "pandas": get_ispx("pandas.pydata.org/docs"),
+        "python": get_ispx("docs.python.org/3"),
+        "scipy": get_ispx("docs.scipy.org/doc/scipy"),
+        "boilercore": IspxMappingValue("https://softboiler.org/boilercore"),
+    }
+    """Intersphinx mapping."""
+    tippy_rtd_urls: list[str] = [
+        ispx.url
+        for pkg, ispx in ispx_mapping.items()
+        if pkg not in ["python", "pandas", "matplotlib"]
+    ]
+    """Tippy ReadTheDocs-compatible URLs."""
+    rev: str = "4025524891c4b9a07c9624b6afa37085d4f73cb5"
+    """Binder revision."""
+    html_thebe_common: dict[str, str] = {
+        "repository_url": f"https://github.com/{ans.user}/{ans.repo}",
+        "path_to_docs": dpath(rooted_paths.docs),
+    }
+    """Options common to HTML and Thebe config."""
+
+
+const = Constants()
+"""Constants."""
+
+# * MARK: Setup
 
 
 def setup(app: Sphinx):
@@ -84,50 +144,25 @@ def add_version_to_css(app: Sphinx, _pagename, _templatename, ctx, _doctree):
     """
     if app.builder.name != "html":
         return
-    css = dpath(CSS)
+    css = dpath(const.css)
     css_files = "css_files"
     for i, css_file in enumerate(ctx.get(css_files, [])):
         if css != css_file.filename:
             continue
-        ctx[css_files][i] = f"{css}?hash={sha256(CSS.read_bytes()).hexdigest()}"
+        ctx[css_files][i] = f"{css}?hash={sha256(const.css.read_bytes()).hexdigest()}"
 
 
-def dpaths(*paths: Path, rel: Path = DOCS) -> list[str]:
-    """Get the string-representation of paths relative to docs for Sphinx config.
-
-    Parameters
-    ----------
-    paths
-        Paths to convert.
-    rel
-        Relative path to convert to. Defaults to the 'docs' directory.
-    """
-    return [dpath(path, rel) for path in paths]
+# * MARK: Basics
 
 
-def dpath(path: Path, rel: Path = DOCS) -> str:
-    """Get the string-representation of a path relative to docs for Sphinx config.
-
-    Parameters
-    ----------
-    path
-        Path to convert.
-    rel
-        Relative path to convert to. Defaults to the 'docs' directory.
-    """
-    return path.relative_to(rel).as_posix()
-
-
-# ! Basics
-project = PACKAGE
-copyright = f"{date.today().year}, {AUTHORS}"  # noqa: A001
-version = VERSION
+project = const.ans.package
+copyright = f"{date.today().year}, {const.authors}"  # noqa: A001
+version = const.ans.version
 master_doc = "index"
 language = "en"
 exclude_patterns = ["_build", "Thumbs.db", ".DS_Store", "**/_*.md", "**/_*.ipynb"]
 extensions = [
-    *([] if default.build.skip_autodoc else ["autodoc2"]),
-    "cappa.ext.docutils",
+    *([] if default.build.skip_autodoc else ["autodoc2", "cappa.ext.docutils"]),
     "myst_nb",
     "sphinx_design",
     "sphinx_tippy",
@@ -142,23 +177,19 @@ extensions = [
 suppress_warnings = [
     "autodoc2.dup_item"  # "Duplicate items in boilercv_tests.test_morphs
 ]
-# ! Theme
-html_title = PACKAGE
+# * MARK: Theme
+html_title = const.ans.package
 html_favicon = "_static/favicon.ico"
 html_logo = "_static/favicon.ico"
-html_static_path = dpaths(STATIC)
-html_css_files = dpaths(CSS, rel=STATIC)
+html_static_path = dpaths(const.static)
+html_css_files = dpaths(const.css, rel=const.static)
 html_theme = "sphinx_book_theme"
 html_context = {
     # ? MyST elements don't look great with dark mode, but allow dark for accessibility.
     "default_mode": "light"
 }
-COMMON_OPTIONS = {
-    "repository_url": f"https://github.com/{USER}/{REPO}",
-    "path_to_docs": dpath(DOCS),
-}
 html_theme_options = {
-    **COMMON_OPTIONS,
+    **const.html_thebe_common,
     "navigation_with_keys": False,  # https://github.com/pydata/pydata-sphinx-theme/pull/1503
     "repository_branch": "main",
     "show_navbar_depth": 2,
@@ -167,7 +198,7 @@ html_theme_options = {
     "use_fullscreen_button": True,
     "use_repository_button": True,
 }
-# ! MyST
+# * MARK: MyST
 mathjax3_config = {
     "tex": {
         "macros": {
@@ -193,30 +224,34 @@ myst_enable_extensions = [
 ]
 myst_heading_anchors = 6
 myst_substitutions = {
-    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{PROJECT_OWNER_GITHUB_USERNAME}/{PACKAGE}/{REV}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Fplot_tracks.ipynb)"
+    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{const.ans.user}/{const.ans.package}/{const.rev}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Fplot_tracks.ipynb)"
 }
-# ! BibTeX
-bibtex_bibfiles = dpaths(BIB_TEMPLATE, BIB)
+# * MARK:  BibTeX
+bibtex_bibfiles = dpaths(const.bib_template, const.bib)
 bibtex_reference_style = "label"
 bibtex_default_style = "unsrt"
-# ! NB
+# * MARK:  NB
 nb_execution_mode = default.build.nb_execution_mode
 nb_execution_excludepatterns = default.build.nb_execution_excludepatterns
 nb_execution_raise_on_error = True
-# ! Thebe
-thebe_config = {**COMMON_OPTIONS, "repository_branch": REV, "selector": "div.highlight"}
-# ! Other
+# * MARK:  Thebe
+thebe_config = {
+    **const.html_thebe_common,
+    "repository_branch": const.rev,
+    "selector": "div.highlight",
+}
+# * MARK:  Other
 numfig = True
 math_eqref_format = "Eq. {number}"
 mermaid_d3_zoom = False
-# ! Autodoc2
+# * MARK:  Autodoc2
 nitpicky = True
 autodoc2_packages = [
-    f"../src/{PACKAGE}",
-    f"{PACKAGE}_docs",
-    f"../pipeline/{PACKAGE}_pipeline",
-    f"../tests/{PACKAGE}_tests",
-    f"../scripts/{PACKAGE}_tools",
+    f"../src/{const.ans.package}",
+    f"{const.ans.package}_docs",
+    f"../pipeline/{const.ans.package}_pipeline",
+    f"../tests/{const.ans.package}_tests",
+    f"../scripts/{const.ans.package}_tools",
 ]
 autodoc2_render_plugin = "myst"
 # ? Autodoc2 does not currently obey `python_display_short_literal_types` or
@@ -225,20 +260,19 @@ autodoc2_render_plugin = "myst"
 # ? https://github.com/sphinx-extensions2/sphinx-autodoc2/issues/58
 maximum_signature_line_length = 1
 # ? Parse Numpy docstrings
-autodoc2_docstring_parser_regexes = [(".*", f"{PACKAGE}_docs.docstrings")]
-# ! Intersphinx
+autodoc2_docstring_parser_regexes = [(".*", f"{const.ans.package}_docs.docstrings")]
+# * MARK:  Intersphinx
 intersphinx_mapping = {
-    pkg: ispx for pkg, ispx in ISPX_MAPPING.items() if pkg != "colorcet"
+    pkg: ispx for pkg, ispx in const.ispx_mapping.items() if pkg != "colorcet"
 }
 nitpick_ignore = [
     ("py:class", "cv2.LineSegmentDetector"),
-    ("py:class", f"{PACKAGE}.correlations.T"),
-    ("py:class", f"{PACKAGE}.data.sets.Stage"),
-    ("py:class", f"{PACKAGE}.experiments.e230920_subcool.NbProcess"),
-    ("py:class", f"{PACKAGE}.experiments.e230920_subcool.NbProcess"),
-    ("py:class", f"{PACKAGE}.morphs.contexts"),
+    ("py:class", f"{const.ans.package}.correlations.T"),
+    ("py:class", f"{const.ans.package}.data.sets.Stage"),
+    ("py:class", f"{const.ans.package}.experiments.e230920_subcool.NbProcess"),
+    ("py:class", f"{const.ans.package}.experiments.e230920_subcool.NbProcess"),
+    ("py:class", f"{const.ans.package}.morphs.contexts"),
 ]
-
 nitpick_ignore_regex = [
     # ? Missing inventory
     (r"py:.*", r"docutils\..+"),
@@ -253,12 +287,12 @@ nitpick_ignore_regex = [
     (r"py:.*", r"pydantic\..+"),  # ? https://github.com/pydantic/pydantic/issues/1339
     (r"py:.*", r"PySide6\..+"),  # ? https://bugreports.qt.io/browse/PYSIDE-2215
     # ? TypeAlias: https://github.com/sphinx-doc/sphinx/issues/10785
-    (r"py:class", rf"{PACKAGE}.*\.types\..+"),
+    (r"py:class", rf"{const.ans.package}.*\.types\..+"),
     (r"py:class", r"boilercore.*\.types\..+"),
-    (r"py:class", rf"{PACKAGE}_pipeline\.captivate\.previews\..+"),
-    (r"py:.*", rf"{PACKAGE}_tests\.test_morphs\..+"),
+    (r"py:class", rf"{const.ans.package}_pipeline\.captivate\.previews\..+"),
+    (r"py:.*", rf"{const.ans.package}_tests\.test_morphs\..+"),
 ]
-# ! Tippy
+# * MARK:  Tippy
 # ? https://sphinx-tippy.readthedocs.io/en/latest/index.html#confval-tippy_anchor_parent_selector
 tippy_anchor_parent_selector = "article.bd-article"
 # ? Mermaid tips don't work
@@ -276,13 +310,13 @@ tippy_tip_selector = """
     table
     """
 # ? Skip Zenodo DOIs as the hover hint doesn't work properly
-tippy_rtd_urls = TIPPY_RTD_URLS
+tippy_rtd_urls = const.tippy_rtd_urls
 tippy_skip_urls = [
     # ? Skip Zenodo DOIs as the hover hint doesn't work properly
     r"https://doi\.org/10\.5281/zenodo\..+"
 ]
-# ! Towncrier
+# * MARK:  Towncrier
 towncrier_draft_autoversion_mode = "draft"
 towncrier_draft_include_empty = True
-towncrier_draft_working_directory = ROOT
-towncrier_draft_config_path = PYPROJECT
+towncrier_draft_working_directory = const.root
+towncrier_draft_config_path = rooted_paths.pyproject

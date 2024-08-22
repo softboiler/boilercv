@@ -5,21 +5,15 @@ from boilercore.settings_models import (
     get_settings_paths,
     sync_settings_schema,
 )
-from pydantic_settings import (
-    BaseSettings,
-    PydanticBaseSettingsSource,
-    SettingsConfigDict,
-)
+from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
 import boilercv
 
 paths = get_settings_paths(boilercv)
 
 
-class PluginModelConfig(BaseSettings):
+class PluginModelConfig(BaseSettings, use_attribute_docstrings=True):
     """Pydantic plugin model configuration."""
-
-    model_config = SettingsConfigDict(use_attribute_docstrings=True)
 
     @classmethod
     def settings_customise_sources(
@@ -33,10 +27,8 @@ class PluginModelConfig(BaseSettings):
         return customise_sources(settings_cls, init_settings, paths.plugin_settings)
 
 
-class Settings(BaseSettings):
+class Settings(BaseSettings, use_attribute_docstrings=True):
     """Package settings."""
-
-    model_config = SettingsConfigDict(use_attribute_docstrings=True)
 
     @classmethod
     def settings_customise_sources(

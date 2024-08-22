@@ -17,7 +17,7 @@ from matplotlib.colors import Colormap, Normalize
 from matplotlib.pyplot import subplots
 from numpy import any, histogram, sqrt, where
 from pandas import CategoricalDtype, DataFrame, NamedAgg
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
 from sparklines import sparklines
 
 from boilercv.images import scale_bool
@@ -42,15 +42,21 @@ def get_time(path: Path) -> str:
 
 
 def submit_nb_process(
-    executor: ProcessPoolExecutor, nb: str, params: AnyParams, outs: type[Model]
+    executor: ProcessPoolExecutor,
+    nb: str,
+    params: AnyParams,
+    outs: type[Model],
+    **kwds: Any,
 ) -> Future[Model]:
     """Submit a notebook process to an executor."""
-    return executor.submit(apply_to_nb, nb=nb, params=params, outs=outs)
+    return executor.submit(apply_to_nb, nb=nb, params=params, outs=outs, **kwds)
 
 
-def apply_to_nb(nb: str, params: AnyParams, outs: type[Model]) -> Model:
+def apply_to_nb(nb: str, params: AnyParams, outs: type[Model], **kwds: Any) -> Model:
     """Apply a process to a notebook."""
-    return outs(**get_nb_ns(nb=nb, params={"PARAMS": params.model_dump_json()}).outs)
+    return outs.model_validate(
+        get_nb_ns(nb=nb, params={"PARAMS": params.model_dump_json(), **kwds}).outs
+    )
 
 
 def save_df(future: Future[DfNbOuts], dfs: Path, dep: Path):
@@ -169,10 +175,9 @@ class Col:
         self.new = f"{self.new} ({self.new_unit})" if self.new_unit else self.new
 
 
-class Columns(BaseModel):
+class Columns(BaseModel, use_attribute_docstrings=True):
     """Columns."""
 
-    model_config = ConfigDict(use_attribute_docstrings=True)
     frame: Col = Col("frame", "Frame #")
 
 

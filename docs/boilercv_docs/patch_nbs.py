@@ -1,19 +1,13 @@
 """Patch notebooks."""
 
 from copy import deepcopy
-from os import chdir
-from pathlib import Path
 from textwrap import dedent
 
 from nbformat import NO_CONVERT, NotebookNode, read, write
 
-EXCLUDE_THEBE = [
-    Path(p)
-    for p in [
-        "experiments/e230920_subcool/find_tracks.ipynb",
-        "experiments/e230920_subcool/find_tracks_trackpy.ipynb",
-    ]
-]
+from boilercv_docs.models import rooted_paths
+
+EXCLUDE_THEBE = ["find_tracks", "find_tracks_trackpy"]
 """Resourcse-intensive notebooks to exclude adding Thebe buttons to."""
 SRC = "source"
 """Cell source key."""
@@ -23,21 +17,16 @@ MD = "markdown"
 """Markdown cell type."""
 
 
-def main():  # noqa: D103
-    chdir("docs")
-    patch_nbs()
-
-
 def patch_nbs():
     """Patch notebooks.
 
     Patch Thebe buttons in. Insert `parameters` and `thebe-init` tags to the first code
     cell. Insert `hide-input` tags to code cells.
     """
-    for path in Path().rglob("*.ipynb"):
+    for path in rooted_paths.notebooks.iterdir():
         orig_nb: NotebookNode = read(path, NO_CONVERT)  # pyright: ignore[reportAssignmentType]
         nb = deepcopy(orig_nb)
-        if path not in EXCLUDE_THEBE:
+        if path.stem not in EXCLUDE_THEBE:
             # ? Patch the first Markdown cell
             i, first = next((i, c) for i, c in enumerate(nb.cells) if c.cell_type == MD)
             nb.cells[i][SRC] = patch(
@@ -49,24 +38,15 @@ def patch_nbs():
                 ::::
                 """,
             )
-        # ? Patch the first code cell
         code_cells = ((i, c) for i, c in enumerate(nb.cells) if c.cell_type == CODE)
-        i, first = next(code_cells)
-        nb.cells[i][SRC] = patch(
-            first.get(SRC, ""),
-            """
-            from boilercv_docs.nbs import init
-
-            paths = init()
-            """,
-        )
         # ? Insert tags to first code cell
+        i, first = next(code_cells)
         nb.cells[i] = insert_tag(
             first,
             [
                 "hide-input",
                 "parameters",
-                *([] if path in EXCLUDE_THEBE else ["thebe-init"]),
+                *([] if path.stem in EXCLUDE_THEBE else ["thebe-init"]),
             ],
         )
         # ? Insert tags to remaining code cells
@@ -113,4 +93,4 @@ def patch(src: str, content: str, end: str = "\n\n") -> str:
 
 
 if __name__ == "__main__":
-    main()
+    patch_nbs()

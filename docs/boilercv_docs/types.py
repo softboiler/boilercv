@@ -6,13 +6,12 @@ from pandas import DataFrame, Series
 
 DfOrS: TypeAlias = DataFrame | Series  # pyright: ignore[reportMissingTypeArgument]
 
-# * -------------------------------------------------------------------------------- * #
-# * settings
+# * MARK: settings
 
+BuildMode: TypeAlias = Literal["dev", "docs"] | None
 NbExecutionMode: TypeAlias = Literal["off", "force", "auto", "cache", "inline"]
 
-# * -------------------------------------------------------------------------------- * #
-# * intersphinx
+# * MARK: intersphinx
 
 
 class IspxMappingValue(NamedTuple):
@@ -22,8 +21,7 @@ class IspxMappingValue(NamedTuple):
     path: str | None = None
 
 
-# * -------------------------------------------------------------------------------- * #
-# * docstrings
+# * MARK: docstrings
 
 
 SeeAlsoReference: TypeAlias = tuple[str, None]

@@ -3,16 +3,17 @@
 from functools import cached_property
 from pathlib import Path
 from re import Pattern, compile
-from typing import Generic, TypeAlias, TypeVar
+from typing import TypeAlias
 
-from pydantic import Field
-
-from boilercv_pipeline.models.stages import StagePaths
+from pydantic import BaseModel, Field
 
 Slicer: TypeAlias = tuple[int | None, ...]
-DfSlicer: TypeAlias = Slicer
-DaSlicer: TypeAlias = dict[str, Slicer]
-Slicer_T = TypeVar("Slicer_T", bound=DfSlicer | DaSlicer, covariant=True)
+Slicers: TypeAlias = dict[str, Slicer]
+
+
+def get_slices(slicers: Slicers) -> dict[str, slice]:
+    """Get slices from slicers."""
+    return {k: slice(*(v or (None,))) for k, v in slicers.items()}
 
 
 def first_slicer(n: int | None, step: int = 1) -> Slicer:
@@ -20,16 +21,16 @@ def first_slicer(n: int | None, step: int = 1) -> Slicer:
     return (None, *[step * f for f in (n - 1, 1)]) if n else (None, None, step)
 
 
-class DepDir(StagePaths, Generic[Slicer_T]):
-    """Dependency directory."""
+class DirSlicer(BaseModel):
+    """Directory slicer."""
 
     path: Path
     include: list[str] = Field(default_factory=list)
     exclude: list[str] = Field(default_factory=list)
     include_patterns: list[str] = Field(default_factory=list)
     exclude_patterns: list[str] = Field(default_factory=list)
-    slicers: dict[str, Slicer_T] = Field(default_factory=dict)
-    slicer_patterns: dict[str, Slicer_T] = Field(default_factory=dict)
+    slicers: dict[str, Slicers] = Field(default_factory=dict)
+    slicer_patterns: dict[str, Slicers] = Field(default_factory=dict)
 
     @cached_property
     def include_patterns_(self) -> list[Pattern[str]]:
@@ -42,80 +43,42 @@ class DepDir(StagePaths, Generic[Slicer_T]):
         return [compile(pat) for pat in self.exclude_patterns]
 
     @cached_property
-    def slice_patterns_(self) -> dict[Pattern[str], Slicer_T]:
+    def slice_patterns_(self) -> dict[Pattern[str], Slicers]:
         """Compiled exclude patterns."""
         return {compile(pat): slice_ for pat, slice_ in self.slicer_patterns.items()}
 
-
-class Dep(StagePaths, Generic[Slicer_T]):
-    """Path to a dependency."""
-
-    path: Path
-    slicer: Slicer_T
-
-
-class DaDep(Dep[DaSlicer]):
-    """Path to a dependency."""
-
-    @property
-    def slices(self) -> dict[str, slice]:
-        """Slices."""
-        return {k: slice(*v) for k, v in self.slicer.items()}
-
-
-class DfDep(Dep[DfSlicer]):
-    """Path to a dependency."""
-
-    @property
-    def slice(self) -> slice:
-        """Slice."""
-        return slice(*self.slicer)
-
-
-class DfDepDir(DepDir[DfSlicer]):
-    """Dependency directory."""
-
-    @property
-    def paths(self) -> list[DfDep]:
+    @cached_property
+    def paths(self) -> list[Path]:
         """Filtered paths."""
-        return filter_paths(self, DfDep)
-
-
-class DaDepDir(DepDir[DaSlicer]):
-    """Dependency directory."""
-
-    @property
-    def paths(self) -> list[DaDep]:
-        """Filtered paths."""
-        return filter_paths(self, DaDep)
-
-
-Dep_T = TypeVar("Dep_T", bound=DaDep | DfDep)
-
-
-def filter_paths(
-    dep_dir: DepDir[DfSlicer | DaSlicer], dep_typ: type[Dep_T]
-) -> list[Dep_T]:
-    """Filter paths."""
-    paths = []
-    for file in dep_dir.path.iterdir():
-        if (
-            (dep_dir.include and file.stem not in dep_dir.include)  # noqa: PLR0916
-            or file.stem in dep_dir.exclude
-            or (
-                dep_dir.include_patterns
-                and not any(pat.search(file.stem) for pat in dep_dir.include_patterns_)
+        return [
+            file
+            for file in self.path.iterdir()
+            if (not self.include or file.stem in self.include)
+            and (file.stem not in self.exclude)
+            and (
+                not self.include_patterns
+                or any(pat.search(file.stem) for pat in self.include_patterns_)
             )
-            or any(pat.search(file.stem) for pat in dep_dir.exclude_patterns_)
-        ):
-            continue
-        slicer: DfSlicer | DaSlicer = (None,) if issubclass(dep_typ, DfDep) else {}
-        if dep_dir.slicers:
-            slicer = dep_dir.slicers.get(file.stem, slicer)
-        if dep_dir.slicer_patterns:
-            for pat, slicer_ in dep_dir.slice_patterns_.items():
-                if pat.search(file.stem):
-                    slicer = slicer_
-                    break
-        paths.append(dep_typ(_context=dep_dir._context, path=file, slicer=slicer))  # noqa: SLF001  # pyright: ignore[reportArgumentType]
-    return paths
+            and not any(pat.search(file.stem) for pat in self.exclude_patterns_)
+        ]
+
+    @cached_property
+    def path_slicers(self) -> dict[Path, Slicers]:
+        """Slicers for paths."""
+        path_slicers = {}
+        for file in self.paths:
+            slicers: Slicers = {}
+            if self.slicers:
+                slicers = self.slicers.get(file.stem, slicers)
+            if self.slicer_patterns:
+                for pat, slicer in self.slice_patterns_.items():
+                    if pat.search(file.stem):
+                        slicers = slicer
+                        break
+            path_slicers[file] = slicers
+        return path_slicers
+
+    @cached_property
+    def path_slices(self) -> dict[Path, dict[str, slice]]:
+        """Slices for paths."""
+        return {k: get_slices(slicers) for k, slicers in self.path_slicers.items()}

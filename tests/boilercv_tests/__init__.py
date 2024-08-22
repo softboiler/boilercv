@@ -19,23 +19,19 @@ import pytest
 from boilercore.hashes import hash_args
 from boilercore.notebooks.namespaces import get_nb_ns
 from cachier import cachier  # pyright: ignore[reportMissingImports]
-from matplotlib.pyplot import style
 from seaborn import set_theme
 
+from boilercv_pipeline.models.stages import set_display_options
 from boilercv_tests.types import Attributes, Params
 
-MPLSTYLE = Path("data/plotting/base.mplstyle")
-"""Styling for test plots."""
 NAMER: Iterator[str] = _RandomNameSequence()
 """Random name sequence for case files."""
-(TEST_TEMP_NBS := Path("docs/temp")).mkdir(exist_ok=True)
-"""Temporary notebooks directory."""
 
 
 def init():
     """Initialize test plot formats."""
     set_theme(context="notebook", style="whitegrid", palette="deep", font="sans-serif")
-    style.use(style=MPLSTYLE)
+    set_display_options()
 
 
 init()
@@ -85,7 +81,8 @@ class Case:
 
     def clean_nb(self) -> str:
         """Clean notebook contents."""
-        self.clean_path = (TEST_TEMP_NBS / next(NAMER)).with_suffix(".ipynb")
+        (test_temp_nbs := Path("docs/temp")).mkdir(exist_ok=True, parents=True)
+        self.clean_path = (test_temp_nbs / next(NAMER)).with_suffix(".ipynb")
         copy(self.path, self.clean_path)
         clean_notebooks(self.clean_path)
         return self.clean_path.read_text(encoding="utf-8")

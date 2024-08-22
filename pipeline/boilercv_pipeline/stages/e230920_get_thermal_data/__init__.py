@@ -4,11 +4,11 @@ from cappa.base import command
 from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stages import NbDeps, NbParams, StagePaths
+from boilercv_pipeline.models.stages import Params, StagePaths
 from boilercv_pipeline.models.types.runtime import DataFile, DocsFile
 
 
-class Deps(NbDeps):
+class Deps(StagePaths):
     stage: DirectoryPath = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
     e230920_thermal_raw: DataFile = paths.e230920_thermal_raw
@@ -22,7 +22,7 @@ class Outs(StagePaths):
     default_long=True,
     invoke="boilercv_pipeline.stages.e230920_get_thermal_data.__main__.main",
 )
-class E230920GetThermalData(NbParams[Deps, Outs]):
+class E230920GetThermalData(Params[Deps, Outs]):
     """Update thermal data for the experiment."""
 
     deps: Deps = Field(default_factory=Deps)

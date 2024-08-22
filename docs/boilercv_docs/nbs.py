@@ -2,12 +2,11 @@
 
 from collections.abc import Callable
 from contextlib import contextmanager, nullcontext, redirect_stdout
-from dataclasses import dataclass
 from io import StringIO
-from os import chdir, environ, remove
+from os import environ, remove
 from pathlib import Path
 from re import match, search, sub
-from shutil import copy, copytree, rmtree
+from shutil import copytree
 from tempfile import NamedTemporaryFile
 from textwrap import dedent
 from typing import Any
@@ -15,99 +14,37 @@ from warnings import catch_warnings, filterwarnings
 
 from IPython.display import HTML, display
 from IPython.utils.capture import capture_output
-from matplotlib.pyplot import style
 from myst_parser.parsers.docutils_ import cli_html
-from numpy import set_printoptions
 from pandas import DataFrame, Index, MultiIndex, Series, concat, options
-from seaborn import set_theme
 
-import boilercv_pipeline
-from boilercv_docs import DOCS, DOCS_DATA, TEST_DATA, get_root
-from boilercv_docs.settings import default
-from boilercv_docs.types import DfOrS
+from boilercv_docs.config import default
+from boilercv_docs.models import rooted_paths
+from boilercv_docs.types import BuildMode, DfOrS
+from boilercv_pipeline.models.types.runtime import (
+    BoilercvPipelineCtxDict,
+    Roots,
+    get_boilercv_pipeline_context,
+)
 from boilercv_tools.warnings import filter_boilercv_warnings
 
-FONT_SCALE = 1.3
-"""Plot font scale."""
-PRECISION = 4
-"""The desired precision."""
-FLOAT_SPEC = f"#.{PRECISION}g"
-"""The desired float specification for formatted output."""
-HIDE = display()
-"""Hide unsuppressed output. Can't use semicolon due to black autoformatter."""
-DISPLAY_ROWS = 20
-"""The number of rows to display in a dataframe."""
 
-
-@dataclass
-class Paths:
-    """Paths."""
-
-    root: Path
-    docs_root: Path
-    test_data_src: Path
-    docs_data_src: Path
-
-
-def init(force_dev: bool = default.build.force_dev) -> Paths:
+def init(force_mode: BuildMode = default.build.mode) -> BoilercvPipelineCtxDict:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
     filter_boilercv_warnings()
-    root = get_root()
-    at_root = Path().cwd() == root
-    if not all((root / check).exists() for check in [DOCS, TEST_DATA]):
-        raise RuntimeError("Either documentation or dependencies are missing.")
-    paths = Paths(*[
-        p.resolve() for p in (root, root / DOCS, root / TEST_DATA, root / DOCS_DATA)
-    ])
-    if force_dev:
-        chdir(paths.root)
-        boilercv_pipeline.PROJECT_PATH = paths.root
-    elif _in_tests := environ.get("PYTEST_CURRENT_TEST"):
-        # ? Tests monkeypatch project path to an isolated temporary test folder
-        tmp_test_dir = paths.root
-        copy(paths.test_data_src / "params.yaml", tmp_test_dir)
-        copytree(
-            paths.test_data_src / "data", tmp_test_dir / "data", dirs_exist_ok=True
+    at_root = Path().cwd() == rooted_paths.root
+    if _in_binder := environ.get("BINDER_LAUNCH_HOST"):
+        copytree(rooted_paths.docs_data, rooted_paths.pipeline_data, dirs_exist_ok=True)
+    if force_mode == "docs" or (
+        force_mode != "dev"
+        and ((_in_docs := not at_root) or (_in_ci := environ.get("CI")))
+    ):
+        return get_boilercv_pipeline_context(
+            roots=Roots(data=rooted_paths.docs_data, docs=rooted_paths.docs)
         )
-    elif _in_binder := environ.get("BINDER_LAUNCH_HOST"):
-        boilercv_pipeline.PROJECT_PATH = paths.root
-        copy(paths.test_data_src / "params.yaml", paths.root)
-        copytree(paths.test_data_src / "data", paths.root / "data", dirs_exist_ok=True)
-        copytree(paths.docs_data_src / "data", paths.root / "data", dirs_exist_ok=True)
-    elif any((_in_docs := not at_root, _in_ci := environ.get("CI"))):
-        boilercv_pipeline.PROJECT_PATH = paths.docs_root
-        if paths.docs_root != paths.root:
-            rmtree(paths.docs_root / "data", ignore_errors=True)
-            rmtree(paths.docs_root / "temp", ignore_errors=True)
-        chdir(paths.docs_root)
-        copy(paths.docs_data_src / "params.yaml", paths.docs_root)
-        copytree(
-            paths.docs_data_src / "data", paths.docs_root / "data", dirs_exist_ok=True
-        )
-    elif _in_dev := at_root:
-        pass
-    else:
-        raise RuntimeError("Can't determine notebook environment.")
-    return paths
-
-
-def set_display_options(font_scale: float = FONT_SCALE):
-    """Set display options."""
-    # The triple curly braces in the f-string allows the format function to be
-    # dynamically specified by a given float specification. The intent is clearer this
-    # way, and may be extended in the future by making `float_spec` a parameter.
-    options.display.float_format = f"{{:{FLOAT_SPEC}}}".format
-    options.display.min_rows = options.display.max_rows = DISPLAY_ROWS
-    set_printoptions(precision=PRECISION)
-    set_theme(
-        context="notebook",
-        style="whitegrid",
-        palette="deep",
-        font="sans-serif",
-        font_scale=font_scale,
+    return get_boilercv_pipeline_context(
+        roots=Roots(data=rooted_paths.pipeline_data, docs=rooted_paths.docs)
     )
-    style.use("data/plotting/base.mplstyle")
 
 
 @contextmanager
@@ -193,26 +130,27 @@ def display_dfs(*dfs: DfOrS, head: bool = False):
 
 
 def get_df_formatter(
-    df: DataFrame, truncated: bool
+    df: DataFrame, truncated: bool, precision: int = 4
 ) -> Callable[..., str] | dict[str, Callable[..., str]]:
     """Get formatter for the dataframe."""
     if truncated:
         return format_cell
     cols = df.columns
     types = {col: dtype.type for col, dtype in zip(cols, df.dtypes, strict=True)}
-    return {col: get_formatter(types[col]()) for col in cols}
+    return {col: get_formatter(types[col](), precision=precision) for col in cols}
 
 
-def format_cell(cell) -> str:
+def format_cell(cell, precision: int = 4) -> str:
     """Format individual cells."""
-    return get_formatter(cell)(cell)
+    return get_formatter(cell, precision=precision)(cell)
 
 
-def get_formatter(instance: Any) -> Callable[..., str]:
+def get_formatter(instance: Any, precision: int) -> Callable[..., str]:
     """Get the formatter depending on the type of the instance."""
+    float_spec = f"#.{precision}g"
     match instance:
         case float():
-            return lambda cell: f"{cell:{FLOAT_SPEC}}"
+            return lambda cell: f"{cell:{float_spec}}"
         case _:
             return lambda cell: f"{cell}"
 

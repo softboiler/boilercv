@@ -6,7 +6,7 @@ from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.context import ContextMergeModel
+from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stages import StagePaths
 from boilercv_pipeline.models.types.runtime import DataFile, DocsFile
@@ -36,7 +36,7 @@ def export_track_plot(ns: SimpleNamespace, _out: Out):
     invoke="boilercv_pipeline.stages.e230920_plot_tracks.__main__.main",
     default_long=True,
 )
-class E230920PlotTracks(ContextMergeModel):
+class E230920PlotTracks(ContextModel):
     """Export correlation plots for tracks."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
