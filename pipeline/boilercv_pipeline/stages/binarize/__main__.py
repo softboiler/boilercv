@@ -16,7 +16,6 @@ from boilercv_pipeline.stages.binarize import Binarize
 def main(params: Binarize):
     logger.info("start binarize")
     for source in tqdm(sorted(params.deps.large_sources.iterdir())):
-        source = Path(r"data/large_sources/2023-09-20T17-14-18.nc")
         destination = params.outs.sources / source.name
         if destination.exists():
             continue
