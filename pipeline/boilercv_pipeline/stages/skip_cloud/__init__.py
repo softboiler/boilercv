@@ -20,4 +20,5 @@ class Outs(StagePaths):
 class SkipCloud(Params[Deps, Outs]):
     """The outs of this stage are too large and unwieldy to cache or push to cloud storage."""
 
+    deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
     outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
