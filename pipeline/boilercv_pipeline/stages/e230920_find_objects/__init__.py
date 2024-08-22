@@ -27,24 +27,6 @@ class Nb(BaseModel):
     filled_slicers: dict[str, Slicer] = Field(default_factory=dict)
 
 
-def get_nb(deps: Deps, stem: str = "2024-07-18T17-44-35") -> Nb:
-    include_patterns: list[str] = [r"^2024-07-18.+$"]
-    all_contours = DirSlicer(path=deps.contours, include_patterns=include_patterns)
-    all_filled = DirSlicer(
-        path=deps.filled,
-        include_patterns=include_patterns,
-        slicer_patterns={r".+": {FRAME: first_slicer(n=3, step=10)}},
-    )
-    for contours, filled in zip(all_contours.paths, all_filled.paths, strict=True):
-        if contours.stem == stem:
-            return Nb(
-                contours=contours,
-                filled=filled,
-                filled_slicers=all_filled.path_slicers[filled],
-            )
-    return Nb()
-
-
 @command(
     invoke="boilercv_pipeline.stages.e230920_find_objects.__main__.main",
     default_long=True,
@@ -70,6 +52,24 @@ class E230920FindObjects(Params[Deps, Outs]):
     """Slicer patterns."""
     nb: Nb = Field(default_factory=Nb)
     """Notebook-only params."""
+
+
+def get_nb(deps: Deps, stem: str = "2024-07-18T17-44-35") -> Nb:
+    include_patterns: list[str] = [r"^2024-07-18.+$"]
+    all_contours = DirSlicer(path=deps.contours, include_patterns=include_patterns)
+    all_filled = DirSlicer(
+        path=deps.filled,
+        include_patterns=include_patterns,
+        slicer_patterns={r".+": {FRAME: first_slicer(n=3, step=10)}},
+    )
+    for contours, filled in zip(all_contours.paths, all_filled.paths, strict=True):
+        if contours.stem == stem:
+            return Nb(
+                contours=contours,
+                filled=filled,
+                filled_slicers=all_filled.path_slicers[filled],
+            )
+    return Nb()
 
 
 if __name__ == "__main__":
