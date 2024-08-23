@@ -10,7 +10,6 @@ dependencies = [
     # ? Core testing
     "pytest-cov==5.0.0",
     "pytest-custom-exit-code==0.3.0",
-    "pytest-env==1.1.3",
     "pytest-github-actions-annotate-failures==0.2.0",
     "pytest==8.2.2",
     # ? Other testing
