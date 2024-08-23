@@ -23,6 +23,7 @@ function Set-Env {
     if (Test-Path '.venv') {
         if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
     }
+    return
     # ? Set environment variables
     $EnvFile = $Env:GITHUB_ENV ? $Env:GITHUB_ENV : '.env'
     if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
