@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from functools import cached_property, partial
 from pathlib import Path
-from typing import Annotated, Any, ClassVar, TypeAlias
+from typing import Annotated, ClassVar, TypeAlias
 
 from cappa.arg import Arg
 from pydantic import (
@@ -25,7 +25,7 @@ from boilercv_pipeline.context.types import (
     SerializationInfo,
     ValidationInfo,
 )
-from boilercv_pipeline.models.types import Kind, Kinds
+from boilercv_pipeline.models.types import Key, Kind, Kinds
 
 
 class Roots(BaseModel):
@@ -118,56 +118,61 @@ class BoilercvPipelineCtxModel(ContextModel):
     _context_handlers: ClassVar = {"boilercv_pipeline": BoilercvPipelineCtx}
 
 
-kinds: dict[Kind, tuple[str, bool]] = {
-    "DataDir": ("data", False),
-    "DataFile": ("data", True),
-    "DocsDir": ("docs", False),
-    "DocsFile": ("docs", True),
+make_path_args: dict[tuple[Key, bool], Kind] = {
+    ("data", False): "DataDir",
+    ("data", True): "DataFile",
+    ("docs", False): "DocsDir",
+    ("docs", True): "DocsFile",
 }
-"""Kinds and their {func}`~boilercv_pipeline.models.types.runtime.make_path` args."""
-make_path_args: dict[tuple[str, bool], Kind] = {v: k for k, v in kinds.items()}
 """{func}`~boilercv_pipeline.models.types.runtime.make_path` args and their kinds."""
 
 
 def make_path(
-    path: Path, info: BoilercvPipelineValidationInfo, key: str, file: bool
+    path: Path, info: BoilercvPipelineValidationInfo, key: Key, file: bool
 ) -> Path:
     """Check path kind and make a directory and its parents or a file's parents."""
     ctx = info.context["boilercv_pipeline"]
     root = getattr(ctx.roots, key, None)
+    kind = make_path_args[(key, file)]
     if root:
         path = (root.resolve() / path) if path.is_absolute() else root / path
         (path.parent if file else path).mkdir(exist_ok=True, parents=True)
     if (
         ctx.check_kinds
-        and make_path_args[(key, file)]
-        not in ctx.kinds[path.relative_to(root) if root else path]
+        and kind not in ctx.kinds[path.relative_to(root) if root else path]
     ):
         raise ValueError("Path kind not as expected.")
     if ctx.track_kinds:
-        ctx.kinds[path] = make_path_args[(key, file)]
+        ctx.kinds[path] = kind
     return path
 
 
-def ser_path(value: Any, nxt: SerializerFunctionWrapHandler) -> Any:
+def ser_path(value: Path | str, nxt: SerializerFunctionWrapHandler) -> str:
     """Resolve paths and serialize POSIX-style."""
-    return nxt(value.as_posix()) if isinstance(value, Path) else nxt(value)
+    return nxt(value.as_posix() if isinstance(value, Path) else value)
 
 
-def AnnotatedPath(kind: Kind):  # noqa: N802
-    """Make partial."""
-    key, file = kinds[kind]
-    return [
-        AfterValidator(partial(make_path, key=key, file=file)),
-        WrapSerializer(ser_path),
-    ]
-
-
-DataDir = Annotated[Path, *AnnotatedPath("DataDir")]
+DataDir = Annotated[
+    Path,
+    AfterValidator(partial(make_path, key="data", file=False)),
+    WrapSerializer(ser_path),
+]
 """Data directory path made upon validation."""
-DataFile = Annotated[Path, *AnnotatedPath("DataFile")]
+DataFile = Annotated[
+    Path,
+    AfterValidator(partial(make_path, key="data", file=True)),
+    WrapSerializer(ser_path),
+]
 """Data file path made upon validation."""
-DocsDir = Annotated[Path, *AnnotatedPath("DocsDir")]
+DocsDir = Annotated[
+    Path,
+    AfterValidator(partial(make_path, key="docs", file=False)),
+    WrapSerializer(ser_path),
+]
 """Docs directory path made upon validation."""
-DocsFile = Annotated[Path, *AnnotatedPath("DocsFile")]
+DocsFile = Annotated[
+    Path,
+    AfterValidator(partial(make_path, key="docs", file=True)),
+    WrapSerializer(ser_path),
+]
 """Docs file path made upon validation."""
