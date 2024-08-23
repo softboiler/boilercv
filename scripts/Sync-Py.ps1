@@ -10,7 +10,6 @@ Param(
 )
 
 . scripts/Common.ps1
-. scripts/Initialize-Shell.ps1
 
 '****** SYNCING' | Write-Progress
 
