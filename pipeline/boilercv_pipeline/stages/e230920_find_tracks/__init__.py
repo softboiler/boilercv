@@ -5,9 +5,9 @@ from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import DirectoryPath, Field
 
-from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.paths.types import StagePaths
+from boilercv_pipeline.models.stages import Params
 from boilercv_pipeline.models.types.runtime import DataDir, DocsFile
 
 
@@ -25,7 +25,7 @@ class Outs(StagePaths):
     invoke="boilercv_pipeline.stages.e230920_find_tracks.__main__.main",
     default_long=True,
 )
-class E230920FindTracks(ContextModel):
+class E230920FindTracks(Params[Deps, Outs]):
     """Export all tracks for this experiment."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)

@@ -1,5 +1,7 @@
 from pathlib import Path
+from typing import Annotated
 
+from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import BaseModel, DirectoryPath, Field
 
@@ -36,22 +38,22 @@ class Nb(BaseModel):
 class E230920FindObjects(Params[Deps, Outs]):
     """Find objects."""
 
-    deps: Deps = Field(default_factory=Deps)
-    outs: Outs = Field(default_factory=Outs)
-    compare_with_trackpy: bool = False
-    """Whether to get objects using the Trackpy approach."""
+    deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
+    outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
     guess_diameter: int = 21
     """Guess diameter for the Trackpy approach. (px)"""
-    trackpy_cols: list[str] = ["y", "x", FRAME, "size"]
-    """Columns to compare with the Trackpy approach."""
-    cols: list[str] = [*trackpy_cols, "area", "diameter_px", "radius_of_gyration_px"]
-    """Data to store."""
     sample: str = "2024-07-18T17-44-35"
     """Sample to process."""
     include_patterns: list[str] = [r"^2024-07-18.+$"]
     """Include patterns."""
     slicer_patterns: dict[str, Slicers] = {r".+": {FRAME: first_slicer(n=3, step=10)}}
     """Slicer patterns."""
+    compare_with_trackpy: bool = False
+    """Whether to get objects using the Trackpy approach."""
+    trackpy_cols: list[str] = ["y", "x", FRAME, "size"]
+    """Columns to compare with the Trackpy approach."""
+    cols: list[str] = [*trackpy_cols, "area", "diameter_px", "radius_of_gyration_px"]
+    """Data to store."""
     nb: Nb = Field(default_factory=Nb)
     """Notebook-only params."""
 

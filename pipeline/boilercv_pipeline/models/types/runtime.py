@@ -6,6 +6,7 @@ from functools import cached_property, partial
 from pathlib import Path
 from typing import Annotated, Any, ClassVar, TypeAlias
 
+from cappa.arg import Arg
 from pydantic import (
     AfterValidator,
     BaseModel,
@@ -113,6 +114,7 @@ class BoilercvPipelineCtxModel(ContextModel):
     model_config: ClassVar[BoilercvPipelineConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
         get_boilercv_pipeline_config()
     )
+    context: Annotated[Context, Arg(hidden=True)] = Context()
     _context_handlers: ClassVar = {"boilercv_pipeline": BoilercvPipelineCtx}
 
 

@@ -1,5 +1,7 @@
 from pathlib import Path
+from typing import Annotated
 
+from cappa.arg import Arg
 from cappa.base import command
 from pydantic import DirectoryPath, Field
 
@@ -26,5 +28,5 @@ class Outs(StagePaths):
 class E230920GetThermalData(Params[Deps, Outs]):
     """Update thermal data for the experiment."""
 
-    deps: Deps = Field(default_factory=Deps)
-    outs: Outs = Field(default_factory=Outs)
+    deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
+    outs: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Outs)
