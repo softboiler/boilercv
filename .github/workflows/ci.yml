@@ -185,7 +185,7 @@ jobs:
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1 -Version '${{ matrix.python }}'"
-      - if: (!startsWith(matrix.runner, 'ubuntu')) && (!matrix.python == '3.11')
+      - if: (!(startsWith(matrix.runner, 'ubuntu') && (matrix.python == '3.11')))
         run: "pytest"
       # ! https://github.com/pytest-dev/pytest-cov/issues/479#issuecomment-1247444988
       - if: startsWith(matrix.runner, 'ubuntu') && matrix.python == '3.11'
