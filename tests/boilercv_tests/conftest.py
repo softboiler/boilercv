@@ -181,7 +181,7 @@ def fixture_stores(fixture_store) -> FixtureStores:
 def figs(request, pytestconfig) -> Iterator[list[Figure]]:
     """Append to this list of Matplotlib figures to save them after the test run."""
     plots = Path(pytestconfig.option.plots)
-    plots.mkdir(exist_ok=True)
+    plots.mkdir(parents=True, exist_ok=True)
     path = plots / f"{request.node.nodeid.replace('/', '.').replace(':', '-')}.png"
     figs = []
     yield figs

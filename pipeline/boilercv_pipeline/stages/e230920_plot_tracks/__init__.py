@@ -22,13 +22,11 @@ class Deps(StagePaths):
 class Outs(StagePaths): ...
 
 
-PLOTS = Path("tests/plots/tracks")
-PLOTS.mkdir(exist_ok=True)
-
-
 def export_track_plot(ns: SimpleNamespace):
     """Export object centers and sizes."""
-    ns.figure.savefig(PLOTS / f"{get_path_time(ns.TIME)}.png")
+    plots = Path("tests/plots/tracks")
+    plots.mkdir(parents=True, exist_ok=True)
+    ns.figure.savefig(plots / f"{get_path_time(ns.TIME)}.png")
 
 
 @command(

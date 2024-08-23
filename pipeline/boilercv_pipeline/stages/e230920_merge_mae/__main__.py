@@ -6,9 +6,6 @@ from cappa.base import invoke
 
 from boilercv_pipeline.stages.e230920_merge_mae import E230920MergeMae
 
-PLOTS = Path("tests/plots/mae")
-PLOTS.mkdir(parents=True, exist_ok=True)
-
 
 def main(params: E230920MergeMae):
     plot_and_merge_mae(
@@ -19,6 +16,8 @@ def main(params: E230920MergeMae):
 
 def plot_and_merge_mae(ns: SimpleNamespace, params: E230920MergeMae):
     """Save mean absolute error plots."""
+    plots = Path("tests/plots/mae")
+    plots.mkdir(parents=True, exist_ok=True)
     ns.mae.to_hdf(
         params.outs.e230920_merged_mae,
         format="table",
@@ -26,7 +25,7 @@ def plot_and_merge_mae(ns: SimpleNamespace, params: E230920MergeMae):
         complib="zlib",
         complevel=9,
     )
-    path = PLOTS / "mae.png"
+    path = plots / "mae.png"
     for i, fig in enumerate(ns.FIGURES):
         fig.savefig(path.with_stem(f"{path.stem}_{i}"))
 
