@@ -99,12 +99,12 @@ bin/uv pip install --editable=scripts
 if ($CI) {
     'SYNCING PROJECT WITH TEMPLATE' | Write-Progress
     boilercv_tools elevate-pyright-warnings
-    # try {scripts/Sync-Template.ps1 -Stay} catch [System.Management.Automation.NativeCommandExitException] {
-    #     git stash save --include-untracked
-    #     scripts/Sync-Template.ps1 -Stay
-    #     git stash pop
-    #     git add .
-    # }
+    try {scripts/Sync-Template.ps1 -Stay} catch [System.Management.Automation.NativeCommandExitException] {
+        git stash save --include-untracked
+        scripts/Sync-Template.ps1 -Stay
+        git stash pop
+        git add .
+    }
     'PROJECT SYNCED WITH TEMPLATE' | Write-Progress
 }
 if ($Devcontainer) {
