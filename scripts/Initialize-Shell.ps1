@@ -31,14 +31,24 @@ function Set-Env {
             ForEach-Object {
                 $EnvVars.Add($_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value)
             }
-        $EnvVars.GetEnumerator() | ForEach-Object { Set-Item "Env:$($_.Key)" $_.Value }
+        $Keys = @()
         $EnvFile = $Env:GITHUB_ENV ? $Env:GITHUB_ENV : '.env'
         if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
-        $lines = Get-Content $EnvFile | ForEach-Object {
+        $Lines = Get-Content $EnvFile | ForEach-Object {
             $_ -replace '^(?<Key>.+)=(?<Value>.+)$', {
                 $Key = $_.Groups['Key'].Value
-                if (!$EnvVars.ContainsKey($Key)) { return $_ }
-                return "$Key=$($EnvVars[$Key])"
+                if ($EnvVars.ContainsKey($Key)) {
+                    $Keys += $Key
+                    return "$Key=$($EnvVars[$Key])"
+                }
+                return $_
+            }
+        }
+        $EnvVars.GetEnumerator() | ForEach-Object {
+            $Key, $Value = $_.Key, $_.Value
+            Set-Item "Env:$Key" $Value
+            if (($Key.ToLower() -ne 'path') -and ($Keys -notcontains $Key)) {
+                $Lines += "$Key=$Value"
             }
         }
         $lines | Set-Content $EnvFile
