@@ -24,19 +24,24 @@ function Set-Env {
         if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
     }
     # ? Set environment variables
-    $EnvFile = $Env:GITHUB_ENV ? $Env:GITHUB_ENV : '.env'
-    if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
-    $Vars = $(Get-Content $EnvFile |
-            Select-String -Pattern '^(.+)=.+$' |
-            ForEach-Object { $_.Matches.Groups[1].value })
     if (Get-Command -Name 'boilercv_tools' -ErrorAction 'Ignore') {
-        foreach ($line in boilercv_tools init-shell) {
-            $Key, $Value = $line -Split '=', 2
-            Set-Item "Env:$Key" $Value
-            if (($Key -ne 'PATH') -and ($Key -notin $Vars)) {
-                "$Key=$Value" >> $EnvFile
+        $EnvVars = @{}
+        boilercv_tools init-shell |
+            Select-String -Pattern '^(.+)=(.+)$' |
+            ForEach-Object {
+                $EnvVars.Add($_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value)
+            }
+        $EnvVars.GetEnumerator() | ForEach-Object { Set-Item "Env:$($_.Key)" $_.Value }
+        $EnvFile = $Env:GITHUB_ENV ? $Env:GITHUB_ENV : '.env'
+        if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
+        $lines = Get-Content $EnvFile | ForEach-Object {
+            $_ -replace '^(?<Key>.+)=(?<Value>.+)$', {
+                $Key = $_.Groups['Key'].Value
+                if (!$EnvVars.ContainsKey($Key)) { return $_ }
+                return "$Key=$($EnvVars[$Key])"
             }
         }
+        $lines | Set-Content $EnvFile
     }
 }
 Set-Env

@@ -35,7 +35,6 @@ ignore_unused = [
     # ? Core testing tools or plugins
     "pytest-cov",
     "pytest-custom-exit-code",
-    "pytest-env",
     "pytest-github-actions-annotate-failures",
     "pytest-plt",
     "pytest-xdist",

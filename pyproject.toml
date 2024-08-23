@@ -84,7 +84,7 @@ markers = "slow"
 testpaths = "tests"
 xfail_strict = true
 
-[tool.pytest_env]
+[tool.boilercv_env]
 COVERAGE_CORE = "sysmon"
 JUPYTER_PLATFORM_DIRS = "1"
 PYRIGHT_PYTHON_PYLANCE_VERSION = "2024.6.1"
