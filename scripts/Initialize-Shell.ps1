@@ -44,14 +44,14 @@ function Set-Env {
                 return $_
             }
         }
-        $EnvVars.GetEnumerator() | ForEach-Object {
+        $NewLines = $EnvVars.GetEnumerator() | ForEach-Object {
             $Key, $Value = $_.Key, $_.Value
             Set-Item "Env:$Key" $Value
             if (($Key.ToLower() -ne 'path') -and ($Keys -notcontains $Key)) {
-                $Lines += "$Key=$Value"
+                return "$Key=$Value"
             }
         }
-        $lines | Set-Content $EnvFile
+        @($Lines, $NewLines) | Set-Content $EnvFile
     }
 }
 Set-Env
