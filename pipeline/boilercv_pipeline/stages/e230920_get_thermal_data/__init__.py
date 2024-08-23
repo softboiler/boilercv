@@ -29,4 +29,4 @@ class E230920GetThermalData(Params[Deps, Outs]):
     """Update thermal data for the experiment."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
-    outs: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Outs)
+    outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
