@@ -11,7 +11,10 @@ PLOTS.mkdir(parents=True, exist_ok=True)
 
 
 def main(params: E230920MergeMae):
-    plot_and_merge_mae(get_nb_ns(params.deps.nb.read_text(encoding="utf-8"), params))
+    plot_and_merge_mae(
+        get_nb_ns(params.deps.nb.read_text(encoding="utf-8"), params.model_dump()),
+        params,
+    )
 
 
 def plot_and_merge_mae(ns: SimpleNamespace, params: E230920MergeMae):

@@ -3,8 +3,9 @@
 Adapted from [iterative/dvcyaml-schema](https://github.com/iterative/dvcyaml-schema).
 See original license below.
 
-License
--------
+Notes
+-----
+The original license is reproduced below.
 
 Copyright 2020-2021 Iterative, Inc.
 

@@ -5,7 +5,7 @@ from textwrap import dedent
 
 from nbformat import NO_CONVERT, NotebookNode, read, write
 
-from boilercv_docs.models import rooted_paths
+from boilercv_docs.models.paths import rooted_paths
 
 EXCLUDE_THEBE = ["find_tracks", "find_tracks_trackpy"]
 """Resourcse-intensive notebooks to exclude adding Thebe buttons to."""

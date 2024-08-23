@@ -6,7 +6,6 @@ from cappa.base import invoke
 from boilercv_pipeline.models.deps import DirSlicer
 from boilercv_pipeline.stages.common import e230920
 from boilercv_pipeline.stages.common.e230920 import submit_nb_process
-from boilercv_pipeline.stages.common.e230920.types import DfNbOuts
 from boilercv_pipeline.stages.e230920_find_objects import E230920FindObjects, Nb
 
 
@@ -28,7 +27,7 @@ def main(params: E230920FindObjects):
                 filled_slicers=all_filled.path_slicers[filled],
             )
             submit_nb_process(
-                executor=executor, nb=nb, params=params, outs=DfNbOuts
+                executor=executor, nb=nb, params=params
             ).add_done_callback(
                 partial(e230920.save_df, dfs=params.outs.dfs, dep=contours)
             )

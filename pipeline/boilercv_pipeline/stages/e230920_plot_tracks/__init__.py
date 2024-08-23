@@ -8,10 +8,9 @@ from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stages import StagePaths
+from boilercv_pipeline.models.paths.types import StagePaths
 from boilercv_pipeline.models.types.runtime import DataFile, DocsFile
 from boilercv_pipeline.stages.common.e230920 import get_path_time
-from boilercv_pipeline.stages.common.e230920.types import Out
 
 
 class Deps(StagePaths):
@@ -27,7 +26,7 @@ PLOTS = Path("tests/plots/tracks")
 PLOTS.mkdir(exist_ok=True)
 
 
-def export_track_plot(ns: SimpleNamespace, _out: Out):
+def export_track_plot(ns: SimpleNamespace):
     """Export object centers and sizes."""
     ns.figure.savefig(PLOTS / f"{get_path_time(ns.TIME)}.png")
 

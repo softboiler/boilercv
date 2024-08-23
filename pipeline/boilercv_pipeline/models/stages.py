@@ -1,6 +1,6 @@
 """Stage models."""
 
-from typing import Generic, TypeAlias, TypeVar
+from typing import Generic, TypeAlias
 
 import matplotlib
 from IPython.display import display
@@ -9,35 +9,8 @@ from pandas import options
 from pydantic import BaseModel, Field
 from seaborn import set_theme
 
-from boilercv_pipeline.config import const
-from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.types.runtime import (
-    BoilercvPipelineCtxDict,
-    BoilercvPipelineCtxModel,
-    Roots,
-    get_boilercv_pipeline_config,
-)
-
-ROOTED = Roots(data=const.data, docs=const.docs)
-"""Paths rooted to their directories."""
-
-
-class Stage(BoilercvPipelineCtxModel):
-    """Base of stage models."""
-
-    model_config = get_boilercv_pipeline_config(
-        ROOTED, kinds_from=paths, track_kinds=True
-    )
-
-
-class StagePaths(Stage):
-    """Paths for stage dependencies and outputs."""
-
-
-Deps_T = TypeVar("Deps_T", bound=StagePaths, covariant=True)
-"""Dependencies type."""
-Outs_T = TypeVar("Outs_T", bound=StagePaths, covariant=True)
-"""Outputs type."""
+from boilercv_pipeline.models.paths.types import Deps_T, Outs_T, Stage, StagePaths
+from boilercv_pipeline.models.types.runtime import BoilercvPipelineCtxDict
 
 
 def set_display_options(

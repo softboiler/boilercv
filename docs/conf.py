@@ -11,7 +11,7 @@ from sphinx.application import Sphinx
 
 from boilercv_docs.config import default
 from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
-from boilercv_docs.models import rooted_paths
+from boilercv_docs.models.paths import rooted_paths
 from boilercv_docs.patch_nbs import patch_nbs
 from boilercv_docs.types import IspxMappingValue
 from boilercv_tools.environment import init_shell
@@ -93,7 +93,14 @@ class Constants(BaseModel):
     ispx_mapping: dict[str, IspxMappingValue] = {
         **{
             pkg: get_rtd(pkg)
-            for pkg in ["myst_parser", "nbformat", "numpydoc", "tomlkit"]
+            for pkg in [
+                "cappa",
+                "myst_parser",
+                "nbformat",
+                "numpydoc",
+                "tomlkit",
+                "typing_extensions",
+            ]
         },
         **{pkg: get_rtd(pkg, latest=True) for pkg in ["pyqtgraph"]},
         "jupyterbook": get_url("jupyterbook.org/en"),
@@ -267,6 +274,7 @@ intersphinx_mapping = {
 }
 nitpick_ignore = [
     ("py:class", "cv2.LineSegmentDetector"),
+    ("py:class", "cappa.subcommand.Subcommands"),
     ("py:class", f"{const.ans.package}.correlations.T"),
     ("py:class", f"{const.ans.package}.data.sets.Stage"),
     ("py:class", f"{const.ans.package}.experiments.e230920_subcool.NbProcess"),
@@ -274,6 +282,7 @@ nitpick_ignore = [
     ("py:class", f"{const.ans.package}.morphs.contexts"),
 ]
 nitpick_ignore_regex = [
+    (r"py:.*", r"boilercv_pipeline\.models\.dvc\..+"),
     # ? Missing inventory
     (r"py:.*", r"docutils\..+"),
     (r"py:.*", r"numpydoc\.docscrape\..+"),
@@ -285,12 +294,18 @@ nitpick_ignore_regex = [
         r"sympy\..+",
     ),
     (r"py:.*", r"pydantic\..+"),  # ? https://github.com/pydantic/pydantic/issues/1339
+    (
+        r"py:.*",
+        r"pydantic_settings\..+",
+    ),  # ? https://github.com/pydantic/pydantic/issues/1339
     (r"py:.*", r"PySide6\..+"),  # ? https://bugreports.qt.io/browse/PYSIDE-2215
     # ? TypeAlias: https://github.com/sphinx-doc/sphinx/issues/10785
     (r"py:class", rf"{const.ans.package}.*\.types\..+"),
     (r"py:class", r"boilercore.*\.types\..+"),
     (r"py:class", rf"{const.ans.package}_pipeline\.captivate\.previews\..+"),
     (r"py:.*", rf"{const.ans.package}_tests\.test_morphs\..+"),
+    # ? Annotated types unwieldy to move to own types paths
+    (r"py:obj", rf"{const.ans.package}_pipeline\.stages\..+\.__init__.py"),
 ]
 # * MARK:  Tippy
 # ? https://sphinx-tippy.readthedocs.io/en/latest/index.html#confval-tippy_anchor_parent_selector

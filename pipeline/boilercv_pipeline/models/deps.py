@@ -3,12 +3,10 @@
 from functools import cached_property
 from pathlib import Path
 from re import Pattern, compile
-from typing import TypeAlias
 
 from pydantic import BaseModel, Field
 
-Slicer: TypeAlias = tuple[int | None, ...]
-Slicers: TypeAlias = dict[str, Slicer]
+from boilercv_pipeline.models.types import Slicer, Slicers
 
 
 def get_slices(slicers: Slicers) -> dict[str, slice]:

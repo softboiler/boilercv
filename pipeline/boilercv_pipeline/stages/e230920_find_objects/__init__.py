@@ -4,9 +4,11 @@ from cappa.base import command, invoke
 from pydantic import BaseModel, DirectoryPath, Field
 
 from boilercv.data import FRAME
-from boilercv_pipeline.models.deps import DirSlicer, Slicer, Slicers, first_slicer
+from boilercv_pipeline.models.deps import DirSlicer, first_slicer
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stages import Params, StagePaths
+from boilercv_pipeline.models.paths.types import StagePaths
+from boilercv_pipeline.models.stages import Params
+from boilercv_pipeline.models.types import Slicer, Slicers
 from boilercv_pipeline.models.types.runtime import DataDir, DocsFile
 
 

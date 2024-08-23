@@ -7,7 +7,7 @@ from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stages import StagePaths
+from boilercv_pipeline.models.paths.types import StagePaths
 from boilercv_pipeline.models.types.runtime import DataDir, DocsFile
 
 

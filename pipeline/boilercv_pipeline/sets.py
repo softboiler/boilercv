@@ -13,8 +13,7 @@ from boilercv.data import FRAME, HEADER, ROI, VIDEO, XPX, YPX
 from boilercv.data.packing import unpack
 from boilercv.types import DF, DS
 from boilercv_pipeline.models.paths import Paths
-from boilercv_pipeline.models.stages import ROOTED
-from boilercv_pipeline.models.types.runtime import get_boilercv_pipeline_context
+from boilercv_pipeline.models.types.runtime import ROOTED, get_boilercv_pipeline_context
 
 ROOTED_PATHS = Paths(context=get_boilercv_pipeline_context(ROOTED))
 """Paths rooted to their directories."""

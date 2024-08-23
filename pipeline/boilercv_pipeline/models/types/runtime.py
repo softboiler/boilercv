@@ -15,6 +15,7 @@ from pydantic import (
     computed_field,
 )
 
+from boilercv_pipeline.config import const
 from boilercv_pipeline.context import ContextModel
 from boilercv_pipeline.context.types import (
     Context,
@@ -33,6 +34,10 @@ class Roots(BaseModel):
     """Data."""
     docs: Path | None = None
     """Docs."""
+
+
+ROOTED = Roots(data=const.data, docs=const.docs)
+"""Paths rooted to their directories."""
 
 
 class BoilercvPipelineCtx(BaseModel):
@@ -117,9 +122,9 @@ kinds: dict[Kind, tuple[str, bool]] = {
     "DocsDir": ("docs", False),
     "DocsFile": ("docs", True),
 }
-"""Kinds and their {func}`~boilercv_pipeline.models.paths.make_path` args."""
+"""Kinds and their {func}`~boilercv_pipeline.models.types.runtime.make_path` args."""
 make_path_args: dict[tuple[str, bool], Kind] = {v: k for k, v in kinds.items()}
-"""{func}`~boilercv_pipeline.models.paths.make_path` args and their kinds."""
+"""{func}`~boilercv_pipeline.models.types.runtime.make_path` args and their kinds."""
 
 
 def make_path(

@@ -5,7 +5,6 @@ from typing import get_args
 
 from boilercv_pipeline.models.generated.types.stages import StageName
 from boilercv_pipeline.models.types.runtime import (
-    ROOTED,
     BoilercvPipelineCtxModel,
     DataDir,
     DataFile,
@@ -82,15 +81,3 @@ class Paths(BoilercvPipelineCtxModel):
 
 
 paths = Paths()
-
-
-class Stage(BoilercvPipelineCtxModel):
-    """Base of stage models."""
-
-    model_config = get_boilercv_pipeline_config(
-        ROOTED, kinds_from=paths, track_kinds=True
-    )
-
-
-class StagePaths(Stage):
-    """Paths for stage dependencies and outputs."""

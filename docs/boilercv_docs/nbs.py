@@ -18,7 +18,7 @@ from myst_parser.parsers.docutils_ import cli_html
 from pandas import DataFrame, Index, MultiIndex, Series, concat, options
 
 from boilercv_docs.config import default
-from boilercv_docs.models import rooted_paths
+from boilercv_docs.models.paths import rooted_paths
 from boilercv_docs.types import BuildMode, DfOrS
 from boilercv_pipeline.models.types.runtime import (
     BoilercvPipelineCtxDict,

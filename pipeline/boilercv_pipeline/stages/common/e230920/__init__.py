@@ -45,14 +45,16 @@ def submit_nb_process(
     executor: ProcessPoolExecutor,
     nb: str,
     params: AnyParams,
-    outs: type[Model],
+    outs: type[Model] = DfNbOuts,
     **kwds: Any,
 ) -> Future[Model]:
     """Submit a notebook process to an executor."""
     return executor.submit(apply_to_nb, nb=nb, params=params, outs=outs, **kwds)
 
 
-def apply_to_nb(nb: str, params: AnyParams, outs: type[Model], **kwds: Any) -> Model:
+def apply_to_nb(
+    nb: str, params: AnyParams, outs: type[Model] = DfNbOuts, **kwds: Any
+) -> Model:
     """Apply a process to a notebook."""
     return outs.model_validate(
         get_nb_ns(nb=nb, params={"PARAMS": params.model_dump_json(), **kwds}).outs

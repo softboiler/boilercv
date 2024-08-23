@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm

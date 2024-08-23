@@ -6,7 +6,8 @@ from cappa.base import command
 from pydantic import DirectoryPath, Field
 
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stages import Params, StagePaths
+from boilercv_pipeline.models.paths.types import StagePaths
+from boilercv_pipeline.models.stages import Params
 from boilercv_pipeline.models.types.runtime import DataDir
 
 

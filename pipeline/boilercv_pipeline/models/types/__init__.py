@@ -11,3 +11,5 @@ Kind = Literal["DataDir", "DataFile", "DocsDir", "DocsFile"]
 """File or directory kind."""
 Kinds: TypeAlias = dict[Path, Kind]
 """Paths and their kinds."""
+Slicer: TypeAlias = tuple[int | None, ...]
+Slicers: TypeAlias = dict[str, Slicer]
