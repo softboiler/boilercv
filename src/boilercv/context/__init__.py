@@ -139,7 +139,7 @@ class ContextModel(BaseModel):
     ) -> Self:
         """Contextualizable string model validate."""
         self_instance = super().model_validate_strings(
-            cls.set_context(obj, context := cls.context_validate_before(obj)),
+            cls.context_set(obj, context := cls.context_validate_before(obj)),
             strict=strict,
             context=context,
         )
@@ -174,7 +174,7 @@ class ContextModel(BaseModel):
             obj={
                 **(
                     obj := (
-                        obj.model_dump(context=cls.get_context(obj))
+                        obj.model_dump(context=cls.context_get(obj))
                         if isinstance(obj, BaseModel)
                         else obj
                     )
@@ -225,13 +225,13 @@ class ContextModel(BaseModel):
             k: cls._context_handlers[k].model_validate(obj=v)
             for k, v in {
                 **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
-                **cls.get_context(data),
+                **cls.context_get(data),
                 **(other or {}),
             }.items()
         }
 
     @classmethod
-    def get_context(cls, data: Self | dict[str, Any]) -> Context:
+    def context_get(cls, data: Self | dict[str, Any]) -> Context:
         """Get context."""
         if isinstance(data, ContextModel):
             return data.context
@@ -240,7 +240,7 @@ class ContextModel(BaseModel):
         return {}
 
     @classmethod
-    def set_context(cls, data: Data_T, context: Context | None = None) -> Data_T:
+    def context_set(cls, data: Data_T, context: Context | None = None) -> Data_T:
         """Set context."""
         context = context or {}
         if isinstance(data, BaseModel):
@@ -354,7 +354,7 @@ class ContextMapping(  # noqa: PLR0904
     ) -> Self:
         """Contextualizable string model validate."""
         self_instance = super().model_validate_strings(
-            cls.set_context(obj, context := cls.context_validate_before(obj)),
+            cls.context_set(obj, context := cls.context_validate_before(obj)),
             strict=strict,
             context=context,
         )
@@ -389,7 +389,7 @@ class ContextMapping(  # noqa: PLR0904
             obj={
                 **(
                     obj := (
-                        obj.model_dump(context=cls.get_context(obj))
+                        obj.model_dump(context=cls.context_get(obj))
                         if isinstance(obj, BaseModel)
                         else obj
                     )
@@ -442,20 +442,20 @@ class ContextMapping(  # noqa: PLR0904
             k: cls._context_handlers[k].model_validate(obj=v)
             for k, v in {
                 **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
-                **cls.get_context(data),  # pyright: ignore[reportArgumentType]
+                **cls.context_get(data),  # pyright: ignore[reportArgumentType]
                 **(other or {}),
             }.items()
         }
 
     @classmethod
-    def get_context(cls, data: BaseModel | MutableMapping[K, V]) -> Context:
+    def context_get(cls, data: BaseModel | MutableMapping[K, V]) -> Context:
         """Get context."""
         if isinstance(data, Mapping) and (context := data.get(_CONTEXT)):  # pyright: ignore[reportArgumentType]
             return loads(context) if isinstance(context, str) else context  # pyright: ignore[reportReturnType]
         return {}
 
     @classmethod
-    def set_context(cls, data: Data_T, context: Context | None = None) -> Data_T:
+    def context_set(cls, data: Data_T, context: Context | None = None) -> Data_T:
         """Set context."""
         context = context or {}
         if isinstance(data, BaseModel):

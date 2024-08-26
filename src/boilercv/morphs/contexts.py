@@ -8,119 +8,39 @@ from contextlib import suppress
 from dataclasses import dataclass, field
 from functools import partial
 from itertools import chain
-from typing import Any, ClassVar, Generic, Self, get_args
+from typing import Any, Generic, Self, get_args
 
-from pydantic import BaseModel, ConfigDict, ValidationInfo, model_validator
+from pydantic import BaseModel, ValidationInfo, model_validator
 from pydantic.alias_generators import to_snake
 
+from boilercv.context import ContextModel
 from boilercv.morphs.morphs import Morph
 from boilercv.morphs.types import (
     CV,
     AnyPipe,
     ContextValueLike,
-    HasModelDump,
     K,
     LiteralGenericAlias,
     Mode,
-    Model,
     T,
     UnionGenericAlias,
     V,
 )
 
-# * MARK: Base context
 
-
-class BaseContext:
-    """Base class for contextualized models."""
-
-    model_config: ClassVar = ConfigDict(
-        protected_namespaces=(
-            *(Morph.model_config.get("protected_namespaces") or []),
-            "context_",
-        )
-    )
-
-    @classmethod
-    def context_model_validate(
-        cls: type[Model],  # pyright: ignore[reportGeneralTypeIssues]
-        obj: Any | None = None,
-        *,
-        strict: bool | None = None,
-        from_attributes: bool | None = None,
-        context: Context | None = None,
-    ) -> Model:
-        """Validate a pydantic model instance.
-
-        Args:
-            obj: The object to validate.
-            strict: Whether to enforce types strictly.
-            from_attributes: Whether to extract data from object attributes.
-            context: Additional context to pass to the validator.
-
-        Raises
-        ------
-            ValidationError: If the object could not be validated.
-
-        Returns
-        -------
-            The validated model instance.
-        """
-        return cls.model_validate(
-            obj.model_dump() if isinstance(obj, HasModelDump) else obj or {},
-            strict=strict,
-            from_attributes=from_attributes,
-            context=context or Context(),  # pyright: ignore[reportArgumentType]
-        )
-
-    @classmethod
-    def context_model_validate_json(
-        cls: type[Model],  # pyright: ignore[reportGeneralTypeIssues]
-        json_data: str | bytes | bytearray = "{}",
-        *,
-        strict: bool | None = None,
-        context: Context | None = None,
-    ) -> Model:
-        """Usage docs: https://docs.pydantic.dev/2.7/concepts/json/#json-parsing.
-
-        Validate the given JSON data against the Pydantic model.
-
-        Args:
-            json_data: The JSON data to validate.
-            strict: Whether to enforce types strictly.
-            context: Extra variables to pass to the validator.
-
-        Returns
-        -------
-            The validated Pydantic model.
-
-        Raises
-        ------
-            ValueError: If `json_data` is not a JSON string.
-        """
-        return cls.model_validate_json(
-            json_data,
-            strict=strict,
-            context=context or Context(),  # pyright: ignore[reportArgumentType]
-        )
-
-
-# * MARK: Contextualized base model
-
-
-class ContextBaseModel(BaseModel, BaseContext):
+class ContextBaseModel(ContextModel):
     """Context base model."""
 
     @model_validator(mode="before")
     @classmethod
-    def context_validate_before(
+    def morph_validate_before(
         cls, data: dict[str, Any], info: ValidationInfo
     ) -> dict[str, Any]:
         """Validate context before."""
         return cls.apply(mode="before", data=data, info=info)
 
     @model_validator(mode="after")
-    def context_validate_after(self, info: ValidationInfo) -> Self:
+    def morph_validate_after(self, info: ValidationInfo) -> Self:
         """Validate context after."""
         return self.apply(mode="after", data=self, info=info)
 
@@ -160,19 +80,19 @@ class ContextBaseModel(BaseModel, BaseContext):
 # * MARK: Contextualized morph
 
 
-class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
+class ContextMorph(Morph[K, V], Generic[K, V]):
     """Context morph."""
 
     @model_validator(mode="before")
     @classmethod
-    def context_validate_before(
+    def morph_validate_before(
         cls, data: dict[K, V], info: ValidationInfo
     ) -> dict[K, V]:
         """Validate context before."""
         return cls.apply(mode="before", data=data, info=info)
 
     @model_validator(mode="after")
-    def context_validate_after(self, info: ValidationInfo) -> Self:
+    def morph_validate_after(self, info: ValidationInfo) -> Self:
         """Validate context after."""
         return self.apply(mode="after", data=self, info=info)
 
@@ -249,7 +169,7 @@ class ContextMorph(Morph[K, V], BaseContext, Generic[K, V]):
         value_context = value_context or Context()
         if value_model:
             factory = (
-                partial(value_model.context_model_validate, context=value_context)
+                partial(value_model.model_validate, context=value_context)
                 if issubclass(value_model, ContextMorph | ContextBaseModel)
                 else partial(
                     value_model.model_validate, obj={}, context=dict(value_context)

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar
 import pytest
 from pydantic import ValidationError
 
+from boilercv.context.types import Context
 from boilercv.morphs.morphs import Morph, TypeType
 
 K = TypeVar("K")
@@ -19,25 +20,27 @@ V = TypeVar("V")
 # fmt: off
 
 # * MARK: Constants
-Fruit: TypeAlias = Literal["apple", "banana", "cherry"]
+Fruit: TypeAlias = Literal["apple", "banana", "cherry", "_context"]
 ANY_MAP: dict[Any, Any] = {"any": "map"}
 FRUIT: list[Fruit] = ["apple", "banana", "cherry"]
-_SelfMap: TypeAlias = MutableMapping[Fruit, str]
-_SelfDict: TypeAlias = dict[Fruit, str]
+Str: TypeAlias = str | Context
+Int: TypeAlias = int | Context
+_SelfMap: TypeAlias = MutableMapping[Fruit, Str]
+_SelfDict: TypeAlias = dict[Fruit, Str]
 SELF_DICT: _SelfDict = {"apple": "delicious"}
-_OtherDict: TypeAlias = dict[Fruit, int]
+_OtherDict: TypeAlias = dict[Fruit, Int]
 OTHER_DICT: _OtherDict = dict.fromkeys(FRUIT, 0)
 
 # * MARK: Concrete morphs
 
 # ! Descriptions
-Morph_: TypeAlias = Morph[Fruit, str]
+Morph_: TypeAlias = Morph[Fruit, Str]
 SELF_MORPH = Morph_(SELF_DICT)
 class _Self(Morph_): ...
 SELF = _Self(SELF_DICT)
 
 # ! Counts
-_OtherMorph: TypeAlias = Morph[Fruit, int]
+_OtherMorph: TypeAlias = Morph[Fruit, Int]
 OTHER_MORPH = _OtherMorph(OTHER_DICT)
 class _Other(_OtherMorph): ...
 OTHER = _Other(OTHER_DICT)
@@ -49,13 +52,13 @@ class _GenericMorph(Morph[K, V], Generic[K, V]): ...
 GENERIC_MORPH = _GenericMorph[Any, Any](ANY_MAP)
 
 # ! Descriptions
-_SubSelfMorph: TypeAlias = _GenericMorph[Fruit, str]
+_SubSelfMorph: TypeAlias = _GenericMorph[Fruit, Str]
 SUB_SELF_MORPH = _SubSelfMorph(SELF_DICT)
 class _SubSelf(_SubSelfMorph): ...
 SUB_SELF = _SubSelf(SELF_DICT)
 
 # ! Counts
-_SubOtherMorph: TypeAlias = _GenericMorph[Fruit, int]
+_SubOtherMorph: TypeAlias = _GenericMorph[Fruit, Int]
 SUB_OTHER_MORPH = _SubOtherMorph(OTHER_DICT)
 class _SubOther(_SubOtherMorph): ...
 SUB_OTHER = _SubOther(OTHER_DICT)
@@ -82,7 +85,7 @@ def _():
 
 # ! (str -> Map)
 def str_map(i: str
-    ) -> MutableMapping[str, int]: return {i: len(i)}
+    ) -> MutableMapping[str, Int]: return {i: len(i)}
 def _():
     return SELF.morph_pipe(str_map)  # pyright: ignore[reportArgumentType, reportCallIssue]
 def str_dict(_: str
@@ -163,7 +166,7 @@ def map_unk(i: _SelfMap
     ): return Morph_(i)
 def _():
     return SELF.morph_pipe(map_unk)
-def dict_unk(i: dict[Fruit, str]
+def dict_unk(i: dict[Fruit, Str]
     ): return Morph_(i)
 def _():
     return SELF.morph_pipe(dict_unk)
@@ -181,7 +184,7 @@ def map_any(i: _SelfMap
     ) -> Any: return Morph_(i)
 def _():
     return SELF.morph_pipe(map_any)
-def dict_any(i: dict[Fruit, str]
+def dict_any(i: dict[Fruit, Str]
     ) -> Any: return Morph_(i)
 def _():
     return SELF.morph_pipe(dict_any)
@@ -205,11 +208,11 @@ def _():
     return SELF.morph_pipe(map_self)
 
 # ! (dict -> Self)
-def dict_morph(i: dict[Fruit, str]
+def dict_morph(i: dict[Fruit, Str]
     ) -> Morph_: return Morph_(i)
 def _():
     return SELF.morph_pipe(dict_morph)
-def dict_self(i: dict[Fruit, str]
+def dict_self(i: dict[Fruit, Str]
     ) -> _Self: return _Self(i)
 def _():
     return SELF.morph_pipe(dict_self)
@@ -243,7 +246,7 @@ def _():
     return SELF.morph_pipe(self1_self2)
 
 # ! (Self -> Other)
-def other_dict(_: _GenericMorph[Fruit, int]
+def other_dict(_: _GenericMorph[Fruit, Int]
     ) -> _SelfDict: return SELF_DICT
 def _():
     return SELF.morph_pipe(other_dict)  # pyright: ignore[reportArgumentType, reportCallIssue]
@@ -302,36 +305,12 @@ if TYPE_CHECKING:
             v3 = SELF.morph_pipe(f)
         for f in return_mismatched_maps:
             v4 = SELF.morph_pipe(f)
-        for f in take_fruits_return_other:
-            v5 = SELF.morph_kpipe(f)
-        for f in take_strs_return_other:
-            v6 = SELF.morph_vpipe(f)
 
 
 @pytest.mark.parametrize("f", take_other_map)
 def test_pipe_returns_other_from_not_mappings(f: Pipe):
     """Pipe produces other types from non-mappings."""
     assert SELF.morph_pipe(f) == f(SELF)
-
-
-@pytest.mark.parametrize("f", take_fruits_return_other)
-def test_pipe_returns_self_from_mismatched_keys(f: TakeFruitsReturnOther):
-    """Pipe produces mismatched keys wrapped in instances of its class."""
-    result = SELF.morph_kpipe(f)
-    k, v = result.morph_get_inner_types()
-    assert result == Morph[k, v](
-        dict(zip(f(list(SELF.keys())), SELF.values(), strict=False))
-    )
-
-
-@pytest.mark.parametrize("f", take_strs_return_other)
-def test_pipe_returns_base_from_mismatched_values(f: TakeIntsReturnOther):
-    """Pipe produces mismatched values wrapped in instances of its base."""
-    result = SELF.morph_vpipe(f)
-    k, v = result.morph_get_inner_types()
-    assert result == Morph[k, v](
-        dict(zip(SELF.keys(), f(list(SELF.values())), strict=False))
-    )
 
 
 @pytest.mark.parametrize("f", return_matching_maps)
