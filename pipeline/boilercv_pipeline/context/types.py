@@ -6,6 +6,11 @@ import pydantic
 from pydantic import BaseModel, ConfigDict
 from typing_extensions import TypedDict
 
+K = TypeVar("K")
+"""Key type."""
+V = TypeVar("V")
+"""Value type."""
+
 
 class AnyTypedDict(TypedDict):
     """Base class representing any typed dictionary."""
