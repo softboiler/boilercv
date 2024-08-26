@@ -15,7 +15,7 @@ from pydantic import (
 )
 from pydantic.main import IncEx
 
-from boilercv_pipeline.context.types import (
+from boilercv.context.types import (
     Context,
     ContextPluginSettings,
     Data_T,

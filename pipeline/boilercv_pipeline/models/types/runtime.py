@@ -16,15 +16,15 @@ from pydantic import (
     computed_field,
 )
 
-from boilercv_pipeline.config import const
-from boilercv_pipeline.context import ContextModel
-from boilercv_pipeline.context.types import (
+from boilercv.context import ContextModel
+from boilercv.context.types import (
     Context,
     ContextPluginSettings,
     PluginConfigDict,
     SerializationInfo,
     ValidationInfo,
 )
+from boilercv_pipeline.config import const
 from boilercv_pipeline.models.types import Key, Kind, Kinds
 
 

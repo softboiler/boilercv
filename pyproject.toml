@@ -32,6 +32,7 @@ dependencies = [
     "pydantic-settings>=2.4.0",
     "pytz>=2023.3",
     "sympy>=1.12",
+    "typing_extensions>=4.12.2",
     "xarray[accel,io,parallel]>=2023.7.0",
     # ? https://github.com/softboiler/boilercv/issues/213
     "netcdf4>=1.6.5",

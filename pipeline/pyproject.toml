@@ -35,7 +35,6 @@ dependencies = [
     "sympy>=1.12",
     "tomlkit>=0.12.4",
     "tqdm>=4.66.3",
-    "typing_extensions>=4.12.2",
     "watchfiles>=0.22.0",
     "xarray[accel,io,parallel]>=2023.7.0",
     "pyyaml>=6.0.2",
