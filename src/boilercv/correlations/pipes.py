@@ -12,14 +12,14 @@ from sympy import Symbol, symbols
 
 from boilercv.correlations.types import CVL, Kind, P, Ps, R, SympifyParams, Transform
 from boilercv.mappings import Repl, replace, replace_pattern, sort_by_keys_pattern
-from boilercv.morphs.contexts import (
+from boilercv.morphs.morphs import Morph
+from boilercv.morphs.pipelines import (
     ContextValue,
     Defaults,
     Pipe,
-    PipemodelCtx,
+    PipelineCtx,
     compose_context,
 )
-from boilercv.morphs.morphs import Morph
 
 
 def fold_whitespace(
@@ -76,7 +76,7 @@ def set_latex_forms(forms: Morph[Kind, str]) -> Morph[Kind, str]:
     return forms
 
 
-def compose_sympify_context(symbols: Iterable[str]) -> PipemodelCtx:
+def compose_sympify_context(symbols: Iterable[str]) -> PipelineCtx:
     """Get `sympify` parameters."""
     return compose_context(
         SympifyParams(locals=dict(LocalSymbols.from_iterable(symbols)), evaluate=False)

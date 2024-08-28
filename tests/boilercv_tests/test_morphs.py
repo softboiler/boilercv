@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, Generic, Literal, TypeAlias, TypeVar
 import pytest
 from pydantic import ValidationError
 
-from boilercv.context.types import Context
+from boilercv.contexts.types import Context
 from boilercv.morphs.morphs import Morph, TypeType
 
 K = TypeVar("K")

@@ -16,8 +16,8 @@ from pydantic import (
     computed_field,
 )
 
-from boilercv.context import ContextModel
-from boilercv.context.types import (
+from boilercv.contexts import ContextModel
+from boilercv.contexts.types import (
     Context,
     ContextPluginSettings,
     PluginConfigDict,

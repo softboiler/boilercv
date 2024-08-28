@@ -31,7 +31,7 @@ from pydantic import (
 from sympy import sympify
 from sympy.logic.boolalg import BooleanAtom
 
-from boilercv.morphs.contexts import PIPEMODEL, ContextValue, PipemodelValidationInfo
+from boilercv.morphs.pipelines import PIPELINE, ContextValue, PipelineValidationInfo
 
 if TYPE_CHECKING:
     from _typeshed import DataclassInstance
@@ -90,15 +90,15 @@ def validator(context_value_type: type[CV]):
 
     def validator_maker(
         f: Callable[[P, CV], R],
-    ) -> Callable[[P, PipemodelValidationInfo], R]:
-        def validate(v: P, info: PipemodelValidationInfo, /) -> R:
+    ) -> Callable[[P, PipelineValidationInfo], R]:
+        def validate(v: P, info: PipelineValidationInfo, /) -> R:
             key = context_value_type.name_to_snake()
             context = info.context or {}
             if not context:
                 raise ValueError(
                     f"No context given. Expected value at '{key}' of type '{context_value_type}'."
                 )
-            context_value = context[PIPEMODEL].get(key)
+            context_value = context[PIPELINE].get(key)
             if not context_value:
                 raise ValueError(
                     f"No context value at {key}. Expected context value at '{key}' of type '{context_value_type}'."

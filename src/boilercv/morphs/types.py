@@ -21,7 +21,7 @@ from typing import (
 from pydantic import BaseModel
 
 if TYPE_CHECKING:
-    from boilercv.morphs.contexts import (
+    from boilercv.morphs.pipelines import (
         ContextValue,
         Pipe,
         PipelineContext,

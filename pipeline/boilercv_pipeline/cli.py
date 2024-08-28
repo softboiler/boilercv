@@ -10,7 +10,7 @@ from cappa.subcommand import Subcommands
 from pydantic import BaseModel, Field
 from yaml import safe_dump
 
-from boilercv.context import ContextModel
+from boilercv.contexts import ContextModel
 from boilercv_pipeline.stages.binarize import Binarize
 from boilercv_pipeline.stages.convert import Convert
 from boilercv_pipeline.stages.e230920_find_objects import E230920FindObjects

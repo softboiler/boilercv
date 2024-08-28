@@ -16,7 +16,7 @@ from boilercv.correlations.models import (
     SymbolicCorrelation,
 )
 from boilercv.correlations.types import AnyExpr, Equation, Sym, trivial_expr
-from boilercv.morphs.contexts import get_pipemodel_context
+from boilercv.morphs.pipelines import get_pipeline_context
 from boilercv.morphs.types import LiteralGenericAlias
 
 _base = Path(__file__).with_suffix(".toml")
@@ -84,7 +84,7 @@ def get_equations(path: Path) -> Equations[AnyExpr]:
     """Get equations."""
     return Equations[AnyExpr].model_validate(
         obj=loads(path.read_text(encoding="utf-8") if path.exists() else "{}"),
-        context=get_pipemodel_context(
+        context=get_pipeline_context(
             Equations[AnyExpr].get_context(symbols=get_args(Sym))
         ),
     )
@@ -114,7 +114,7 @@ def get_equations_and_solutions(
                         solutions.read_text("utf-8") if solutions.exists() else ""
                     ),
                 ),
-                context=get_pipemodel_context(
+                context=get_pipeline_context(
                     SolvedEquations[solve_sym].get_context(
                         symbols=get_args(Sym), solve_syms=get_args(solve_sym)
                     )

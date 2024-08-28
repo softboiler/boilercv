@@ -8,7 +8,7 @@ from typing import Any, Generic, Self, TypeVar, get_args, get_type_hints, overlo
 
 from pydantic import ValidationError, model_validator
 
-from boilercv.context import RootMapping
+from boilercv.contexts import RootMapping
 from boilercv.morphs.types import (
     RK,
     RV,

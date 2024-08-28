@@ -13,7 +13,7 @@ from watchfiles import awatch
 from boilercv.correlations import GROUPS, META_TOML, RANGES_TOML, get_equations
 from boilercv.correlations.models import Equations, Metadata
 from boilercv.correlations.types import Corr, Equation, Range
-from boilercv.morphs.contexts import get_pipemodel_context
+from boilercv.morphs.pipelines import get_pipeline_context
 from boilercv_pipeline.equations import EQUATIONS, SYMS, get_raw_equations_context
 
 logger.remove()
@@ -72,7 +72,7 @@ def make_docs():
     ranges = {name: r.latex for name, r in get_equations(RANGES_TOML).items()}
     meta = Metadata.model_validate(
         obj=loads(META_TOML.read_text("utf-8") if META_TOML.exists() else ""),
-        context=get_pipemodel_context(Metadata.get_context()),
+        context=get_pipeline_context(Metadata.get_context()),
     )
     header = "# Correlation equations\n"
     groups = ""

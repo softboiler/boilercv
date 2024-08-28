@@ -1,4 +1,4 @@
-"""Contextual morphs."""
+"""Pipelines."""
 
 from __future__ import annotations
 
@@ -13,14 +13,14 @@ from typing import Any, ClassVar, Generic, Self, TypeAlias, get_args
 from pydantic import BaseModel, model_validator
 from pydantic.alias_generators import to_snake
 
-from boilercv import context
-from boilercv.context import (
+from boilercv import contexts
+from boilercv.contexts import (
     CONTEXT,
     PLUGIN_SETTINGS,
     ContextBase,
     context_validate_before,
 )
-from boilercv.context.types import (
+from boilercv.contexts.types import (
     ContextPluginSettings,
     PluginConfigDict,
     SerializationInfo,
@@ -39,7 +39,7 @@ from boilercv.morphs.types import (
     V,
 )
 
-PIPEMODEL = "pipemodel"
+PIPELINE = "pipeline"
 """Pipe model context key."""
 
 # * MARK: Pipelines
@@ -122,7 +122,7 @@ class PipeWithInfo:
 # * MARK: Contexts
 
 
-class PipemodelCtx(UserDict[str, ContextValueLike]):
+class PipelineCtx(UserDict[str, ContextValueLike]):
     """Morphs."""
 
     @property
@@ -131,10 +131,10 @@ class PipemodelCtx(UserDict[str, ContextValueLike]):
         context = self.get(get_context_key(PipelineContext), PipelineContext())
         return context if isinstance(context, PipelineContext) else PipelineContext()
 
-    def __or__(self, other: PipemodelCtx | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def __or__(self, other: PipelineCtx | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
         # sourcery skip: remove-redundant-constructor-in-dict-union
         # ! This Sourcery refactoring results in an infinite loop
-        if isinstance(other, PipemodelCtx):
+        if isinstance(other, PipelineCtx):
             merged = dict(self) | dict(other)
             if (morphs := get_context_value(PipelineContext, self)) is not None and (
                 other_morphs := get_context_value(PipelineContext, other)
@@ -145,41 +145,39 @@ class PipemodelCtx(UserDict[str, ContextValueLike]):
             return self | type(self)(other)  # pyright: ignore[reportArgumentType]
         return NotImplemented
 
-    def __ror__(self, other: PipemodelCtx | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
+    def __ror__(self, other: PipelineCtx | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
         if isinstance(other, Mapping):
             return type(self)(other) | self
         return NotImplemented
 
-    def __ior__(self, other: PipemodelCtx | Mapping[str, Any] | Any) -> Self:
+    def __ior__(self, other: PipelineCtx | Mapping[str, Any] | Any) -> Self:
         self.data = (self | other).data
         return self
 
 
-class PipemodelCtxDict(context.Context):
+class PipelineCtxDict(contexts.Context):
     """Boilercv pipeline context."""
 
-    pipemodel: PipemodelCtx
+    pipeline: PipelineCtx
 
 
-def get_pipemodel_context(ctx: PipemodelCtx | None = None) -> PipemodelCtxDict:
+def get_pipeline_context(ctx: PipelineCtx | None = None) -> PipelineCtxDict:
     """Get pipe model context."""
-    return PipemodelCtxDict(pipemodel=ctx or PipemodelCtx())
+    return PipelineCtxDict(pipeline=ctx or PipelineCtx())
 
 
-PipemodelConfigDict: TypeAlias = PluginConfigDict[
-    ContextPluginSettings[PipemodelCtxDict]
-]
-PipemodelValidationInfo: TypeAlias = ValidationInfo[PipemodelCtxDict]
-PipemodelSerializationInfo: TypeAlias = SerializationInfo[PipemodelCtxDict]
+PipelineConfigDict: TypeAlias = PluginConfigDict[ContextPluginSettings[PipelineCtxDict]]
+PipelineValidationInfo: TypeAlias = ValidationInfo[PipelineCtxDict]
+PipelineSerializationInfo: TypeAlias = SerializationInfo[PipelineCtxDict]
 
 
-class ContextBaseModel(ContextBase):
-    """Context base model."""
+class PipelineBase(ContextBase):
+    """Pipeline base model."""
 
-    model_config: ClassVar[PipemodelConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
+    model_config: ClassVar[PipelineConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
         PluginConfigDict({
             PLUGIN_SETTINGS: ContextPluginSettings({
-                CONTEXT: PipemodelCtxDict({PIPEMODEL: PipemodelCtx()})
+                CONTEXT: PipelineCtxDict({PIPELINE: PipelineCtx()})
             })
         })
     )
@@ -187,20 +185,20 @@ class ContextBaseModel(ContextBase):
     @model_validator(mode="before")
     @classmethod
     def morph_validate_before(
-        cls, data: dict[str, Any], info: PipemodelValidationInfo
+        cls, data: dict[str, Any], info: PipelineValidationInfo
     ) -> dict[str, Any]:
         """Validate context before."""
         return cls.apply(mode="before", data=context_validate_before(data), info=info)
 
     @model_validator(mode="after")
-    def morph_validate_after(self, info: PipemodelValidationInfo) -> Self:
+    def morph_validate_after(self, info: PipelineValidationInfo) -> Self:
         """Validate context after."""
         return self.apply(mode="after", data=self, info=info)
 
     @classmethod
-    def apply(cls, mode: Mode | Any, data: T, info: PipemodelValidationInfo) -> T:
+    def apply(cls, mode: Mode | Any, data: T, info: PipelineValidationInfo) -> T:
         """Apply a pipe to data."""
-        context = info.context[PIPEMODEL]
+        context = info.context[PIPELINE]
         pipelines_context = (
             get_context_value(PipelineContext, context) or PipelineContext()
         )
@@ -233,13 +231,13 @@ class ContextBaseModel(ContextBase):
 # * MARK: Contextualized morph
 
 
-class ContextMorph(Morph[K, V], Generic[K, V]):
-    """Context morph."""
+class Pipeline(Morph[K, V], Generic[K, V]):
+    """Pipeline model."""
 
-    model_config: ClassVar[PipemodelConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
+    model_config: ClassVar[PipelineConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
         PluginConfigDict({
             PLUGIN_SETTINGS: ContextPluginSettings({
-                CONTEXT: PipemodelCtxDict({PIPEMODEL: PipemodelCtx()})
+                CONTEXT: PipelineCtxDict({PIPELINE: PipelineCtx()})
             })
         })
     )
@@ -247,20 +245,20 @@ class ContextMorph(Morph[K, V], Generic[K, V]):
     @model_validator(mode="before")
     @classmethod
     def morph_validate_before(
-        cls, data: dict[K, V], info: PipemodelValidationInfo
+        cls, data: dict[K, V], info: PipelineValidationInfo
     ) -> dict[K, V]:
         """Validate context before."""
         return cls.apply(mode="before", data=context_validate_before(data), info=info)
 
     @model_validator(mode="after")
-    def morph_validate_after(self, info: PipemodelValidationInfo) -> Self:
+    def morph_validate_after(self, info: PipelineValidationInfo) -> Self:
         """Validate context after."""
         return self.apply(mode="after", data=self, info=info)
 
     @classmethod
-    def apply(cls, mode: Mode, data: T, info: PipemodelValidationInfo) -> T:  # noqa: C901, PLR0912
+    def apply(cls, mode: Mode, data: T, info: PipelineValidationInfo) -> T:  # noqa: C901, PLR0912
         """Apply a pipe to data."""
-        context = info.context[PIPEMODEL]
+        context = info.context[PIPELINE]
         pipelines_context = (
             get_context_value(PipelineContext, context) or PipelineContext()
         )
@@ -309,10 +307,9 @@ class ContextMorph(Morph[K, V], Generic[K, V]):
         value: V | BaseModel | None = None,
         value_copier: Callable[[V | BaseModel], V | BaseModel] = lambda v: v,
         factory: Callable[..., Any] | None = None,
-        value_model: type[ContextMorph[K, V] | ContextBaseModel | BaseModel]
-        | None = None,
-        value_context: PipemodelCtx | None = None,
-    ) -> PipemodelCtx:
+        value_model: type[Pipeline[K, V] | PipelineBase | BaseModel] | None = None,
+        value_context: PipelineCtx | None = None,
+    ) -> PipelineCtx:
         """Compose defaults."""
         k, v = cls.morph_get_inner_types()
         if (
@@ -331,13 +328,13 @@ class ContextMorph(Morph[K, V], Generic[K, V]):
             factory = (
                 partial(
                     value_model.model_validate,
-                    context=get_pipemodel_context(value_context),
+                    context=get_pipeline_context(value_context),
                 )
-                if issubclass(value_model, ContextMorph | ContextBaseModel)
+                if issubclass(value_model, Pipeline | PipelineBase)
                 else partial(
                     value_model.model_validate,
                     obj={},
-                    context=get_pipemodel_context(value_context),
+                    context=get_pipeline_context(value_context),
                 )
             )
         defaults = (
@@ -349,7 +346,7 @@ class ContextMorph(Morph[K, V], Generic[K, V]):
         )
         return compose_contexts(
             make_pipelines(cls, before=[Pipe(set_defaults, defaults)]),
-            value_context or PipemodelCtx(),
+            value_context or PipelineCtx(),
         )
 
 
@@ -396,9 +393,9 @@ def set_defaults(i: dict[K, V], d: Defaults[K, V]) -> dict[K, V]:
     return i
 
 
-def compose_contexts(*contexts: PipemodelCtx) -> PipemodelCtx:
+def compose_contexts(*contexts: PipelineCtx) -> PipelineCtx:
     """Compose contexts."""
-    context = PipemodelCtx()
+    context = PipelineCtx()
     for ctx in contexts:
         context |= ctx
     return context
@@ -409,23 +406,23 @@ def make_pipelines(
     /,
     before: Sequence[AnyPipe] | AnyPipe | None = None,
     after: Sequence[AnyPipe] | AnyPipe | None = None,
-) -> PipemodelCtx:
+) -> PipelineCtx:
     """Compose defaults."""
     return compose_context(
         PipelineContext({typ: Pipelines.make(before=before, after=after)})
     )
 
 
-def compose_context(*context_values: ContextValue) -> PipemodelCtx:
+def compose_context(*context_values: ContextValue) -> PipelineCtx:
     """Compose inner contexts."""
-    return PipemodelCtx({
+    return PipelineCtx({
         context_value.name_to_snake(): context_value for context_value in context_values
     })
 
 
-def get_context_value(value_type: type[CV], context: PipemodelCtx | None) -> CV | None:
+def get_context_value(value_type: type[CV], context: PipelineCtx | None) -> CV | None:
     """Get context values for a type."""
-    return (context or PipemodelCtx()).get(get_context_key(value_type))  # pyright: ignore[reportReturnType]
+    return (context or PipelineCtx()).get(get_context_key(value_type))  # pyright: ignore[reportReturnType]
 
 
 def get_context_key(value_type: type[CV]) -> str:

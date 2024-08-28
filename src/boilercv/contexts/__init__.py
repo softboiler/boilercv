@@ -1,4 +1,4 @@
-"""Context."""
+"""Contexts."""
 
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ from pydantic.main import IncEx, _object_setattr
 from pydantic.root_model import RootModelRootType, _RootModelMetaclass
 from pydantic_core import PydanticUndefined
 
-from boilercv.context.types import (
+from boilercv.contexts.types import (
     Context,
     ContextPluginSettings,
     Data_T,

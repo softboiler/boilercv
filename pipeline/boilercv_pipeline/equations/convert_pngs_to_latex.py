@@ -15,8 +15,8 @@ from boilercv.correlations.models import EquationForms, Equations
 from boilercv.correlations.pipes import fold_whitespace
 from boilercv.correlations.types import Corr, Kind
 from boilercv.mappings import Repl, replace, sync
-from boilercv.morphs.contexts import Defaults
 from boilercv.morphs.morphs import Morph
+from boilercv.morphs.pipelines import Defaults
 from boilercv_pipeline.equations import (
     EQUATIONS,
     PIPX,

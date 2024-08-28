@@ -27,17 +27,17 @@ from boilercv.correlations.types import (
     Kind,
     S,
 )
-from boilercv.morphs.contexts import (
-    ContextBaseModel,
-    ContextMorph,
+from boilercv.morphs.morphs import Morph
+from boilercv.morphs.pipelines import (
     Defaults,
     Pipe,
-    PipemodelCtx,
+    Pipeline,
+    PipelineBase,
+    PipelineCtx,
     compose_contexts,
-    get_pipemodel_context,
+    get_pipeline_context,
     make_pipelines,
 )
-from boilercv.morphs.morphs import Morph
 
 
 class EquationMetadata(BaseModel):
@@ -49,40 +49,40 @@ class EquationMetadata(BaseModel):
     """Citekey."""
 
 
-class Metadata(ContextMorph[AnyEquation, EquationMetadata]):
+class Metadata(Pipeline[AnyEquation, EquationMetadata]):
     """Equations."""
 
     @classmethod
-    def get_context(cls) -> PipemodelCtx:
+    def get_context(cls) -> PipelineCtx:
         """Get context."""
         return compose_contexts(
             cls.compose_defaults(), make_pipelines(cls, before=sort_by_year)
         )
 
 
-class Expectations(ContextMorph[K, Expectation], Generic[K]):
+class Expectations(Pipeline[K, Expectation], Generic[K]):
     """Expectations."""
 
     @classmethod
-    def get_context(cls) -> PipemodelCtx:
+    def get_context(cls) -> PipelineCtx:
         """Get Pydantic context."""
         return cls.compose_defaults(value=nan)
 
 
-class Forms(ContextMorph[Kind, str]):
+class Forms(Pipeline[Kind, str]):
     """Forms."""
 
     @classmethod
-    def get_context(cls) -> PipemodelCtx:
+    def get_context(cls) -> PipelineCtx:
         """Get context."""
         return compose_contexts(cls.compose_defaults(value=""))
 
 
-class Params(ContextMorph[K, Forms], Generic[K]):
+class Params(Pipeline[K, Forms], Generic[K]):
     """Parameters."""
 
     @classmethod
-    def get_context(cls) -> PipemodelCtx:
+    def get_context(cls) -> PipelineCtx:
         """Get Pydantic context."""
         return compose_contexts(
             cls.compose_defaults(value_context=Forms.get_context()),
@@ -91,12 +91,12 @@ class Params(ContextMorph[K, Forms], Generic[K]):
 
 
 def prep_equation_forms(
-    i: dict[Kind, str], context: PipemodelCtx | None = None
+    i: dict[Kind, str], context: PipelineCtx | None = None
 ) -> Morph[Kind, str]:
     """Prepare equation forms."""
     return Forms.model_validate(
         obj=i,
-        context=get_pipemodel_context(
+        context=get_pipeline_context(
             context
             or make_pipelines(
                 Forms,
@@ -109,7 +109,7 @@ def prep_equation_forms(
     )
 
 
-class EquationForms(ContextBaseModel, Generic[EQ]):
+class EquationForms(PipelineBase, Generic[EQ]):
     """Equation forms."""
 
     latex: str
@@ -121,8 +121,8 @@ class EquationForms(ContextBaseModel, Generic[EQ]):
     def get_context(
         cls,
         symbols: Iterable[str] | None = None,
-        forms_context: PipemodelCtx | None = None,
-    ) -> PipemodelCtx:
+        forms_context: PipelineCtx | None = None,
+    ) -> PipelineCtx:
         """Get context."""
         symbols = symbols or ()
         return compose_contexts(
@@ -133,15 +133,15 @@ class EquationForms(ContextBaseModel, Generic[EQ]):
         )
 
 
-class Equations(ContextMorph[Equation, EquationForms[EQ]], Generic[EQ]):
+class Equations(Pipeline[Equation, EquationForms[EQ]], Generic[EQ]):
     """Equations."""
 
     @classmethod
     def get_context(
         cls,
         symbols: Iterable[str] | None = None,
-        forms_context: PipemodelCtx | None = None,
-    ) -> PipemodelCtx:
+        forms_context: PipelineCtx | None = None,
+    ) -> PipelineCtx:
         """Get context."""
         symbols = symbols or ()
         Eq_, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
@@ -155,7 +155,7 @@ class Equations(ContextMorph[Equation, EquationForms[EQ]], Generic[EQ]):
         )
 
 
-class Solutions(ContextBaseModel):
+class Solutions(PipelineBase):
     """Solutions for a symbol."""
 
     solutions: list[Expr] = Field(default_factory=list)
@@ -164,31 +164,31 @@ class Solutions(ContextBaseModel):
     """Warnings."""
 
     @classmethod
-    def get_context(cls, symbols: Iterable[str]) -> PipemodelCtx:
+    def get_context(cls, symbols: Iterable[str]) -> PipelineCtx:
         """Get Pydantic context."""
         return compose_sympify_context(symbols)  # for `Expr`
 
 
-class SymbolSolutions(ContextMorph[S, Solutions], Generic[S]):
+class SymbolSolutions(Pipeline[S, Solutions], Generic[S]):
     """Solutions for given symbols."""
 
     @classmethod
     def get_context(
         cls, symbols: Iterable[str], solve_syms: tuple[S, ...] | None = None
-    ) -> PipemodelCtx:
+    ) -> PipelineCtx:
         """Get Pydantic context."""
         return cls.compose_defaults(
             keys=solve_syms, value_context=Solutions.get_context(symbols=symbols)
         )
 
 
-class EquationSolutions(ContextMorph[Equation, SymbolSolutions[S]], Generic[S]):
+class EquationSolutions(Pipeline[Equation, SymbolSolutions[S]], Generic[S]):
     """Equation solutions."""
 
     @classmethod
     def get_context(
         cls, symbols: Iterable[str], solve_syms: tuple[str, ...] | None = None
-    ) -> PipemodelCtx:
+    ) -> PipelineCtx:
         """Get Pydantic context."""
         SolveSyms, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
         return compose_contexts(
@@ -201,7 +201,7 @@ class EquationSolutions(ContextMorph[Equation, SymbolSolutions[S]], Generic[S]):
         )
 
 
-class SolvedEquations(ContextBaseModel, Generic[S]):
+class SolvedEquations(PipelineBase, Generic[S]):
     """Solved equations."""
 
     equations: Equations[Eq]
@@ -212,7 +212,7 @@ class SolvedEquations(ContextBaseModel, Generic[S]):
     @classmethod
     def get_context(
         cls, symbols: Iterable[str], solve_syms: tuple[str, ...]
-    ) -> PipemodelCtx:
+    ) -> PipelineCtx:
         """Get Pydantic context."""
         SolveSyms, *_ = cls.__pydantic_generic_metadata__["args"]  # noqa: N806
         return compose_contexts(

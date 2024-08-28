@@ -8,7 +8,7 @@ from boilercv import correlations
 from boilercv.correlations.models import Correlation, Expectations, SymbolicCorrelation
 from boilercv.correlations.nusselt.types import SolveSym
 from boilercv.correlations.types import Equation, Sym
-from boilercv.morphs.contexts import get_pipemodel_context
+from boilercv.morphs.pipelines import get_pipeline_context
 
 PNGS = Path("data/png_equations_nusselt")
 """Equation PNGs."""
@@ -32,7 +32,7 @@ SYMBOL_EXPECTATIONS = Expectations[Sym].model_validate(
         "alpha": 1.0,
         "pi": pi,
     },
-    context=get_pipemodel_context(Expectations[Sym].get_context()),
+    context=get_pipeline_context(Expectations[Sym].get_context()),
 )
 """Common keyword arguments applied to correlations."""
 

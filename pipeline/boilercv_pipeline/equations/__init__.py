@@ -20,8 +20,8 @@ from boilercv.correlations.models import (
 from boilercv.correlations.nusselt.types import SolveSym as SolveSymNusselt
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, Kind, Range, Sym
-from boilercv.morphs.contexts import Pipe, PipemodelCtx, make_pipelines
 from boilercv.morphs.morphs import Morph
+from boilercv.morphs.pipelines import Pipe, PipelineCtx, make_pipelines
 
 SYMS = tuple(SYMBOLS.keys())
 PIPX = Path(executable).parent / "pipx"
@@ -80,7 +80,7 @@ def make_raw(content: str):
     return content
 
 
-def get_raw_equations_context(symbols: Iterable[str]) -> PipemodelCtx:
+def get_raw_equations_context(symbols: Iterable[str]) -> PipelineCtx:
     """Get raw equations."""
     forms_context = Forms.get_context()
     forms_context.pipelines[Forms].before = (forms_context.pipelines[Forms].before[0],)

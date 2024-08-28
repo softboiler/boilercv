@@ -17,8 +17,8 @@ from boilercv.correlations.models import Solutions, SolvedEquations, SymbolSolut
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, trivial
 from boilercv.mappings import filt, sync
-from boilercv.morphs.contexts import PipemodelCtxDict, get_pipemodel_context
 from boilercv.morphs.morphs import Morph
+from boilercv.morphs.pipelines import PipelineCtxDict, get_pipeline_context
 from boilercv_pipeline.equations import EQUATIONS, SOLUTIONS, SOLVE_SYMS, SUBSTITUTIONS
 
 TIMEOUT = 5
@@ -45,7 +45,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     solns_content = solutions.read_text("utf-8") if solutions.exists() else ""
     symbols = tuple(dict(substitutions).keys())
 
-    context = get_pipemodel_context(
+    context = get_pipeline_context(
         SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_syms)
     )
     model = SolvedEquations[str].model_validate(
@@ -84,7 +84,7 @@ def solve_equations(
     solve_syms: tuple[str, ...],
     overwrite: bool,
     symbols: LocalSymbols,
-    context: PipemodelCtxDict,
+    context: PipelineCtxDict,
 ) -> Morph[Equation, SymbolSolutions[str]]:
     """Solve equations."""
     for name, eq in tqdm(equations.items()):
