@@ -33,7 +33,7 @@ def default(corr: Corr = "beta"):  # noqa: D103
     )
     equations = (
         Equations[str]
-        .context_model_validate(
+        .model_validate(
             obj=loads(
                 equations_path.read_text("utf-8") if equations_path.exists() else ""
             ),

@@ -1,7 +1,7 @@
 """Mapping functions."""
 
 from collections.abc import Callable, Iterable, Mapping, MutableMapping
-from copy import deepcopy
+from copy import copy
 from re import Pattern, sub
 from typing import Any, Generic, NamedTuple
 
@@ -12,35 +12,60 @@ def apply(
     mapping: Mapping[Any, Any],
     node_fun: Callable[[Node], Any] = lambda n: n,
     leaf_fun: Callable[[Leaf], Any] = lambda v: v,
-    node_cond: Callable[[Node], bool] = bool,
-    leaf_cond: Callable[[Node], bool] = bool,
+    key_cond: Callable[[Any], bool] = lambda _: True,
+    node_cond_before: Callable[[Node], bool] = lambda _: True,
+    node_cond_after: Callable[[Node], bool] = lambda _: True,
+    leaf_cond_before: Callable[[Node], bool] = lambda _: True,
+    leaf_cond_after: Callable[[Node], bool] = lambda _: True,
 ) -> dict[Any, Any]:
     """Apply functions and conditions recursively to nodes and leaves of a mapping."""
-    filtered = dict(deepcopy(mapping))
+    # ? `deepcopy` is wasteful and has side-effects on some leaves (e.g. SymPy exprs)
+    # ? Instead, `copy` mappings on entry and `copy` leaves before applying `leaf_fun`
+    filtered = dict(copy(mapping))
     marks: list[Any] = []
     for k, v in filtered.items():
+        if not key_cond(k):
+            continue
         if isinstance(v, Mapping):
+            if not node_cond_before(v):
+                continue
             filtered[k] = node_fun(
-                apply(filtered[k], node_fun, leaf_fun, node_cond, leaf_cond)
+                apply(
+                    mapping=filtered[k],
+                    node_fun=node_fun,
+                    leaf_fun=leaf_fun,
+                    key_cond=key_cond,
+                    node_cond_before=node_cond_before,
+                    node_cond_after=node_cond_after,
+                    leaf_cond_before=leaf_cond_before,
+                    leaf_cond_after=leaf_cond_after,
+                )
             )
-            if not node_cond(filtered[k]):
+            if not node_cond_after(filtered[k]):
                 marks.append(k)
             continue
-        filtered[k] = leaf_fun(filtered[k])
-        if not leaf_cond(filtered[k]):
+        if not leaf_cond_before(v):
+            continue
+        filtered[k] = leaf_fun(copy(filtered[k]))
+        if not leaf_cond_after(filtered[k]):
             marks.append(k)
     for mark in marks:
         del filtered[mark]
     return filtered
 
 
+def is_truthy(v: Any) -> bool:
+    """Check if a value is truthy, handling array types."""
+    return v.any() if getattr(v, "any", None) else bool(v)
+
+
 def filt(
     mapping: Mapping[Any, Any],
-    node_cond: Callable[[Node], bool] = bool,
-    leaf_cond: Callable[[Node], bool] = bool,
+    node_cond: Callable[[Node], bool] = is_truthy,
+    leaf_cond: Callable[[Node], bool] = is_truthy,
 ) -> dict[Any, Any]:
     """Filter nodes and leaves of a mapping recursively."""
-    return apply(mapping, node_cond=node_cond, leaf_cond=leaf_cond)
+    return apply(mapping, node_cond_after=node_cond, leaf_cond_after=leaf_cond)
 
 
 def sort_by_keys_pattern(
@@ -89,14 +114,16 @@ def replace_pattern(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
 
 def sync(reference: Node | Leaf, target: MN | Leaf) -> MN:
     """Sync two mappings."""
-    synced = deepcopy(target)
+    # ? `deepcopy` is wasteful and has side-effects on some leaves (e.g. SymPy exprs)
+    # ? Instead, `copy` target on entry
+    synced = copy(target)
     for key in [k for k in synced if k not in reference]:
         del synced[key]
     for key in reference:
         if key in synced:
             if reference[key] == synced[key]:
                 continue
-            if isinstance(reference[key], dict) and isinstance(
+            if isinstance(reference[key], Mapping) and isinstance(
                 synced[key], MutableMapping
             ):
                 synced[key] = sync(reference[key], synced[key])

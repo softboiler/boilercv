@@ -8,11 +8,13 @@ from boilercv import correlations
 from boilercv.correlations.beta.types import SolveSym
 from boilercv.correlations.models import Correlation, Expectations, SymbolicCorrelation
 from boilercv.correlations.types import Equation, Sym
+from boilercv.morphs.contexts import get_pipemodel_context
 
 PNGS = Path("data/png_equations_beta")
 """Equation PNGs."""
 
 _base = Path(__file__).with_suffix(".toml")
+
 
 EQUATIONS_TOML = _base.with_stem("equations")
 """TOML file with equations."""
@@ -20,7 +22,7 @@ EXPECTATIONS_TOML = _base.with_stem("expectations")
 """TOML file with expectations."""
 SOLUTIONS_TOML = _base.with_stem("solutions")
 """TOML file with solutions."""
-SYMBOL_EXPECTATIONS = Expectations[Sym].context_model_validate(
+SYMBOL_EXPECTATIONS = Expectations[Sym].model_validate(
     obj={
         "Nu_c": 1.0,
         "Fo_0": linspace(start=0.0, stop=5.0e-3, num=10),
@@ -33,7 +35,7 @@ SYMBOL_EXPECTATIONS = Expectations[Sym].context_model_validate(
         "alpha": 1.0,
         "pi": pi,
     },
-    context=Expectations[Sym].get_context(),
+    context=get_pipemodel_context(Expectations[Sym].get_context()),
 )
 """Common keyword arguments applied to correlations.
 

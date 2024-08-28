@@ -67,6 +67,7 @@ ignore_undeclared = ["_typeshed"]
 ignore_unused = ["netcdf4"]
 [tool.fawltydeps.custom_mapping]
 boilercore = ["boilercore"]
+pydantic = ["pydantic", "pydantic_core"]
 
 [tool.pytest.ini_options]
 addopts = """
@@ -76,7 +77,7 @@ addopts = """
     --color=yes
     -p no:legacypaths
     -r a
-    -n auto
+    -n 0
     --dist=loadfile
     --plots=tests/plots
 """ # ? `-n 0` because test suite is currently faster in series

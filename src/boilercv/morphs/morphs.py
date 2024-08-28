@@ -8,7 +8,7 @@ from typing import Any, Generic, Self, TypeVar, get_args, get_type_hints, overlo
 
 from pydantic import ValidationError, model_validator
 
-from boilercv.context import ContextMapping
+from boilercv.context import RootMapping
 from boilercv.morphs.types import (
     RK,
     RV,
@@ -31,7 +31,7 @@ TRUNC = 200
 """Truncate representations beyond this length."""
 
 
-class Morph(ContextMapping[K, V], Generic[K, V]):
+class Morph(RootMapping[K, V], Generic[K, V]):
     """Type-checked, generic, morphable mapping."""
 
     def __repr__(self):
@@ -171,10 +171,13 @@ class Morph(ContextMapping[K, V], Generic[K, V]):
             with suppress(TypeError):
                 if issubclass(hint, Morph):
                     out_k, out_v = hint.morph_get_inner_types()
-        copy = self.model_validate(obj=self.model_dump(), context=context)
+        copy = self.model_validate(
+            obj=self.model_dump(context=context),  # pyright: ignore[reportArgumentType]
+            context=context,
+        )
         result = f(copy, *args, **kwds)
         result = (
-            result.model_dump(warnings="none")
+            result.model_dump(warnings="none", context=context)  # pyright: ignore[reportArgumentType]
             if isinstance(result, HasModelDump)
             else result
         )

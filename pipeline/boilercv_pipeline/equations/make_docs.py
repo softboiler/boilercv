@@ -13,6 +13,7 @@ from watchfiles import awatch
 from boilercv.correlations import GROUPS, META_TOML, RANGES_TOML, get_equations
 from boilercv.correlations.models import Equations, Metadata
 from boilercv.correlations.types import Corr, Equation, Range
+from boilercv.morphs.contexts import get_pipemodel_context
 from boilercv_pipeline.equations import EQUATIONS, SYMS, get_raw_equations_context
 
 logger.remove()
@@ -69,9 +70,9 @@ def make_docs():
     """Generate equation documentation."""
     all_eqs = {corr: get_raw_equations(corr) for corr in get_args(Corr)}
     ranges = {name: r.latex for name, r in get_equations(RANGES_TOML).items()}
-    meta = Metadata.context_model_validate(
+    meta = Metadata.model_validate(
         obj=loads(META_TOML.read_text("utf-8") if META_TOML.exists() else ""),
-        context=Metadata.get_context(),
+        context=get_pipemodel_context(Metadata.get_context()),
     )
     header = "# Correlation equations\n"
     groups = ""
@@ -109,7 +110,7 @@ def get_raw_equations(corr: Corr | Range) -> dict[Equation, str]:
     """Get equations."""
     equations = (
         Equations[str]
-        .context_model_validate(
+        .model_validate(
             obj=loads(
                 EQUATIONS[corr].read_text("utf-8") if EQUATIONS[corr].exists() else ""
             ),

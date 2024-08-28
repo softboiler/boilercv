@@ -1,10 +1,12 @@
 """Types."""
 
-from typing import Any, Generic, Protocol, TypeVar
+from typing import Any, Generic, Literal, Protocol, TypeAlias, TypeVar
 
 import pydantic
 from pydantic import BaseModel, ConfigDict
 from typing_extensions import TypedDict
+
+Mode: TypeAlias = Literal["python", "json", "strings"]
 
 K = TypeVar("K")
 """Key type."""

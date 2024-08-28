@@ -20,7 +20,7 @@ from boilercv.correlations.models import (
 from boilercv.correlations.nusselt.types import SolveSym as SolveSymNusselt
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, Kind, Range, Sym
-from boilercv.morphs.contexts import Context, Pipe, make_pipelines
+from boilercv.morphs.contexts import Pipe, PipemodelCtx, make_pipelines
 from boilercv.morphs.morphs import Morph
 
 SYMS = tuple(SYMBOLS.keys())
@@ -80,7 +80,7 @@ def make_raw(content: str):
     return content
 
 
-def get_raw_equations_context(symbols: Iterable[str]) -> Context:
+def get_raw_equations_context(symbols: Iterable[str]) -> PipemodelCtx:
     """Get raw equations."""
     forms_context = Forms.get_context()
     forms_context.pipelines[Forms].before = (forms_context.pipelines[Forms].before[0],)
@@ -93,7 +93,7 @@ def sanitize_forms(
     sanitizer: Callable[[dict[Kind, str], tuple[str, ...]], Morph[Kind, str]],
 ) -> EquationForms[str]:
     """Sanitize forms."""
-    return EquationForms[str].context_model_validate(
+    return EquationForms[str].model_validate(
         obj=forms.model_dump(),
         context=EquationForms[str].get_context(
             symbols=symbols,

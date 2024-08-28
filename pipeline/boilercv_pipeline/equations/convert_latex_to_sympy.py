@@ -46,8 +46,8 @@ def default(corr: Corr | Range = "beta", overwrite: bool = False):  # noqa: D103
     context = get_raw_equations_context(symbols=SYMS)
     equations = (
         Equations[str]
-        .context_model_validate(obj=loads(content), context=context)
-        .morph_cpipe(parse_equations, context, symbols=SYMS, overwrite=overwrite)
+        .model_validate(obj=loads(content), context=context)
+        .morph_pipe(parse_equations, context, symbols=SYMS, overwrite=overwrite)
     )
     equations_path.write_text(
         encoding="utf-8",

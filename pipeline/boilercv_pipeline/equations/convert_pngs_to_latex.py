@@ -47,7 +47,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     content = equations_path.read_text("utf-8") if equations_path.exists() else ""
     equations = (
         Equations[str]
-        .context_model_validate(
+        .model_validate(
             obj=loads(content), context=get_raw_equations_context(symbols=SYMS)
         )
         .morph_pipe(parse_equations, pngs=PNGS[corr], overwrite=overwrite, symbols=SYMS)

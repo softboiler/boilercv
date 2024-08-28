@@ -17,7 +17,7 @@ from boilercv.correlations.models import Solutions, SolvedEquations, SymbolSolut
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, trivial
 from boilercv.mappings import filt, sync
-from boilercv.morphs.contexts import Context
+from boilercv.morphs.contexts import PipemodelCtxDict, get_pipemodel_context
 from boilercv.morphs.morphs import Morph
 from boilercv_pipeline.equations import EQUATIONS, SOLUTIONS, SOLVE_SYMS, SUBSTITUTIONS
 
@@ -45,8 +45,10 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
     solns_content = solutions.read_text("utf-8") if solutions.exists() else ""
     symbols = tuple(dict(substitutions).keys())
 
-    context = SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_syms)
-    model = SolvedEquations[str].context_model_validate(
+    context = get_pipemodel_context(
+        SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_syms)
+    )
+    model = SolvedEquations[str].model_validate(
         dict(equations=eqns_content, solutions=loads(solns_content)), context=context
     )
 
@@ -55,7 +57,7 @@ def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
         encoding="utf-8",
         data=(
             sync(
-                reference=model.solutions.morph_cpipe(
+                reference=model.solutions.morph_pipe(
                     solve_equations,
                     context,
                     equations={
@@ -82,14 +84,14 @@ def solve_equations(
     solve_syms: tuple[str, ...],
     overwrite: bool,
     symbols: LocalSymbols,
-    context: Context,
+    context: PipemodelCtxDict,
 ) -> Morph[Equation, SymbolSolutions[str]]:
     """Solve equations."""
     for name, eq in tqdm(equations.items()):
         filtered_solutions = filt(solutions[name].model_dump())
         if eq == trivial or (not overwrite and filtered_solutions):
             continue
-        solutions[name] = solutions[name].morph_cpipe(
+        solutions[name] = solutions[name].morph_pipe(
             solve_equation,
             context,
             equation=eq,

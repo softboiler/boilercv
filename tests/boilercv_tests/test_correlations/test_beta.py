@@ -51,6 +51,7 @@ def test_correlations(corr, expected):
 )
 def test_correlation_ranges(range_):
     """Symbolic ranges evaluate as expected."""
+    # sourcery skip: no-conditionals-in-tests
     if not range_:
         return
     assert isinstance(

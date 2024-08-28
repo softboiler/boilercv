@@ -15,7 +15,7 @@ def main():  # noqa: D103
     META_TOML.write_text(
         encoding="utf-8",
         data=sync(
-            reference=Metadata.context_model_validate(
+            reference=Metadata.model_validate(
                 obj=parse(META_TOML.read_text("utf-8") if META_TOML.exists() else ""),
                 context=Metadata.get_context(),
             ).model_dump(mode="json"),

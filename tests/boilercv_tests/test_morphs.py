@@ -20,7 +20,7 @@ V = TypeVar("V")
 # fmt: off
 
 # * MARK: Constants
-Fruit: TypeAlias = Literal["apple", "banana", "cherry", "_context"]
+Fruit: TypeAlias = Literal["apple", "banana", "cherry"]
 ANY_MAP: dict[Any, Any] = {"any": "map"}
 FRUIT: list[Fruit] = ["apple", "banana", "cherry"]
 Str: TypeAlias = str | Context

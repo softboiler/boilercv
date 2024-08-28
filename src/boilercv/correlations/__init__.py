@@ -16,6 +16,7 @@ from boilercv.correlations.models import (
     SymbolicCorrelation,
 )
 from boilercv.correlations.types import AnyExpr, Equation, Sym, trivial_expr
+from boilercv.morphs.contexts import get_pipemodel_context
 from boilercv.morphs.types import LiteralGenericAlias
 
 _base = Path(__file__).with_suffix(".toml")
@@ -81,9 +82,11 @@ GROUPS = {
 
 def get_equations(path: Path) -> Equations[AnyExpr]:
     """Get equations."""
-    return Equations[AnyExpr].context_model_validate(
-        obj=loads(path.read_text("utf-8") if path.exists() else ""),
-        context=Equations[AnyExpr].get_context(symbols=get_args(Sym)),
+    return Equations[AnyExpr].model_validate(
+        obj=loads(path.read_text(encoding="utf-8") if path.exists() else "{}"),
+        context=get_pipemodel_context(
+            Equations[AnyExpr].get_context(symbols=get_args(Sym))
+        ),
     )
 
 
@@ -91,9 +94,6 @@ def get_equations_and_solutions(
     equations: Path, solutions: Path, solve_sym: LiteralGenericAlias
 ) -> dict[Equation, SymbolicCorrelation]:
     """Get correlation equations and their solutions."""
-    context = SolvedEquations[str].get_context(
-        symbols=get_args(Sym), solve_syms=get_args(solve_sym)
-    )
     ranges = get_equations(RANGES_TOML)
     return {
         name: SymbolicCorrelation(
@@ -105,7 +105,7 @@ def get_equations_and_solutions(
         )
         for name, soln in (
             SolvedEquations[solve_sym]
-            .context_model_validate(
+            .model_validate(
                 dict(
                     equations=loads(
                         equations.read_text("utf-8") if equations.exists() else ""
@@ -114,7 +114,11 @@ def get_equations_and_solutions(
                         solutions.read_text("utf-8") if solutions.exists() else ""
                     ),
                 ),
-                context=context,
+                context=get_pipemodel_context(
+                    SolvedEquations[solve_sym].get_context(
+                        symbols=get_args(Sym), solve_syms=get_args(solve_sym)
+                    )
+                ),
             )
             .solutions
         ).items()

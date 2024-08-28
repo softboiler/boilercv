@@ -18,7 +18,7 @@ def main():  # noqa: D103
         data=make_raw(
             sync(
                 reference=Equations[str]
-                .context_model_validate(
+                .model_validate(
                     obj=(
                         content := parse(
                             RANGES_TOML.read_text("utf-8")
