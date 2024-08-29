@@ -93,7 +93,7 @@ class SyncDVC:
             find_contours: FindContours = Field(default_factory=FindContours)
             fill: Fill = Field(default_factory=Fill)
             preview_filled: PreviewFilled = Field(default_factory=PreviewFilled)
-            e230920_update_thermal_data: E230920GetThermalData = Field(
+            e230920_get_thermal_data: E230920GetThermalData = Field(
                 default_factory=E230920GetThermalData
             )
             e230920_find_contours: E230920FindObjects = Field(

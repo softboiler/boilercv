@@ -1,0 +1,6 @@
+outs:
+- md5: f7658d9357316cceb9527780074bbf54.dir
+  size: 3631617
+  nfiles: 32
+  hash: md5
+  path: thermal

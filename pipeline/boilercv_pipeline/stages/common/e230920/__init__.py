@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
 from re import search
-from typing import Any, TypedDict
+from typing import Any, Generic, TypedDict
 
 from boilercore.notebooks.namespaces import get_nb_ns
 from boilercore.paths import ISOLIKE, dt_fromisolike
@@ -23,8 +23,43 @@ from sparklines import sparklines
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, Img
+from boilercv_pipeline.models import stages
+from boilercv_pipeline.models.paths.types import Deps_T, Outs_T
 from boilercv_pipeline.models.stages import AnyParams
-from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, Model
+from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, Model, Nb_T
+
+
+class Constants(BaseModel):
+    day: str = "2024-07-18"
+    time: str = "17-44-35"
+
+    @property
+    def sample(self) -> str:
+        """Sample to process."""
+        return f"{self.day}T{self.time}"
+
+    @property
+    def include_patterns(self) -> list[str]:
+        """Include patterns."""
+        return [rf"^{self.day}.+$"]
+
+
+const = Constants()
+
+
+class Params(stages.Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T, Nb_T]):
+    """Stage parameters for `e230920`."""
+
+    deps: Deps_T
+    """Stage dependencies."""
+    outs: Outs_T
+    """Stage outputs."""
+    nb: Nb_T
+    """Notebook-only params."""
+    sample: str = const.sample
+    """Sample to process."""
+    include_patterns: list[str] = const.include_patterns
+    """Include patterns."""
 
 
 def get_times(directory: Path, pattern: str) -> list[str]:

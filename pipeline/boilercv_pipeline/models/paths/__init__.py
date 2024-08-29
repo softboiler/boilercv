@@ -57,6 +57,7 @@ class Paths(BoilercvPipelineCtxModel):
     rois: DataDir = Path("rois")
     samples: DataDir = Path("samples")
     sources: DataDir = Path("sources")
+    thermal: DataDir = Path("thermal")
     e230920: DataDir = Path("e230920")
     e230920_thermal_raw: DataFile = e230920 / Path("thermal_raw.csv")
 
