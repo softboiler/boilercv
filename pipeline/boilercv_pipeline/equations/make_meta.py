@@ -6,6 +6,7 @@ from tomlkit import TOMLDocument, parse
 from boilercv.correlations import META_TOML
 from boilercv.correlations.models import Metadata
 from boilercv.mappings import sync
+from boilercv.morphs.pipelines import get_pipeline_context
 
 APP = App()
 """CLI."""
@@ -17,7 +18,7 @@ def main():  # noqa: D103
         data=sync(
             reference=Metadata.model_validate(
                 obj=parse(META_TOML.read_text("utf-8") if META_TOML.exists() else ""),
-                context=Metadata.get_context(),
+                context=get_pipeline_context(Metadata.get_context()),
             ).model_dump(mode="json"),
             target=TOMLDocument(),
         ).as_string(),

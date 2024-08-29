@@ -21,7 +21,12 @@ from boilercv.correlations.nusselt.types import SolveSym as SolveSymNusselt
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, Kind, Range, Sym
 from boilercv.morphs.morphs import Morph
-from boilercv.morphs.pipelines import Pipe, PipelineCtx, make_pipelines
+from boilercv.morphs.pipelines import (
+    Pipe,
+    PipelineCtxDict,
+    get_pipeline_context,
+    make_pipelines,
+)
 
 SYMS = tuple(SYMBOLS.keys())
 PIPX = Path(executable).parent / "pipx"
@@ -80,11 +85,13 @@ def make_raw(content: str):
     return content
 
 
-def get_raw_equations_context(symbols: Iterable[str]) -> PipelineCtx:
+def get_raw_equations_context(symbols: Iterable[str]) -> PipelineCtxDict:
     """Get raw equations."""
     forms_context = Forms.get_context()
     forms_context.pipelines[Forms].before = (forms_context.pipelines[Forms].before[0],)
-    return Equations[str].get_context(symbols=symbols, forms_context=forms_context)
+    return get_pipeline_context(
+        Equations[str].get_context(symbols=symbols, forms_context=forms_context)
+    )
 
 
 def sanitize_forms(
@@ -95,14 +102,16 @@ def sanitize_forms(
     """Sanitize forms."""
     return EquationForms[str].model_validate(
         obj=forms.model_dump(),
-        context=EquationForms[str].get_context(
-            symbols=symbols,
-            forms_context=make_pipelines(
-                Forms,
-                before=[
-                    Forms.get_context().pipelines[Forms].before[0],
-                    Pipe(sanitizer, LocalSymbols.from_iterable(symbols)),
-                ],
-            ),
+        context=get_pipeline_context(
+            EquationForms[str].get_context(
+                symbols=symbols,
+                forms_context=make_pipelines(
+                    Forms,
+                    before=[
+                        Forms.get_context().pipelines[Forms].before[0],
+                        Pipe(sanitizer, LocalSymbols.from_iterable(symbols)),
+                    ],
+                ),
+            )
         ),
     )

@@ -217,7 +217,6 @@ class ContextBase(BaseModel):
             strict=strict, from_attributes=from_attributes, context=context, mode=mode
         )
         match kwds.mode:
-            # TODO: Make `ContextBase` "json" mode go through `python` so we can propagate context
             case "json":
                 return cls.__pydantic_validator__.validate_json(
                     (obj or '""') if cls.__pydantic_root_model__ else (obj or "{}"),
@@ -228,8 +227,6 @@ class ContextBase(BaseModel):
                 return cls.__pydantic_validator__.validate_strings(
                     obj, strict=kwds.strict, context=kwds.context
                 )
-            case "python" if isinstance(obj, BaseModel):
-                return obj
             case "python":
                 return (
                     cls(root=obj, **{_KWDS: kwds})
@@ -407,6 +404,23 @@ class RootMapping(  # noqa: PLW1641
     """Mapping root model with context."""
 
     root: MutableMapping[K, V] = Field(default_factory=dict)
+
+    @classmethod
+    def from_mapping(
+        cls,
+        obj: Any,
+        *,
+        strict: bool | None = None,
+        from_attributes: bool | None = None,
+        context: Any | None = None,
+    ) -> Self:
+        """Create `RootMapping` from any mapping, mutable or not."""
+        return cls.model_validate(
+            obj=dict(obj),
+            strict=strict,
+            from_attributes=from_attributes,
+            context=context,
+        )
 
     def __eq__(self, other: object) -> bool:
         return self.root == (other.root if isinstance(other, RootMapping) else other)
@@ -597,12 +611,20 @@ class ContextModel(ContextBase):
         context: Any | None = None,
     ) -> Self:
         """Contextualizable model validate."""
+        if isinstance(obj, BaseModel):
+            obj = obj.model_dump(context=context)
+            return super().model_validate(
+                obj={**obj, CONTEXT: cls.context_validate_pre_init(obj, context)},
+                strict=strict,
+                from_attributes=from_attributes,
+                context=context,
+            )
         return super().model_validate(
             obj={
                 **(
                     obj := (
                         obj.model_dump(context=cls.context_get(obj))
-                        if isinstance(obj, BaseModel)
+                        if isinstance(obj, ContextModel)
                         else obj
                     )
                 ),

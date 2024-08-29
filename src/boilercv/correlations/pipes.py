@@ -23,11 +23,12 @@ from boilercv.morphs.pipelines import (
 
 
 def fold_whitespace(
-    forms: dict[Kind, str], defaults: Defaults[Kind, str]
+    forms: Mapping[Kind, str], defaults: Defaults[Kind, str]
 ) -> Morph[Kind, str]:
     """Fold whitespace."""
     return (
-        Morph[Kind, str](forms)
+        Morph[Kind, str]
+        .from_mapping(forms)
         .morph_pipe(
             replace,
             repls=(
@@ -62,8 +63,9 @@ class LocalSymbols(UserDict[str, Symbol], ContextValue):
         )
 
 
-def set_latex_forms(forms: Morph[Kind, str]) -> Morph[Kind, str]:
+def set_latex_forms(forms: Mapping[Kind, str]) -> Morph[Kind, str]:
     """Set forms for parameters."""
+    forms = Morph[Kind, str].from_mapping(forms)
     if forms["sympy"] and not forms["latex"]:
         forms["latex"] = forms["sympy"]
     forms = forms.morph_pipe(

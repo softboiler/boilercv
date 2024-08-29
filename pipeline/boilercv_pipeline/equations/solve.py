@@ -33,18 +33,16 @@ def main():  # noqa: D103
 
 @APP.default
 def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
+    logger.info("Start generating symbolic equations.")
     equations = EQUATIONS[corr]
     solutions = SOLUTIONS[corr]
     substitutions = SUBSTITUTIONS[corr]
     solve_syms = SOLVE_SYMS[corr]
 
-    logger.info("Start generating symbolic equations.")
-
     # ? Produce equations and solutions model
     eqns_content = loads(equations.read_text("utf-8") if equations.exists() else "")
     solns_content = solutions.read_text("utf-8") if solutions.exists() else ""
     symbols = tuple(dict(substitutions).keys())
-
     context = get_pipeline_context(
         SolvedEquations[str].get_context(symbols=symbols, solve_syms=solve_syms)
     )

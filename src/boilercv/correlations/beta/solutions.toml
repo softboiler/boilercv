@@ -53,7 +53,7 @@ solutions = ["1 - 2.92*Fo_0*Ja**0.69*Pr**0.33*Re_b0**0.61"]
 warnings = []
 
 [kim_park_2011.beta]
-solutions = ["(1 - 0.67*Fo_0*Ja**0.7959*Re_b0**0.7/Pr**0.4564)**0.769"]
+solutions = ["(1 - 0.67*Fo_0*Ja**0.7959*Re_b0**0.7/(Pr**0.4564))**0.769"]
 warnings = []
 
 # [inaba_et_al_2013.beta]

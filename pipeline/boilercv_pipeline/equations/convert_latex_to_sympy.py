@@ -137,7 +137,7 @@ def sanitize_and_fold(
     return (
         Morph[Kind, str](forms)
         .morph_pipe(sanitize, symbols=symbols)
-        .morph_pipe(fold_whitespace, Defaults(keys=get_args(Kind)))
+        .morph_pipe(fold_whitespace, defaults=Defaults(keys=get_args(Kind)))
     )
 
 
@@ -147,7 +147,7 @@ def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, st
         Morph[Kind, str](forms)
         .morph_pipe(
             replace,
-            (
+            repls=(
                 Repl[Kind](src="sympy", dst="sympy", find=find, repl=repl)
                 for find, repl in {
                     "{b}": "b",
@@ -160,7 +160,7 @@ def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, st
         )
         .morph_pipe(
             replace_pattern,
-            tuple(
+            repls=tuple(
                 Repl[Kind](src="sympy", dst="sympy", find=f, repl=r)
                 for f, r in {
                     # ? Unwrapped negative.

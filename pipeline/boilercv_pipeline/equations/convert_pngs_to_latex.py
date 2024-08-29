@@ -105,7 +105,7 @@ def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, st
         Morph[Kind, str](forms)
         .morph_pipe(
             replace,
-            (
+            repls=(
                 Repl[Kind](src="latex", dst="latex", find=find, repl=repl)
                 for find, repl in {
                     **{" ".join(s): s for s in syms_no_script},
@@ -124,7 +124,7 @@ def sanitize(forms: dict[Kind, str], symbols: tuple[str, ...]) -> Morph[Kind, st
                 }.items()
             ),
         )
-        .morph_pipe(fold_whitespace, Defaults(keys=get_args(Kind)))
+        .morph_pipe(fold_whitespace, defaults=Defaults(keys=get_args(Kind)))
     )
 
 

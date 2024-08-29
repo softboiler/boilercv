@@ -69,7 +69,8 @@ def filt(
 
 
 def sort_by_keys_pattern(
-    i: Mapping[SK, V],
+    mapping: Mapping[SK, V],
+    /,
     pattern: Pattern[str],
     groups: Iterable[str],
     apply_to_match: Callable[[list[str]], Any] = str,
@@ -82,7 +83,7 @@ def sort_by_keys_pattern(
             return apply_to_match([match[g] for g in groups])
         raise ValueError(message.format(key=key))
 
-    return dict(sorted(i.items(), key=get_key))
+    return dict(sorted(mapping.items(), key=get_key))
 
 
 class Repl(NamedTuple, Generic[T]):
@@ -98,18 +99,22 @@ class Repl(NamedTuple, Generic[T]):
     """Replacement for what was found."""
 
 
-def replace(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
+def replace(
+    mapping: MutableMapping[K, str], /, repls: Iterable[Repl[K]]
+) -> dict[K, str]:
     """Make replacements from `Repl`s."""
     for r in repls:
-        i[r.dst] = i[r.src].replace(r.find, r.repl)
-    return dict(i)
+        mapping[r.dst] = mapping[r.src].replace(r.find, r.repl)
+    return dict(mapping)
 
 
-def replace_pattern(i: dict[K, str], repls: Iterable[Repl[K]]) -> dict[K, str]:
+def replace_pattern(
+    mapping: MutableMapping[K, str], /, repls: Iterable[Repl[K]]
+) -> dict[K, str]:
     """Make regex replacements."""
     for r in repls:
-        i[r.dst] = sub(r.find, r.repl, i[r.src])
-    return i
+        mapping[r.dst] = sub(r.find, r.repl, mapping[r.src])
+    return dict(mapping)
 
 
 def sync(reference: Node | Leaf, target: MN | Leaf) -> MN:
