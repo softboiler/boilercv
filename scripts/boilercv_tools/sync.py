@@ -16,7 +16,7 @@ from boilercv_tools.environment import escape
 from boilercv_tools.types import Dep, PythonVersion, SubmoduleInfoKind, ops
 
 if version_info >= (3, 11):  # noqa: UP036, RUF100
-    from datetime import UTC
+    from datetime import UTC  # pyright: ignore[reportAttributeAccessIssue]
 else:
     from datetime import timezone
 

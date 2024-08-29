@@ -6,7 +6,6 @@ from pathlib import Path
 from re import finditer, sub
 from shlex import join, split
 from sys import version_info
-from tomllib import loads
 
 from cyclopts import App
 
@@ -16,7 +15,7 @@ from boilercv_tools.sync import check_compilation
 from boilercv_tools.types import ChangeType
 
 if version_info >= (3, 11):  # noqa: UP036, RUF100
-    from tomllib import loads
+    from tomllib import loads  # pyright: ignore[reportMissingImports]
 else:
     from toml import loads  # pyright: ignore[reportMissingModuleSource]
 
