@@ -22,7 +22,7 @@ jobs:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
-      - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
+      - uses: "actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d" # v5.1.0
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1"
@@ -44,7 +44,7 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
+      - uses: "actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d" # v5.1.0
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1"
@@ -64,7 +64,7 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
+      - uses: "actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d" # v5.1.0
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1"
@@ -83,7 +83,7 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
+      - uses: "actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d" # v5.1.0
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1"
@@ -107,7 +107,7 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
+      - uses: "actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d" # v5.1.0
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1"
@@ -127,17 +127,13 @@ jobs:
           - "3.12"
     runs-on: "${{ matrix.runner }}"
     steps:
-      # ! https://askubuntu.com/questions/900285/libegl-so-1-is-not-a-symbolic-link
-      - if: startsWith(matrix.runner, 'ubuntu')
-        name: "Install PySide6 system dependencies"
-        run: "sudo apt update && sudo apt install libegl1-mesa-dev"
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
+      - uses: "actions/setup-python@82c7e631bb3cdc910f68e0081d67478d79c6982d" # v5.1.0
         with:
           python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Py.ps1 -Version '${{ matrix.python }}'"
@@ -161,7 +157,7 @@ jobs:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
-      - uses: "actions/download-artifact@65a9edc5881444af0b9093a5e628f2fe47ea3b2e" # v4.1.7
+      - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
       - uses: "stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842" # v5.0.1
