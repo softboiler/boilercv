@@ -54,19 +54,25 @@ class Paths(BoilercvPipelineCtxModel):
         stage_name: Path("notebooks") / f"{stage_name}.ipynb"
         for stage_name in get_args(StageName)
     }
-    rois: DataDir = Path("rois")
     samples: DataDir = Path("samples")
     sources: DataDir = Path("sources")
     thermal: DataDir = Path("thermal")
-    e230920: DataDir = Path("e230920")
 
     # * DVC-tracked results
+    rois: DataDir = Path("rois")
     contours: DataDir = Path("contours")
     examples: DataDir = Path("examples")
     filled: DataDir = Path("filled")
     lifetimes: DataDir = Path("lifetimes")
+
+    e230920: DataDir = Path("e230920")
+
     e230920_thermal: DataFile = e230920 / Path("thermal.h5")
+    e230920_thermal_plots: DataDir = e230920 / Path("plots_thermal")
+
     e230920_objects: DataDir = e230920 / Path("objects")
+    e230920_objects_plots: DataDir = e230920 / Path("plots_objects")
+
     e230920_tracks: DataDir = e230920 / Path("tracks")
     e230920_processed_tracks: DataDir = e230920 / Path("processed_tracks")
     e230920_merged_tracks: DataFile = e230920 / Path("merged_tracks.h5")

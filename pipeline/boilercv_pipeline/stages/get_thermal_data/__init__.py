@@ -32,7 +32,8 @@ class Deps(StagePaths):
 
 
 class Outs(StagePaths):
-    dfs: DataFile = paths.e230920_thermal
+    df: DataFile = paths.e230920_thermal
+    plots: DataDir = paths.e230920_thermal_plots
 
 
 @command(

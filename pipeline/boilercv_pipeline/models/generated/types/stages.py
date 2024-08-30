@@ -5,7 +5,6 @@ from typing import Literal, TypeAlias
 StageName: TypeAlias = Literal[
     "binarize",
     "convert",
-    "e230920_find_objects",
     "e230920_find_tracks",
     "e230920_get_mae",
     "e230920_merge_mae",
@@ -14,6 +13,7 @@ StageName: TypeAlias = Literal[
     "e230920_process_tracks",
     "fill",
     "find_contours",
+    "find_objects",
     "get_thermal_data",
     "preview_binarized",
     "preview_filled",

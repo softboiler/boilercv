@@ -17,7 +17,7 @@ from boilercv_pipeline.models.types.runtime import (
 )
 from boilercv_pipeline.stages.common.e230920 import Params, const
 
-SLICER_PATTERNS = {r".+": {FRAME: first_slicer(n=3, step=10)}}
+SLICER_PATTERNS = {r".+": {FRAME: first_slicer(n=10, step=100)}}
 """Slicer patterns."""
 
 
@@ -30,6 +30,7 @@ class Deps(StagePaths):
 
 class Outs(StagePaths):
     dfs: DataDir = paths.e230920_objects
+    plots: DataDir = paths.e230920_objects_plots
 
 
 class Nb(BaseModel):
@@ -39,10 +40,9 @@ class Nb(BaseModel):
 
 
 @command(
-    invoke="boilercv_pipeline.stages.e230920_find_objects.__main__.main",
-    default_long=True,
+    invoke="boilercv_pipeline.stages.find_objects.__main__.main", default_long=True
 )
-class E230920FindObjects(Params[Deps, Outs, Nb]):
+class FindObjects(Params[Deps, Outs, Nb]):
     """Find objects."""
 
     deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
@@ -53,7 +53,7 @@ class E230920FindObjects(Params[Deps, Outs, Nb]):
     """Notebook-only params."""
     slicer_patterns: dict[str, Slicers] = SLICER_PATTERNS
     """Slicer patterns."""
-    compare_with_trackpy: bool = False
+    compare_with_trackpy: bool = True
     """Whether to get objects using the Trackpy approach."""
     guess_diameter: int = 21
     """Guess diameter for the Trackpy approach. (px)"""
@@ -63,20 +63,19 @@ class E230920FindObjects(Params[Deps, Outs, Nb]):
     """Data to store."""
 
 
-def get_nb(deps: Deps, sample: str = const.sample) -> Nb:
+def get_nb(deps: Deps) -> Nb:
     all_contours = DirSlicer(
-        path=deps.contours, include_patterns=const.include_patterns
+        path=deps.contours, include_patterns=const.single_sample_include_pattern
     )
     all_filled = DirSlicer(
         path=deps.filled,
-        include_patterns=const.include_patterns,
+        include_patterns=const.single_sample_include_pattern,
         slicer_patterns=SLICER_PATTERNS,
     )
     for contours, filled in zip(all_contours.paths, all_filled.paths, strict=True):
-        if contours.stem == sample:
-            return Nb(
-                contours=contours,
-                filled=filled,
-                filled_slicers=all_filled.path_slicers[filled],
-            )
+        return Nb(
+            contours=contours,
+            filled=filled,
+            filled_slicers=all_filled.path_slicers[filled],
+        )
     return Nb()

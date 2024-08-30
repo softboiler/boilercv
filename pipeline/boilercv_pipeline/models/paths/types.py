@@ -13,9 +13,7 @@ from boilercv_pipeline.models.types.runtime import (
 class Stage(BoilercvPipelineCtxModel):
     """Base of stage models."""
 
-    model_config = get_boilercv_pipeline_config(
-        ROOTED, kinds_from=paths, track_kinds=True
-    )
+    model_config = get_boilercv_pipeline_config(ROOTED, kinds_from=paths)
 
 
 class StagePaths(Stage):

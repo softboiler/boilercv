@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from functools import cached_property, partial
+from functools import partial
 from pathlib import Path
 from typing import Annotated, ClassVar, TypeAlias
 
@@ -15,7 +15,6 @@ from pydantic import (
     FilePath,
     SerializerFunctionWrapHandler,
     WrapSerializer,
-    computed_field,
 )
 
 from boilercv.contexts import ContextModel
@@ -52,12 +51,8 @@ class BoilercvPipelineCtx(BaseModel):
     """Kind of each path."""
     track_kinds: bool = False
     """Whether to track kinds."""
-
-    @computed_field
-    @cached_property
-    def check_kinds(self) -> bool:
-        """Whether kinds were pre-populated and should be checked against."""
-        return bool(self.kinds)
+    resolve_rooted: bool = True
+    """Whether to resolve rooted paths when serializing."""
 
 
 class BoilercvPipelineCtxDict(Context):
@@ -79,6 +74,7 @@ def get_boilercv_pipeline_context(
     roots: Roots | None = None,
     kinds_from: BoilercvPipelineCtxModel | None = None,
     track_kinds: bool = False,
+    resolve_rooted: bool = True,
 ) -> BoilercvPipelineCtxDict:
     """Context for {mod}`~boilercv_pipeline`."""
     ctx_from: BoilercvPipelineCtxDict = getattr(
@@ -91,6 +87,7 @@ def get_boilercv_pipeline_context(
             roots=roots or Roots(),
             kinds=ctx_from["boilercv_pipeline"].kinds,
             track_kinds=track_kinds,
+            resolve_rooted=resolve_rooted,
         )
     )
 
@@ -99,12 +96,16 @@ def get_boilercv_pipeline_config(
     roots: Roots | None = None,
     kinds_from: BoilercvPipelineCtxModel | None = None,
     track_kinds: bool = False,
+    resolve_rooted: bool = True,
 ) -> BoilercvPipelineConfigDict:
     """Model config for {mod}`~boilercv_pipeline`."""
     return PluginConfigDict(
         plugin_settings=ContextPluginSettings(
             context=get_boilercv_pipeline_context(
-                roots=roots, kinds_from=kinds_from, track_kinds=track_kinds
+                roots=roots,
+                kinds_from=kinds_from,
+                track_kinds=track_kinds,
+                resolve_rooted=resolve_rooted,
             )
         )
     )
@@ -138,13 +139,10 @@ def make_path(
     kind = make_path_args[(key, file)]
     if root:
         path = (root.resolve() / path) if path.is_absolute() else root / path
-    if (
-        ctx.check_kinds
-        and kind not in ctx.kinds[path.relative_to(root) if root else path]
-    ):
-        raise ValueError("Path kind not as expected.")
     if ctx.track_kinds:
         ctx.kinds[path] = kind
+    elif ctx.kinds and kind not in ctx.kinds[path.relative_to(root) if root else path]:
+        raise ValueError("Path kind not as expected.")
     if root:
         (path.parent if file else path).mkdir(exist_ok=True, parents=True)
     return path
@@ -162,9 +160,10 @@ def ser_rooted_path(
     key: Key,
 ) -> str:
     """Serialize paths POSIX-style, resolving if rooted."""
+    ctx = info.context["boilercv_pipeline"]
     return (
         resolve_path(value, nxt)
-        if getattr(info.context["boilercv_pipeline"].roots, key, None)
+        if ctx.resolve_rooted and getattr(ctx.roots, key, None)
         else nxt(Path(value).as_posix())
     )
 

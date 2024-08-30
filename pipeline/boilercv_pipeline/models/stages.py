@@ -15,7 +15,7 @@ from boilercv_pipeline.models.types.runtime import BoilercvPipelineCtxDict
 
 
 def set_display_options(
-    font_scale: float = 1.3, precision: int = 4, display_rows: int = 20
+    font_scale: float = 1.3, precision: int = 4, display_rows: int = 12
 ):
     """Set display options."""
     float_spec = f"#.{precision}g"
@@ -32,6 +32,7 @@ def set_display_options(
         font="sans-serif",
         font_scale=font_scale,
     )
+    matplotlib.rcParams["figure.frameon"]
     matplotlib.rcParams |= {
         # * Figure
         "figure.autolayout": True,
@@ -45,7 +46,7 @@ def set_display_options(
         "savefig.bbox": "tight",
         "savefig.pad_inches": 0.2,
         # ? Both are necessary to enforce a white figure background on save
-        "savefig.transparent": False,
+        "savefig.transparent": True,
         "savefig.facecolor": "white",
         # ? DPI for saving figures only
         "savefig.dpi": 600,

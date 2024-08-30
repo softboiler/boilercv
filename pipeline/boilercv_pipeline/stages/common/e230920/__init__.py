@@ -1,6 +1,6 @@
 """Subcooled bubble collapse experiment."""
 
-from collections.abc import Iterator
+from collections.abc import Callable, Iterable, Iterator
 from concurrent.futures import Future, ProcessPoolExecutor
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -16,6 +16,7 @@ from cmasher import get_sub_cmap
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Colormap, Normalize
+from matplotlib.figure import Figure
 from matplotlib.pyplot import subplots
 from numpy import histogram, sqrt, where
 from pandas import CategoricalDtype, DataFrame, NamedAgg
@@ -197,9 +198,14 @@ class Constants(BaseModel):
         return f"{self.day}T{self.time}"
 
     @property
+    def single_sample_include_pattern(self) -> list[str]:
+        """Include pattern for a single sample."""
+        return [rf"^.*{self.sample}.*$"]
+
+    @property
     def include_patterns(self) -> list[str]:
         """Include patterns."""
-        return [rf"^.+{self.day}.+$"]
+        return [rf"^.*{self.day}.*$"]
 
 
 const = Constants()
@@ -254,14 +260,45 @@ def apply_to_nb(
     )
 
 
+def df_to_compressed_hdf(df: DataFrame, path: Path | str, key: str | None = None):
+    """Save data frame to a compressed HDF5 file."""
+    path = Path(path)
+    df.to_hdf(path, key=key or path.stem, complib="zlib", complevel=9)
+
+
+def callbacks(
+    future: Future[DfNbOuts], /, callbacks: Iterable[Callable[[Future[DfNbOuts]], None]]
+):
+    """Apply a series of done callbacks to the future."""
+    for callback in callbacks:
+        callback(future)
+
+
 def save_df(future: Future[DfNbOuts], dfs: Path, dep: Path):
     """Save a DataFrame to HDF5 format."""
-    future.result().df.to_hdf(
+    df_to_compressed_hdf(
+        future.result().df,
         dfs / f"{dfs.stem}_{time}.h5" if (time := get_time(dep)) else f"{dfs.stem}.h5",
-        key=dfs.stem,
-        complib="zlib",
-        complevel=9,
     )
+
+
+def save_plots(figs: Iterable[Figure], plots: Path):
+    """Save a DataFrame to HDF5 format."""
+    for i, fig in enumerate(figs):
+        fig.savefig(
+            plots / f"{plots.stem}_{i}.png"  # pyright: ignore[reportArgumentType]
+        )
+
+
+def save_future_plots(future: Future[DfNbOuts], plots: Path, dep: Path):
+    """Save a DataFrame to HDF5 format."""
+    figs = future.result().plots
+    for i, fig in enumerate(figs):
+        fig.savefig(
+            plots / f"{plots.stem}_{time}_{i}.png"  # pyright: ignore[reportArgumentType]
+            if (time := get_time(dep))
+            else f"{plots.stem}_{i}.png"
+        )
 
 
 def get_path_time(time: str) -> str:

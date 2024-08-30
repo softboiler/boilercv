@@ -72,15 +72,15 @@ stages:
       - data/models
     outs:
       - data/e230920/thermal.h5: *id002
-  # e230920_find_objects:
-  #   cmd: boilercv-pipeline stage e230920-find-objects
-  #   deps:
-  #     - pipeline/boilercv_pipeline/stages/e230920_find_objects
-  #     - docs/notebooks/e230920_find_objects.ipynb
-  #     - data/contours
-  #     - data/filled
-  #   outs:
-  #     - data/e230920/objects: *id002
+  find_objects:
+    cmd: boilercv-pipeline stage find-objects
+    deps:
+      - pipeline/boilercv_pipeline/stages/find_objects
+      - docs/notebooks/find_objects.ipynb
+      - data/contours
+      - data/filled
+    outs:
+      - data/e230920/objects: *id002
   # e230920_find_tracks:
   #   cmd: boilercv-pipeline stage e230920-find-tracks
   #   deps:
