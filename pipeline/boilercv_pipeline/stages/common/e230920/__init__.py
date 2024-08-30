@@ -4,10 +4,12 @@ from collections.abc import Iterator
 from concurrent.futures import Future, ProcessPoolExecutor
 from contextlib import contextmanager
 from dataclasses import dataclass
+from itertools import chain
 from pathlib import Path
 from re import search
-from typing import Any, Generic, TypedDict
+from typing import Annotated, Any, Generic, Self, TypedDict
 
+import numpy
 from boilercore.notebooks.namespaces import get_nb_ns
 from boilercore.paths import ISOLIKE, dt_fromisolike
 from cmasher import get_sub_cmap
@@ -15,9 +17,9 @@ from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Colormap, Normalize
 from matplotlib.pyplot import subplots
-from numpy import any, histogram, sqrt, where
+from numpy import histogram, sqrt, where
 from pandas import CategoricalDtype, DataFrame, NamedAgg
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
 from sparklines import sparklines
 
 from boilercv.images import scale_bool
@@ -28,10 +30,166 @@ from boilercv_pipeline.models.paths.types import Deps_T, Outs_T
 from boilercv_pipeline.models.stages import AnyParams
 from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, Model, Nb_T
 
+IDX = "idx"
+SRC = "src"
+DST = "dst"
+
+
+def get_unit(unit: str) -> str:
+    """Get unit label."""
+    return f"°{unit}" if unit == "C" else unit
+
+
+def get_parts(label: str) -> tuple[str, str, str]:
+    """Get parts of a label."""
+    if m := search(
+        r"^(?P<sym>[^_\()]+)(?P<sub>_[^\s]+)?\s?\(?(?P<unit>[^)]+)?\)?$", label
+    ):
+        return (
+            m["sym"].strip(),
+            (m["sub"] or "").removeprefix("_").strip(),
+            (m["unit"] or "").strip(),
+        )
+    return label, "", ""
+
+
+def get_label(sym: str, sub: str, unit: str) -> str:
+    """Get label."""
+    if sym and sub and unit:
+        return f"{sym}_{sub} ({unit})"
+    return f"{sym} ({unit})" if sym and unit else sym
+
+
+def get_latex(sym: str, sub: str, unit: str) -> str:
+    """Get LaTeX label."""
+    if sub:
+        sym = f"${sym}_{{{sub}}}$"
+    elif len(sym) < 4:
+        sym = f"${sym}$"
+    if unit:
+        return rf"{sym} $\left({unit}\right)$" if "/" in unit else rf"{sym} ({unit})"
+    return sym
+
+
+@dataclass
+class Col:
+    """Column transformation."""
+
+    src: str
+    dst: str = ""
+    unit: str = ""
+    dst_unit: str = ""
+    scale: float = 1
+    latex: str = ""
+    df: str = ""
+    ylabel: str = ""
+
+    def __post_init__(self):
+        src_sym, src_sub, src_unit = get_parts(self.src)
+        self.unit = get_unit(self.unit or src_unit)
+
+        self.dst = self.dst or get_label(src_sym, src_sub, self.unit)
+        dst_sym, dst_sub, self.dst_unit = get_parts(self.dst)
+        self.dst_unit = get_unit(self.dst_unit) or self.unit
+        self.dst = get_label(dst_sym, dst_sub, self.dst_unit)
+        self.ylabel = get_latex(dst_sym, "", self.dst_unit)
+
+        self.latex = self.latex or get_latex(dst_sym, dst_sub, self.dst_unit)
+        self.df = self.df or self.dst
+
+
+class Conversion(TypedDict):
+    """Scalar conversion between units."""
+
+    old_unit: str
+    new_unit: str
+    scale: float
+
+
+M_TO_MM = Conversion(old_unit="m", new_unit="mm", scale=1000)
+
+
+class Columns(BaseModel):
+    """Columns."""
+
+    frame: Col = Col("frame", "Frame #")
+
+
+def transform_cols(df: DataFrame, cols: list[Col], drop: bool = True) -> DataFrame:
+    """Transform dataframe columns."""
+    df = df.assign(**{
+        col.dst: df[col.src] if col.scale == 1 else df[col.src] * col.scale
+        for col in cols
+    })
+    return df[[col.dst for col in cols]] if drop else df
+
+
+def get_cols(cols_model: BaseModel, meta: str) -> list[Col]:
+    """Get columns."""
+    cols = dict(cols_model)
+    return list(
+        chain.from_iterable(
+            cols[field] if isinstance(cols[field], list) else [cols[field]]
+            for field, info in cols_model.model_fields.items()
+            if meta in info.metadata
+        )
+    )
+
+
+class ThermalCols(BaseModel):
+    """Thermal columns."""
+
+    time: Annotated[Col, IDX, SRC, DST] = Col("time", "Time")
+    time_elapsed: Annotated[Col, DST] = Col("t", unit="min", scale=1 / 60)
+
+    water_temps: Annotated[list[Col], SRC, DST] = [
+        Col("Tw3cal (C)", "T_w3"),
+        Col("Tw4cal (C)", "T_w4"),
+    ]
+    water_temp: Annotated[Col, DST] = Col("T_w (C)")
+    superheat: Annotated[Col, DST] = Col("ΔT_super (K)")
+    subcool: Annotated[Col, DST] = Col("ΔT_sub (K)")
+
+    base_temp: Annotated[Col, SRC, DST] = Col("T0cal (C)", "T_0")
+    sample_temps: Annotated[list[Col], SRC, DST] = [
+        Col("T1cal (C)", "T_1"),
+        Col("T2cal (C)", "T_2"),
+        Col("T3cal (C)", "T_3"),
+        Col("T4cal (C)", "T_4"),
+        Col("T5cal (C)", "T_5"),
+    ]
+    surface_temp: Annotated[Col, SRC, DST] = Col("T_s (C)")
+    flux: Annotated[Col, DST] = Col("q'' (W/cm^2)", scale=1e-4)
+
+    boiling: Annotated[Col, DST] = Col("T_sat (C)")
+
+    @model_validator(mode="after")
+    def validate_time(self) -> Self:
+        """Validate time column."""
+        if len(self.idx) > 1 or self.time != self.idx[0]:
+            raise ValueError("Expected only one index column.")
+        return self
+
+    @property
+    def idx(self) -> list[Col]:
+        """All index columns."""
+        return get_cols(self, IDX)
+
+    @property
+    def sources(self) -> list[Col]:
+        """All source columns."""
+        return get_cols(self, SRC)
+
+    @property
+    def dests(self) -> list[Col]:
+        """All destination columns."""
+        return get_cols(self, DST)
+
 
 class Constants(BaseModel):
     day: str = "2024-07-18"
     time: str = "17-44-35"
+    thermal_cols: ThermalCols = ThermalCols()
 
     @property
     def sample(self) -> str:
@@ -41,7 +199,7 @@ class Constants(BaseModel):
     @property
     def include_patterns(self) -> list[str]:
         """Include patterns."""
-        return [rf"^{self.day}.+$"]
+        return [rf"^.+{self.day}.+$"]
 
 
 const = Constants()
@@ -164,8 +322,8 @@ def bounded_ax(img: Img, ax: Axes | None = None) -> Iterator[Axes]:
 def get_image_boundaries(img) -> tuple[tuple[int, int], tuple[int, int]]:
     """Get the boundaries of an image."""
     dilated = transform(scale_bool(img), Transform(Op.dilate, 12))
-    cols = any(dilated, axis=0)
-    rows = any(dilated, axis=1)
+    cols = numpy.any(dilated, axis=0)
+    rows = numpy.any(dilated, axis=1)
     ylim = tuple(where(rows)[0][[0, -1]])
     xlim = tuple(where(cols)[0][[0, -1]])
     return ylim, xlim
@@ -194,48 +352,6 @@ def sparkhist(grp: DataFrame) -> str:
     bins = min(WIDTH - 2, int(sqrt(grp.count())))
     histogram_, _edges = histogram(grp, bins=bins)
     return "\n".join(sparklines(histogram_, num_lines))
-
-
-@dataclass
-class Col:
-    """Column transformation."""
-
-    old: str
-    new: str = ""
-    old_unit: str = ""
-    new_unit: str = ""
-    scale: float = 1
-
-    def __post_init__(self):
-        self.new = self.new or self.old
-        self.new_unit = self.new_unit or self.old_unit
-        self.new = f"{self.new} ({self.new_unit})" if self.new_unit else self.new
-
-
-class Columns(BaseModel, use_attribute_docstrings=True):
-    """Columns."""
-
-    frame: Col = Col("frame", "Frame #")
-
-
-def transform_cols(df: DataFrame, cols: list[Col], drop: bool = True) -> DataFrame:
-    """Transform dataframe columns."""
-    df = df.assign(**{
-        col.new: df[col.old] if col.scale == 1 else df[col.old] * col.scale
-        for col in cols
-    })
-    return df[[col.new for col in cols]] if drop else df
-
-
-class Conversion(TypedDict):
-    """Scalar conversion between units."""
-
-    old_unit: str
-    new_unit: str
-    scale: float
-
-
-M_TO_MM = Conversion(old_unit="m", new_unit="mm", scale=1000)
 
 
 def get_cat_colorbar(

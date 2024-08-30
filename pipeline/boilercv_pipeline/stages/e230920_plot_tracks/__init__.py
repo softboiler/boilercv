@@ -4,17 +4,21 @@ from typing import Annotated
 
 from cappa.arg import Arg
 from cappa.base import command, invoke
-from pydantic import DirectoryPath, Field
+from pydantic import Field
 
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.paths.types import StagePaths
 from boilercv_pipeline.models.stages import Params
-from boilercv_pipeline.models.types.runtime import DataFile, DocsFile
+from boilercv_pipeline.models.types.runtime import (
+    DataFile,
+    DirectoryPathSerPosix,
+    DocsFile,
+)
 from boilercv_pipeline.stages.common.e230920 import get_path_time
 
 
 class Deps(StagePaths):
-    stage: DirectoryPath = Path(__file__).parent
+    stage: DirectoryPathSerPosix = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
     e230920_merged_tracks: DataFile = paths.e230920_merged_tracks
 

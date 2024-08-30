@@ -4,8 +4,7 @@ from functools import partial
 from cappa.base import invoke
 
 from boilercv_pipeline.models.deps import DirSlicer
-from boilercv_pipeline.stages.common import e230920
-from boilercv_pipeline.stages.common.e230920 import submit_nb_process
+from boilercv_pipeline.stages.common.e230920 import save_df, submit_nb_process
 from boilercv_pipeline.stages.e230920_find_objects import E230920FindObjects, Nb
 
 
@@ -28,9 +27,7 @@ def main(params: E230920FindObjects):
             )
             submit_nb_process(
                 executor=executor, nb=nb, params=params
-            ).add_done_callback(
-                partial(e230920.save_df, dfs=params.outs.dfs, dep=contours)
-            )
+            ).add_done_callback(partial(save_df, dfs=params.outs.dfs, dep=contours))
 
 
 if __name__ == "__main__":

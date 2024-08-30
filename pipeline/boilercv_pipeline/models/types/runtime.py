@@ -10,7 +10,9 @@ from cappa.arg import Arg
 from pydantic import (
     AfterValidator,
     BaseModel,
+    DirectoryPath,
     Field,
+    FilePath,
     SerializerFunctionWrapHandler,
     WrapSerializer,
     computed_field,
@@ -136,7 +138,6 @@ def make_path(
     kind = make_path_args[(key, file)]
     if root:
         path = (root.resolve() / path) if path.is_absolute() else root / path
-        (path.parent if file else path).mkdir(exist_ok=True, parents=True)
     if (
         ctx.check_kinds
         and kind not in ctx.kinds[path.relative_to(root) if root else path]
@@ -144,35 +145,55 @@ def make_path(
         raise ValueError("Path kind not as expected.")
     if ctx.track_kinds:
         ctx.kinds[path] = kind
+    if root:
+        (path.parent if file else path).mkdir(exist_ok=True, parents=True)
     return path
 
 
-def ser_path(value: Path | str, nxt: SerializerFunctionWrapHandler) -> str:
+def resolve_path(value: Path | str, nxt: SerializerFunctionWrapHandler) -> str:
     """Resolve paths and serialize POSIX-style."""
-    return nxt(value.as_posix() if isinstance(value, Path) else value)
+    return nxt(Path(value).resolve().as_posix())
 
 
+def ser_rooted_path(
+    value: Path | str,
+    nxt: SerializerFunctionWrapHandler,
+    info: BoilercvPipelineSerializationInfo,
+    key: Key,
+) -> str:
+    """Serialize paths POSIX-style, resolving if rooted."""
+    return (
+        resolve_path(value, nxt)
+        if getattr(info.context["boilercv_pipeline"].roots, key, None)
+        else nxt(Path(value).as_posix())
+    )
+
+
+FilePathSerPosix = Annotated[FilePath, WrapSerializer(resolve_path)]
+"""Directory path that serializes as POSIX."""
+DirectoryPathSerPosix = Annotated[DirectoryPath, WrapSerializer(resolve_path)]
+"""Directory path that serializes as POSIX."""
 DataDir = Annotated[
     Path,
     AfterValidator(partial(make_path, key="data", file=False)),
-    WrapSerializer(ser_path),
+    WrapSerializer(partial(ser_rooted_path, key="data")),
 ]
 """Data directory path made upon validation."""
 DataFile = Annotated[
     Path,
     AfterValidator(partial(make_path, key="data", file=True)),
-    WrapSerializer(ser_path),
+    WrapSerializer(partial(ser_rooted_path, key="data")),
 ]
 """Data file path made upon validation."""
 DocsDir = Annotated[
     Path,
     AfterValidator(partial(make_path, key="docs", file=False)),
-    WrapSerializer(ser_path),
+    WrapSerializer(partial(ser_rooted_path, key="docs")),
 ]
 """Docs directory path made upon validation."""
 DocsFile = Annotated[
     Path,
     AfterValidator(partial(make_path, key="docs", file=True)),
-    WrapSerializer(ser_path),
+    WrapSerializer(partial(ser_rooted_path, key="docs")),
 ]
 """Docs file path made upon validation."""

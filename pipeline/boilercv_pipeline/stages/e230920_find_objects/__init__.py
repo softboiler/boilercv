@@ -3,14 +3,18 @@ from typing import Annotated
 
 from cappa.arg import Arg
 from cappa.base import command
-from pydantic import BaseModel, DirectoryPath, Field
+from pydantic import BaseModel, Field
 
 from boilercv.data import FRAME
 from boilercv_pipeline.models.deps import DirSlicer, first_slicer
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.paths.types import StagePaths
 from boilercv_pipeline.models.types import Slicer, Slicers
-from boilercv_pipeline.models.types.runtime import DataDir, DocsFile
+from boilercv_pipeline.models.types.runtime import (
+    DataDir,
+    DirectoryPathSerPosix,
+    DocsFile,
+)
 from boilercv_pipeline.stages.common.e230920 import Params, const
 
 SLICER_PATTERNS = {r".+": {FRAME: first_slicer(n=3, step=10)}}
@@ -18,7 +22,7 @@ SLICER_PATTERNS = {r".+": {FRAME: first_slicer(n=3, step=10)}}
 
 
 class Deps(StagePaths):
-    stage: DirectoryPath = Path(__file__).parent
+    stage: DirectoryPathSerPosix = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
     contours: DataDir = paths.contours
     filled: DataDir = paths.filled

@@ -59,7 +59,6 @@ class Paths(BoilercvPipelineCtxModel):
     sources: DataDir = Path("sources")
     thermal: DataDir = Path("thermal")
     e230920: DataDir = Path("e230920")
-    e230920_thermal_raw: DataFile = e230920 / Path("thermal_raw.csv")
 
     # * DVC-tracked results
     contours: DataDir = Path("contours")

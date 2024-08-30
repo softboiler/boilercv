@@ -2,39 +2,40 @@
 flowchart TD
  node1["binarize"]
  node2["convert"]
- node3["e230920_find_contours"]
- node4["e230920_find_objects"]
- node5["e230920_find_tracks"]
- node6["e230920_get_mae"]
- node7["e230920_merge_mae"]
- node8["e230920_merge_tracks"]
- node9["e230920_plot_tracks"]
- node10["e230920_process_tracks"]
- node11["fill"]
- node12["find_contours"]
- node13["preview_binarized"]
- node14["preview_filled"]
- node15["preview_gray"]
+ node3["e230920_find_objects"]
+ node4["e230920_find_tracks"]
+ node5["e230920_get_mae"]
+ node6["e230920_merge_mae"]
+ node7["e230920_merge_tracks"]
+ node8["e230920_plot_tracks"]
+ node9["e230920_process_tracks"]
+ node10["fill"]
+ node11["find_contours"]
+ node12["preview_binarized"]
+ node13["preview_filled"]
+ node14["preview_gray"]
+ node15["skip_cloud"]
+ node1-->node10
  node1-->node11
  node1-->node12
  node1-->node13
- node1-->node14
  node2-->node1
- node2-->node15
+ node2-->node14
  node3-->node4
- node4-->node5
- node5-->node10
- node6-->node7
- node8-->node9
- node10-->node6
- node10-->node8
- node12-->node3
- node12-->node11
- node16["e230920_update_thermal_data"]
- node17["data\examples.dvc"]
- node18["data\experiments.dvc"]
- node19["data\notebooks.dvc"]
- node20["data\samples.dvc"]
- node21["data\models\modelfun-3.11.dillpickle.dvc"]
- node22["data\models\modelfun-3.12.dillpickle.dvc"]
+ node4-->node9
+ node5-->node6
+ node7-->node8
+ node9-->node5
+ node9-->node7
+ node10-->node3
+ node11-->node3
+ node11-->node10
+ node15-->node2
+ node16["data\models\modelfun-3.11.dillpickle.dvc"]
+ node17["data\models\modelfun-3.12.dillpickle.dvc"]
+ node18["data\thermal.dvc"]
+ node19["get_thermal_data"]
+ node16-->node19
+ node17-->node19
+ node18-->node19
 ```

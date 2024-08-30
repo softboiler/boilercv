@@ -3,16 +3,20 @@ from typing import Annotated
 
 from cappa.arg import Arg
 from cappa.base import command, invoke
-from pydantic import DirectoryPath, Field
+from pydantic import Field
 
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.paths.types import StagePaths
 from boilercv_pipeline.models.stages import Params
-from boilercv_pipeline.models.types.runtime import DataDir, DataFile
+from boilercv_pipeline.models.types.runtime import (
+    DataDir,
+    DataFile,
+    DirectoryPathSerPosix,
+)
 
 
 class Deps(StagePaths):
-    stage: DirectoryPath = Path(__file__).parent
+    stage: DirectoryPathSerPosix = Path(__file__).parent
     e230920_processed_tracks: DataDir = paths.e230920_processed_tracks
 
 

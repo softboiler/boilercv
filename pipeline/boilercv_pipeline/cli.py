@@ -4,25 +4,25 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from boilercore.models import apply_to_paths
 from cappa.base import command
 from cappa.subcommand import Subcommands
 from pydantic import BaseModel, Field
 from yaml import safe_dump
 
 from boilercv.contexts import ContextModel
+from boilercv.mappings import apply
 from boilercv_pipeline.stages.binarize import Binarize
 from boilercv_pipeline.stages.convert import Convert
 from boilercv_pipeline.stages.e230920_find_objects import E230920FindObjects
 from boilercv_pipeline.stages.e230920_find_tracks import E230920FindTracks
 from boilercv_pipeline.stages.e230920_get_mae import E230920GetMae
-from boilercv_pipeline.stages.e230920_get_thermal_data import E230920GetThermalData
 from boilercv_pipeline.stages.e230920_merge_mae import E230920MergeMae
 from boilercv_pipeline.stages.e230920_merge_tracks import E230920MergeTracks
 from boilercv_pipeline.stages.e230920_plot_tracks import E230920PlotTracks
 from boilercv_pipeline.stages.e230920_process_tracks import E230920ProcessTracks
 from boilercv_pipeline.stages.fill import Fill
 from boilercv_pipeline.stages.find_contours import FindContours
+from boilercv_pipeline.stages.get_thermal_data import GetThermalData
 from boilercv_pipeline.stages.preview_binarized import PreviewBinarized
 from boilercv_pipeline.stages.preview_filled import PreviewFilled
 from boilercv_pipeline.stages.preview_gray import PreviewGray
@@ -32,6 +32,8 @@ from boilercv_pipeline.stages.skip_cloud import SkipCloud
 class Constants(BaseModel):
     """Constants."""
 
+    dvc_keys: list[str] = ["deps", "outs"]
+    """Keys expected in a DVC stage."""
     dvc_out_config: dict[str, bool] = {"persist": True}
     """Default `dvc.yaml` configuration for `outs`."""
     skip_cloud: list[str] = ["data/cines", "data/large_sources"]
@@ -62,7 +64,7 @@ class Stage:
         | E230920MergeTracks
         | E230920PlotTracks
         | E230920ProcessTracks
-        | E230920GetThermalData
+        | GetThermalData
         | Fill
         | FindContours
         | PreviewBinarized
@@ -93,12 +95,7 @@ class SyncDVC:
             find_contours: FindContours = Field(default_factory=FindContours)
             fill: Fill = Field(default_factory=Fill)
             preview_filled: PreviewFilled = Field(default_factory=PreviewFilled)
-            e230920_get_thermal_data: E230920GetThermalData = Field(
-                default_factory=E230920GetThermalData
-            )
-            e230920_find_contours: E230920FindObjects = Field(
-                default_factory=E230920FindObjects
-            )
+            get_thermal_data: GetThermalData = Field(default_factory=GetThermalData)
             e230920_find_objects: E230920FindObjects = Field(
                 default_factory=E230920FindObjects
             )
@@ -117,34 +114,58 @@ class SyncDVC:
             e230920_get_mae: E230920GetMae = Field(default_factory=E230920GetMae)
             e230920_merge_mae: E230920MergeMae = Field(default_factory=E230920MergeMae)
 
+        def process_path(path: Path) -> str:
+            path = Path(path)
+            return (
+                path.relative_to(self.root) if path.is_absolute() else path
+            ).as_posix()
+
         stages: dict[str, Any] = {}
-        for stage, stage_value in Stages().model_dump().items():
-            for paths, paths_value in stage_value.items():
-                stage_value[paths] = [
-                    apply_to_paths(
-                        path,
-                        lambda path: (
-                            path.relative_to(self.root) if path.is_absolute() else path
-                        ).as_posix(),
-                    )
-                    for path in paths_value.values()
-                ]
+        raw_stages = Stages().model_dump()
+        del raw_stages["context"]
+        for stage, stage_value in raw_stages.items():
+            for k in const.dvc_keys:
+                del stage_value[k]["context"]
+            for k in [k for k in stage_value if k not in const.dvc_keys]:
+                del stage_value[k]
+            stage_value["deps"] = [
+                process_path(v) for v in stage_value["deps"].values()
+            ]
             stage_value["outs"] = [
                 (
                     {out: const.dvc_out_skip_cloud_config}
                     if out in const.skip_cloud
                     else {out: const.dvc_out_config}
                 )
-                for out in stage_value["outs"]
+                for out in stage_value["outs"].values()
             ]
             stages[stage] = {
                 "cmd": f"boilercv-pipeline stage {stage.replace('_', '-')}",
                 **stage_value,
             }
         dvc = self.root / "dvc.yaml"
+
+        def drop_context(n):
+            n.pop("context", None)
+            return n
+
         dvc.write_text(
             encoding="utf-8",
-            data=safe_dump(sort_keys=False, indent=2, data={"stages": stages}),
+            data=safe_dump(
+                sort_keys=False,
+                indent=2,
+                data={
+                    "stages": apply(
+                        stages,
+                        node_fun=drop_context,
+                        leaf_fun=(
+                            lambda leaf: process_path(leaf)
+                            if isinstance(leaf, Path)
+                            else leaf
+                        ),
+                    )
+                },
+            ),
         )
 
 

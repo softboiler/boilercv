@@ -14,9 +14,7 @@ NbExecutionExcludePatterns = Annotated[
     AfterValidator(
         lambda patterns: [
             p.resolve().as_posix()
-            for p in chain.from_iterable([
-                Path.cwd().glob(f"{pat}/**/*.ipynb") for pat in patterns
-            ])
+            for p in chain.from_iterable([Path.cwd().glob(pat) for pat in patterns])
         ]
     ),
 ]

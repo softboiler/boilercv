@@ -4,10 +4,11 @@ from typing import Generic, TypeAlias
 
 import matplotlib
 from IPython.display import display
+from matplotlib.axes import Axes
 from numpy import set_printoptions
 from pandas import options
 from pydantic import BaseModel, Field
-from seaborn import set_theme
+from seaborn import move_legend, set_theme
 
 from boilercv_pipeline.models.paths.types import Deps_T, Outs_T, Stage, StagePaths
 from boilercv_pipeline.models.types.runtime import BoilercvPipelineCtxDict
@@ -76,6 +77,12 @@ class Format(BaseModel):
     def set_display_options(self):
         """Set display options."""
         set_display_options(self.font_scale)
+
+    def move_legend(
+        self, ax: Axes, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3
+    ):
+        """Move legend."""
+        move_legend(ax, loc=loc, bbox_to_anchor=bbox_to_anchor, ncol=ncol)
 
 
 class Params(Stage, Generic[Deps_T, Outs_T]):
