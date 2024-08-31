@@ -1,6 +1,4 @@
 _build/
 _api/
 apidocs/
-data/*
-!data/.gitkeep
 params.yaml

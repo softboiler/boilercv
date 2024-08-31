@@ -23,13 +23,16 @@ from pandas import CategoricalDtype, DataFrame, NamedAgg
 from pydantic import BaseModel, model_validator
 from sparklines import sparklines
 
+from boilercv.data import FRAME, PX, X, Y
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, Img
 from boilercv_pipeline.models import stages
+from boilercv_pipeline.models.deps import first_slicer
 from boilercv_pipeline.models.paths.types import Deps_T, Outs_T
 from boilercv_pipeline.models.stages import AnyParams
-from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, Model, Nb_T
+from boilercv_pipeline.models.types import Slicers
+from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, Model
 
 IDX = "idx"
 SRC = "src"
@@ -64,12 +67,10 @@ def get_label(sym: str, sub: str, unit: str) -> str:
 def get_latex(sym: str, sub: str, unit: str) -> str:
     """Get LaTeX label."""
     if sub:
-        sym = f"${sym}_{{{sub}}}$"
-    elif len(sym) < 4:
-        sym = f"${sym}$"
+        sym = f"{sym}_{{{sub}}}"
     if unit:
-        return rf"{sym} $\left({unit}\right)$" if "/" in unit else rf"{sym} ({unit})"
-    return sym
+        sym = rf"{sym}\ \left({unit}\right)"
+    return rf"$\mathsf{{{sym}}}$"
 
 
 @dataclass
@@ -85,13 +86,16 @@ class Col:
     df: str = ""
     ylabel: str = ""
 
+    def __call__(self) -> Any:
+        return self.latex
+
     def __post_init__(self):
         src_sym, src_sub, src_unit = get_parts(self.src)
         self.unit = get_unit(self.unit or src_unit)
 
         self.dst = self.dst or get_label(src_sym, src_sub, self.unit)
-        dst_sym, dst_sub, self.dst_unit = get_parts(self.dst)
-        self.dst_unit = get_unit(self.dst_unit) or self.unit
+        dst_sym, dst_sub, dst_unit = get_parts(self.dst)
+        self.dst_unit = get_unit(self.dst_unit) or dst_unit or self.unit
         self.dst = get_label(dst_sym, dst_sub, self.dst_unit)
         self.ylabel = get_latex(dst_sym, "", self.dst_unit)
 
@@ -137,11 +141,19 @@ def get_cols(cols_model: BaseModel, meta: str) -> list[Col]:
     )
 
 
+class VideoDims(BaseModel):
+    """Video dimensions."""
+
+    y: Col = Col(Y, unit=PX)
+    x: Col = Col(X, unit=PX)
+
+
 class ThermalCols(BaseModel):
     """Thermal columns."""
 
     time: Annotated[Col, IDX, SRC, DST] = Col("time", "Time")
-    time_elapsed: Annotated[Col, DST] = Col("t", unit="min", scale=1 / 60)
+    time_elapsed: Annotated[Col, DST] = Col("t", unit="s")
+    time_elapsed_min: Col = Col("t", unit="s", dst_unit="min", scale=1 / 60)
 
     water_temps: Annotated[list[Col], SRC, DST] = [
         Col("Tw3cal (C)", "T_w3"),
@@ -191,6 +203,11 @@ class Constants(BaseModel):
     day: str = "2024-07-18"
     time: str = "17-44-35"
     thermal_cols: ThermalCols = ThermalCols()
+    video_dims: VideoDims = VideoDims()
+    nb_slicer_patterns: dict[str, Slicers] = {
+        r".+": {FRAME: first_slicer(n=10, step=100)}
+    }
+    """Slicer patterns representing a small subset of frames."""
 
     @property
     def sample(self) -> str:
@@ -198,8 +215,8 @@ class Constants(BaseModel):
         return f"{self.day}T{self.time}"
 
     @property
-    def single_sample_include_pattern(self) -> list[str]:
-        """Include pattern for a single sample."""
+    def nb_include_patterns(self) -> list[str]:
+        """Include patterns for a single sample."""
         return [rf"^.*{self.sample}.*$"]
 
     @property
@@ -211,15 +228,13 @@ class Constants(BaseModel):
 const = Constants()
 
 
-class Params(stages.Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T, Nb_T]):
+class Params(stages.Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T]):
     """Stage parameters for `e230920`."""
 
     deps: Deps_T
     """Stage dependencies."""
     outs: Outs_T
     """Stage outputs."""
-    nb: Nb_T
-    """Notebook-only params."""
     sample: str = const.sample
     """Sample to process."""
     include_patterns: list[str] = const.include_patterns
@@ -260,7 +275,7 @@ def apply_to_nb(
     )
 
 
-def df_to_compressed_hdf(df: DataFrame, path: Path | str, key: str | None = None):
+def save_df(df: DataFrame, path: Path | str, key: str | None = None):
     """Save data frame to a compressed HDF5 file."""
     path = Path(path)
     df.to_hdf(path, key=key or path.stem, complib="zlib", complevel=9)
@@ -274,30 +289,11 @@ def callbacks(
         callback(future)
 
 
-def save_df(future: Future[DfNbOuts], dfs: Path, dep: Path):
-    """Save a DataFrame to HDF5 format."""
-    df_to_compressed_hdf(
-        future.result().df,
-        dfs / f"{dfs.stem}_{time}.h5" if (time := get_time(dep)) else f"{dfs.stem}.h5",
-    )
-
-
 def save_plots(figs: Iterable[Figure], plots: Path):
     """Save a DataFrame to HDF5 format."""
     for i, fig in enumerate(figs):
         fig.savefig(
             plots / f"{plots.stem}_{i}.png"  # pyright: ignore[reportArgumentType]
-        )
-
-
-def save_future_plots(future: Future[DfNbOuts], plots: Path, dep: Path):
-    """Save a DataFrame to HDF5 format."""
-    figs = future.result().plots
-    for i, fig in enumerate(figs):
-        fig.savefig(
-            plots / f"{plots.stem}_{time}_{i}.png"  # pyright: ignore[reportArgumentType]
-            if (time := get_time(dep))
-            else f"{plots.stem}_{i}.png"
         )
 
 

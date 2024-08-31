@@ -2,44 +2,41 @@ from concurrent.futures import ProcessPoolExecutor
 from functools import partial
 
 from cappa.base import invoke
+from more_itertools import one
 
-from boilercv_pipeline.models.deps import DirSlicer
 from boilercv_pipeline.stages.common.e230920 import (
     callbacks,
-    const,
+    get_time,
     save_df,
-    save_future_plots,
+    save_plots,
     submit_nb_process,
 )
-from boilercv_pipeline.stages.find_objects import FindObjects, Nb
+from boilercv_pipeline.stages.find_objects import FindObjects as Params
 
 
-def main(params: FindObjects):
+def main(params: Params):
     nb = params.deps.nb.read_text(encoding="utf-8")
-    all_contours = DirSlicer(
-        path=params.deps.contours, include_patterns=const.single_sample_include_pattern
-    )
-    all_filled = DirSlicer(
-        path=params.deps.filled,
-        include_patterns=const.single_sample_include_pattern,
-        slicer_patterns=params.slicer_patterns,
-    )
+    dfs = params.outs.dfs
     with ProcessPoolExecutor() as executor:
-        for contours, filled in zip(all_contours.paths, all_filled.paths, strict=True):
-            params.nb = Nb(
-                contours=contours,
-                filled=filled,
-                filled_slicers=all_filled.path_slicers[filled],
-            )
+        for contours, filled, filled_slicers in zip(
+            params.contours, params.filled, params.filled_slicers, strict=True
+        ):
+            for field, value in {
+                "contours": contours,
+                "filled": filled,
+                "filled_slicers": filled_slicers,
+                "dfs": (dfs / f"{dfs.name}_{get_time(contours)}.h5"),
+            }.items():
+                setattr(params, field, value)
             submit_nb_process(
                 executor=executor, nb=nb, params=params
             ).add_done_callback(
                 partial(
                     callbacks,
                     callbacks=[
-                        partial(save_df, dfs=params.outs.dfs, dep=contours),
-                        partial(
-                            save_future_plots, plots=params.outs.plots, dep=contours
+                        lambda f: save_df(df=f.result().df, path=one(params.dfs)),
+                        lambda f: save_plots(
+                            figs=f.result().plots, plots=params.outs.plots
                         ),
                     ],
                 )
@@ -47,4 +44,4 @@ def main(params: FindObjects):
 
 
 if __name__ == "__main__":
-    invoke(FindObjects)
+    invoke(Params)

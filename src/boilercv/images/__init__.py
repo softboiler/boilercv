@@ -3,14 +3,13 @@
 # * Pure numpy image processing functions take lots of types, including DataArrays.
 # pyright: reportGeneralTypeIssues=none
 
-from typing import Any
-
 from matplotlib.font_manager import FontProperties, findfont
 from numpy import asarray, iinfo, invert, mean, uint8
 from numpy.typing import DTypeLike
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from boilercv.colors import BLACK, BLACK3, RED, WHITE, WHITE3
+from boilercv.images.types import T
 from boilercv.types import DA_T, Img, ImgLike
 
 # * -------------------------------------------------------------------------------- * #
@@ -35,12 +34,12 @@ def unpad(img: Img, pad_width: int) -> Img:
 # * PURE NUMPY - NOT ALWAYS TYPE PRESERVING
 
 
-def scale_bool(img: Any, dtype: DTypeLike = uint8) -> Any:
+def scale_bool(img: T, dtype: DTypeLike = uint8) -> T:
     """Return the input as `dtype` multiplied by the max value of `dtype`.
 
     Useful for functions (such as in OpenCV) which expect numeric bools.
     """
-    return img.astype(dtype) * iinfo(dtype).max
+    return img.astype(dtype) * iinfo(dtype).max  # pyright: ignore[reportAttributeAccessIssue]
 
 
 # * -------------------------------------------------------------------------------- * #

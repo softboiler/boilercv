@@ -1,5 +1,6 @@
 """Stage models."""
 
+from contextlib import contextmanager
 from typing import Generic, TypeAlias
 
 import matplotlib
@@ -15,10 +16,10 @@ from boilercv_pipeline.models.types.runtime import BoilercvPipelineCtxDict
 
 
 def set_display_options(
-    font_scale: float = 1.3, precision: int = 4, display_rows: int = 12
+    font_scale: float = 1.3, precision: int = 3, display_rows: int = 12
 ):
     """Set display options."""
-    float_spec = f"#.{precision}g"
+    float_spec = f".{precision}g"
     # The triple curly braces in the f-string allows the format function to be
     # dynamically specified by a given float specification. The intent is clearer this
     # way, and may be extended in the future by making `float_spec` a parameter.
@@ -32,7 +33,6 @@ def set_display_options(
         font="sans-serif",
         font_scale=font_scale,
     )
-    matplotlib.rcParams["figure.frameon"]
     matplotlib.rcParams |= {
         # * Figure
         "figure.autolayout": True,
@@ -45,9 +45,8 @@ def set_display_options(
         # ? Fix whitespace around axes
         "savefig.bbox": "tight",
         "savefig.pad_inches": 0.2,
-        # ? Both are necessary to enforce a white figure background on save
-        "savefig.transparent": True,
-        "savefig.facecolor": "white",
+        # ? Transparent figure background, leave axes white
+        "savefig.facecolor": (1, 1, 1, 0),
         # ? DPI for saving figures only
         "savefig.dpi": 600,
         # ! Also hide title
@@ -60,15 +59,24 @@ def set_display_options(
 class Format(BaseModel):
     """Plotting parameters."""
 
-    scale: float = 1.6
+    scale: float = 1.3
     """Plot scale."""
     marker_scale: float = 20
     """Marker scale."""
+    precision: int = 4
+    """Number precision."""
+    display_rows: int = 12
+    """Number of rows to display in data frames."""
 
     @property
     def size(self) -> float:
         """Marker size."""
         return self.scale * self.marker_scale
+
+    @property
+    def floatfmt(self) -> str:
+        """Floating number format."""
+        return f"#.{self.precision}g"
 
     @property
     def font_scale(self) -> float:
@@ -77,13 +85,23 @@ class Format(BaseModel):
 
     def set_display_options(self):
         """Set display options."""
-        set_display_options(self.font_scale)
+        set_display_options(self.font_scale, self.precision, self.display_rows)
 
     def move_legend(
         self, ax: Axes, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3
     ):
         """Move legend."""
         move_legend(ax, loc=loc, bbox_to_anchor=bbox_to_anchor, ncol=ncol)
+
+
+@contextmanager
+def display_options(orig: Format, new: Format):
+    """Display options."""
+    try:
+        new.set_display_options()
+        yield
+    finally:
+        orig.set_display_options()
 
 
 class Params(Stage, Generic[Deps_T, Outs_T]):

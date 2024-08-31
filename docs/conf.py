@@ -242,6 +242,7 @@ nb_execution_mode = default.build.nb_execution_mode
 nb_execution_excludepatterns = default.build.nb_execution_excludepatterns
 nb_execution_raise_on_error = True
 nb_execution_timeout = 120
+nb_render_markdown_format = "myst"
 # * MARK:  Thebe
 thebe_config = {
     **const.html_thebe_common,

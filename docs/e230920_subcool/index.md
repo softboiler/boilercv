@@ -4,6 +4,7 @@ Subcooled bubble collapse experiment.
 
 :::{toctree}
 :hidden:
-correlations/index
-thermal/index
+correlations
+equations
+/notebooks/get_thermal_data
 :::

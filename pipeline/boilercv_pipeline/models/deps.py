@@ -1,8 +1,7 @@
 """Dependency models."""
 
-from functools import cached_property
 from pathlib import Path
-from re import Pattern, compile
+from re import search
 
 from pydantic import BaseModel, Field
 
@@ -30,22 +29,7 @@ class DirSlicer(BaseModel):
     slicers: dict[str, Slicers] = Field(default_factory=dict)
     slicer_patterns: dict[str, Slicers] = Field(default_factory=dict)
 
-    @cached_property
-    def include_patterns_(self) -> list[Pattern[str]]:
-        """Compiled include patterns."""
-        return [compile(pat) for pat in self.include_patterns]
-
-    @cached_property
-    def exclude_patterns_(self) -> list[Pattern[str]]:
-        """Compiled exclude patterns."""
-        return [compile(pat) for pat in self.exclude_patterns]
-
-    @cached_property
-    def slice_patterns_(self) -> dict[Pattern[str], Slicers]:
-        """Compiled exclude patterns."""
-        return {compile(pat): slice_ for pat, slice_ in self.slicer_patterns.items()}
-
-    @cached_property
+    @property
     def paths(self) -> list[Path]:
         """Filtered paths."""
         return [
@@ -55,28 +39,24 @@ class DirSlicer(BaseModel):
             and (file.stem not in self.exclude)
             and (
                 not self.include_patterns
-                or any(pat.search(file.stem) for pat in self.include_patterns_)
+                or any(search(pat, file.stem) for pat in self.include_patterns)
             )
-            and not any(pat.search(file.stem) for pat in self.exclude_patterns_)
+            and not any(search(pat, file.stem) for pat in self.exclude_patterns)
         ]
 
-    @cached_property
-    def path_slicers(self) -> dict[Path, Slicers]:
-        """Slicers for paths."""
-        path_slicers = {}
-        for file in self.paths:
-            slicers: Slicers = {}
-            if self.slicers:
-                slicers = self.slicers.get(file.stem, slicers)
-            if self.slicer_patterns:
-                for pat, slicer in self.slice_patterns_.items():
-                    if pat.search(file.stem):
-                        slicers = slicer
-                        break
-            path_slicers[file] = slicers
-        return path_slicers
 
-    @cached_property
-    def path_slices(self) -> dict[Path, dict[str, slice]]:
-        """Slices for paths."""
-        return {k: get_slices(slicers) for k, slicers in self.path_slicers.items()}
+def get_slicers(
+    path: Path,
+    path_slicers: dict[str, Slicers] | None = None,
+    slicer_patterns: dict[str, Slicers] | None = None,
+) -> Slicers:
+    """Get slicers for a path."""
+    slicers: Slicers = {}
+    if path_slicers:
+        slicers = path_slicers.get(path.stem, slicers)
+    if slicer_patterns:
+        for pat, slicer in slicer_patterns.items():
+            if search(pat, path.stem):
+                slicers = slicer
+                break
+    return slicers

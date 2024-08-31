@@ -14,7 +14,6 @@ from pydantic import (
     FieldSerializationInfo,
     PydanticUserError,
     RootModel,
-    SerializerFunctionWrapHandler,
     field_serializer,
     model_validator,
 )
@@ -488,15 +487,52 @@ class ContextModel(ContextBase):
     context: Context = Context()
     _context_handlers: ClassVar[dict[str, type[BaseModel]]] = {}
 
-    @field_serializer(CONTEXT, mode="wrap")
-    def context_ser(
-        self,
-        value: Any,
-        nxt: SerializerFunctionWrapHandler,
-        info: FieldSerializationInfo,
-    ) -> Any:
+    @field_serializer(CONTEXT, mode="plain")
+    def context_ser(self, value: Any, info: FieldSerializationInfo) -> Any:
         """Serialize context."""
-        return {k: nxt(v) for k, v in (value or info.context or {}).items()}
+        return {
+            k: v.model_dump(
+                mode=info.mode,
+                by_alias=info.by_alias,
+                include=info.include,
+                exclude=info.exclude,
+                context=info.context or {},
+                exclude_unset=info.exclude_unset,
+                exclude_defaults=info.exclude_defaults,
+                exclude_none=info.exclude_none,
+                round_trip=info.round_trip,
+                serialize_as_any=info.serialize_as_any,
+            )
+            for k, v in (value or info.context or {}).items()
+        }
+        # return {
+        #     k: v.model_dump_json(
+        #         by_alias=info.by_alias,
+        #         include=info.include,
+        #         exclude=info.exclude,
+        #         context=info.context or {},
+        #         exclude_unset=info.exclude_unset,
+        #         exclude_defaults=info.exclude_defaults,
+        #         exclude_none=info.exclude_none,
+        #         round_trip=info.round_trip,
+        #         serialize_as_any=info.serialize_as_any,
+        #     )
+        #     if info.mode_is_json()
+        #     else v.model_dump(
+        #         mode=info.mode,
+        #         by_alias=info.by_alias,
+        #         include=info.include,
+        #         exclude=info.exclude,
+        #         context=info.context or {},
+        #         exclude_unset=info.exclude_unset,
+        #         exclude_defaults=info.exclude_defaults,
+        #         exclude_none=info.exclude_none,
+        #         round_trip=info.round_trip,
+        #         serialize_as_any=info.serialize_as_any,
+        #     )
+        #     for k, v in (value or info.context or {}).items()
+        # }
+        # return {k: nxt(v) for k, v in (value or info.context or {}).items()}
 
     @classmethod
     def context_post_init(cls, context: Context) -> Context:

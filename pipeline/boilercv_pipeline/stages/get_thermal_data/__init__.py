@@ -8,7 +8,7 @@ from pydantic import Field
 from boilercv_pipeline.models.deps import DirSlicer
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.paths.types import StagePaths
-from boilercv_pipeline.models.stages import Params
+from boilercv_pipeline.models.stages import Format, Params
 from boilercv_pipeline.models.types.runtime import (
     DataDir,
     DataFile,
@@ -46,3 +46,5 @@ class GetThermalData(Params[Deps, Outs]):
     """Stage dependencies."""
     outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
     """Stage outputs."""
+    format: Format = Format(precision=3)
+    """Format parameters."""

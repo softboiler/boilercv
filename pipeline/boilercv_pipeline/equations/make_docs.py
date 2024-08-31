@@ -29,7 +29,7 @@ INTERVAL = 5
 COOLDOWN = 2
 """Wait at least this many seconds before triggering `on_modified` again."""
 
-OUT = Path("docs") / "experiments" / "e230920_subcool" / "correlations" / "equations.md"
+OUT = Path("docs") / "experiments" / "e230920_subcool" / "equations.md"
 """Generated equations directory."""
 APP = App()
 """CLI."""

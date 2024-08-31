@@ -8,8 +8,6 @@ from pydantic import BaseModel, Field
 
 Model = TypeVar("Model", bound=BaseModel, covariant=True)
 """Model type."""
-Nb_T = TypeVar("Nb_T", bound=BaseModel, covariant=True)
-"""Notebook model type."""
 
 
 class NbOuts(BaseModel):

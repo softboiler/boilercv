@@ -10,6 +10,7 @@ dependencies = [
     # ? Core docs
     "docutils==0.21.2",
     "linkify-it-py==2.0.3",
+    "more-itertools==10.4.0",
     "myst-nb==1.1.1",
     "myst-parser==3.0.1",
     "nbformat==5.10.4",
