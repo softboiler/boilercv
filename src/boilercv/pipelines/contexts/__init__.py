@@ -9,8 +9,8 @@ from itertools import chain
 from typing import Any, Self
 
 from boilercv.contexts.types import Context
-from boilercv.pipes import ContextValue
-from boilercv.pipes.types import CV, AnyPipe
+from boilercv.pipelines.pipes import ContextValue
+from boilercv.pipelines.pipes.types import CV, AnyPipe
 
 
 @dataclass

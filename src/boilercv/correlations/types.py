@@ -33,7 +33,7 @@ from sympy.logic.boolalg import BooleanAtom
 
 from boilercv.pipelines import PIPELINE
 from boilercv.pipelines.contexts.types import PipelineValidationInfo
-from boilercv.pipes import ContextValue
+from boilercv.pipelines.pipes import ContextValue
 
 if TYPE_CHECKING:
     from _typeshed import DataclassInstance

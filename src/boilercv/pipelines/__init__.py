@@ -28,6 +28,8 @@ from boilercv.pipelines.contexts import (
     get_pipeline_context,
 )
 from boilercv.pipelines.contexts.types import PipelineConfigDict, PipelineValidationInfo
+from boilercv.pipelines.pipes import ContextValue, Pipe, PipeWithInfo
+from boilercv.pipelines.pipes.types import AnyPipe
 from boilercv.pipelines.types import (
     K,
     LiteralGenericAlias,
@@ -36,8 +38,6 @@ from boilercv.pipelines.types import (
     UnionGenericAlias,
     V,
 )
-from boilercv.pipes import ContextValue, Pipe, PipeWithInfo
-from boilercv.pipes.types import AnyPipe
 
 PIPELINE = "pipeline"
 """Pipe model context key."""

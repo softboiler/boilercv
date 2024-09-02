@@ -36,7 +36,7 @@ from boilercv.pipelines import (
     make_pipelines,
 )
 from boilercv.pipelines.contexts import PipelineCtx, get_pipeline_context
-from boilercv.pipes import Pipe
+from boilercv.pipelines.pipes import Pipe
 
 
 class EquationMetadata(BaseModel):

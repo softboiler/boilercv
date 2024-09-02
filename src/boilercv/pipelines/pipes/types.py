@@ -3,7 +3,7 @@
 from collections.abc import Callable
 from typing import Any, TypeAlias, TypeVar
 
-from boilercv.pipes import ContextValue, Pipe, PipeWithInfo
+from boilercv.pipelines.pipes import ContextValue, Pipe, PipeWithInfo
 
 AnyPipe: TypeAlias = Pipe | PipeWithInfo | Callable[[Any], Any]
 """Any pipe."""
