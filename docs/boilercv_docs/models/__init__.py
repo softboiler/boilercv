@@ -24,3 +24,5 @@ class Build(BaseModel):
     """
     skip_autodoc: SkipAutodoc = False
     """Skip the potentially slow process of autodoc generation."""
+    skip_autodoc_post_parse: bool = False
+    """Skip the potentially slow process of autodoc post parsing."""

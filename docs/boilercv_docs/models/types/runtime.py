@@ -3,13 +3,13 @@
 from itertools import chain
 from pathlib import Path
 from shutil import rmtree
-from typing import Annotated
+from typing import Annotated, TypeAlias
 
 from pydantic import AfterValidator
 
 from boilercv_docs.models.paths import rooted_paths
 
-NbExecutionExcludePatterns = Annotated[
+NbExecutionExcludePatterns: TypeAlias = Annotated[
     list[str],
     AfterValidator(
         lambda patterns: [
@@ -27,4 +27,4 @@ def remove_stale_autodoc(skip_autodoc: bool) -> bool:
     return skip_autodoc
 
 
-SkipAutodoc = Annotated[bool, AfterValidator(remove_stale_autodoc)]
+SkipAutodoc: TypeAlias = Annotated[bool, AfterValidator(remove_stale_autodoc)]

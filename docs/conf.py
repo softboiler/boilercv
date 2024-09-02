@@ -269,7 +269,8 @@ autodoc2_render_plugin = "myst"
 # ? https://github.com/sphinx-extensions2/sphinx-autodoc2/issues/58
 maximum_signature_line_length = 1
 # ? Parse Numpy docstrings
-autodoc2_docstring_parser_regexes = [(".*", f"{const.ans.package}_docs.docstrings")]
+if not default.build.skip_autodoc_post_parse:
+    autodoc2_docstring_parser_regexes = [(".*", f"{const.ans.package}_docs.docstrings")]
 # * MARK:  Intersphinx
 intersphinx_mapping = {
     pkg: ispx for pkg, ispx in const.ispx_mapping.items() if pkg != "colorcet"
@@ -284,28 +285,29 @@ nitpick_ignore = [
     ("py:class", f"{const.ans.package}.morphs.contexts"),
 ]
 nitpick_ignore_regex = [
-    (r"py:.*", r"boilercv_pipeline\.models\.dvc\..+"),
+    # ? Auto-generated, too hard to separate into own `types` module for ignoring
+    (r"py:.+", r"boilercv_pipeline\.models\.dvc\..+"),
     # ? Missing inventory
-    (r"py:.*", r"docutils\..+"),
-    (r"py:.*", r"numpydoc\.docscrape\..+"),
-    (r"py:.*", r"_pytest\..+"),
-    (r"py:.*", r"numpy\.typing\..+"),
-    (r"py:.*", r"tomlkit\.container\..+"),
+    (r"py:.+", r"docutils\..+"),
+    (r"py:.+", r"numpydoc\.docscrape\..+"),
+    (r"py:.+", r"_pytest\..+"),
+    (r"py:.+", r"numpy\.typing\..+"),
+    (r"py:.+", r"tomlkit\.container\..+"),
     (  # ? sympy: https://github.com/sympy/sympy/issues/17619#issuecomment-536781620
-        r"py:.*",
+        r"py:.+",
         r"sympy\..+",
     ),
-    (r"py:.*", r"pydantic\..+"),  # ? https://github.com/pydantic/pydantic/issues/1339
+    (r"py:.+", r"pydantic\..+"),  # ? https://github.com/pydantic/pydantic/issues/1339
     (
-        r"py:.*",
+        r"py:.+",
         r"pydantic_settings\..+",
     ),  # ? https://github.com/pydantic/pydantic/issues/1339
-    (r"py:.*", r"PySide6\..+"),  # ? https://bugreports.qt.io/browse/PYSIDE-2215
+    (r"py:.+", r"PySide6\..+"),  # ? https://bugreports.qt.io/browse/PYSIDE-2215
     # ? TypeAlias: https://github.com/sphinx-doc/sphinx/issues/10785
     (r"py:class", rf"{const.ans.package}.*\.types\..+"),
     (r"py:class", r"boilercore.*\.types\..+"),
     (r"py:class", rf"{const.ans.package}_pipeline\.captivate\.previews\..+"),
-    (r"py:.*", rf"{const.ans.package}_tests\.test_morphs\..+"),
+    (r"py:.+", rf"{const.ans.package}_tests\.test_morphs\..+"),
     # ? Annotated types unwieldy to move to own types paths
     (r"py:obj", rf"{const.ans.package}_pipeline\.stages\..+\.__init__.py"),
 ]

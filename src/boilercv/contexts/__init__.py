@@ -5,11 +5,10 @@ from __future__ import annotations
 from collections.abc import Iterator, Mapping, MutableMapping
 from copy import copy, deepcopy
 from json import loads
-from typing import TYPE_CHECKING, Annotated, Any, ClassVar, Generic, Literal, Self
+from typing import TYPE_CHECKING, Any, ClassVar, Generic, Literal, Self
 
 from pydantic import (
     BaseModel,
-    BeforeValidator,
     Field,
     FieldSerializationInfo,
     PydanticUserError,
@@ -29,6 +28,7 @@ from boilercv.contexts.types import (
     K,
     Mode,
     PluginConfigDict,
+    PydanticContext,
     V,
 )
 from boilercv.mappings import apply
@@ -61,9 +61,7 @@ class Kwds(BaseModel):
 
     strict: bool | None = None
     from_attributes: bool | None = None
-    context: Annotated[dict[str, Any] | None, BeforeValidator(lambda v: v or {})] = (
-        Field(default_factory=dict)
-    )
+    context: PydanticContext = Field(default_factory=dict)
     mode: Mode = "python"
 
 
@@ -243,10 +241,14 @@ class ContextRoot(  # noqa: PLW1641
 
     Attributes
     ----------
-        root: The root object of the model.
-        __pydantic_root_model__: Whether the model is a RootModel.
-        __pydantic_private__: Private fields in the model.
-        __pydantic_extra__: Extra fields in the model.
+        root :
+            The root object of the model.
+        __pydantic_root_model__ :
+            Whether the model is a RootModel.
+        __pydantic_private__ :
+            Private fields in the model.
+        __pydantic_extra__ :
+            Extra fields in the model.
 
     Notes
     -----
@@ -308,17 +310,20 @@ class ContextRoot(  # noqa: PLW1641
     ) -> Self:
         """Create a new model using the provided root object and update fields set.
 
-        Args:
-            root: The root object of the model.
-            _fields_set: The set of fields to be updated.
+        Parameters
+        ----------
+        root
+            The root object of the model.
+        _fields_set
+            The set of fields to be updated.
 
         Returns
         -------
-            The new model.
+        The new model.
 
         Raises
         ------
-            NotImplemented: If the model is not a subclass of `RootModel`.
+        NotImplemented: If the model is not a subclass of `RootModel`.
         """
         return super().model_construct(root=root, _fields_set=_fields_set)
 

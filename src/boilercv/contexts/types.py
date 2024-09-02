@@ -1,9 +1,9 @@
 """Types."""
 
-from typing import Any, Generic, Literal, Protocol, TypeAlias, TypeVar
+from typing import Annotated, Any, Generic, Literal, Protocol, TypeAlias, TypeVar
 
 import pydantic
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, BeforeValidator, ConfigDict
 from typing_extensions import TypedDict
 
 Mode: TypeAlias = Literal["python", "json", "strings"]
@@ -54,3 +54,9 @@ class ContextPluginSettings(TypedDict, Generic[Context_T]):
     """Context model Pydantic plugin settings."""
 
     context: Context_T
+
+
+PydanticContext: TypeAlias = Annotated[
+    dict[str, Any] | None, BeforeValidator(lambda v: v or {})
+]
+"""Pydantic context."""

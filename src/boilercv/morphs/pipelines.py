@@ -13,7 +13,6 @@ from typing import Any, ClassVar, Generic, Self, TypeAlias, get_args
 from pydantic import BaseModel, model_validator
 from pydantic.alias_generators import to_snake
 
-from boilercv import contexts
 from boilercv.contexts import (
     CONTEXT,
     PLUGIN_SETTINGS,
@@ -21,6 +20,7 @@ from boilercv.contexts import (
     context_validate_before,
 )
 from boilercv.contexts.types import (
+    Context,
     ContextPluginSettings,
     PluginConfigDict,
     SerializationInfo,
@@ -155,7 +155,7 @@ class PipelineCtx(UserDict[str, ContextValueLike]):
         return self
 
 
-class PipelineCtxDict(contexts.Context):
+class PipelineCtxDict(Context):
     """Boilercv pipeline context."""
 
     pipeline: PipelineCtx

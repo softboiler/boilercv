@@ -111,13 +111,16 @@ def get_boilercv_pipeline_config(
     )
 
 
+HiddenContext: TypeAlias = Annotated[Context, Arg(hidden=True)]
+
+
 class BoilercvPipelineCtxModel(ContextModel):
     """Context model for {mod}`~boilercv_pipeline`."""
 
     model_config: ClassVar[BoilercvPipelineConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
         get_boilercv_pipeline_config()
     )
-    context: Annotated[Context, Arg(hidden=True)] = Context()
+    context: HiddenContext = Context()
     _context_handlers: ClassVar = {"boilercv_pipeline": BoilercvPipelineCtx}
 
 
@@ -168,29 +171,31 @@ def ser_rooted_path(
     )
 
 
-FilePathSerPosix = Annotated[FilePath, WrapSerializer(resolve_path)]
+FilePathSerPosix: TypeAlias = Annotated[FilePath, WrapSerializer(resolve_path)]
 """Directory path that serializes as POSIX."""
-DirectoryPathSerPosix = Annotated[DirectoryPath, WrapSerializer(resolve_path)]
+DirectoryPathSerPosix: TypeAlias = Annotated[
+    DirectoryPath, WrapSerializer(resolve_path)
+]
 """Directory path that serializes as POSIX."""
-DataDir = Annotated[
+DataDir: TypeAlias = Annotated[
     Path,
     AfterValidator(partial(make_path, key="data", file=False)),
     WrapSerializer(partial(ser_rooted_path, key="data")),
 ]
 """Data directory path made upon validation."""
-DataFile = Annotated[
+DataFile: TypeAlias = Annotated[
     Path,
     AfterValidator(partial(make_path, key="data", file=True)),
     WrapSerializer(partial(ser_rooted_path, key="data")),
 ]
 """Data file path made upon validation."""
-DocsDir = Annotated[
+DocsDir: TypeAlias = Annotated[
     Path,
     AfterValidator(partial(make_path, key="docs", file=False)),
     WrapSerializer(partial(ser_rooted_path, key="docs")),
 ]
 """Docs directory path made upon validation."""
-DocsFile = Annotated[
+DocsFile: TypeAlias = Annotated[
     Path,
     AfterValidator(partial(make_path, key="docs", file=True)),
     WrapSerializer(partial(ser_rooted_path, key="docs")),

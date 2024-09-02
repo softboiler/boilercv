@@ -81,10 +81,10 @@ class PlotFlags(OutFlags):
     template: FilePath = Field(None, description="Default plot template")
 
 
-X = Annotated[dict[FilePath, PlotColumn], Field(default_factory=dict)]
+X: TypeAlias = Annotated[dict[FilePath, PlotColumn], Field(default_factory=dict)]
 
 
-Y = Annotated[dict[FilePath, PlotColumns], Field(default_factory=dict)]
+Y: TypeAlias = Annotated[dict[FilePath, PlotColumns], Field(default_factory=dict)]
 
 
 class TopLevelPlotFlags(BaseModel):
@@ -108,7 +108,7 @@ class TopLevelPlotFlags(BaseModel):
     template: str = Field(default="linear", description="Default plot template")
 
 
-EmptyTopLevelPlotFlags = Annotated[NoneType, Field(default=None)]
+EmptyTopLevelPlotFlags: TypeAlias = Annotated[NoneType, Field(default=None)]
 
 
 class TopLevelArtifactFlags(BaseModel):
@@ -125,22 +125,24 @@ class TopLevelArtifactFlags(BaseModel):
 DEP_DESC = "Path to a dependency (input) file or directory for the stage."
 
 
-DepModel = Annotated[FilePath, Field(..., description=DEP_DESC)]
+DepModel: TypeAlias = Annotated[FilePath, Field(..., description=DEP_DESC)]
 
 
 Dependencies: TypeAlias = list[DepModel]
 
 
-ParamKey = Annotated[str, Field(..., description="Parameter name (dot-separated).")]
+ParamKey: TypeAlias = Annotated[
+    str, Field(..., description="Parameter name (dot-separated).")
+]
 
 
-CustomParamFileKeys = Annotated[
+CustomParamFileKeys: TypeAlias = Annotated[
     dict[FilePath, list[ParamKey]],
     Field(..., description="Path to YAML/JSON/TOML/Python params file."),
 ]
 
 
-EmptyParamFileKeys = Annotated[
+EmptyParamFileKeys: TypeAlias = Annotated[
     dict[FilePath, None],
     Field(..., description="Path to YAML/JSON/TOML/Python params file."),
 ]
@@ -152,7 +154,7 @@ Param = ParamKey | CustomParamFileKeys | EmptyParamFileKeys
 Params = list[Param]
 
 
-Out = Annotated[
+Out: TypeAlias = Annotated[
     FilePath | dict[FilePath, OutFlags],
     Field(..., description="Path to an output file or dir of the stage."),
 ]
@@ -161,7 +163,7 @@ Out = Annotated[
 Outs = list[Out]
 
 
-Metric = Annotated[
+Metric: TypeAlias = Annotated[
     FilePath | dict[FilePath, OutFlags],
     Field(..., description="Path to a JSON/TOML/YAML metrics output of the stage."),
 ]
@@ -175,19 +177,19 @@ Data files may be JSON/YAML/CSV/TSV.
 Image files may be JPEG/GIF/PNG."""
 
 
-Plot = Annotated[
+Plot: TypeAlias = Annotated[
     FilePath | dict[FilePath, PlotFlags], Field(..., description=PLOT_DESC)
 ]
 
 Plots = list[Plot]
 
 
-VarPath = Annotated[
+VarPath: TypeAlias = Annotated[
     str, Field(..., description="Path to params file with values for substitution.")
 ]
 
 
-VarDecl = Annotated[
+VarDecl: TypeAlias = Annotated[
     dict[VarKey, Any], Field(..., description="Dict of values for substitution.")
 ]
 
@@ -259,14 +261,14 @@ Parametrized stage definition that'll be substituted over for each of the \
 value from the foreach data."""
 
 
-ParametrizedString = Annotated[str, Field(pattern=r"^\$\{.*?\}$")]
+ParametrizedString: TypeAlias = Annotated[str, Field(pattern=r"^\$\{.*?\}$")]
 
 
 class ForeachDo(BaseModel):
     model_config = ConfigDict(frozen=False, extra="forbid")
-    foreach: (
-        Annotated[str, Field(pattern=r"^\$\{.*?\}$")] | list[Any] | dict[str, Any]
-    ) = Field(..., description=FOREACH_DESC)
+    foreach: ParametrizedString | list[Any] | dict[str, Any] = Field(
+        ..., description=FOREACH_DESC
+    )
     do: Stage = Field(..., description=DO_DESC)
 
 
@@ -296,23 +298,23 @@ dict to params in the file).
 Use elsewhere in `dvc.yaml` with the `${}` substitution expression."""
 
 
-TopLevelPlots = Annotated[
+TopLevelPlots: TypeAlias = Annotated[
     dict[PlotIdOrFilePath, TopLevelPlotFlags | EmptyTopLevelPlotFlags],
     Field(default_factory=dict),
 ]
 
 
-TopLevelPlotsList = Annotated[
+TopLevelPlotsList: TypeAlias = Annotated[
     list[PlotIdOrFilePath | TopLevelPlots], Field(default_factory=list)
 ]
 
 
-ArtifactIdOrFilePath = Annotated[
+ArtifactIdOrFilePath: TypeAlias = Annotated[
     str, Field(pattern=r"^[a-z0-9]([a-z0-9-/]*[a-z0-9])?$")
 ]
 
 
-TopLevelArtifacts = Annotated[
+TopLevelArtifacts: TypeAlias = Annotated[
     dict[ArtifactIdOrFilePath, TopLevelArtifactFlags], Field(default_factory=dict)
 ]
 
