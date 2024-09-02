@@ -3,9 +3,8 @@
 # TODO: https://github.com/softboiler/boilercv/issues/232
 # pyright:reportInvalidTypeVarUse=none
 
-from collections.abc import Callable, MutableMapping
+from collections.abc import MutableMapping
 from typing import (
-    TYPE_CHECKING,
     Any,
     Literal,
     NamedTuple,
@@ -20,24 +19,23 @@ from typing import (
 
 from pydantic import BaseModel
 
-if TYPE_CHECKING:
-    from boilercv.morphs.pipelines import (
-        ContextValue,
-        Pipe,
-        PipelineContext,
-        PipeWithInfo,
-    )
+from boilercv.contexts.types import (
+    ContextPluginSettings,
+    PluginConfigDict,
+    SerializationInfo,
+    ValidationInfo,
+)
+from boilercv.morphs.contexts import PipelineCtxDict
 
-AnyPipe: TypeAlias = "Pipe | PipeWithInfo | Callable[[Any], Any]"
-"""Any pipe."""
 Mode: TypeAlias = Literal["before", "after"]
 """Mode."""
 UnionGenericAlias: TypeAlias = _UnionGenericAlias
 """Union type."""
 LiteralGenericAlias: TypeAlias = _LiteralGenericAlias
 """Literal type."""
-ContextValueLike: TypeAlias = "PipelineContext | ContextValue"
-"""Allowable context-value-like values."""
+PipelineConfigDict: TypeAlias = PluginConfigDict[ContextPluginSettings[PipelineCtxDict]]
+PipelineValidationInfo: TypeAlias = ValidationInfo[PipelineCtxDict]
+PipelineSerializationInfo: TypeAlias = SerializationInfo[PipelineCtxDict]
 
 T = TypeVar("T")
 """Type."""
@@ -55,8 +53,7 @@ RK = TypeVar("RK")
 """Return key type that may differ from parameter key type."""
 RV = TypeVar("RV")
 """Return value type that may differ from parameter value type."""
-CV = TypeVar("CV", bound="ContextValue", contravariant=True)
-"""Context value type."""
+
 Model = TypeVar("Model", bound=BaseModel)
 """Model type."""
 TypeOfModel = TypeVar("TypeOfModel", bound=type[BaseModel])

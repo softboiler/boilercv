@@ -2,16 +2,14 @@
 
 from __future__ import annotations
 
-from collections import UserDict, defaultdict
-from collections.abc import Callable, Mapping, Sequence
+from collections.abc import Callable, Sequence
 from contextlib import suppress
 from dataclasses import dataclass, field
 from functools import partial
 from itertools import chain
-from typing import Any, ClassVar, Generic, Self, TypeAlias, get_args
+from typing import Any, ClassVar, Generic, Self, get_args
 
 from pydantic import BaseModel, model_validator
-from pydantic.alias_generators import to_snake
 
 from boilercv.contexts import (
     CONTEXT,
@@ -19,21 +17,24 @@ from boilercv.contexts import (
     ContextBase,
     context_validate_before,
 )
-from boilercv.contexts.types import (
-    Context,
-    ContextPluginSettings,
-    PluginConfigDict,
-    SerializationInfo,
-    ValidationInfo,
+from boilercv.contexts.types import ContextPluginSettings, PluginConfigDict
+from boilercv.morphs.contexts import (
+    PipelineContext,
+    PipelineCtx,
+    PipelineCtxDict,
+    Pipelines,
+    get_context_value,
+    get_pipeline_context,
 )
 from boilercv.morphs.morphs import Morph
+from boilercv.morphs.pipes import ContextValue, Pipe, PipeWithInfo
+from boilercv.morphs.pipes.types import AnyPipe
 from boilercv.morphs.types import (
-    CV,
-    AnyPipe,
-    ContextValueLike,
     K,
     LiteralGenericAlias,
     Mode,
+    PipelineConfigDict,
+    PipelineValidationInfo,
     T,
     UnionGenericAlias,
     V,
@@ -41,134 +42,6 @@ from boilercv.morphs.types import (
 
 PIPELINE = "pipeline"
 """Pipe model context key."""
-
-# * MARK: Pipelines
-
-
-@dataclass
-class Pipelines:
-    """Pipelines."""
-
-    before: tuple[AnyPipe, ...] = field(default_factory=tuple)
-    after: tuple[AnyPipe, ...] = field(default_factory=tuple)
-
-    @classmethod
-    def make(
-        cls,
-        before: Sequence[AnyPipe] | AnyPipe | None = None,
-        after: Sequence[AnyPipe] | AnyPipe | None = None,
-    ) -> Self:
-        """Get validators."""
-        before = () if before is None else before
-        after = () if after is None else after
-        bef = tuple(before) if isinstance(before, Sequence) else (before,)
-        aft = tuple(after) if isinstance(after, Sequence) else (after,)
-        return cls(before=bef, after=aft)
-
-
-class ContextValue:
-    """Context value."""
-
-    @classmethod
-    def name_to_snake(cls) -> str:
-        """Get name."""
-        return to_snake(cls.__name__)
-
-
-class PipelineContext(UserDict[Any, Pipelines], ContextValue):
-    """Morphs."""
-
-    def __or__(  # pyright: ignore[reportIncompatibleMethodOverride]
-        self, other: Self | Mapping[Any, Pipelines] | Any
-    ) -> Self:
-        if isinstance(other, PipelineContext):
-            merged: dict[Any, Pipelines] = defaultdict(Pipelines)
-            for model, pipeline in chain.from_iterable([self.items(), other.items()]):
-                merged[model].before += pipeline.before
-                merged[model].after += pipeline.after
-            return type(self)(merged)
-        if isinstance(other, Mapping):
-            return self | type(self)(other)
-        return NotImplemented
-
-    def __ror__(  # pyright: ignore[reportIncompatibleMethodOverride]
-        self, other: Self | Mapping[Any, Pipelines] | Any
-    ) -> Self:
-        if isinstance(other, Mapping):
-            return type(self)(other) | self
-        return NotImplemented
-
-    def __ior__(self, other: Self | Mapping[Any, Pipelines] | Any) -> Self:
-        self.data = (self | other).data
-        return self
-
-
-@dataclass
-class Pipe:
-    """Pipe."""
-
-    f: Callable[[Any, Any], Any]
-    context_value: ContextValue
-
-
-@dataclass
-class PipeWithInfo:
-    """Pipe with validation info."""
-
-    f: Callable[[Any, Any, Any], Any]
-    context_value: ContextValue
-
-
-# * MARK: Contexts
-
-
-class PipelineCtx(UserDict[str, ContextValueLike]):
-    """Morphs."""
-
-    @property
-    def pipelines(self) -> PipelineContext:
-        """Get pipelines."""
-        context = self.get(get_context_key(PipelineContext), PipelineContext())
-        return context if isinstance(context, PipelineContext) else PipelineContext()
-
-    def __or__(self, other: PipelineCtx | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
-        # sourcery skip: remove-redundant-constructor-in-dict-union
-        # ! This Sourcery refactoring results in an infinite loop
-        if isinstance(other, PipelineCtx):
-            merged = dict(self) | dict(other)
-            if (morphs := get_context_value(PipelineContext, self)) is not None and (
-                other_morphs := get_context_value(PipelineContext, other)
-            ) is not None:
-                merged[get_context_key(PipelineContext)] = morphs | other_morphs
-            return type(self)(merged)
-        if isinstance(other, Mapping):
-            return self | type(self)(other)  # pyright: ignore[reportArgumentType]
-        return NotImplemented
-
-    def __ror__(self, other: PipelineCtx | Mapping[str, Any] | Any) -> Self:  # pyright: ignore[reportIncompatibleMethodOverride]
-        if isinstance(other, Mapping):
-            return type(self)(other) | self
-        return NotImplemented
-
-    def __ior__(self, other: PipelineCtx | Mapping[str, Any] | Any) -> Self:
-        self.data = (self | other).data
-        return self
-
-
-class PipelineCtxDict(Context):
-    """Boilercv pipeline context."""
-
-    pipeline: PipelineCtx
-
-
-def get_pipeline_context(ctx: PipelineCtx | None = None) -> PipelineCtxDict:
-    """Get pipe model context."""
-    return PipelineCtxDict(pipeline=ctx or PipelineCtx())
-
-
-PipelineConfigDict: TypeAlias = PluginConfigDict[ContextPluginSettings[PipelineCtxDict]]
-PipelineValidationInfo: TypeAlias = ValidationInfo[PipelineCtxDict]
-PipelineSerializationInfo: TypeAlias = SerializationInfo[PipelineCtxDict]
 
 
 class PipelineBase(ContextBase):
@@ -418,13 +291,3 @@ def compose_context(*context_values: ContextValue) -> PipelineCtx:
     return PipelineCtx({
         context_value.name_to_snake(): context_value for context_value in context_values
     })
-
-
-def get_context_value(value_type: type[CV], context: PipelineCtx | None) -> CV | None:
-    """Get context values for a type."""
-    return (context or PipelineCtx()).get(get_context_key(value_type))  # pyright: ignore[reportReturnType]
-
-
-def get_context_key(value_type: type[CV]) -> str:
-    """Get context keys for a type."""
-    return value_type.name_to_snake()

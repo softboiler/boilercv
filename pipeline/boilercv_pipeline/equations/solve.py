@@ -17,8 +17,8 @@ from boilercv.correlations.models import Solutions, SolvedEquations, SymbolSolut
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, trivial
 from boilercv.mappings import filt, sync
+from boilercv.morphs.contexts import PipelineCtxDict, get_pipeline_context
 from boilercv.morphs.morphs import Morph
-from boilercv.morphs.pipelines import PipelineCtxDict, get_pipeline_context
 from boilercv_pipeline.equations import EQUATIONS, SOLUTIONS, SOLVE_SYMS, SUBSTITUTIONS
 
 TIMEOUT = 5

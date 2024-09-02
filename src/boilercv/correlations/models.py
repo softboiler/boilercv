@@ -27,17 +27,16 @@ from boilercv.correlations.types import (
     Kind,
     S,
 )
+from boilercv.morphs.contexts import PipelineCtx, get_pipeline_context
 from boilercv.morphs.morphs import Morph
 from boilercv.morphs.pipelines import (
     Defaults,
-    Pipe,
     Pipeline,
     PipelineBase,
-    PipelineCtx,
     compose_contexts,
-    get_pipeline_context,
     make_pipelines,
 )
+from boilercv.morphs.pipes import Pipe
 
 
 class EquationMetadata(BaseModel):
