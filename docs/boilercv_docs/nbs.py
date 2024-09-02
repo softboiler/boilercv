@@ -13,7 +13,7 @@ from pandas import DataFrame
 from boilercv_docs.config import default
 from boilercv_docs.models.paths import rooted_paths
 from boilercv_docs.types import BuildMode
-from boilercv_pipeline.models.types.runtime import (
+from boilercv_pipeline.models.path import (
     BoilercvPipelineCtxDict,
     Roots,
     get_boilercv_pipeline_context,

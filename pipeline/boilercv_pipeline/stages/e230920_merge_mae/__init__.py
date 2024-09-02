@@ -5,15 +5,15 @@ from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import Field
 
-from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.paths.types import StagePaths
-from boilercv_pipeline.models.stages import Params
-from boilercv_pipeline.models.types.runtime import (
+from boilercv_pipeline.models.path import (
     DataDir,
     DataFile,
     DirectoryPathSerPosix,
     DocsFile,
 )
+from boilercv_pipeline.models.paths import paths
+from boilercv_pipeline.models.paths.types import StagePaths
+from boilercv_pipeline.models.stages import Params
 
 
 class Deps(StagePaths):

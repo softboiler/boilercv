@@ -1,4 +1,4 @@
-"""Types used at runtime."""
+"""Path models."""
 
 from __future__ import annotations
 
@@ -26,7 +26,7 @@ from boilercv.contexts.types import (
     ValidationInfo,
 )
 from boilercv_pipeline.config import const
-from boilercv_pipeline.models.types import Key, Kind, Kinds
+from boilercv_pipeline.models.path.types import Key, Kind, Kinds
 
 
 class Roots(BaseModel):

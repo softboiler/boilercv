@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field
 from yaml import safe_dump
 
 from boilercv.mappings import apply
-from boilercv_pipeline.models.types.runtime import (
+from boilercv_pipeline.models.path import (
     ROOTED,
     BoilercvPipelineCtxModel,
     get_boilercv_pipeline_config,

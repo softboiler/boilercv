@@ -11,8 +11,8 @@ from pandas import options
 from pydantic import BaseModel, Field
 from seaborn import move_legend, set_theme
 
+from boilercv_pipeline.models.path import BoilercvPipelineCtxDict
 from boilercv_pipeline.models.paths.types import Deps_T, Outs_T, Stage, StagePaths
-from boilercv_pipeline.models.types.runtime import BoilercvPipelineCtxDict
 
 
 def set_display_options(

@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import get_args
 
 from boilercv_pipeline.models.generated.types.stages import StageName
-from boilercv_pipeline.models.types.runtime import (
+from boilercv_pipeline.models.path import (
     BoilercvPipelineCtxModel,
     DataDir,
     DataFile,

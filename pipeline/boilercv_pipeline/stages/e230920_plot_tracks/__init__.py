@@ -6,14 +6,10 @@ from cappa.arg import Arg
 from cappa.base import command, invoke
 from pydantic import Field
 
+from boilercv_pipeline.models.path import DataFile, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.paths.types import StagePaths
 from boilercv_pipeline.models.stages import Params
-from boilercv_pipeline.models.types.runtime import (
-    DataFile,
-    DirectoryPathSerPosix,
-    DocsFile,
-)
 from boilercv_pipeline.stages.common.e230920 import get_path_time
 
 

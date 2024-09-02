@@ -2,12 +2,12 @@
 
 from typing import TypeVar
 
-from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.types.runtime import (
+from boilercv_pipeline.models.path import (
     ROOTED,
     BoilercvPipelineCtxModel,
     get_boilercv_pipeline_config,
 )
+from boilercv_pipeline.models.paths import paths
 
 
 class Stage(BoilercvPipelineCtxModel):

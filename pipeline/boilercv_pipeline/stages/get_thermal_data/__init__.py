@@ -6,15 +6,15 @@ from cappa.base import command
 from pydantic import Field
 
 from boilercv_pipeline.models.deps import DirSlicer
-from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.paths.types import StagePaths
-from boilercv_pipeline.models.stages import Format, Params
-from boilercv_pipeline.models.types.runtime import (
+from boilercv_pipeline.models.path import (
     DataDir,
     DataFile,
     DirectoryPathSerPosix,
     DocsFile,
 )
+from boilercv_pipeline.models.paths import paths
+from boilercv_pipeline.models.paths.types import StagePaths
+from boilercv_pipeline.models.stages import Format, Params
 from boilercv_pipeline.stages.common.e230920 import const
 
 

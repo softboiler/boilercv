@@ -22,7 +22,7 @@ from matplotlib.figure import Figure
 from pydantic.alias_generators import to_pascal
 
 from boilercv_pipeline.config import const as boilercv_pipeline_const
-from boilercv_pipeline.models.types.runtime import Roots, get_boilercv_pipeline_context
+from boilercv_pipeline.models.path import Roots, get_boilercv_pipeline_context
 from boilercv_tests import Case, get_cached_nb_ns, normalize_cases
 from boilercv_tests.config import const
 from boilercv_tests.types import FixtureStore
