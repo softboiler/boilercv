@@ -6,7 +6,7 @@ from boilercv.contexts.types import (
     SerializationInfo,
     ValidationInfo,
 )
-from boilercv.morphs.contexts import PipelineCtxDict
+from boilercv.pipelines.contexts import PipelineCtxDict
 
 PipelineConfigDict = PluginConfigDict[ContextPluginSettings[PipelineCtxDict]]
 PipelineValidationInfo = ValidationInfo[PipelineCtxDict]

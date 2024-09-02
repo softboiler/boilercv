@@ -27,7 +27,6 @@ from boilercv.correlations.types import (
     Kind,
     S,
 )
-from boilercv.morphs.contexts import PipelineCtx, get_pipeline_context
 from boilercv.morphs.morphs import Morph
 from boilercv.pipelines import (
     Defaults,
@@ -36,6 +35,7 @@ from boilercv.pipelines import (
     compose_contexts,
     make_pipelines,
 )
+from boilercv.pipelines.contexts import PipelineCtx, get_pipeline_context
 from boilercv.pipes import Pipe
 
 

@@ -6,7 +6,7 @@ from tomlkit import TOMLDocument, parse
 from boilercv.correlations import META_TOML
 from boilercv.correlations.models import Metadata
 from boilercv.mappings import sync
-from boilercv.morphs.contexts import get_pipeline_context
+from boilercv.pipelines.contexts import get_pipeline_context
 
 APP = App()
 """CLI."""

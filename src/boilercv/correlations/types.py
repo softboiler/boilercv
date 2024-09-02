@@ -31,8 +31,8 @@ from pydantic import (
 from sympy import sympify
 from sympy.logic.boolalg import BooleanAtom
 
-from boilercv.morphs.contexts.types import PipelineValidationInfo
 from boilercv.pipelines import PIPELINE
+from boilercv.pipelines.contexts.types import PipelineValidationInfo
 from boilercv.pipes import ContextValue
 
 if TYPE_CHECKING:

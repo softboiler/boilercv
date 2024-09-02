@@ -18,7 +18,8 @@ from boilercv.contexts import (
     context_validate_before,
 )
 from boilercv.contexts.types import ContextPluginSettings, PluginConfigDict
-from boilercv.morphs.contexts import (
+from boilercv.morphs.morphs import Morph
+from boilercv.pipelines.contexts import (
     PipelineContext,
     PipelineCtx,
     PipelineCtxDict,
@@ -26,8 +27,7 @@ from boilercv.morphs.contexts import (
     get_context_value,
     get_pipeline_context,
 )
-from boilercv.morphs.contexts.types import PipelineConfigDict, PipelineValidationInfo
-from boilercv.morphs.morphs import Morph
+from boilercv.pipelines.contexts.types import PipelineConfigDict, PipelineValidationInfo
 from boilercv.pipelines.types import (
     K,
     LiteralGenericAlias,

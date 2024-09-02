@@ -13,7 +13,7 @@ from watchfiles import awatch
 from boilercv.correlations import GROUPS, META_TOML, RANGES_TOML, get_equations
 from boilercv.correlations.models import Equations, Metadata
 from boilercv.correlations.types import Corr, Equation, Range
-from boilercv.morphs.contexts import get_pipeline_context
+from boilercv.pipelines.contexts import get_pipeline_context
 from boilercv_pipeline.equations import EQUATIONS, SYMS, get_raw_equations_context
 
 logger.remove()

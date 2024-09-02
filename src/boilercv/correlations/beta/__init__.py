@@ -8,7 +8,7 @@ from boilercv import correlations
 from boilercv.correlations.beta.types import SolveSym
 from boilercv.correlations.models import Correlation, Expectations, SymbolicCorrelation
 from boilercv.correlations.types import Equation, Sym
-from boilercv.morphs.contexts import get_pipeline_context
+from boilercv.pipelines.contexts import get_pipeline_context
 
 PNGS = Path("data/png_equations_beta")
 """Equation PNGs."""
