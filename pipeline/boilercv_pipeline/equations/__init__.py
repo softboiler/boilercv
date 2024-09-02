@@ -22,8 +22,8 @@ from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, Kind, Range, Sym
 from boilercv.morphs.contexts import PipelineCtxDict, get_pipeline_context
 from boilercv.morphs.morphs import Morph
-from boilercv.morphs.pipelines import make_pipelines
-from boilercv.morphs.pipes import Pipe
+from boilercv.pipelines import make_pipelines
+from boilercv.pipes import Pipe
 
 SYMS = tuple(SYMBOLS.keys())
 PIPX = Path(executable).parent / "pipx"

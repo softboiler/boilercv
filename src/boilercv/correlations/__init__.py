@@ -17,7 +17,7 @@ from boilercv.correlations.models import (
 )
 from boilercv.correlations.types import AnyExpr, Equation, Sym, trivial_expr
 from boilercv.morphs.contexts import get_pipeline_context
-from boilercv.morphs.pipelines.types import LiteralGenericAlias
+from boilercv.pipelines.types import LiteralGenericAlias
 
 _base = Path(__file__).with_suffix(".toml")
 META_TOML = _base.with_stem("meta")

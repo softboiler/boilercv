@@ -14,8 +14,8 @@ from boilercv.correlations.types import CVL, Kind, P, Ps, R, SympifyParams, Tran
 from boilercv.mappings import Repl, replace, replace_pattern, sort_by_keys_pattern
 from boilercv.morphs.contexts import PipelineCtx
 from boilercv.morphs.morphs import Morph
-from boilercv.morphs.pipelines import Defaults, compose_context
-from boilercv.morphs.pipes import ContextValue, Pipe
+from boilercv.pipelines import Defaults, compose_context
+from boilercv.pipes import ContextValue, Pipe
 
 
 def fold_whitespace(

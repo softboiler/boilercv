@@ -28,7 +28,7 @@ from boilercv.morphs.contexts import (
 )
 from boilercv.morphs.contexts.types import PipelineConfigDict, PipelineValidationInfo
 from boilercv.morphs.morphs import Morph
-from boilercv.morphs.pipelines.types import (
+from boilercv.pipelines.types import (
     K,
     LiteralGenericAlias,
     Mode,
@@ -36,8 +36,8 @@ from boilercv.morphs.pipelines.types import (
     UnionGenericAlias,
     V,
 )
-from boilercv.morphs.pipes import ContextValue, Pipe, PipeWithInfo
-from boilercv.morphs.pipes.types import AnyPipe
+from boilercv.pipes import ContextValue, Pipe, PipeWithInfo
+from boilercv.pipes.types import AnyPipe
 
 PIPELINE = "pipeline"
 """Pipe model context key."""
