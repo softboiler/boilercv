@@ -20,7 +20,7 @@ from boilercv.correlations.models import (
 from boilercv.correlations.nusselt.types import SolveSym as SolveSymNusselt
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, Kind, Range, Sym
-from boilercv.morphs.morphs import Morph
+from boilercv.morphs import Morph
 from boilercv.pipelines import make_pipelines
 from boilercv.pipelines.contexts import PipelineCtxDict, get_pipeline_context
 from boilercv.pipes import Pipe

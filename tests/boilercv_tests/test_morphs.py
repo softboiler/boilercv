@@ -10,7 +10,7 @@ import pytest
 from pydantic import ValidationError
 
 from boilercv.contexts.types import Context
-from boilercv.morphs.morphs import Morph, TypeType
+from boilercv.morphs import Morph, TypeType
 
 K = TypeVar("K")
 """Key type."""

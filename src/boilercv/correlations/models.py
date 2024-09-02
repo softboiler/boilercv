@@ -27,7 +27,7 @@ from boilercv.correlations.types import (
     Kind,
     S,
 )
-from boilercv.morphs.morphs import Morph
+from boilercv.morphs import Morph
 from boilercv.pipelines import (
     Defaults,
     Pipeline,
