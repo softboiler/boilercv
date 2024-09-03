@@ -1,5 +1,7 @@
 """Types."""
 
+from typing import TypeAlias
+
 from boilercv.contexts.types import (
     ContextPluginSettings,
     PluginConfigDict,
@@ -8,6 +10,6 @@ from boilercv.contexts.types import (
 )
 from boilercv.pipelines.contexts import PipelineCtxDict
 
-PipelineConfigDict = PluginConfigDict[ContextPluginSettings[PipelineCtxDict]]
-PipelineValidationInfo = ValidationInfo[PipelineCtxDict]
-PipelineSerializationInfo = SerializationInfo[PipelineCtxDict]
+PipelineConfigDict: TypeAlias = PluginConfigDict[ContextPluginSettings[PipelineCtxDict]]
+PipelineValidationInfo: TypeAlias = ValidationInfo[PipelineCtxDict]
+PipelineSerializationInfo: TypeAlias = SerializationInfo[PipelineCtxDict]

@@ -13,11 +13,8 @@ from pandas import DataFrame
 from boilercv_docs.config import default
 from boilercv_docs.models.paths import rooted_paths
 from boilercv_docs.types import BuildMode
-from boilercv_pipeline.models.path import (
-    BoilercvPipelineCtxDict,
-    Roots,
-    get_boilercv_pipeline_context,
-)
+from boilercv_pipeline.models.contexts import BoilercvPipelineCtxDict, Roots
+from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 from boilercv_tools.warnings import filter_boilercv_warnings
 
 

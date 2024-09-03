@@ -2,8 +2,8 @@
 
 from typing import TypeVar
 
+from boilercv_pipeline.models.contexts import ROOTED
 from boilercv_pipeline.models.path import (
-    ROOTED,
     BoilercvPipelineCtxModel,
     get_boilercv_pipeline_config,
 )

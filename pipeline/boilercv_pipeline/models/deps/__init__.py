@@ -5,7 +5,7 @@ from re import search
 
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.models.types import Slicer, Slicers
+from boilercv_pipeline.models.deps.types import Slicer, Slicers
 
 
 def get_slices(slicers: Slicers) -> dict[str, slice]:

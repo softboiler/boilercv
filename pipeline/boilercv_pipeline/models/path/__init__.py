@@ -9,65 +9,26 @@ from typing import Annotated, ClassVar, TypeAlias
 from cappa.arg import Arg
 from pydantic import (
     AfterValidator,
-    BaseModel,
     DirectoryPath,
-    Field,
     FilePath,
     SerializerFunctionWrapHandler,
     WrapSerializer,
 )
 
 from boilercv.contexts import ContextModel
-from boilercv.contexts.types import (
-    Context,
-    ContextPluginSettings,
-    PluginConfigDict,
-    SerializationInfo,
-    ValidationInfo,
+from boilercv.contexts.types import Context, ContextPluginSettings, PluginConfigDict
+from boilercv_pipeline.models.contexts import (
+    BoilercvPipelineCtx,
+    BoilercvPipelineCtxDict,
+    Roots,
 )
-from boilercv_pipeline.config import const
-from boilercv_pipeline.models.path.types import Key, Kind, Kinds
-
-
-class Roots(BaseModel):
-    """Root directories."""
-
-    data: Path | None = None
-    """Data."""
-    docs: Path | None = None
-    """Docs."""
-
-
-ROOTED = Roots(data=const.data, docs=const.docs)
-"""Paths rooted to their directories."""
-
-
-class BoilercvPipelineCtx(BaseModel):
-    """Root directory context."""
-
-    roots: Roots = Field(default_factory=Roots)
-    """Root directories for different kinds of paths."""
-    kinds: Kinds = Field(default_factory=dict)
-    """Kind of each path."""
-    track_kinds: bool = False
-    """Whether to track kinds."""
-    resolve_rooted: bool = True
-    """Whether to resolve rooted paths when serializing."""
-
-
-class BoilercvPipelineCtxDict(Context):
-    """Boilercv pipeline context."""
-
-    boilercv_pipeline: BoilercvPipelineCtx
-
-
-BoilercvPipelineConfigDict: TypeAlias = PluginConfigDict[
-    ContextPluginSettings[BoilercvPipelineCtxDict]
-]
-BoilercvPipelineValidationInfo: TypeAlias = ValidationInfo[BoilercvPipelineCtxDict]
-BoilercvPipelineSerializationInfo: TypeAlias = SerializationInfo[
-    BoilercvPipelineCtxDict
-]
+from boilercv_pipeline.models.contexts.types import (
+    BoilercvPipelineConfigDict,
+    BoilercvPipelineSerializationInfo,
+    BoilercvPipelineValidationInfo,
+    Kind,
+)
+from boilercv_pipeline.models.path.types import Key
 
 
 def get_boilercv_pipeline_context(

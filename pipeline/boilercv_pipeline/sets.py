@@ -12,7 +12,8 @@ from boilercv.correlations.types import Stage
 from boilercv.data import FRAME, HEADER, ROI, VIDEO, XPX, YPX
 from boilercv.data.packing import unpack
 from boilercv.types import DF, DS
-from boilercv_pipeline.models.path import ROOTED, get_boilercv_pipeline_context
+from boilercv_pipeline.models.contexts import ROOTED
+from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 from boilercv_pipeline.models.paths import Paths
 
 ROOTED_PATHS = Paths(context=get_boilercv_pipeline_context(ROOTED))
