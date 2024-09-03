@@ -1,6 +1,4 @@
-"""Types."""
-
-from typing import TypeVar
+"""Stage."""
 
 from boilercv_pipeline.models.contexts import ROOTED
 from boilercv_pipeline.models.path import (
@@ -18,9 +16,3 @@ class Stage(BoilercvPipelineCtxModel):
 
 class StagePaths(Stage):
     """Paths for stage dependencies and outputs."""
-
-
-Deps_T = TypeVar("Deps_T", bound=StagePaths, covariant=True)
-"""Dependencies type."""
-Outs_T = TypeVar("Outs_T", bound=StagePaths, covariant=True)
-"""Outputs type."""

@@ -7,7 +7,7 @@ from pydantic import Field
 
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.paths.types import StagePaths
+from boilercv_pipeline.models.stage import StagePaths
 from boilercv_pipeline.models.stages import Params
 
 

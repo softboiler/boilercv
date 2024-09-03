@@ -30,8 +30,8 @@ from boilercv.types import DA, Img
 from boilercv_pipeline.models import stages
 from boilercv_pipeline.models.deps import first_slicer
 from boilercv_pipeline.models.deps.types import Slicers
-from boilercv_pipeline.models.paths.types import Deps_T, Outs_T
 from boilercv_pipeline.models.stages import AnyParams
+from boilercv_pipeline.models.stages.types import Deps_T, Outs_T
 from boilercv_pipeline.stages.common.e230920.types import DfNbOuts, Model
 
 IDX = "idx"

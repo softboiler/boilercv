@@ -13,7 +13,7 @@ from boilercv_pipeline.models.path import (
     DocsFile,
 )
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.paths.types import StagePaths
+from boilercv_pipeline.models.stage import StagePaths
 from boilercv_pipeline.models.stages import Format, Params
 from boilercv_pipeline.stages.common.e230920 import const
 
