@@ -20,7 +20,13 @@ class Constants(BaseModel, use_attribute_docstrings=True):
     }
     """Stages."""
     data: Path = Path("data")
+    """Data directory."""
     docs: Path = Path("docs")
+    """Docs directory."""
+    generated_stages: Path = (
+        package_dir / "models" / "generated" / "types" / "stages.py"
+    )
+    """Generated stages."""
 
 
 const = Constants()

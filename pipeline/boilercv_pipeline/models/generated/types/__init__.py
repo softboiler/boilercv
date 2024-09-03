@@ -17,7 +17,7 @@ def init():
 
 def sync_stages():
     """Sync generated types prior to their import and usage in models."""
-    stages_literals = const.package_dir / "models" / "generated" / "types" / "stages.py"
+    stages_literals = const.generated_stages
     # ? Append `#@` annotations to tell `astroid` which nodes to extract
     src = sub(
         r"(?m)(?P<line>^StageName: TypeAlias.+$)",
