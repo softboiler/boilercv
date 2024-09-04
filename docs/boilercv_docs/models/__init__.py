@@ -22,7 +22,7 @@ class Build(BaseModel):
 
     https://myst-nb.readthedocs.io/en/stable/computation/execute.html#notebook-execution-modes
     """
-    skip_autodoc: SkipAutodoc = False
+    skip_autodoc: SkipAutodoc = True
     """Skip the potentially slow process of autodoc generation."""
     skip_autodoc_post_parse: bool = False
     """Skip the potentially slow process of autodoc post parsing."""
