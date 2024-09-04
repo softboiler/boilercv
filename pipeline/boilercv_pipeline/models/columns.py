@@ -2,9 +2,10 @@
 
 from itertools import chain
 
-from pydantic import BaseModel
+from more_itertools import one
+from pydantic import BaseModel, computed_field
 
-from boilercv_pipeline.models.column import Col, Kind
+from boilercv_pipeline.models.column import Col, Kind, LinkedCol
 from boilercv_pipeline.models.stage import DataStage
 
 
@@ -12,14 +13,20 @@ class Cols(BaseModel):
     """Columns."""
 
     @property
-    def idx(self) -> list[Col]:
+    def index(self) -> Col:
+        """Get the singular index column."""
+        return one(self.indices)
+
+    @property
+    def indices(self) -> list[Col]:
         """All index columns."""
         return get_cols(self, Kind.idx)
 
+    @computed_field
     @property
-    def sources(self) -> list[Col]:
+    def sources(self) -> list[LinkedCol]:
         """All source columns."""
-        return get_cols(self, DataStage.src)
+        return get_cols(self, DataStage.src)  # pyright: ignore[reportReturnType]
 
     @property
     def dests(self) -> list[Col]:
