@@ -4,13 +4,10 @@ from functools import partial
 from cappa.base import invoke
 from more_itertools import one
 
-from boilercv_pipeline.stages.common.e230920 import (
-    callbacks,
-    get_time,
-    save_df,
-    save_plots,
-    submit_nb_process,
-)
+from boilercv_pipeline.dfs import save_df
+from boilercv_pipeline.models.path import get_time
+from boilercv_pipeline.nbs import callbacks, submit_nb_process
+from boilercv_pipeline.plotting import save_plots
 from boilercv_pipeline.stages.find_objects import FindObjects as Params
 
 

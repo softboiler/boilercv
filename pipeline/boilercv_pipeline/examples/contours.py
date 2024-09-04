@@ -16,7 +16,7 @@ from boilercv_pipeline.examples import (
     EXAMPLE_VIDEO_NAME,
 )
 from boilercv_pipeline.sets import get_dataset
-from boilercv_pipeline.stages.common.contours import get_all_contours
+from boilercv_pipeline.stages.find_contours.__main__ import get_all_contours
 
 
 def main():  # noqa: D103

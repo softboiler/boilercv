@@ -4,10 +4,10 @@ from cappa.arg import Arg
 from cappa.base import command
 from pydantic import Field
 
+from boilercv_pipeline.models.params import Params
 from boilercv_pipeline.models.path import DataDir
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import StagePaths
-from boilercv_pipeline.models.stages import Params
 
 
 class Deps(StagePaths): ...

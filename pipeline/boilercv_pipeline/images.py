@@ -1,9 +1,15 @@
-"""Video dataset model."""
+"""Images."""
 
+from collections.abc import Iterator
+from contextlib import contextmanager
 from dataclasses import asdict
 from pathlib import Path
 
+import numpy
 from boilercine import get_cine_attributes, get_cine_images
+from matplotlib.axes import Axes
+from matplotlib.pyplot import subplots
+from numpy import where
 from scipy.spatial.distance import euclidean
 from xarray import DataArray
 
@@ -22,7 +28,9 @@ from boilercv.data import (
     assign_ds,
 )
 from boilercv.data.models import Dimension
-from boilercv.types import DA, DS, ArrInt
+from boilercv.images import scale_bool
+from boilercv.images.cv import Op, Transform, transform
+from boilercv.types import DA, DS, ArrInt, Img
 from boilercv_pipeline.types import Slicer2D
 
 
@@ -105,3 +113,42 @@ def get_length_dims(
         original_coords=images[parent_dim].values,
         scale=scale,
     )
+
+
+def get_image_boundaries(img) -> tuple[tuple[int, int], tuple[int, int]]:
+    """Get the boundaries of an image."""
+    dilated = transform(scale_bool(img), Transform(Op.dilate, 12))
+    cols = numpy.any(dilated, axis=0)
+    rows = numpy.any(dilated, axis=1)
+    ylim = tuple(where(rows)[0][[0, -1]])
+    xlim = tuple(where(cols)[0][[0, -1]])
+    return ylim, xlim
+
+
+@contextmanager
+def bounded_ax(img: Img, ax: Axes | None = None) -> Iterator[Axes]:
+    """Show only the region bounding nonzero elements of the image."""
+    ylim, xlim = get_image_boundaries(img)
+    if ax:
+        bound_ax = ax
+    else:
+        _, bound_ax = subplots()
+    bound_ax.set_xlim(*xlim)  # pyright: ignore[reportAttributeAccessIssue], CI
+    bound_ax.set_ylim(*ylim)  # pyright: ignore[reportAttributeAccessIssue], CI
+    bound_ax.invert_yaxis()
+    yield bound_ax  # pyright: ignore[reportReturnType], CI
+
+
+def plot_composite_da(video: DA, ax: Axes | None = None) -> Axes:
+    """Compose a video-like data array and highlight the first frame."""
+    first_frame = video.sel(frame=0).values
+    composite_video = video.max("frame").values
+    with bounded_ax(composite_video, ax) as ax:
+        ax.imshow(~first_frame, alpha=0.6)
+        ax.imshow(~composite_video, alpha=0.2)
+    return ax
+
+
+def crop_image(img, ylim, xlim):
+    """Crop an image to the specified boundaries."""
+    return img[ylim[0] : ylim[1] + 1, xlim[0] : xlim[1] + 1]

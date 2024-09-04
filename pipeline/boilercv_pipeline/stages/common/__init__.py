@@ -1,1 +1,0 @@
-"""Utilities common to stages."""

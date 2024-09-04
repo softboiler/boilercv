@@ -1,7 +1,7 @@
 from cappa.base import invoke
 from pandas import concat, read_hdf
 
-from boilercv_pipeline.stages.common.e230920 import get_times
+from boilercv_pipeline.models.path import get_times
 from boilercv_pipeline.stages.e230920_merge_tracks import E230920MergeTracks
 
 

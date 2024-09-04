@@ -1,9 +1,11 @@
-"""Stage models."""
+"""Pipeline stages model."""
 
 from contextlib import contextmanager
-from typing import Generic, TypeAlias
+from typing import Annotated as Ann
+from typing import Generic
 
 import matplotlib
+from cappa.arg import Arg
 from IPython.display import display
 from matplotlib.axes import Axes
 from numpy import set_printoptions
@@ -12,8 +14,8 @@ from pydantic import BaseModel, Field
 from seaborn import move_legend, set_theme
 
 from boilercv_pipeline.models.contexts import BoilercvPipelineCtxDict
-from boilercv_pipeline.models.stage import Stage, StagePaths
-from boilercv_pipeline.models.stages.types import Deps_T, Outs_T
+from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T
+from boilercv_pipeline.models.stage import Stage
 
 
 def set_display_options(
@@ -105,14 +107,16 @@ def display_options(orig: Format, new: Format):
         orig.set_display_options()
 
 
-class Params(Stage, Generic[Deps_T, Outs_T]):
+class Params(Stage, Generic[Deps_T, Outs_T, Data_T]):
     """Stage parameters."""
 
     deps: Deps_T
     """Stage dependencies."""
     outs: Outs_T
     """Stage outputs."""
-    format: Format = Field(default_factory=Format)
+    data: Data_T
+    """Stage data."""
+    format: Ann[Format, Arg(hidden=True)] = Field(default_factory=Format)
     """Format parameters."""
 
     @classmethod
@@ -127,6 +131,3 @@ class Params(Stage, Generic[Deps_T, Outs_T]):
     def hide(cls):
         """Hide unsuppressed output in notebook cells."""
         display()
-
-
-AnyParams: TypeAlias = Params[StagePaths, StagePaths]

@@ -3,7 +3,7 @@ from types import SimpleNamespace
 
 from cappa.base import invoke
 
-from boilercv_pipeline.stages.common.e230920 import get_path_time
+from boilercv_pipeline.models.path import get_path_time
 from boilercv_pipeline.stages.e230920_plot_tracks import E230920PlotTracks
 
 

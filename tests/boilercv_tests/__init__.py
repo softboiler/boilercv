@@ -21,7 +21,7 @@ from boilercore.notebooks.namespaces import get_nb_ns
 from cachier import cachier  # pyright: ignore[reportMissingImports]
 from seaborn import set_theme
 
-from boilercv_pipeline.models.stages import set_display_options
+from boilercv_pipeline.models.params import set_display_options
 from boilercv_tests.types import Attributes, Params
 
 NAMER: Iterator[str] = _RandomNameSequence()

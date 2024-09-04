@@ -1,17 +1,19 @@
 from pathlib import Path
-from typing import Annotated, Self
+from typing import Annotated as Ann
+from typing import Self
 
 from cappa.arg import Arg
 from cappa.base import command
 from pydantic import AfterValidator, Field, model_validator
 
 from boilercv.data import FRAME
+from boilercv_pipeline.models.data import AnyData
 from boilercv_pipeline.models.deps import DirSlicer, get_slicers
 from boilercv_pipeline.models.deps.types import Slicers
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import StagePaths
-from boilercv_pipeline.stages.common.e230920 import Params, const
+from boilercv_pipeline.models.subcool import Params
 
 
 class Deps(StagePaths):
@@ -29,16 +31,15 @@ class Outs(StagePaths):
 @command(
     invoke="boilercv_pipeline.stages.find_objects.__main__.main", default_long=True
 )
-class FindObjects(Params[Deps, Outs]):
+class FindObjects(Params[Deps, Outs, AnyData]):
     """Find objects."""
 
-    deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
+    deps: Ann[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
     """Stage dependencies."""
-    outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
+    outs: Ann[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
     """Stage outputs."""
-
-    include_patterns: list[str] = const.include_patterns
-    """Include patterns."""
+    data: Ann[AnyData, Arg(hidden=True)] = Field(default_factory=AnyData, exclude=True)
+    """Stage data."""
     slicer_patterns: dict[str, Slicers] = Field(default_factory=dict)
     """Slicer patterns."""
     compare_with_trackpy: bool = False
@@ -49,8 +50,7 @@ class FindObjects(Params[Deps, Outs]):
     """Columns to compare with the Trackpy approach."""
     cols: list[str] = [*trackpy_cols, "area", "diameter_px", "radius_of_gyration_px"]
     """Data to store."""
-
-    contours: Annotated[
+    contours: Ann[
         list[Path],
         AfterValidator(
             lambda paths, info: paths
@@ -65,7 +65,7 @@ class FindObjects(Params[Deps, Outs]):
     """Paths to filled video datasets to process."""
     filled_slicers: list[Slicers] = Field(default_factory=list)
     """Slicers for filled video datasets."""
-    dfs: Annotated[
+    dfs: Ann[
         list[Path],
         AfterValidator(
             lambda paths, info: paths

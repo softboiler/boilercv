@@ -7,8 +7,8 @@ from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
 
+from boilercv_pipeline.images import prepare_dataset
 from boilercv_pipeline.stages.convert import Convert
-from boilercv_pipeline.video import prepare_dataset
 
 
 def main(params: Convert):

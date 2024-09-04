@@ -3,8 +3,8 @@ from loguru import logger
 from tqdm import tqdm
 
 from boilercv.data import FRAME, VIDEO
+from boilercv_pipeline.preview import new_videos_to_preview
 from boilercv_pipeline.sets import get_dataset
-from boilercv_pipeline.stages.common.preview import new_videos_to_preview
 from boilercv_pipeline.stages.preview_filled import PreviewFilled
 
 
