@@ -1,5 +1,7 @@
 """Pipeline stages model."""
 
+from __future__ import annotations
+
 from collections.abc import Iterable
 from contextlib import contextmanager
 from typing import Annotated as Ann
@@ -142,15 +144,14 @@ class Format(BaseModel):
         """Hide unsuppressed output in notebook cells."""
         display()
 
-
-@contextmanager
-def display_options(orig: Format, new: Format):
-    """Display options."""
-    try:
-        new.set_display_options()
-        yield
-    finally:
-        orig.set_display_options()
+    @contextmanager
+    def display_options(self, other: Format):
+        """Display options."""
+        try:
+            other.set_display_options()
+            yield
+        finally:
+            self.set_display_options()
 
 
 class Params(Stage, Generic[Deps_T, Outs_T]):
