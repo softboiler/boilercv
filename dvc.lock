@@ -652,18 +652,23 @@ stages:
       nfiles: 1
     - path: docs/notebooks/get_thermal_data.ipynb
       hash: md5
-      md5: 724202e7ef64b1093f671234d3989431
-      size: 6723
+      md5: 8f587acedc7c3b83c211e5cb7240badf
+      size: 9740
     - path: pipeline/boilercv_pipeline/stages/get_thermal_data
       hash: md5
-      md5: 20e01378ec84d126971a0afa2ec1f48e.dir
-      size: 1862
+      md5: f0645b6d34a99cb6bdf612d89426cf59.dir
+      size: 4413
       nfiles: 2
     outs:
     - path: data/e230920/thermal.h5
       hash: md5
-      md5: b5a14bb41d801f43d9e6b1a721df5da6
-      size: 430398
+      md5: 4be874ecd9c4bb1490fcfbfdb2535b95
+      size: 402300
+    - path: data/e230920/thermal_plots
+      hash: md5
+      md5: 7817895a96a2681640792cd966438268.dir
+      size: 1302418
+      nfiles: 3
   find_objects:
     cmd: boilercv-pipeline stage find-objects
     deps:
