@@ -1,40 +1,39 @@
 from pathlib import Path
 from typing import Annotated as Ann
-from typing import Self
 
 from cappa.arg import Arg
 from cappa.base import command
 from matplotlib.figure import Figure
 from pandas import DataFrame
-from pydantic import AfterValidator, Field, model_validator
+from pydantic import Field
 
 from boilercv.data import FRAME, PX, XPX, YPX, X, Y
-from boilercv_pipeline.models import columns, data
+from boilercv_pipeline.models import columns, data, stage
 from boilercv_pipeline.models.column import Col, ConstCol, Kind, LinkedCol
 from boilercv_pipeline.models.columns import get_cols
-from boilercv_pipeline.models.deps import DirSlicer, get_slicers
-from boilercv_pipeline.models.deps.types import Slicers
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stage import StagePaths, _DataStage
-from boilercv_pipeline.models.subcool import SubcoolParams
+from boilercv_pipeline.models.stage import DfsPlotsOuts
+from boilercv_pipeline.models.subcool import (
+    FilledDeps,
+    FilledParams,
+    validate_deps_paths,
+)
 
 
-class Deps(StagePaths):
+class Deps(FilledDeps):
     stage: DirectoryPathSerPosix = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
     contours: DataDir = paths.contours
     filled: DataDir = paths.filled
 
 
-class Outs(StagePaths):
-    dfs: DataDir = paths.e230920_objects
-    plots: DataDir = paths.e230920_objects_plots
+class Outs(DfsPlotsOuts):
+    dfs: DataDir = paths.objects
+    plots: DataDir = paths.objects_plots
 
 
-class _MyDataStage(_DataStage):
-    """Data stage in a pipeline stage."""
-
+class DataStage(stage.DataStage):
     src: str = "src"
     trackpy: str = "trackpy"
     centroids: str = "centroids"
@@ -42,8 +41,7 @@ class _MyDataStage(_DataStage):
     dst: str = "dst"
 
 
-D = _MyDataStage()
-"""Data stage in a pipeline stage."""
+D = DataStage()
 
 
 class Dfs(data.types.Dfs):
@@ -107,7 +105,7 @@ class Cols(columns.Cols):
 @command(
     invoke="boilercv_pipeline.stages.find_objects.__main__.main", default_long=True
 )
-class FindObjects(SubcoolParams[Deps, Outs, Data]):
+class FindObjects(FilledParams[Deps, Outs, Data]):
     """Find objects."""
 
     deps: Ann[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
@@ -118,50 +116,11 @@ class FindObjects(SubcoolParams[Deps, Outs, Data]):
     """Stage data."""
     cols: Ann[Cols, Arg(hidden=True)] = Field(default_factory=Cols)
     """Columns."""
-    slicer_patterns: dict[str, Slicers] = Field(default_factory=dict)
-    """Slicer patterns."""
     compare_with_trackpy: bool = False
     """Whether to get objects using the Trackpy approach."""
     guess_diameter: int = 21
     """Guess diameter for the Trackpy approach. (px)"""
-    contours: Ann[
-        list[Path],
-        AfterValidator(
-            lambda paths, info: paths
-            or DirSlicer(
-                path=info.data["deps"].contours,
-                include_patterns=info.data["include_patterns"],
-            ).paths
-        ),
-    ] = Field(default_factory=list)
-    """Paths to filled video datasets to process."""
-    filled: list[Path] = Field(default_factory=list)
-    """Paths to filled video datasets to process."""
-    filled_slicers: list[Slicers] = Field(default_factory=list)
-    """Slicers for filled video datasets."""
-    dfs: Ann[
-        list[Path],
-        AfterValidator(
-            lambda paths, info: paths
-            or DirSlicer(
-                path=info.data["outs"].dfs,
-                include_patterns=info.data["include_patterns"],
-            ).paths
-        ),
-    ] = Field(default_factory=list)
-    """Paths to filled video datasets to process."""
-
-    @model_validator(mode="after")
-    def validate_filled(self) -> Self:
-        """Validate attributes related to filled video datasets."""
-        self.filled = (
-            self.filled
-            or DirSlicer(
-                path=self.deps.filled, include_patterns=self.include_patterns
-            ).paths
-        )
-        self.filled_slicers = [
-            get_slicers(path, slicer_patterns=self.slicer_patterns)
-            for path in self.filled
-        ]
-        return self
+    contours: Ann[list[Path], validate_deps_paths("contours")] = Field(
+        default_factory=list
+    )
+    """Paths to contours."""

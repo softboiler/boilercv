@@ -14,7 +14,7 @@ from boilercv_pipeline.models.stage import StagePaths
 class Deps(StagePaths):
     stage: DirectoryPathSerPosix = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
-    e230920_tracks: DataDir = paths.e230920_tracks
+    e230920_tracks: DataDir = paths.tracks
 
 
 class Outs(StagePaths):

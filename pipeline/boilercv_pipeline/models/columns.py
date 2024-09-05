@@ -9,6 +9,8 @@ from pydantic import BaseModel, computed_field
 from boilercv_pipeline.models.column import Col, Kind, LinkedCol
 from boilercv_pipeline.models.stage import DataStage
 
+D = DataStage()
+
 
 class Cols(BaseModel):
     """Columns."""
@@ -27,12 +29,12 @@ class Cols(BaseModel):
     @property
     def sources(self) -> list[LinkedCol]:
         """All source columns."""
-        return get_cols(self, DataStage.src)
+        return get_cols(self, D.src)
 
     @property
     def dests(self) -> list[Col]:
         """All destination columns."""
-        return get_cols(self, DataStage.dst)
+        return get_cols(self, D.dst)
 
 
 def get_cols(cols_model: Cols, meta: str) -> list[Any]:

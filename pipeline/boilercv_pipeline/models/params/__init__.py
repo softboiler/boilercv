@@ -78,6 +78,11 @@ def head(df: DataFrame) -> DataFrame:  # noqa: D103
     return df.head()
 
 
+def get_floatfmt(precision: int = 3) -> str:
+    """Get floating number format at given precision."""
+    return f"#.{precision}g"
+
+
 class Format(BaseModel):
     """Plotting parameters."""
 
@@ -98,7 +103,7 @@ class Format(BaseModel):
     @property
     def floatfmt(self) -> str:
         """Floating number format."""
-        return f"#.{self.precision}g"
+        return get_floatfmt(self.precision)
 
     @property
     def font_scale(self) -> float:

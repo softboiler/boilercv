@@ -70,10 +70,11 @@ class Paths(BoilercvPipelineCtxModel):
     e230920_thermal: DataFile = e230920 / Path("thermal.h5")
     e230920_thermal_plots: DataDir = e230920 / Path("plots_thermal")
 
-    e230920_objects: DataDir = e230920 / Path("objects")
-    e230920_objects_plots: DataDir = e230920 / Path("plots_objects")
+    objects: DataDir = e230920 / Path("objects")
+    objects_plots: DataDir = e230920 / Path("objects_plots")
+    tracks: DataDir = e230920 / Path("tracks")
+    tracks_plots: DataDir = e230920 / Path("tracks_plots")
 
-    e230920_tracks: DataDir = e230920 / Path("tracks")
     e230920_processed_tracks: DataDir = e230920 / Path("processed_tracks")
     e230920_merged_tracks: DataFile = e230920 / Path("merged_tracks.h5")
     e230920_mae: DataDir = e230920 / Path("mae")

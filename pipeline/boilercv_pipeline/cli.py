@@ -17,7 +17,6 @@ from boilercv_pipeline.models.path import (
 )
 from boilercv_pipeline.stages.binarize import Binarize
 from boilercv_pipeline.stages.convert import Convert
-from boilercv_pipeline.stages.e230920_find_tracks import E230920FindTracks
 from boilercv_pipeline.stages.e230920_get_mae import E230920GetMae
 from boilercv_pipeline.stages.e230920_merge_mae import E230920MergeMae
 from boilercv_pipeline.stages.e230920_merge_tracks import E230920MergeTracks
@@ -26,6 +25,7 @@ from boilercv_pipeline.stages.e230920_process_tracks import E230920ProcessTracks
 from boilercv_pipeline.stages.fill import Fill
 from boilercv_pipeline.stages.find_contours import FindContours
 from boilercv_pipeline.stages.find_objects import FindObjects
+from boilercv_pipeline.stages.find_tracks import FindTracks
 from boilercv_pipeline.stages.get_thermal_data import GetThermalData
 from boilercv_pipeline.stages.preview_binarized import PreviewBinarized
 from boilercv_pipeline.stages.preview_filled import PreviewFilled
@@ -62,7 +62,7 @@ class Stage:
         | SkipCloud
         | Convert
         | FindObjects
-        | E230920FindTracks
+        | FindTracks
         | E230920GetMae
         | E230920MergeMae
         | E230920MergeTracks
@@ -103,9 +103,7 @@ class SyncDVC:
             preview_filled: PreviewFilled = Field(default_factory=PreviewFilled)
             get_thermal_data: GetThermalData = Field(default_factory=GetThermalData)
             find_objects: FindObjects = Field(default_factory=FindObjects)
-            e230920_find_tracks: E230920FindTracks = Field(
-                default_factory=E230920FindTracks
-            )
+            find_tracks: FindTracks = Field(default_factory=FindTracks)
             e230920_process_tracks: E230920ProcessTracks = Field(
                 default_factory=E230920ProcessTracks
             )
