@@ -125,25 +125,31 @@ class SyncDVC:
         stages: dict[str, Any] = {}
         raw_stages = Stages().model_dump()
         del raw_stages["context"]
-        for stage, stage_value in raw_stages.items():
+        for stage_name, stage in raw_stages.items():
             for k in const.dvc_keys:
-                del stage_value[k]["context"]
-            for k in [k for k in stage_value if k not in const.dvc_keys]:
-                del stage_value[k]
-            stage_value["deps"] = [
-                process_path(v) for v in stage_value["deps"].values()
-            ]
-            stage_value["outs"] = [
+                del stage[k]["context"]
+            for k in [k for k in stage if k not in const.dvc_keys]:
+                del stage[k]
+            stage["deps"] = [process_path(v) for v in stage["deps"].values()]
+            if "plots" in stage["outs"]:
+                stage["plots"] = []
+            stage["outs"] = [
                 (
                     {out: const.dvc_out_skip_cloud_config}
                     if out in const.skip_cloud
                     else {out: const.dvc_out_config}
                 )
-                for out in stage_value["outs"].values()
+                for out in stage["outs"].values()
             ]
-            stages[stage] = {
-                "cmd": f"boilercv-pipeline stage {stage.replace('_', '-')}",
-                **stage_value,
+            for i, out in enumerate(
+                out for out_dict in stage["outs"] for out in out_dict
+            ):
+                if Path(out).stem.endswith("_plots"):
+                    stage["outs"].pop(i)
+                    stage["plots"].append(out)
+            stages[stage_name] = {
+                "cmd": f"boilercv-pipeline stage {stage_name.replace('_', '-')}",
+                **stage,
             }
         dvc = self.root / "dvc.yaml"
 

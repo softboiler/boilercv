@@ -90,8 +90,8 @@ stages:
       nfiles: 336
     - path: pipeline/boilercv_pipeline/stages/fill
       hash: md5
-      md5: 01a7d2eb93ba94d3a6682ec967ca8223.dir
-      size: 2671
+      md5: e9aa33d74d1d1f15761c339a4587a9d5.dir
+      size: 2656
       nfiles: 2
     outs:
     - path: data/filled
@@ -248,8 +248,8 @@ stages:
       nfiles: 336
     - path: pipeline/boilercv_pipeline/stages/find_contours
       hash: md5
-      md5: a86642257f528d43530b3cd6c96c0a53.dir
-      size: 2113
+      md5: ea842c8f6c77837eb2c3c2d2dfa62b09.dir
+      size: 4344
       nfiles: 2
     outs:
     - path: data/contours
@@ -404,8 +404,8 @@ stages:
       nfiles: 17
     - path: pipeline/boilercv_pipeline/stages/binarize
       hash: md5
-      md5: 72f726c4b2da57c96881939047aab429.dir
-      size: 2420
+      md5: 295238291ab2ba4a5c9a67a086c43693.dir
+      size: 2405
       nfiles: 2
     outs:
     - path: data/rois
@@ -428,8 +428,8 @@ stages:
       nfiles: 16
     - path: pipeline/boilercv_pipeline/stages/convert
       hash: md5
-      md5: 50d8befeb90f55e5430b5846cc23cbab.dir
-      size: 2285
+      md5: 730be861c1af4b45a2aee0ccb3d4cc9b.dir
+      size: 2271
       nfiles: 2
     outs:
     - path: data/large_sources
@@ -664,3 +664,36 @@ stages:
       hash: md5
       md5: b5a14bb41d801f43d9e6b1a721df5da6
       size: 430398
+  find_objects:
+    cmd: boilercv-pipeline stage find-objects
+    deps:
+    - path: data/contours
+      hash: md5
+      md5: da949dd69775b9cdeb57c297dbef53c0.dir
+      size: 4427447588
+      nfiles: 337
+    - path: data/filled
+      hash: md5
+      md5: dd689eddfd2017e88d817ea549e22c2f.dir
+      size: 3616770112
+      nfiles: 337
+    - path: docs/notebooks/find_objects.ipynb
+      hash: md5
+      md5: b3fdd5feea49bcd2615eec0fe4bfacad
+      size: 10842
+    - path: pipeline/boilercv_pipeline/stages/find_objects
+      hash: md5
+      md5: 40f808cd514fe79b3200bb10f5615274.dir
+      size: 5877
+      nfiles: 2
+    outs:
+    - path: data/e230920/objects
+      hash: md5
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0
+    - path: data/e230920/objects_plots
+      hash: md5
+      md5: d751713988987e9331980363e24189ce.dir
+      size: 0
+      nfiles: 0

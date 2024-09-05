@@ -68,7 +68,7 @@ class Paths(BoilercvPipelineCtxModel):
     e230920: DataDir = Path("e230920")
 
     e230920_thermal: DataFile = e230920 / Path("thermal.h5")
-    e230920_thermal_plots: DataDir = e230920 / Path("plots_thermal")
+    e230920_thermal_plots: DataDir = e230920 / Path("thermal_plots")
 
     objects: DataDir = e230920 / Path("objects")
     objects_plots: DataDir = e230920 / Path("objects_plots")

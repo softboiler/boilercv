@@ -11,15 +11,17 @@
       "default": "",
       "options": [
         "",
-        "generate_reports",
-        "preview_binarized",
+        "skip_cloud",
+        "convert",
+        "binarize",
         "preview_gray",
+        "preview_binarized",
         "find_contours",
         "fill",
         "preview_filled",
-        "find_unobstructed",
-        "find_tracks",
-        "compare_theory"
+        "get_thermal_data",
+        "find_objects",
+        "find_tracks"
       ]
     },
     {
