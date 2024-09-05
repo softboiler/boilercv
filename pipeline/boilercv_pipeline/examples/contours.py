@@ -23,7 +23,8 @@ def main():  # noqa: D103
     ds = get_dataset(EXAMPLE_VIDEO_NAME, EXAMPLE_NUM_FRAMES)
     video = ds[VIDEO]
     df = get_all_contours(
-        bitwise_not(scale_bool(video.values)), method=CHAIN_APPROX_SIMPLE
+        bitwise_not(scale_bool(video.values)),  # pyright: ignore[reportArgumentType]
+        method=CHAIN_APPROX_SIMPLE,
     )
     df.to_hdf(EXAMPLE_CONTOURS, key="contours", complib="zlib", complevel=9)
     result: list[Img] = []

@@ -1,6 +1,7 @@
 """Data columns model."""
 
 from itertools import chain
+from typing import Any
 
 from more_itertools import one
 from pydantic import BaseModel, computed_field
@@ -26,7 +27,7 @@ class Cols(BaseModel):
     @property
     def sources(self) -> list[LinkedCol]:
         """All source columns."""
-        return get_cols(self, DataStage.src)  # pyright: ignore[reportReturnType]
+        return get_cols(self, DataStage.src)
 
     @property
     def dests(self) -> list[Col]:
@@ -34,7 +35,7 @@ class Cols(BaseModel):
         return get_cols(self, DataStage.dst)
 
 
-def get_cols(cols_model: Cols, meta: str) -> list[Col]:
+def get_cols(cols_model: Cols, meta: str) -> list[Any]:
     """Get columns."""
     cols = dict(cols_model)
     return list(

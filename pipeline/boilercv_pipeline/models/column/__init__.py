@@ -60,6 +60,7 @@ class Col:
     unit: str = ""
     sub: str = ""
     raw: str = ""
+    fmt: str | None = None
 
     def __post_init__(self):
         """Post-init."""
@@ -99,6 +100,21 @@ class Col:
     def from_col(cls, col: "Col") -> "Col":
         """Build a column from a column."""
         return cls(col.sym, col.sub, col.unit, col.raw)
+
+    def rename(self, df: DataFrame) -> DataFrame:
+        """Rename this column."""
+        return df.rename(columns={self.raw: self()})
+
+
+@dataclass
+class ConstCol(Col):
+    """Constant column."""
+
+    val: Any = None
+
+    def assign(self, df: DataFrame) -> DataFrame:
+        """Assign this column."""
+        return df.assign(**{self(): self.val})
 
 
 def transform(

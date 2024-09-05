@@ -1,20 +1,23 @@
 """Pipeline stages model."""
 
+from collections.abc import Iterable
 from contextlib import contextmanager
 from typing import Annotated as Ann
 from typing import Generic
 
 import matplotlib
 from cappa.arg import Arg
-from IPython.display import display
+from IPython.display import Markdown, display
 from matplotlib.axes import Axes
 from numpy import set_printoptions
-from pandas import options
+from pandas import DataFrame, options
 from pydantic import BaseModel, Field
 from seaborn import move_legend, set_theme
 
+from boilercv_pipeline.models.column import Col
+from boilercv_pipeline.models.column.types import Ps
 from boilercv_pipeline.models.contexts import BoilercvPipelineCtxDict
-from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T
+from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T, Preview
 from boilercv_pipeline.models.stage import Stage
 
 
@@ -59,6 +62,20 @@ def set_display_options(
     }
 
 
+def display_markdown(df: DataFrame, floatfmt: str = "#.3g"):
+    """Render dataframes as Markdown, facilitating MathJax rendering.
+
+    Notes
+    -----
+    https://github.com/jupyter-book/jupyter-book/issues/1501#issuecomment-2301641068
+    """
+    display(Markdown(df.to_markdown(floatfmt=floatfmt)))
+
+
+def head(df: DataFrame) -> DataFrame:  # noqa: D103
+    return df.head()
+
+
 class Format(BaseModel):
     """Plotting parameters."""
 
@@ -96,6 +113,35 @@ class Format(BaseModel):
         """Move legend."""
         move_legend(ax, loc=loc, bbox_to_anchor=bbox_to_anchor, ncol=ncol)
 
+    def preview(
+        self,
+        df: DataFrame,
+        cols: Iterable[Col] | None = None,
+        index: Col | None = None,
+        f: Preview[Ps] = head,
+        *args: Ps.args,
+        **kwds: Ps.kwargs,
+    ) -> DataFrame:
+        """Preview a dataframe in the notebook."""
+        _fmt = self.floatfmt
+        if cols:
+            _fmt = tuple(c.fmt or self.floatfmt for c in cols)
+            _cols = [c() for c in cols] if cols else list(df.columns)
+        else:
+            _fmt = self.floatfmt
+            _cols = list(df.columns)
+        _index: str = index or _cols.pop(0)  # pyright: ignore[reportAssignmentType]
+        display_markdown(
+            df.set_index(_index)[_cols].pipe(f, *args, **kwds),
+            floatfmt=_fmt,  # pyright: ignore[reportArgumentType]
+        )
+        return df
+
+    @classmethod
+    def hide(cls):
+        """Hide unsuppressed output in notebook cells."""
+        display()
+
 
 @contextmanager
 def display_options(orig: Format, new: Format):
@@ -107,15 +153,13 @@ def display_options(orig: Format, new: Format):
         orig.set_display_options()
 
 
-class Params(Stage, Generic[Deps_T, Outs_T, Data_T]):
+class Params(Stage, Generic[Deps_T, Outs_T]):
     """Stage parameters."""
 
     deps: Deps_T
     """Stage dependencies."""
     outs: Outs_T
     """Stage outputs."""
-    data: Data_T
-    """Stage data."""
     format: Ann[Format, Arg(hidden=True)] = Field(default_factory=Format)
     """Format parameters."""
 
@@ -127,7 +171,9 @@ class Params(Stage, Generic[Deps_T, Outs_T, Data_T]):
         context["boilercv_pipeline"].kinds = {}
         return context
 
-    @classmethod
-    def hide(cls):
-        """Hide unsuppressed output in notebook cells."""
-        display()
+
+class DataParams(Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T, Data_T]):
+    """Stage parameters."""
+
+    data: Data_T
+    """Stage data."""

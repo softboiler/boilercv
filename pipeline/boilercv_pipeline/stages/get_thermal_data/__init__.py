@@ -8,9 +8,8 @@ from matplotlib.figure import Figure
 from pandas import DataFrame
 from pydantic import Field
 
-from boilercv_pipeline.models import data
+from boilercv_pipeline.models import columns, data
 from boilercv_pipeline.models.column import Col, IdentityCol, Kind, LinkedCol
-from boilercv_pipeline.models.columns import Cols
 from boilercv_pipeline.models.deps import DirSlicer
 from boilercv_pipeline.models.params import Format
 from boilercv_pipeline.models.path import (
@@ -22,7 +21,7 @@ from boilercv_pipeline.models.path import (
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DataStage as D  # noqa: N814
 from boilercv_pipeline.models.stage import StagePaths
-from boilercv_pipeline.models.subcool import Params, const
+from boilercv_pipeline.models.subcool import SubcoolParams, const
 
 
 class Deps(StagePaths):
@@ -48,23 +47,17 @@ class Dfs(data.types.Dfs):
 
 
 class Plots(data.types.Plots):
-    """Plots."""
-
     subcool_superheat: Figure = Field(default_factory=Figure)
     subcool: Figure = Field(default_factory=Figure)
     superheat: Figure = Field(default_factory=Figure)
 
 
 class Data(data.Data[Dfs, Plots]):
-    """Stage data."""
-
     dfs: Dfs = Field(default_factory=Dfs)
     plots: Plots = Field(default_factory=Plots)
 
 
-class ThermalCols(Cols):
-    """Thermal columns."""
-
+class Cols(columns.Cols):
     time: Ann[LinkedCol, Kind.idx, D.src, D.dst] = LinkedCol("Time", source=Col("time"))
     time_elapsed: Ann[Col, D.dst] = Col("t", "s")
     time_elapsed_min: Ann[LinkedCol, D.dst] = LinkedCol("t", "min", source=time_elapsed)
@@ -95,7 +88,7 @@ class ThermalCols(Cols):
 @command(
     default_long=True, invoke="boilercv_pipeline.stages.get_thermal_data.__main__.main"
 )
-class GetThermalData(Params[Deps, Outs, Data]):
+class GetThermalData(SubcoolParams[Deps, Outs, Data]):
     """Update thermal data for the experiment."""
 
     deps: Ann[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
@@ -104,7 +97,7 @@ class GetThermalData(Params[Deps, Outs, Data]):
     """Stage outputs."""
     data: Ann[Data, Arg(hidden=True)] = Field(default_factory=Data, exclude=True)
     """Stage data."""
-    cols: Ann[ThermalCols, Arg(hidden=True)] = Field(default_factory=ThermalCols)
+    cols: Ann[Cols, Arg(hidden=True)] = Field(default_factory=Cols)
     """Columns."""
     format: Ann[Format, Arg(hidden=True)] = Format(
         precision=3  # ? Suitable for integer-dominated temperatures

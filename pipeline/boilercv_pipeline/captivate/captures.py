@@ -63,7 +63,7 @@ def coerce_input(imgs: Img | ImgBool | DA) -> Img:
         viewable: Img = imgs.values if isinstance(imgs, DA) else imgs  # pyright: ignore[reportAssignmentType]
     elif issubdtype(imgs.dtype, bool):
         viewable: Img = (
-            scale_bool(imgs.values) if isinstance(imgs, DA) else scale_bool(imgs)
+            scale_bool(imgs.values) if isinstance(imgs, DA) else scale_bool(imgs)  # pyright: ignore[reportArgumentType]
         )
     else:
         raise TypeError(f"Cannot coerce {type(imgs)} to a viewable type.")

@@ -2,6 +2,9 @@
 
 from typing import TypedDict
 
+from pandas import DataFrame, NamedAgg
+from pandas.api.typing import DataFrameGroupBy  # pyright: ignore[reportMissingImports]
+
 
 class GroupByCommon(TypedDict):
     """Common groupby parameters."""
@@ -30,3 +33,8 @@ def gbc(
 
 
 WIDTH = 10
+
+
+def agg(dfgb: DataFrameGroupBy, cols: dict[str, NamedAgg]) -> DataFrame:
+    """Pandas group aggregator for correct types."""
+    return dfgb.agg(**cols)

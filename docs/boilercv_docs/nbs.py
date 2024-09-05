@@ -6,9 +6,7 @@ from pathlib import Path
 from shutil import copytree
 from warnings import catch_warnings, filterwarnings
 
-from IPython.display import Markdown, display
 from IPython.utils.capture import capture_output
-from pandas import DataFrame
 
 from boilercv_docs.config import default
 from boilercv_docs.models.paths import rooted_paths
@@ -51,13 +49,3 @@ def keep_viewer_in_scope():
 
     with image_viewer([]) as viewer:
         return viewer
-
-
-def display_markdown(df: DataFrame, floatfmt: str = "#.3g"):
-    """Render dataframes as Markdown, facilitating MathJax rendering.
-
-    Notes
-    -----
-    https://github.com/jupyter-book/jupyter-book/issues/1501#issuecomment-2301641068
-    """
-    display(Markdown(df.to_markdown(floatfmt=floatfmt)))

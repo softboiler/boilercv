@@ -40,7 +40,9 @@ class Constants(BaseModel):
 const = Constants()
 
 
-class Params(params.Params[Deps_T, Outs_T, Data_T], Generic[Deps_T, Outs_T, Data_T]):
+class SubcoolParams(
+    params.DataParams[Deps_T, Outs_T, Data_T], Generic[Deps_T, Outs_T, Data_T]
+):
     """Stage parameters for `e230920`."""
 
     sample: str = const.sample
