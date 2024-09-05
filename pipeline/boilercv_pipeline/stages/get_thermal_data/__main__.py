@@ -9,7 +9,7 @@ from boilercv_pipeline.stages.get_thermal_data import GetThermalData as Params
 def main(params: Params):
     data = apply_to_nb(params=params, nb=params.deps.nb.read_text(encoding="utf-8"))
     save_df(data.dfs.dst, params.outs.df)
-    save_plots(data.plots.model_dump(), params.outs.plots)
+    save_plots(data.plots, params.outs.plots)
 
 
 if __name__ == "__main__":

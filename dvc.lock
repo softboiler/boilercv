@@ -679,21 +679,21 @@ stages:
       nfiles: 337
     - path: docs/notebooks/find_objects.ipynb
       hash: md5
-      md5: b3fdd5feea49bcd2615eec0fe4bfacad
-      size: 10842
+      md5: 6e461392eb8760f54822d87145f9d16a
+      size: 10866
     - path: pipeline/boilercv_pipeline/stages/find_objects
       hash: md5
-      md5: 40f808cd514fe79b3200bb10f5615274.dir
-      size: 5877
+      md5: 0b80036cc542d32a045b0007e4882cfd.dir
+      size: 5906
       nfiles: 2
     outs:
     - path: data/e230920/objects
       hash: md5
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: 03eebf6411f1ad222c55388a42abef9c.dir
+      size: 30501
+      nfiles: 1
     - path: data/e230920/objects_plots
       hash: md5
-      md5: d751713988987e9331980363e24189ce.dir
-      size: 0
-      nfiles: 0
+      md5: e3c777be92f31d6a2dc7feb4c1d29df2.dir
+      size: 48332
+      nfiles: 1

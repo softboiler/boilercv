@@ -8,7 +8,7 @@ from typing import Any, NamedTuple
 from pandas import DataFrame
 from pydantic import BaseModel
 
-from boilercv_pipeline.models.column import types as types  # noqa: PLC0414
+from boilercv_pipeline.models.column import types
 from boilercv_pipeline.models.column.types import P, Ps, R, SupportsMul_T
 from boilercv_pipeline.units import U
 

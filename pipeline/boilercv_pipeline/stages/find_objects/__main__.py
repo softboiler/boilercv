@@ -22,18 +22,18 @@ def main(params: Params):
                 "contours": contours,
                 "filled": filled,
                 "filled_slicers": filled_slicers,
-                "dfs": (dfs / f"{dfs.name}_{get_time(contours)}.h5"),
+                "dfs": dfs / f"{dfs.name}_{get_time(contours)}.h5",
             }.items():
-                setattr(params, field, value)
+                setattr(params, field, [value])
             submit_nb_process(
                 executor=executor, nb=nb, params=params
             ).add_done_callback(
                 partial(
                     callbacks,
                     callbacks=[
-                        lambda f: save_df(df=f.result().df, path=one(params.dfs)),
+                        lambda f: save_df(df=f.result().dfs.dst, path=one(params.dfs)),
                         lambda f: save_plots(
-                            figs=f.result().plots, plots=params.outs.plots
+                            plots=f.result().plots, path=params.outs.plots
                         ),
                     ],
                 )

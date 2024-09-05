@@ -1,23 +1,9 @@
 """Types."""
 
-from typing import TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
-from pandas import DataFrame
-from pydantic import BaseModel, Field
+if TYPE_CHECKING:
+    from boilercv_pipeline.models.data import Dfs, Plots
 
-
-class Dfs(BaseModel, arbitrary_types_allowed=True):
-    """Data frames."""
-
-    src: DataFrame = Field(default_factory=DataFrame)
-    dst: DataFrame = Field(default_factory=DataFrame)
-
-
-Dfs_T = TypeVar("Dfs_T", bound=Dfs, covariant=True)
-
-
-class Plots(BaseModel, arbitrary_types_allowed=True):
-    """Plots."""
-
-
-Plots_T = TypeVar("Plots_T", bound=Plots, covariant=True)
+Dfs_T = TypeVar("Dfs_T", bound="Dfs", covariant=True)
+Plots_T = TypeVar("Plots_T", bound="Plots", covariant=True)

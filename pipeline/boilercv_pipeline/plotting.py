@@ -7,8 +7,8 @@ from cmasher import get_sub_cmap
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import Colormap, Normalize
-from matplotlib.figure import Figure
 from pandas import CategoricalDtype, DataFrame
+from pydantic import BaseModel
 
 
 def get_first_from_palette(palette: Any, n: int) -> Colormap:
@@ -35,7 +35,7 @@ def get_cat_colorbar(
     return palette.colors, data
 
 
-def save_plots(figs: dict[str, Figure], plots: Path):
+def save_plots(plots: BaseModel, path: Path):
     """Save a DataFrame to HDF5 format."""
-    for name, fig in figs.items():
-        fig.savefig(plots / f"{name}.png")  # pyright: ignore[reportArgumentType]
+    for name, fig in plots.model_dump().items():
+        fig.savefig(path / f"{name}.png")  # pyright: ignore[reportArgumentType]

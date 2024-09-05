@@ -41,11 +41,11 @@ class Outs(StagePaths):
     plots: DataDir = paths.e230920_thermal_plots
 
 
-class Dfs(data.types.Dfs):
+class Dfs(data.Dfs):
     resampled: DataFrame = Field(default_factory=DataFrame)
 
 
-class Plots(data.types.Plots):
+class Plots(data.Plots):
     subcool_superheat: Figure = Field(default_factory=Figure)
     subcool: Figure = Field(default_factory=Figure)
     superheat: Figure = Field(default_factory=Figure)

@@ -44,13 +44,13 @@ class DataStage(stage.DataStage):
 D = DataStage()
 
 
-class Dfs(data.types.Dfs):
+class Dfs(data.Dfs):
     trackpy: DataFrame = Field(default_factory=DataFrame)
     centroids: DataFrame = Field(default_factory=DataFrame)
     geo: DataFrame = Field(default_factory=DataFrame)
 
 
-class Plots(data.types.Plots):
+class Plots(data.Plots):
     composite: Figure = Field(default_factory=Figure)
 
 
@@ -73,7 +73,7 @@ class Cols(columns.Cols):
     x: Ann[LinkedCol, D.src, D.dst] = LinkedCol(X, PX, source=Col(XPX))
     y: Ann[LinkedCol, D.src, D.dst] = LinkedCol(Y, PX, source=Col(YPX))
 
-    size: Ann[Col, D.trackpy] = LinkedCol("Size", PX, source=Col("size"))
+    size: Ann[LinkedCol, D.trackpy] = LinkedCol("Size", PX, source=Col("size"))
 
     centroid: Ann[Col, D.centroids] = Col("Centroid")
 
@@ -116,7 +116,8 @@ class FindObjects(FilledParams[Deps, Outs, Data]):
     """Stage data."""
     cols: Ann[Cols, Arg(hidden=True)] = Field(default_factory=Cols)
     """Columns."""
-    compare_with_trackpy: bool = False
+    # TODO: Revert to `False`
+    compare_with_trackpy: bool = True
     """Whether to get objects using the Trackpy approach."""
     guess_diameter: int = 21
     """Guess diameter for the Trackpy approach. (px)"""

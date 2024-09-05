@@ -4,8 +4,7 @@ from typing import ParamSpec, Protocol, TypeVar
 
 from pandas import DataFrame
 
-from boilercv_pipeline.models.data import Data
-from boilercv_pipeline.models.data.types import Dfs, Plots
+from boilercv_pipeline.models.data import Data, Dfs, Plots
 from boilercv_pipeline.models.stage import StagePaths
 
 Deps_T = TypeVar("Deps_T", bound=StagePaths, covariant=True)

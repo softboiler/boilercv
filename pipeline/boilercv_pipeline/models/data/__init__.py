@@ -2,10 +2,21 @@
 
 from typing import Generic
 
+from pandas import DataFrame
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.models.data import types as types  # noqa: PLC0414
-from boilercv_pipeline.models.data.types import Dfs, Dfs_T, Plots, Plots_T
+from boilercv_pipeline.models.data.types import Dfs_T, Plots_T
+
+
+class Dfs(BaseModel, arbitrary_types_allowed=True):
+    """Data frames."""
+
+    src: DataFrame = Field(default_factory=DataFrame)
+    dst: DataFrame = Field(default_factory=DataFrame)
+
+
+class Plots(BaseModel, arbitrary_types_allowed=True):
+    """Plots."""
 
 
 class Data(BaseModel, Generic[Dfs_T, Plots_T]):
