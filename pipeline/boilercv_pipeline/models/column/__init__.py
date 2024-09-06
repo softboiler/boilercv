@@ -37,9 +37,14 @@ def get_parts(string: str) -> Parts:
 
 def get_name(p: Parts) -> str:
     """Get name from parts."""
+    # sourcery skip: assign-if-exp, hoist-repeated-if-condition, hoist-similar-statement-from-if, reintroduce-else, swap-nested-ifs
     if p.sym and p.sub and p.unit:
         return f"{p.sym}_{p.sub} ({p.unit})"
-    return f"{p.sym} ({p.unit})" if p.sym and p.unit else p.sym
+    if p.sym and p.sub:
+        return f"{p.sym}_{p.sub}"
+    if p.sym and p.unit:
+        return f"{p.sym} ({p.unit})"
+    return p.sym
 
 
 def get_latex(p: Parts) -> str:
@@ -91,10 +96,20 @@ class Col:
         """LaTeX name."""
         return get_latex(Parts(self.sym, self.sub, self.unit))
 
+    @cached_property
+    def name(self) -> str:
+        """Name."""
+        return get_name(Parts(self.sym, self.sub, self.unit))
+
     @property
-    def without_subscript(self) -> str:
+    def no_sub(self) -> "Col":
         """Canonical name without subscript."""
-        return Col(sym=self.sym, unit=self.unit)()
+        return Col(sym=self.sym, unit=self.unit)
+
+    @property
+    def no_unit(self) -> "Col":
+        """Canonical name without unit."""
+        return Col(sym=self.sym, sub=self.sub)
 
     @classmethod
     def from_col(cls, col: "Col") -> "Col":
@@ -168,9 +183,9 @@ class IdentityCol(LinkedCol):
         self.source = Col(self.raw)
 
 
-def rename(df: DataFrame, cols: list[LinkedCol]) -> DataFrame:
+def rename(df: DataFrame, columns: list[LinkedCol]) -> DataFrame:
     """Rename."""
-    return df.rename(columns={col.source.raw: col() for col in cols})
+    return df.rename(columns={col.source.raw: col() for col in columns})
 
 
 def convert(df: DataFrame, cols: list[LinkedCol]) -> DataFrame:

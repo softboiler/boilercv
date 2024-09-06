@@ -30,3 +30,17 @@ def save_df(df: DataFrame, path: Path | str, key: str | None = None):
     """Save data frame to a compressed HDF5 file."""
     path = Path(path)
     df.to_hdf(path, key=key or path.stem, complib="zlib", complevel=9)
+
+
+def limit_group_size(df: DataFrame, by: str | list[str], n: int) -> DataFrame:
+    """Filter out groups shorter than a certain length."""
+    count = "__count"  # ? Dunder triggers forbidden control characters
+    return (
+        df.assign(**{
+            count: lambda df: df.groupby(by, **GBC)[
+                [by[0] if isinstance(by, list) else by]
+            ].transform("count")
+        })
+        .query(f"`{count}` > {n}")
+        .drop(columns=count)
+    )

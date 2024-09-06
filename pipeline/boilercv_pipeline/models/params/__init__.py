@@ -27,7 +27,7 @@ def set_display_options(
     font_scale: float = 1.3, precision: int = 3, display_rows: int = 12
 ):
     """Set display options."""
-    float_spec = f".{precision}g"
+    float_spec = f"#.{precision}g"
     # The triple curly braces in the f-string allows the format function to be
     # dynamically specified by a given float specification. The intent is clearer this
     # way, and may be extended in the future by making `float_spec` a parameter.
@@ -90,7 +90,7 @@ class Format(BaseModel):
     """Plot scale."""
     marker_scale: float = 20
     """Marker scale."""
-    precision: int = 4
+    precision: int = 3
     """Number precision."""
     display_rows: int = 12
     """Number of rows to display in data frames."""
@@ -139,7 +139,7 @@ class Format(BaseModel):
             _cols = list(df.columns)
         _index: str = index or _cols.pop(0)  # pyright: ignore[reportAssignmentType]
         display_markdown(
-            df.set_index(_index)[_cols].pipe(f, *args, **kwds),
+            df.pipe(f, *args, **kwds).set_index(_index)[_cols],
             floatfmt=_fmt,  # pyright: ignore[reportArgumentType]
         )
         return df

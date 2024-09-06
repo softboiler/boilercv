@@ -34,11 +34,9 @@ class Outs(DfsPlotsOuts):
 
 
 class DataStage(stage.DataStage):
-    src: str = "src"
     trackpy: str = "trackpy"
     centroids: str = "centroids"
     geo: str = "geo"
-    dst: str = "dst"
 
 
 D = DataStage()
@@ -66,7 +64,6 @@ class Cols(columns.Cols):
     contour: Ann[LinkedCol, Kind.idx, D.src, D.dst] = LinkedCol(
         "Contour", fmt=".0f", source=Col("contour")
     )
-    count: Ann[Col, D.centroids, D.geo, D.dst] = Col("Count", fmt=".0f")
 
     x_tp: Ann[LinkedCol, D.trackpy] = LinkedCol(X, PX, source=Col(X))
     y_tp: Ann[LinkedCol, D.trackpy] = LinkedCol(Y, PX, source=Col(Y))

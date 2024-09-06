@@ -317,23 +317,42 @@ stages:
       size: 0
       nfiles: 1
   find_tracks:
-    cmd: python pipeline/boilercv_pipeline/stages/find_tracks.py
+    cmd: boilercv-pipeline stage find-tracks
     deps:
-    - path: data/unobstructed
+    - path: data/e230920/objects
       hash: md5
-      md5: d86b284d61c0341668c7594a76e10ec3.dir
-      size: 0
+      md5: b9ae542d7cfe59ed694b6096bf546717.dir
+      size: 24314
       nfiles: 1
-    - path: pipeline/boilercv_pipeline/stages/find_tracks.py
+    - path: data/e230920/thermal.h5
       hash: md5
-      md5: 4b6c0605a414020b888d79bd4d332b91
-      size: 197
+      md5: 7aa7901c8ca7ccccd54e335fb6f411c6
+      size: 402330
+    - path: data/filled
+      hash: md5
+      md5: dd689eddfd2017e88d817ea549e22c2f.dir
+      size: 3616770112
+      nfiles: 337
+    - path: docs/notebooks/find_tracks.ipynb
+      hash: md5
+      md5: d65646dfe1e22734fec4340132c2715f
+      size: 20956
+    - path: pipeline/boilercv_pipeline/stages/find_tracks
+      hash: md5
+      md5: 9a8a8b509543c00f7acd1133d212c014.dir
+      size: 5956
+      nfiles: 2
     outs:
-    - path: data/tracks
+    - path: data/e230920/tracks
       hash: md5
-      md5: 3224c01679660267629b93a0a66c9d22.dir
-      size: 0
+      md5: 5db67bb0d2d046006130f94ca7bae9ce.dir
+      size: 29641
       nfiles: 1
+    - path: data/e230920/tracks_plots
+      hash: md5
+      md5: 41207c7f08ef8c3544c7454151160f8a.dir
+      size: 139797
+      nfiles: 2
   compare_theory:
     cmd: python pipeline/boilercv_pipeline/stages/compare_theory.py
     deps:
@@ -652,18 +671,18 @@ stages:
       nfiles: 1
     - path: docs/notebooks/get_thermal_data.ipynb
       hash: md5
-      md5: 8f587acedc7c3b83c211e5cb7240badf
-      size: 9740
+      md5: 904c25174ac4d27f2471ff9e6b586eb1
+      size: 9613
     - path: pipeline/boilercv_pipeline/stages/get_thermal_data
       hash: md5
-      md5: f0645b6d34a99cb6bdf612d89426cf59.dir
-      size: 4413
+      md5: 1101feb970d7d934ef7dbee5a7b9d020.dir
+      size: 4189
       nfiles: 2
     outs:
     - path: data/e230920/thermal.h5
       hash: md5
-      md5: 4be874ecd9c4bb1490fcfbfdb2535b95
-      size: 402300
+      md5: 7aa7901c8ca7ccccd54e335fb6f411c6
+      size: 402330
     - path: data/e230920/thermal_plots
       hash: md5
       md5: 7817895a96a2681640792cd966438268.dir
@@ -684,18 +703,18 @@ stages:
       nfiles: 337
     - path: docs/notebooks/find_objects.ipynb
       hash: md5
-      md5: 6e461392eb8760f54822d87145f9d16a
-      size: 10866
+      md5: c264adb4cf0731c1362316b1379f4622
+      size: 10647
     - path: pipeline/boilercv_pipeline/stages/find_objects
       hash: md5
-      md5: 0b80036cc542d32a045b0007e4882cfd.dir
-      size: 5906
+      md5: 0fa451146495d02c05707ada11b977be.dir
+      size: 5788
       nfiles: 2
     outs:
     - path: data/e230920/objects
       hash: md5
-      md5: 03eebf6411f1ad222c55388a42abef9c.dir
-      size: 30501
+      md5: b9ae542d7cfe59ed694b6096bf546717.dir
+      size: 24314
       nfiles: 1
     - path: data/e230920/objects_plots
       hash: md5

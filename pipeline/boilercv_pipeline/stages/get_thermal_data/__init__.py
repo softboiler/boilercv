@@ -11,7 +11,6 @@ from pydantic import Field
 from boilercv_pipeline.models import columns, data
 from boilercv_pipeline.models.column import Col, IdentityCol, Kind, LinkedCol
 from boilercv_pipeline.models.deps import DirSlicer
-from boilercv_pipeline.models.params import get_floatfmt
 from boilercv_pipeline.models.path import (
     DataDir,
     DataFile,
@@ -59,24 +58,17 @@ class Data(data.Data[Dfs, Plots]):
 D = const.data_stage
 
 
-class TempCol(LinkedCol):
-    """Temperature column."""
-
-    fmt: str | None = get_floatfmt(3)
-    """Floating number format suitable for integer-dominated temperatures."""
-
-
 class Cols(columns.Cols):
     time: Ann[LinkedCol, Kind.idx, D.src, D.dst] = LinkedCol("Time", source=Col("time"))
     time_elapsed: Ann[Col, D.dst] = Col("t", "s")
     time_elapsed_min: Ann[LinkedCol, D.dst] = LinkedCol("t", "min", source=time_elapsed)
-    water_temps: Ann[list[TempCol], D.src, D.dst] = [
-        TempCol(dst, "C", source=Col(src, "C"))
+    water_temps: Ann[list[LinkedCol], D.src, D.dst] = [
+        LinkedCol(dst, "C", source=Col(src, "C"))
         for src, dst in {"Tw3cal": "T_w3", "Tw4cal": "T_w4"}.items()
     ]
-    water_temp: Ann[TempCol, D.dst] = TempCol("T_w", "C")
-    superheat: Ann[TempCol, D.dst] = TempCol("ΔT_super", "K")
-    subcool: Ann[TempCol, D.dst] = TempCol("ΔT_sub", "K")
+    water_temp: Ann[LinkedCol, D.dst] = LinkedCol("T_w", "C")
+    superheat: Ann[LinkedCol, D.dst] = LinkedCol("ΔT_super", "K")
+    subcool: Ann[LinkedCol, D.dst] = LinkedCol("ΔT_sub", "K")
 
     sample_temps: Ann[list[LinkedCol], D.src, D.dst] = [
         LinkedCol(dst, "C", source=Col(src, "C"))

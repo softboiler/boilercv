@@ -92,19 +92,11 @@ stages:
       - docs/notebooks/find_tracks.ipynb
       - data/filled
       - data/e230920/objects
+      - data/e230920/thermal.h5
     outs:
       - data/e230920/tracks: *id002
     plots:
       - data/e230920/tracks_plots
-  # e230920_find_tracks:
-  #   cmd: boilercv-pipeline stage e230920-find-tracks
-  #   deps:
-  #     - pipeline/boilercv_pipeline/stages/e230920_find_tracks
-  #     - docs/notebooks/e230920_find_tracks.ipynb
-  #     - data/e230920/objects
-  #   outs:
-  #     - data/e230920/tracks: *id002
-  # e230920_process_tracks:
   #   cmd: boilercv-pipeline stage e230920-process-tracks
   #   deps:
   #     - pipeline/boilercv_pipeline/stages/e230920_process_tracks

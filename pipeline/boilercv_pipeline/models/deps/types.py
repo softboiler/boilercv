@@ -1,6 +1,14 @@
 """Types."""
 
-from typing import TypeAlias
+from typing import NamedTuple, TypeAlias
 
-Slicer: TypeAlias = tuple[int | None, ...]
+
+class Slicer(NamedTuple):
+    """Tuple of slice elements."""
+
+    start: int | None
+    stop: int | None
+    step: int
+
+
 Slicers: TypeAlias = dict[str, Slicer]
