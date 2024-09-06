@@ -31,7 +31,7 @@ class Deps(StagePaths):
 
 class Outs(DfsPlotsOuts):
     dfs: DataDir = paths.mae
-    plots: DataDir = paths.tracks_plots
+    plots: DataDir = paths.mae_plots
 
 
 class Dfs(data.Dfs): ...

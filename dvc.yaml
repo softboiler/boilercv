@@ -73,7 +73,9 @@ stages:
     outs:
       - data/e230920/thermal.h5: *id002
     plots:
-      - data/e230920/thermal_plots
+      - data/e230920/thermal_plots/subcool.png
+      - data/e230920/thermal_plots/subcool_superheat.png
+      - data/e230920/thermal_plots/superheat.png
   find_objects:
     cmd: boilercv-pipeline stage find-objects
     deps:
@@ -84,7 +86,7 @@ stages:
     outs:
       - data/e230920/objects: *id002
     plots:
-      - data/e230920/objects_plots
+      - data/e230920/objects_plots/composite.png
   find_tracks:
     cmd: boilercv-pipeline stage find-tracks
     deps:
@@ -96,41 +98,14 @@ stages:
     outs:
       - data/e230920/tracks: *id002
     plots:
-      - data/e230920/tracks_plots
-  #   cmd: boilercv-pipeline stage e230920-process-tracks
-  #   deps:
-  #     - pipeline/boilercv_pipeline/stages/e230920_process_tracks
-  #     - docs/notebooks/e230920_process_tracks.ipynb
-  #     - data/e230920/tracks
-  #   outs:
-  #     - data/e230920/processed_tracks: *id002
-  # # e230920_merge_tracks:
-  # #   cmd: boilercv-pipeline stage e230920-merge-tracks
-  # #   deps:
-  # #     - pipeline/boilercv_pipeline/stages/e230920_merge_tracks
-  # #     - data/e230920/processed_tracks
-  # #   outs:
-  # #     - data/e230920/merged_tracks.h5: *id002
-  # # e230920_plot_tracks:
-  # #   cmd: boilercv-pipeline stage e230920-plot-tracks
-  # #   deps:
-  # #     - pipeline/boilercv_pipeline/stages/e230920_plot_tracks
-  # #     - docs/notebooks/e230920_plot_tracks.ipynb
-  # #     - data/e230920/merged_tracks.h5
-  # #   outs: []
-  # e230920_get_mae:
-  #   cmd: boilercv-pipeline stage e230920-get-mae
-  #   deps:
-  #     - pipeline/boilercv_pipeline/stages/e230920_get_mae
-  #     - docs/notebooks/e230920_get_mae.ipynb
-  #     - data/e230920/processed_tracks
-  #   outs:
-  #     - data/e230920/mae: *id002
-  # # e230920_merge_mae:
-  # #   cmd: boilercv-pipeline stage e230920-merge-mae
-  # #   deps:
-  # #     - pipeline/boilercv_pipeline/stages/e230920_merge_mae
-  # #     - docs/notebooks/e230920_merge_mae.ipynb
-  # #     - data/e230920/mae
-  # #   outs:
-  # #     - data/e230920/merged_mae.h5: *id002
+      - data/e230920/tracks_plots/corr.png
+      - data/e230920/tracks_plots/multi.png
+  get_mae:
+    cmd: boilercv-pipeline stage get-mae
+    deps:
+      - pipeline/boilercv_pipeline/stages/get_mae
+      - docs/notebooks/get_mae.ipynb
+      - data/e230920/thermal.h5
+      - data/e230920/tracks
+    outs:
+      - data/e230920/mae: *id002

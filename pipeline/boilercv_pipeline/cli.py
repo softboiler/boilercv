@@ -21,6 +21,7 @@ from boilercv_pipeline.stages.fill import Fill
 from boilercv_pipeline.stages.find_contours import FindContours
 from boilercv_pipeline.stages.find_objects import FindObjects
 from boilercv_pipeline.stages.find_tracks import FindTracks
+from boilercv_pipeline.stages.get_mae import GetMae
 from boilercv_pipeline.stages.get_thermal_data import GetThermalData
 from boilercv_pipeline.stages.preview_binarized import PreviewBinarized
 from boilercv_pipeline.stages.preview_filled import PreviewFilled
@@ -64,6 +65,7 @@ class Stage:
         | GetThermalData
         | FindObjects
         | FindTracks
+        | GetMae
     ]
 
 
@@ -94,7 +96,7 @@ class SyncDVC:
             get_thermal_data: GetThermalData = Field(default_factory=GetThermalData)
             find_objects: FindObjects = Field(default_factory=FindObjects)
             find_tracks: FindTracks = Field(default_factory=FindTracks)
-            # e230920_get_mae: E230920GetMae = Field(default_factory=E230920GetMae)
+            get_mae: GetMae = Field(default_factory=GetMae)
 
         def process_path(path: Path) -> str:
             path = Path(path)
@@ -126,7 +128,7 @@ class SyncDVC:
             ):
                 if Path(out).stem.endswith("_plots"):
                     stage["outs"].pop(i)
-                    stage["plots"].append(out)
+                    stage["plots"].extend([p.as_posix() for p in Path(out).iterdir()])
             stages[stage_name] = {
                 "cmd": f"boilercv-pipeline stage {stage_name.replace('_', '-')}",
                 **stage,
