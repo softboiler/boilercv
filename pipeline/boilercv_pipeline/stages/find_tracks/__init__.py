@@ -73,18 +73,19 @@ def convert_col(source: Col, unit: str, fmt: str = "") -> LinkedCol:
 
 class Cols(columns.Cols):
     time_elapsed: Ann[Col, Kind.idx, D.tracks] = Col("t", "s")
-    bubble: Ann[LinkedCol, Kind.idx, D.src, D.tracks] = LinkedCol(
+    bub: Ann[LinkedCol, Kind.idx, D.src, D.tracks, D.bubbles, D.dst] = LinkedCol(
         "Bubble", fmt=".0f", source=Col("particle")
     )
-    bubble_visible_frames: Ann[Col, Kind.idx, D.tracks] = Col(
+    bub_visible_frames: Ann[Col, Kind.idx, D.tracks] = Col(
         "t", "frames", "b, vis", fmt=".0f"
     )
-    bubble_visible: Ann[LinkedCol, Kind.idx, D.tracks] = LinkedCol(
-        "t", "s", "b, vis", source=bubble_visible_frames
+    bub_visible: Ann[LinkedCol, Kind.idx, D.tracks] = LinkedCol(
+        "t", "s", "b, vis", source=bub_visible_frames
     )
 
     x: Ann[LinkedCol, D.tracks] = convert_col(OC.x, "m")
     y: Ann[LinkedCol, D.tracks] = convert_col(OC.y, "m")
+
     u: Ann[LinkedCol, D.tracks] = LinkedCol("u", "m/s", source=x)
     v: Ann[LinkedCol, D.tracks] = LinkedCol("v", "m/s", source=y)
 
@@ -92,20 +93,26 @@ class Cols(columns.Cols):
     radius_of_gyration: Ann[LinkedCol, D.tracks] = convert_col(
         OC.radius_of_gyration, "m"
     )
-    distance: Ann[Col, D.tracks] = Col("d", "m")
+    distance: Ann[Col, D.tracks] = Col("z", "m")
 
-    bubble_time: Ann[Col, Kind.idx, D.bubbles] = Col("t", "s", "b")
-    bubble_lifetime: Ann[Col, Kind.idx, D.bubbles] = Col("t", "s", "b,tot")
+    bub_time: Ann[Col, Kind.idx, D.bubbles] = Col("t", "s", "b")
+    bub_lifetime: Ann[Col, Kind.idx, D.bubbles] = Col("t", "s", "b,tot")
 
-    bubble_depart_t: Ann[Col, Kind.idx, D.bubbles] = Col("t", "s", "b0")
-    bubble_depart_d: Ann[Col, D.bubbles] = Col("d", "m", "b0")
-    bubble_depart_x: Ann[Col, D.bubbles] = Col("x", "m", "b0")
-    bubble_depart_y: Ann[Col, D.bubbles] = Col("y", "m", "b0")
-    bubble_depart_u: Ann[Col, D.bubbles] = Col("u", "m/s", "b0")
-    bubble_depart_v: Ann[Col, D.bubbles] = Col("v", "m/s", "b0")
+    bub_t0: Ann[Col, Kind.idx, D.bubbles] = Col("t", "s", "b0")
+    bub_d0: Ann[Col, D.bubbles] = Col("d", "m", "b0")
+    bub_x0: Ann[Col, D.bubbles] = Col("x", "m", "b0")
+    bub_y0: Ann[Col, D.bubbles] = Col("y", "m", "b0")
+    bub_u0: Ann[Col, D.bubbles] = Col("u", "m/s", "b0")
+    bub_v0: Ann[Col, D.bubbles] = Col("v", "m/s", "b0")
 
-    max_diameter: Ann[Col, D.bubbles] = Col("d", "m", "b,max")
-    diameter_rate_of_change: Ann[Col, D.bubbles] = Col(r"\dot{d}", "m/s", "b")
+    max_diam: Ann[Col, D.bubbles] = Col("d", "m", "b,max")
+    diam_rate_of_change: Ann[Col, D.bubbles] = Col(r"\dot{d}", "m/s", "b")
+
+    bub_reynolds: Ann[Col, D.dst] = Col("Re", sub="b")
+    bub_reynolds0: Ann[Col, D.dst] = Col("Re", sub="b0")
+    bub_fourier: Ann[Col, D.dst] = Col("Fo", sub="b")
+    bub_nusselt: Ann[Col, D.dst] = Col("Nu", sub="c")
+    bub_beta: Ann[Col, D.dst] = Col("β")
 
     @property
     def tracks(self) -> list[Col]:

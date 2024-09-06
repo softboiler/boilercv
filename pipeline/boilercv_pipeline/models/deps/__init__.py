@@ -13,9 +13,11 @@ def get_slices(slicers: Slicers) -> dict[str, slice]:
     return {k: slice(*(v or (None,))) for k, v in slicers.items()}
 
 
-def first_slicer(n: int | None, step: int = 1) -> Slicer:
+def first_slicer(n: int = 0, step: int = 1) -> Slicer:
     """Slicer for the first `n` elements taken at `step`s."""
-    return (None, *[step * f for f in (n - 1, 1)]) if n else (None, None, step)
+    return (
+        Slicer(None, *[step * f for f in (n - 1, 1)]) if n else Slicer(None, None, step)
+    )
 
 
 class DirSlicer(BaseModel):

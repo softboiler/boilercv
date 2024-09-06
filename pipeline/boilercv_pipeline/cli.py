@@ -17,11 +17,6 @@ from boilercv_pipeline.models.path import (
 )
 from boilercv_pipeline.stages.binarize import Binarize
 from boilercv_pipeline.stages.convert import Convert
-from boilercv_pipeline.stages.e230920_get_mae import E230920GetMae
-from boilercv_pipeline.stages.e230920_merge_mae import E230920MergeMae
-from boilercv_pipeline.stages.e230920_merge_tracks import E230920MergeTracks
-from boilercv_pipeline.stages.e230920_plot_tracks import E230920PlotTracks
-from boilercv_pipeline.stages.e230920_process_tracks import E230920ProcessTracks
 from boilercv_pipeline.stages.fill import Fill
 from boilercv_pipeline.stages.find_contours import FindContours
 from boilercv_pipeline.stages.find_objects import FindObjects
@@ -58,22 +53,17 @@ class Stage:
     """Stage."""
 
     commands: Subcommands[
-        Binarize
-        | SkipCloud
+        SkipCloud
         | Convert
+        | Binarize
+        | PreviewGray
+        | PreviewBinarized
+        | FindContours
+        | Fill
+        | PreviewFilled
+        | GetThermalData
         | FindObjects
         | FindTracks
-        | E230920GetMae
-        | E230920MergeMae
-        | E230920MergeTracks
-        | E230920PlotTracks
-        | E230920ProcessTracks
-        | GetThermalData
-        | Fill
-        | FindContours
-        | PreviewBinarized
-        | PreviewFilled
-        | PreviewGray,
     ]
 
 
@@ -104,17 +94,7 @@ class SyncDVC:
             get_thermal_data: GetThermalData = Field(default_factory=GetThermalData)
             find_objects: FindObjects = Field(default_factory=FindObjects)
             find_tracks: FindTracks = Field(default_factory=FindTracks)
-            e230920_process_tracks: E230920ProcessTracks = Field(
-                default_factory=E230920ProcessTracks
-            )
-            e230920_merge_tracks: E230920MergeTracks = Field(
-                default_factory=E230920MergeTracks
-            )
-            e230920_plot_tracks: E230920PlotTracks = Field(
-                default_factory=E230920PlotTracks
-            )
-            e230920_get_mae: E230920GetMae = Field(default_factory=E230920GetMae)
-            e230920_merge_mae: E230920MergeMae = Field(default_factory=E230920MergeMae)
+            # e230920_get_mae: E230920GetMae = Field(default_factory=E230920GetMae)
 
         def process_path(path: Path) -> str:
             path = Path(path)

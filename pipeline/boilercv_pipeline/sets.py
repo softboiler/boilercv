@@ -118,14 +118,15 @@ def get_dataset(
     # Unpacking is incompatible with dask
     frame = slice_frames(num_frames, frame)
     cmp_source, unc_source = get_stage(name, sources)
-    source = unc_source if unc_source.exists() else cmp_source
     if stage == "large_sources":
+        source = cmp_source.parent.with_name("large_sources") / cmp_source.name
         ds = open_dataset(source)
         return (
             Dataset({VIDEO: ds[VIDEO].sel(frame=frame), HEADER: ds[HEADER]})
             if source.exists()
             else Dataset()
         )
+    source = unc_source if unc_source.exists() else cmp_source
     roi = rois / f"{name}.nc"
     with open_dataset(source) as ds, open_dataset(roi) as roi_ds:
         if not unc_source.exists():

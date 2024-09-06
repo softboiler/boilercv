@@ -65,10 +65,10 @@ class Cols(columns.Cols):
         "Contour", fmt=".0f", source=Col("contour")
     )
 
-    x_tp: Ann[LinkedCol, D.trackpy] = LinkedCol(X, PX, source=Col(X))
-    y_tp: Ann[LinkedCol, D.trackpy] = LinkedCol(Y, PX, source=Col(Y))
     x: Ann[LinkedCol, D.src, D.dst] = LinkedCol(X, PX, source=Col(XPX))
     y: Ann[LinkedCol, D.src, D.dst] = LinkedCol(Y, PX, source=Col(YPX))
+    x_tp: LinkedCol = LinkedCol(X, PX, source=Col(X))
+    y_tp: LinkedCol = LinkedCol(Y, PX, source=Col(Y))
 
     size: Ann[LinkedCol, D.trackpy] = LinkedCol("Size", PX, source=Col("size"))
 
@@ -113,8 +113,7 @@ class FindObjects(FilledParams[Deps, Outs, Data]):
     """Stage data."""
     cols: Ann[Cols, Arg(hidden=True)] = Field(default_factory=Cols)
     """Columns."""
-    # TODO: Revert to `False`
-    compare_with_trackpy: bool = True
+    compare_with_trackpy: bool = False
     """Whether to get objects using the Trackpy approach."""
     guess_diameter: int = 21
     """Guess diameter for the Trackpy approach. (px)"""

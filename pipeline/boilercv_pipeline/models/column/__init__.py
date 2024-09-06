@@ -6,11 +6,11 @@ from re import search
 from typing import Any, NamedTuple
 
 from pandas import DataFrame
+from pint import UnitRegistry
 from pydantic import BaseModel
 
 from boilercv_pipeline.models.column import types
 from boilercv_pipeline.models.column.types import P, Ps, R, SupportsMul_T
-from boilercv_pipeline.units import U
 
 
 class Parts(NamedTuple):
@@ -169,9 +169,9 @@ class LinkedCol(Col):
         """Rename this column."""
         return df.rename(columns={self.source.raw: self()})
 
-    def convert(self, df: DataFrame) -> DataFrame:
+    def convert(self, df: DataFrame, ureg: UnitRegistry) -> DataFrame:
         """Convert this column."""
-        return U.convert(df[[self.source()]], self.source.unit, self.unit)
+        return ureg.convert(df[[self.source()]], self.source.unit, self.unit)
 
 
 @dataclass
@@ -188,9 +188,9 @@ def rename(df: DataFrame, columns: list[LinkedCol]) -> DataFrame:
     return df.rename(columns={col.source.raw: col() for col in columns})
 
 
-def convert(df: DataFrame, cols: list[LinkedCol]) -> DataFrame:
+def convert(df: DataFrame, cols: list[LinkedCol], ureg: UnitRegistry) -> DataFrame:
     """Convert."""
-    return df.assign(**{col(): col.convert(df) for col in cols})
+    return df.assign(**{col(): col.convert(df, ureg) for col in cols})
 
 
 class _Kind(BaseModel):
