@@ -31,7 +31,6 @@ class Deps(FilledDeps):
     nb: DocsFile = paths.notebooks[stage.stem]
     objects: DataDir = paths.objects
     thermal: DataFile = paths.e230920_thermal
-    filled: DataDir = paths.filled
 
 
 class Outs(DfsPlotsOuts):

@@ -25,7 +25,6 @@ class Deps(FilledDeps):
     stage: DirectoryPathSerPosix = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
     contours: DataDir = paths.contours
-    filled: DataDir = paths.filled
 
 
 class Outs(DfsPlotsOuts):

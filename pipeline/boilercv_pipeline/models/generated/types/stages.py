@@ -5,11 +5,11 @@ from typing import Literal, TypeAlias
 StageName: TypeAlias = Literal[
     "binarize",
     "convert",
-    "e230920_get_mae",
     "fill",
     "find_contours",
     "find_objects",
     "find_tracks",
+    "get_mae",
     "get_thermal_data",
     "preview_binarized",
     "preview_filled",
