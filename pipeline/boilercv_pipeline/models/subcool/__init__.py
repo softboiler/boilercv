@@ -26,6 +26,9 @@ class Constants(BaseModel):
     time: str = "17-44-35"
     # TODO: Revert to `first_slicer(n=10, step=100)`
     nb_slicer_patterns: dict[str, Slicers] = {r".+": {FRAME: first_slicer()}}
+    # nb_slicer_patterns: dict[str, Slicers] = {
+    #     r".+": {FRAME: first_slicer(n=10, step=100)}
+    # }
     """Slicer patterns representing a small subset of frames."""
     data_stage: DataStage = DataStage()
     """Common stages of data processing."""
