@@ -142,8 +142,6 @@ def get_dataset(
 
 def get_dataset2(path: Path, slices: dict[str, slice] | None = None) -> DS:
     """Load a video dataset."""
-    # Can't use `xarray.open_mfdataset` because it requires dask
-    # Unpacking is incompatible with dask
     slices = slices or {}
     cmp_source, unc_source = get_stage(path.stem, path.parent)
     source = unc_source if unc_source.exists() else cmp_source
