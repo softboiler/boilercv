@@ -113,8 +113,10 @@ class SyncDVC:
             for k in [k for k in stage if k not in const.dvc_keys]:
                 del stage[k]
             stage["deps"] = [process_path(v) for v in stage["deps"].values()]
-            if "plots" in stage["outs"]:
-                stage["plots"] = []
+            if (plots := stage["outs"].pop("plots", None)) and (
+                plots := [p.as_posix() for p in Path(plots).iterdir()]
+            ):
+                stage["plots"] = plots
             stage["outs"] = [
                 (
                     {out: const.dvc_out_skip_cloud_config}
@@ -123,12 +125,6 @@ class SyncDVC:
                 )
                 for out in stage["outs"].values()
             ]
-            for i, out in enumerate(
-                out for out_dict in stage["outs"] for out in out_dict
-            ):
-                if Path(out).stem.endswith("_plots"):
-                    stage["outs"].pop(i)
-                    stage["plots"].extend([p.as_posix() for p in Path(out).iterdir()])
             stages[stage_name] = {
                 "cmd": f"boilercv-pipeline stage {stage_name.replace('_', '-')}",
                 **stage,

@@ -13,7 +13,7 @@ from boilercv_pipeline.models.stage import StagePaths
 
 class Deps(StagePaths):
     stage: DirectoryPathSerPosix = Path(__file__).parent
-    sources: DataDir = paths.sources
+    filled: DataDir = paths.filled
     rois: DataDir = paths.rois
 
 

@@ -14,14 +14,14 @@ def main(params: PreviewFilled):
     destination = params.outs.filled_preview
     # TODO: Figure out out-of-order preview frames to avoid reprocessing frames
     with new_videos_to_preview(
-        destination, reprocess=True, sources=params.deps.sources
+        destination, reprocess=True, sources=params.deps.filled
     ) as videos_to_preview:
         for video_name in tqdm(videos_to_preview):
             ds = get_dataset(
                 video_name,
                 stage=stage,
                 num_frames=1,
-                sources=params.deps.sources,
+                sources=params.deps.filled,
                 rois=params.deps.rois,
             )
             videos_to_preview[video_name] = ds[VIDEO].isel({FRAME: 0}).values

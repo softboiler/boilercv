@@ -59,7 +59,7 @@ stages:
     cmd: boilercv-pipeline stage preview-filled
     deps:
       - pipeline/boilercv_pipeline/stages/preview_filled
-      - data/sources
+      - data/filled
       - data/rois
     outs:
       - data/previews/filled_preview.nc: *id002
