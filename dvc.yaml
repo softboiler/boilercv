@@ -1,11 +1,10 @@
 stages:
   skip_cloud:
     cmd: boilercv-pipeline stage skip-cloud
-    deps: []
     outs:
-      - data/cines: &id001
-          persist: true
+      - data/cines:
           cache: false
+          persist: true
           push: false
   convert:
     cmd: boilercv-pipeline stage convert
@@ -13,23 +12,28 @@ stages:
       - pipeline/boilercv_pipeline/stages/convert
       - data/cines
     outs:
-      - data/large_sources: *id001
+      - data/large_sources:
+          cache: false
+          persist: true
+          push: false
   binarize:
     cmd: boilercv-pipeline stage binarize
     deps:
       - pipeline/boilercv_pipeline/stages/binarize
       - data/large_sources
     outs:
-      - data/sources: &id002
+      - data/sources:
           persist: true
-      - data/rois: *id002
+      - data/rois:
+          persist: true
   preview_gray:
     cmd: boilercv-pipeline stage preview-gray
     deps:
       - pipeline/boilercv_pipeline/stages/preview_gray
       - data/large_sources
     outs:
-      - data/previews/gray_preview.nc: *id002
+      - data/previews/gray_preview.nc:
+          persist: true
   preview_binarized:
     cmd: boilercv-pipeline stage preview-binarized
     deps:
@@ -37,7 +41,8 @@ stages:
       - data/sources
       - data/rois
     outs:
-      - data/previews/binarized_preview.nc: *id002
+      - data/previews/binarized_preview.nc:
+          persist: true
   find_contours:
     cmd: boilercv-pipeline stage find-contours
     deps:
@@ -45,7 +50,8 @@ stages:
       - data/sources
       - data/rois
     outs:
-      - data/contours: *id002
+      - data/contours:
+          persist: true
   fill:
     cmd: boilercv-pipeline stage fill
     deps:
@@ -54,7 +60,8 @@ stages:
       - data/rois
       - data/contours
     outs:
-      - data/filled: *id002
+      - data/filled:
+          persist: true
   preview_filled:
     cmd: boilercv-pipeline stage preview-filled
     deps:
@@ -62,7 +69,8 @@ stages:
       - data/filled
       - data/rois
     outs:
-      - data/previews/filled_preview.nc: *id002
+      - data/previews/filled_preview.nc:
+          persist: true
   get_thermal_data:
     cmd: boilercv-pipeline stage get-thermal-data
     deps:
@@ -71,7 +79,8 @@ stages:
       - data/thermal
       - data/models
     outs:
-      - data/e230920/thermal.h5: *id002
+      - data/e230920/thermal.h5:
+          persist: true
     plots:
       - data/e230920/thermal_plots/subcool.png
       - data/e230920/thermal_plots/subcool_superheat.png
@@ -84,7 +93,8 @@ stages:
       - data/filled
       - data/contours
     outs:
-      - data/e230920/objects: *id002
+      - data/e230920/objects:
+          persist: true
     plots:
       - data/e230920/objects_plots/composite.png
   find_tracks:
@@ -96,7 +106,8 @@ stages:
       - data/e230920/objects
       - data/e230920/thermal.h5
     outs:
-      - data/e230920/tracks: *id002
+      - data/e230920/tracks:
+          persist: true
     plots:
       - data/e230920/tracks_plots/corr.png
       - data/e230920/tracks_plots/multi.png
@@ -108,4 +119,5 @@ stages:
       - data/e230920/thermal.h5
       - data/e230920/tracks
     outs:
-      - data/e230920/mae: *id002
+      - data/e230920/mae:
+          persist: true

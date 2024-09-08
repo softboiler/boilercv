@@ -484,10 +484,7 @@ class ContextModel(ContextBase):
     """Model that guarantees a dictionary context is available during validation."""
 
     model_config: ClassVar[PluginConfigDict[ContextPluginSettings[Context]]] = (  # pyright: ignore[reportIncompatibleVariableOverride]
-        PluginConfigDict(
-            validate_default=True,
-            plugin_settings=ContextPluginSettings(context=Context()),
-        )
+        PluginConfigDict(plugin_settings=ContextPluginSettings(context=Context()))
     )
     context: Context = Context()
     _context_handlers: ClassVar[dict[str, type[BaseModel]]] = {}
@@ -683,7 +680,7 @@ class ContextModel(ContextBase):
             if field == CONTEXT:
                 continue
             if isinstance(inner := getattr(self, field), ContextModel):
-                inner.context = inner.context_sync_after(self.context)  # pyright: ignore[reportAttributeAccessIssue]
+                inner.context_sync_after(self.context)  # pyright: ignore[reportAttributeAccessIssue]
 
     @classmethod
     def context_sync_before(
