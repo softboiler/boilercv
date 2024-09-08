@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
+import dataclasses
 from collections.abc import Iterator, Mapping, MutableMapping
 from copy import copy, deepcopy
+from dataclasses import dataclass
 from json import loads
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, Literal, Self
 
@@ -28,7 +30,6 @@ from boilercv.contexts.types import (
     K,
     Mode,
     PluginConfigDict,
-    PydanticContext,
     V,
 )
 from boilercv.mappings import apply
@@ -56,12 +57,13 @@ def context_validate_before(data: Any) -> Any:
     return data
 
 
-class Kwds(BaseModel):
+@dataclass
+class Kwds:
     """Keywords."""
 
     strict: bool | None = None
     from_attributes: bool | None = None
-    context: PydanticContext = Field(default_factory=dict)
+    context: dict[str, Any] = dataclasses.field(default_factory=dict)
     mode: Mode = "python"
 
 
@@ -77,19 +79,24 @@ class ContextBase(BaseModel):
     )
 
     def __init__(self, /, **data: Any):
-        kwds = Kwds.model_validate(data.pop(_KWDS, {}))
+        kwds = Kwds() if isinstance(data, BaseModel) else data.pop(_KWDS, Kwds())
         self.__context_init__(data=data, kwds=kwds)
 
     __init__.__pydantic_base_init__ = True  # pyright: ignore[reportFunctionMemberAccess]
 
+    @classmethod
+    def context_data_pre_init(cls, data: Data_T, kwds: Kwds) -> Data_T:
+        """Update data before initialization."""
+        return (
+            apply(data, node_fun=lambda v: {**v, _KWDS: kwds})
+            if isinstance(data, Mapping)
+            else data
+        )
+
     def __context_init__(self, data: Any, kwds: Kwds):  # noqa: PLW3201
         """Context initializer."""
         self.__pydantic_validator__.validate_python(
-            (
-                apply(data, node_fun=lambda v: {**v, _KWDS: kwds})
-                if isinstance(data, Mapping)
-                else data
-            ),
+            self.context_data_pre_init(data, kwds),
             self_instance=self,
             strict=kwds.strict,
             from_attributes=kwds.from_attributes,
@@ -293,7 +300,7 @@ class ContextRoot(  # noqa: PLW1641
         super().__init_subclass__(**kwargs)
 
     def __init__(self, /, root: RootModelRootType = PydanticUndefined, **data) -> None:
-        kwds = Kwds.model_validate(data.pop(_KWDS, {}))
+        kwds = data.pop(_KWDS, Kwds())
         if data:
             if root is not PydanticUndefined:
                 raise ValueError(
@@ -541,14 +548,36 @@ class ContextModel(ContextBase):
         """Update context after initialization."""
         return context
 
+    @classmethod
+    def context_data_pre_init(cls, data: Data_T, kwds: Kwds) -> Data_T:
+        """Sync nested contexts before validation."""
+        for field, info in cls.model_fields.items():
+            if (
+                plugin_settings := deepcopy(
+                    getattr(info.annotation, MODEL_CONFIG, {}).get(PLUGIN_SETTINGS, {})
+                )
+            ) and isinstance(
+                (inner_context_config := plugin_settings.get(PLUGIN_CONTEXT)), Mapping
+            ):
+                inner_kwds = Kwds(
+                    strict=kwds.strict,
+                    from_attributes=kwds.from_attributes,
+                    context={**inner_context_config, **kwds.context},
+                    mode=kwds.mode,
+                )
+                value = data.get(field) or {}  # pyright: ignore[reportAttributeAccessIssue]
+                if isinstance(value, ContextModel):
+                    value.context = inner_kwds.context  # pyright: ignore[reportAttributeAccessIssue]
+                    continue
+                data[field] = {**value, _KWDS: inner_kwds}  # pyright: ignore[reportIndexIssue]
+        return data
+
     def __init__(self, /, **data: Any):
-        # TODO: De-duplicate methods on parent `ContextBase`
         context = self.context_validate_pre_init(data)
-        self.__pydantic_validator__.validate_python(
-            self.context_sync_before(data, context), self_instance=self, context=context
-        )
+        kwds = data.pop(_KWDS, Kwds(context=context))  # pyright: ignore[reportArgumentType, reportCallIssue]
+        self.__context_init__(data=data, kwds=kwds)
         self.context = self.context_post_init(context)
-        self.context_sync_after(context)
+        self.context_sync_after(self.context)
 
     def model_dump(
         self,
@@ -651,21 +680,15 @@ class ContextModel(ContextBase):
         """Contextualizable model validate."""
         if isinstance(obj, BaseModel):
             obj = obj.model_dump(context=context)
-            return super().model_validate(
-                obj={**obj, CONTEXT: cls.context_validate_pre_init(obj, context)},
+            return cls.model_validate(
+                obj={**obj, CONTEXT: context},
                 strict=strict,
                 from_attributes=from_attributes,
                 context=context,
             )
         return super().model_validate(
             obj={
-                **(
-                    obj := (
-                        obj.model_dump(context=cls.context_get(obj))
-                        if isinstance(obj, ContextModel)
-                        else obj
-                    )
-                ),
+                **obj,
                 CONTEXT: (context := cls.context_validate_pre_init(obj, context)),
             },
             strict=strict,
@@ -681,27 +704,6 @@ class ContextModel(ContextBase):
                 continue
             if isinstance(inner := getattr(self, field), ContextModel):
                 inner.context_sync_after(self.context)  # pyright: ignore[reportAttributeAccessIssue]
-
-    @classmethod
-    def context_sync_before(
-        cls, data: dict[str, Any], context: Context
-    ) -> dict[str, Any]:
-        """Sync nested contexts before validation."""
-        for field, info in cls.model_fields.items():
-            if (
-                plugin_settings := deepcopy(
-                    getattr(info.annotation, MODEL_CONFIG, {}).get(PLUGIN_SETTINGS, {})
-                )
-            ) and isinstance(
-                (inner_context_config := plugin_settings.get(PLUGIN_CONTEXT)), Mapping
-            ):
-                inner_context = {**inner_context_config, **context}
-                value = data.get(field) or {}
-                if isinstance(value, ContextModel):
-                    value.context = inner_context  # pyright: ignore[reportAttributeAccessIssue]
-                    continue
-                data[field] = {**value, CONTEXT: inner_context}
-        return data
 
     @classmethod
     def context_validate_pre_init(

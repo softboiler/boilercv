@@ -1,17 +1,14 @@
 """Types."""
 
-from typing import Annotated, Any, Generic, Literal, Protocol, TypeAlias, TypeVar
+from typing import Any, Generic, Literal, Protocol, TypeAlias, TypeVar
 
 import pydantic
-from pydantic import BaseModel, BeforeValidator, ConfigDict
+from pydantic import BaseModel, ConfigDict
 from typing_extensions import TypedDict
 
+Data: TypeAlias = BaseModel | dict[str, Any]
+"""Data."""
 Mode: TypeAlias = Literal["python", "json", "strings"]
-
-K = TypeVar("K")
-"""Key type."""
-V = TypeVar("V")
-"""Value type."""
 
 
 class AnyTypedDict(TypedDict):
@@ -22,11 +19,15 @@ class Context(AnyTypedDict):
     """Context."""
 
 
+K = TypeVar("K")
+"""Key type."""
+V = TypeVar("V")
+"""Value type."""
 PluginSettings_T = TypeVar("PluginSettings_T", bound=AnyTypedDict, covariant=True)
 """Plugin settings type."""
 Context_T = TypeVar("Context_T", bound=Context, covariant=True)
 """Context type."""
-Data_T = TypeVar("Data_T", bound=BaseModel | dict[str, Any])
+Data_T = TypeVar("Data_T", bound=Data)
 """Data type."""
 
 
@@ -54,9 +55,3 @@ class ContextPluginSettings(TypedDict, Generic[Context_T]):
     """Context model Pydantic plugin settings."""
 
     context: Context_T
-
-
-PydanticContext: TypeAlias = Annotated[
-    dict[str, Any] | None, BeforeValidator(lambda v: v or {})
-]
-"""Pydantic context."""

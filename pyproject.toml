@@ -119,7 +119,6 @@ showcontent = true
 stubPath = "submodules/stubs/stubs"
 exclude = [
     "**/.*",
-    "**/AppData",
     "**/__pycache__",
     "**/node_modules",
     ".cache",
@@ -127,7 +126,7 @@ exclude = [
     "submodules",
     "scripts/install.py",
 ]
-ignore = ["**/.*", "**/AppData", "**/__pycache__", "**/node_modules", ".cache", "bin"]
+ignore = ["**/.*", "**/__pycache__", "**/node_modules", ".cache", "bin"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true
