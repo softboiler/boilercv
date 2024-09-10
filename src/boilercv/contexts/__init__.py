@@ -519,20 +519,21 @@ class ContextModel(ContextBase):
     @field_serializer(CONTEXT, mode="plain")
     def context_ser(self, value: Any, info: FieldSerializationInfo) -> Any:
         """Serialize context."""
+        context=info.context or Context()
         return {
             k: v.model_dump(
                 mode=info.mode,
                 by_alias=info.by_alias,
                 include=info.include,
                 exclude=info.exclude,
-                context=info.context or {},
+                context=context,
                 exclude_unset=info.exclude_unset,
                 exclude_defaults=info.exclude_defaults,
                 exclude_none=info.exclude_none,
                 round_trip=info.round_trip,
                 serialize_as_any=info.serialize_as_any,
             )
-            for k, v in (value or info.context or {}).items()
+            for k, v in (value or context).items()
         }
 
     def model_dump(
