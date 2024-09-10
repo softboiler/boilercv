@@ -44,9 +44,8 @@ PLUGIN_SETTINGS = "plugin_settings"
 
 def context_validate_before(data: Data_T) -> Data_T:
     """Validate context before."""
-    if isinstance(data, BaseModel) or _CONTEXT not in data:
-        return data
-    data.pop(_CONTEXT)
+    if not isinstance(data, BaseModel) and _CONTEXT in data:
+        data.pop(_CONTEXT)
     return data
 
 
