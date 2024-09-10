@@ -1,12 +1,13 @@
 """Types."""
 
+from collections.abc import MutableMapping
 from typing import Any, Generic, Literal, Protocol, TypeAlias, TypeVar
 
 import pydantic
 from pydantic import BaseModel, ConfigDict
 from typing_extensions import TypedDict
 
-Data: TypeAlias = BaseModel | dict[str, Any]
+Data: TypeAlias = BaseModel | MutableMapping[str, Any]
 """Data."""
 Mode: TypeAlias = Literal["python", "json", "strings"]
 
@@ -23,7 +24,9 @@ K = TypeVar("K")
 """Key type."""
 V = TypeVar("V")
 """Value type."""
-PluginSettings_T = TypeVar("PluginSettings_T", bound=AnyTypedDict, covariant=True)
+PluginSettings_T = TypeVar(
+    "PluginSettings_T", bound=BaseModel | AnyTypedDict, covariant=True
+)
 """Plugin settings type."""
 Context_T = TypeVar("Context_T", bound=Context, covariant=True)
 """Context type."""

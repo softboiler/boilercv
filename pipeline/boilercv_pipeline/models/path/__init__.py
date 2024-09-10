@@ -77,6 +77,7 @@ def get_boilercv_pipeline_config(
 ) -> BoilercvPipelineConfigDict:
     """Model config for {mod}`~boilercv_pipeline`."""
     return PluginConfigDict(
+        validate_default=True,
         plugin_settings=ContextPluginSettings(
             context=get_boilercv_pipeline_context(
                 roots=roots,
@@ -84,7 +85,7 @@ def get_boilercv_pipeline_config(
                 track_kinds=track_kinds,
                 resolve_rooted=resolve_rooted,
             )
-        )
+        ),
     )
 
 
@@ -94,9 +95,7 @@ HiddenContext: TypeAlias = Annotated[Context, Arg(hidden=True)]
 class BoilercvPipelineCtxModel(ContextModel):
     """Context model for {mod}`~boilercv_pipeline`."""
 
-    model_config: ClassVar[BoilercvPipelineConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
-        get_boilercv_pipeline_config()
-    )
+    model_config: ClassVar[BoilercvPipelineConfigDict] = get_boilercv_pipeline_config()  # pyright: ignore[reportIncompatibleVariableOverride]
     context: HiddenContext = Context()
     _context_handlers: ClassVar = {"boilercv_pipeline": BoilercvPipelineCtx}
 

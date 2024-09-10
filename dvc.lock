@@ -723,7 +723,7 @@ stages:
     outs:
     - path: data/e230920/objects
       hash: md5
-      md5: 53e9c0460abd75328144bce30a10e7e0.dir
+      md5: bae04c790d7e092f9bdd97f80c9f6ffa.dir
       size: 2356628
       nfiles: 1
     - path: data/e230920/objects_plots/composite.png

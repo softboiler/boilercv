@@ -11,13 +11,9 @@ from typing import Any, ClassVar, Generic, Self, get_args
 
 from pydantic import BaseModel, model_validator
 
-from boilercv.contexts import (
-    CONTEXT,
-    PLUGIN_SETTINGS,
-    ContextBase,
-    context_validate_before,
-)
-from boilercv.contexts.types import ContextPluginSettings, PluginConfigDict
+from boilercv.contexts import _CONTEXT, ContextBase, context_validate_before
+from boilercv.contexts.types import ContextPluginSettings, Data_T, PluginConfigDict
+from boilercv.mappings import apply
 from boilercv.morphs import Morph
 from boilercv.pipelines.contexts import (
     PipelineContext,
@@ -47,12 +43,20 @@ class PipelineBase(ContextBase):
     """Pipeline base model."""
 
     model_config: ClassVar[PipelineConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
-        PluginConfigDict({
-            PLUGIN_SETTINGS: ContextPluginSettings({
-                CONTEXT: PipelineCtxDict({PIPELINE: PipelineCtx()})
-            })
-        })
+        PluginConfigDict(
+            validate_default=True,
+            plugin_settings=ContextPluginSettings(
+                context=PipelineCtxDict({PIPELINE: PipelineCtx()})
+            ),
+        )
     )
+
+    @classmethod
+    def context_data_pre_init(cls, data: Data_T) -> Data_T:
+        """Update data before initialization."""
+        if isinstance(data, BaseModel):
+            return data
+        return apply(data, node_fun=lambda v: {**v, _CONTEXT: data[_CONTEXT]})
 
     @model_validator(mode="before")
     @classmethod
@@ -107,11 +111,12 @@ class Pipeline(Morph[K, V], Generic[K, V]):
     """Pipeline model."""
 
     model_config: ClassVar[PipelineConfigDict] = (  # pyright: ignore[reportIncompatibleVariableOverride]
-        PluginConfigDict({
-            PLUGIN_SETTINGS: ContextPluginSettings({
-                CONTEXT: PipelineCtxDict({PIPELINE: PipelineCtx()})
-            })
-        })
+        PluginConfigDict(
+            validate_default=True,
+            plugin_settings=ContextPluginSettings(
+                context=PipelineCtxDict({PIPELINE: PipelineCtx()})
+            ),
+        )
     )
 
     @model_validator(mode="before")
@@ -120,7 +125,7 @@ class Pipeline(Morph[K, V], Generic[K, V]):
         cls, data: dict[K, V], info: PipelineValidationInfo
     ) -> dict[K, V]:
         """Validate context before."""
-        return cls.apply(mode="before", data=context_validate_before(data), info=info)
+        return cls.apply(mode="before", data=context_validate_before(data), info=info)  # pyright: ignore[reportArgumentType]
 
     @model_validator(mode="after")
     def morph_validate_after(self, info: PipelineValidationInfo) -> Self:

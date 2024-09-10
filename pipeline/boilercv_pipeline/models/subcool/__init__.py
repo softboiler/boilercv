@@ -52,7 +52,7 @@ class Constants(BaseModel):
 const = Constants()
 
 
-def get_paths(
+def _get_paths(
     deps: bool, field: str, paths: list[Path] | None, info: ValidationInfo
 ) -> list[Path]:
     """Get paths for a given paths field in dependencies."""
@@ -67,12 +67,12 @@ def get_paths(
 
 def validate_deps_paths(field: str) -> AfterValidator:
     """Validate paths for a given paths field in dependencies."""
-    return AfterValidator(partial(get_paths, True, field))
+    return AfterValidator(partial(_get_paths, True, field))
 
 
 def validate_outs_paths(field: str) -> AfterValidator:
     """Validate paths for a given paths field in dependencies."""
-    return AfterValidator(partial(get_paths, False, field))
+    return AfterValidator(partial(_get_paths, False, field))
 
 
 class SubcoolParams(
