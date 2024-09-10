@@ -102,7 +102,7 @@ class ContextBase(BaseModel):
     ) -> Self:
         """Contextualizable string model validate."""
         return cls.model_validate(
-            obj=apply(obj, leaf_fun=loads), strict=strict, context=context or Context()
+            obj=apply(obj, leaf_fun=loads), strict=strict, context=context
         )
 
     @classmethod
@@ -115,7 +115,7 @@ class ContextBase(BaseModel):
     ) -> Self:
         """Contextualizable JSON model validate."""
         return cls.model_validate(
-            obj=loads(json_data), strict=strict, context=context or Context()
+            obj=loads(json_data), strict=strict, context=context
         )
 
     def model_dump(
