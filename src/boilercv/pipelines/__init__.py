@@ -52,7 +52,7 @@ class PipelineBase(ContextBase):
     )
 
     @classmethod
-    def context_data_pre_init(cls, data: Data_T) -> Data_T:
+    def context_pre_init(cls, data: Data_T) -> Data_T:
         """Update data before initialization."""
         if isinstance(data, BaseModel):
             return data

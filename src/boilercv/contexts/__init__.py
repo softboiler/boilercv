@@ -13,6 +13,7 @@ from pydantic import (
     FieldSerializationInfo,
     PydanticUserError,
     RootModel,
+    SerializerFunctionWrapHandler,
     field_serializer,
     model_validator,
 )
@@ -34,6 +35,8 @@ from boilercv.mappings import apply
 
 CONTEXT = "context"
 """Context attribute name."""
+ROOT = "root"
+"""Root field name."""
 _CONTEXT = "_context"
 """Context temporary key name."""
 MODEL_CONFIG = "model_config"
@@ -61,13 +64,13 @@ class ContextBase(BaseModel):
 
     def __init__(self, /, **data: Data):
         self.__pydantic_validator__.validate_python(
-            self.context_data_pre_init(data),
+            input=self.context_pre_init(data),
             self_instance=self,
             context=data.get(_CONTEXT) or Context(),
         )
 
     @classmethod
-    def context_data_pre_init(cls, data: Data_T) -> Data_T:
+    def context_pre_init(cls, data: Data_T | Any) -> Data_T | Any:
         """Update data before initialization."""
         return data
 
@@ -89,7 +92,7 @@ class ContextBase(BaseModel):
         """Contextualizable model validate."""
         context = context or Context()
         return cls.__pydantic_validator__.validate_python(
-            {**obj, _CONTEXT: context},
+            input={**obj, _CONTEXT: context},
             strict=strict,
             from_attributes=from_attributes,
             context=context,
@@ -113,9 +116,7 @@ class ContextBase(BaseModel):
         context: Any | None = None,
     ) -> Self:
         """Contextualizable JSON model validate."""
-        return cls.model_validate(
-            obj=loads(json_data), strict=strict, context=context
-        )
+        return cls.model_validate(obj=loads(json_data), strict=strict, context=context)
 
     def model_dump(
         self,
@@ -245,7 +246,11 @@ class ContextRoot(  # noqa: PLW1641
                     '"ContextRoot.__init__" accepts either a single positional argument or arbitrary keyword arguments'
                 )
             root = data  # pyright: ignore[reportAssignmentType]
-        self.__pydantic_validator__.validate_python(root, self_instance=self)
+        self.__pydantic_validator__.validate_python(
+            input=self.context_pre_init(root),
+            self_instance=self,
+            context=root.get(_CONTEXT, Context()),  # pyright: ignore[reportAttributeAccessIssue]
+        )
 
     @classmethod
     def model_construct(  # pyright: ignore[reportIncompatibleMethodOverride]
@@ -358,44 +363,22 @@ class RootMapping(  # noqa: PLW1641
         root: MutableMapping[K, V] = PydanticUndefined,  # pyright: ignore[reportArgumentType]
         **data,
     ) -> None:
-        context = data.pop(_CONTEXT, Context())
         if data:
             if root is not PydanticUndefined:
-                raise ValueError(
-                    '"RootMapping.__init__" accepts either a single positional argument or arbitrary keyword arguments'
-                )
+                super().__init__(root=root, **data)
             root = data  # pyright: ignore[reportAssignmentType]
-        self.__pydantic_validator__.validate_python(
-            self.context_data_pre_init(root, context),
-            self_instance=self,
-            context=context,
-        )
+        super().__init__(root=self.context_pre_init(root))
 
     @classmethod
-    def context_data_pre_init(  # pyright: ignore[reportIncompatibleMethodOverride]
-        cls, data: MutableMapping[K, V], context: Context
+    def context_pre_init(  # pyright: ignore[reportIncompatibleMethodOverride]
+        cls, data: MutableMapping[K, V]
     ) -> MutableMapping[K, V]:
         """Update data before initialization."""
         if isinstance(data, BaseModel):
             return data
-        return apply(data, node_fun=lambda v: {**v, _CONTEXT: context})
-
-    @classmethod
-    def model_validate(
-        cls,
-        obj: Any,
-        *,
-        strict: bool | None = None,
-        from_attributes: bool | None = None,
-        context: Any | None = None,
-    ) -> Self:
-        """Contextualizable model validate."""
-        context = context or Context()
-        return cls.__pydantic_validator__.validate_python(
-            {**obj, _CONTEXT: context},
-            strict=strict,
-            from_attributes=from_attributes,
-            context=context,
+        return apply(
+            data,
+            node_fun=lambda v: {**v, _CONTEXT: data.get(_CONTEXT, Context())},  # pyright: ignore[reportArgumentType]
         )
 
     @classmethod
@@ -493,7 +476,7 @@ class ContextModel(ContextBase):
         self.context = self.context_post_init(context)
 
     @classmethod
-    def context_data_pre_init(cls, data: Data_T) -> Data_T:
+    def context_pre_init(cls, data: Data_T) -> Data_T:
         """Sync nested contexts before validation."""
         if isinstance(data, BaseModel):
             return data
@@ -515,23 +498,30 @@ class ContextModel(ContextBase):
         """Update context after initialization."""
         return context
 
-    @field_serializer(CONTEXT, mode="plain")
-    def context_ser(self, value: Any, info: FieldSerializationInfo) -> Any:
+    @field_serializer(CONTEXT, mode="wrap")
+    def context_ser(
+        self,
+        value: dict[str, Any],
+        nxt: SerializerFunctionWrapHandler,
+        info: FieldSerializationInfo,
+    ) -> Any:
         """Serialize context."""
-        context=info.context or Context()
+        context = info.context or Context()
         return {
             k: v.model_dump(
                 mode=info.mode,
                 by_alias=info.by_alias,
-                include=info.include,
-                exclude=info.exclude,
+                include=info.include,  # pyright: ignore[reportArgumentType]
+                exclude=info.exclude,  # pyright: ignore[reportArgumentType]
                 context=context,
                 exclude_unset=info.exclude_unset,
                 exclude_defaults=info.exclude_defaults,
                 exclude_none=info.exclude_none,
-                round_trip=info.round_trip,
+                round_trip=info.round_trip,  # pyright: ignore[reportArgumentType]
                 serialize_as_any=info.serialize_as_any,
             )
+            if isinstance(v, BaseModel)
+            else nxt(v)
             for k, v in (value or context).items()
         }
 
@@ -616,7 +606,7 @@ class ContextModel(ContextBase):
 
     def context_sync_after(self, context: Context | None = None):
         """Sync nested contexts after validation."""
-        self.context = {**self.context, **(context or Context()}
+        self.context = {**self.context, **(context or Context())}
         for field in self.model_fields_set:
             if field == CONTEXT:
                 continue
