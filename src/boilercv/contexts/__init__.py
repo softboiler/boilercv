@@ -617,7 +617,7 @@ class ContextModel(ContextBase):
 
     def context_sync_after(self, context: Context | None = None):
         """Sync nested contexts after validation."""
-        self.context = {**(self.context or {}), **(context or {})}
+        self.context = {**self.context, **(context or Context()}
         for field in self.model_fields_set:
             if field == CONTEXT:
                 continue
