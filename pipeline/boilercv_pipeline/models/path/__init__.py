@@ -18,8 +18,9 @@ from pydantic import (
 )
 
 from boilercv.contexts import ContextModel
-from boilercv.contexts.types import Context, ContextPluginSettings, PluginConfigDict
+from boilercv.contexts.types import ContextPluginSettings, PluginConfigDict
 from boilercv_pipeline.models.contexts import (
+    BOILERCV_PIPELINE,
     BoilercvPipelineCtx,
     BoilercvPipelineCtxDict,
     Roots,
@@ -52,6 +53,7 @@ def get_boilercv_pipeline_context(
     kinds_from: BoilercvPipelineCtxModel | None = None,
     track_kinds: bool = False,
     resolve_rooted: bool = True,
+    sync_dvc: bool = False,
 ) -> BoilercvPipelineCtxDict:
     """Context for {mod}`~boilercv_pipeline`."""
     ctx_from: BoilercvPipelineCtxDict = getattr(
@@ -62,9 +64,10 @@ def get_boilercv_pipeline_context(
     return BoilercvPipelineCtxDict(
         boilercv_pipeline=BoilercvPipelineCtx(
             roots=roots or Roots(),
-            kinds=ctx_from["boilercv_pipeline"].kinds,
+            kinds=ctx_from[BOILERCV_PIPELINE].kinds,
             track_kinds=track_kinds,
             resolve_rooted=resolve_rooted,
+            sync_dvc=sync_dvc,
         )
     )
 
@@ -74,6 +77,7 @@ def get_boilercv_pipeline_config(
     kinds_from: BoilercvPipelineCtxModel | None = None,
     track_kinds: bool = False,
     resolve_rooted: bool = True,
+    sync_dvc: bool = False,
 ) -> BoilercvPipelineConfigDict:
     """Model config for {mod}`~boilercv_pipeline`."""
     return PluginConfigDict(
@@ -84,20 +88,22 @@ def get_boilercv_pipeline_config(
                 kinds_from=kinds_from,
                 track_kinds=track_kinds,
                 resolve_rooted=resolve_rooted,
+                sync_dvc=sync_dvc,
             )
         ),
     )
 
 
-HiddenContext: TypeAlias = Annotated[Context, Arg(hidden=True)]
+HiddenContext: TypeAlias = Annotated[BoilercvPipelineCtxDict, Arg(hidden=True)]
 
 
 class BoilercvPipelineCtxModel(ContextModel):
     """Context model for {mod}`~boilercv_pipeline`."""
 
     model_config: ClassVar[BoilercvPipelineConfigDict] = get_boilercv_pipeline_config()  # pyright: ignore[reportIncompatibleVariableOverride]
-    context: HiddenContext = Context()
-    _context_handlers: ClassVar = {"boilercv_pipeline": BoilercvPipelineCtx}
+    context: HiddenContext = BoilercvPipelineCtxDict(  # pyright: ignore[reportIncompatibleVariableOverride]
+        boilercv_pipeline=BoilercvPipelineCtx()
+    )
 
 
 make_path_args: dict[tuple[Key, bool], Kind] = {
@@ -113,9 +119,9 @@ def make_path(
     path: Path, info: BoilercvPipelineValidationInfo, key: Key, file: bool
 ) -> Path:
     """Check path kind and make a directory and its parents or a file's parents."""
-    ctx = info.context["boilercv_pipeline"]
+    ctx = info.context[BOILERCV_PIPELINE]
     root = getattr(ctx.roots, key, None)
-    kind = make_path_args[(key, file)]
+    kind = make_path_args[key, file]
     if root:
         path = (root.resolve() / path) if path.is_absolute() else root / path
     if ctx.track_kinds:
@@ -139,7 +145,7 @@ def ser_rooted_path(
     key: Key,
 ) -> str:
     """Serialize paths POSIX-style, resolving if rooted."""
-    ctx = info.context["boilercv_pipeline"]
+    ctx = info.context[BOILERCV_PIPELINE]
     return (
         resolve_path(value, nxt)
         if ctx.resolve_rooted and getattr(ctx.roots, key, None)

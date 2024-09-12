@@ -5,67 +5,92 @@ from copy import copy
 from re import Pattern, sub
 from typing import Any, Generic, NamedTuple
 
-from boilercv.mappings.types import MN, SK, K, Leaf, Node, T, V
+from boilercv.mappings.types import MN, SK, K, Leaf, MutableNode_T, Node, T, V
 
 
 def apply(
-    mapping: Mapping[Any, Any],
+    mapping: Mapping[K, V],
+    skip_key: Callable[[Any], bool] = lambda _: False,
+    node_fun_pre: Callable[[Node], Any] = lambda n: n,
+    skip_node: Callable[[Node], bool] = lambda _: False,
+    del_node_pre: Callable[[Node], bool] = lambda _: False,
     node_fun: Callable[[Node], Any] = lambda n: n,
+    del_node: Callable[[Node], bool] = lambda _: False,
+    skip_leaf: Callable[[Node], bool] = lambda _: False,
     leaf_fun: Callable[[Leaf], Any] = lambda v: v,
-    key_cond: Callable[[Any], bool] = lambda _: True,
-    node_cond_before: Callable[[Node], bool] = lambda _: True,
-    node_cond_after: Callable[[Node], bool] = lambda _: True,
-    leaf_cond_before: Callable[[Node], bool] = lambda _: True,
-    leaf_cond_after: Callable[[Node], bool] = lambda _: True,
-) -> dict[Any, Any]:
-    """Apply functions and conditions recursively to nodes and leaves of a mapping."""
+) -> dict[K, V]:
+    """Apply functions conditionally to nodes and leaves of a mapping."""
+    return update(
+        mapping=dict(copy(mapping)),
+        skip_key=skip_key,
+        node_fun_pre=lambda n: node_fun_pre(copy(n)),
+        skip_node=skip_node,
+        del_node_pre=del_node_pre,
+        node_fun=node_fun,
+        del_node=del_node,
+        skip_leaf=skip_leaf,
+        leaf_fun=lambda v: leaf_fun(copy(v)),
+    )
+
+
+def update(
+    mapping: MutableNode_T,
+    skip_key: Callable[[Any], bool] = lambda _: False,
+    node_fun_pre: Callable[[MutableNode_T], Any] = lambda n: n,
+    skip_node: Callable[[MutableNode_T], bool] = lambda _: False,
+    del_node_pre: Callable[[MutableNode_T], bool] = lambda _: False,
+    node_fun: Callable[[MutableNode_T], Any] = lambda n: n,
+    del_node: Callable[[MutableNode_T], bool] = lambda _: False,
+    skip_leaf: Callable[[Leaf], bool] = lambda _: False,
+    leaf_fun: Callable[[Leaf], Any] = lambda v: v,
+) -> MutableNode_T:
+    """Update in-place by applying functions conditionally to nodes and leaves."""
     # ? `deepcopy` is wasteful and has side-effects on some leaves (e.g. SymPy exprs)
     # ? Instead, `copy` mappings on entry and `copy` leaves before applying `leaf_fun`
-    filtered = dict(copy(mapping))
     marks: list[Any] = []
-    for k, v in filtered.items():
-        if not key_cond(k):
+    for key, value in mapping.items():
+        if skip_key(key):
             continue
-        if isinstance(v, Mapping):
-            if not node_cond_before(v):
+        if isinstance(node := value, Mapping):
+            mapping[key] = node = node_fun_pre(node)  # pyright: ignore[reportArgumentType]
+            if skip_node(node):
                 continue
-            filtered[k] = node_fun(
-                apply(
-                    mapping=filtered[k],
+            if del_node_pre(node):
+                marks.append(key)
+                continue
+            mapping[key] = node = node_fun(
+                update(
+                    mapping=node,
+                    skip_key=skip_key,
+                    node_fun_pre=node_fun_pre,
+                    skip_node=skip_node,
+                    del_node_pre=del_node_pre,
                     node_fun=node_fun,
+                    del_node=del_node,
+                    skip_leaf=skip_leaf,
                     leaf_fun=leaf_fun,
-                    key_cond=key_cond,
-                    node_cond_before=node_cond_before,
-                    node_cond_after=node_cond_after,
-                    leaf_cond_before=leaf_cond_before,
-                    leaf_cond_after=leaf_cond_after,
                 )
             )
-            if not node_cond_after(filtered[k]):
-                marks.append(k)
+            if del_node(node):
+                marks.append(key)
             continue
-        if not leaf_cond_before(v):
+        leaf = value
+        if skip_leaf(leaf):
             continue
-        filtered[k] = leaf_fun(copy(filtered[k]))
-        if not leaf_cond_after(filtered[k]):
-            marks.append(k)
+        mapping[key] = leaf_fun(leaf)
     for mark in marks:
-        del filtered[mark]
-    return filtered
+        del mapping[mark]
+    return mapping
 
 
-def is_truthy(v: Any) -> bool:
-    """Check if a value is truthy, handling array types."""
-    return v.any() if getattr(v, "any", None) else bool(v)
+def is_falsey(v: Any) -> bool:
+    """Check if a value is falsey, handling array types."""
+    return not (v.any() if getattr(v, "any", None) else v)
 
 
-def filt(
-    mapping: Mapping[Any, Any],
-    node_cond: Callable[[Node], bool] = is_truthy,
-    leaf_cond: Callable[[Node], bool] = is_truthy,
-) -> dict[Any, Any]:
+def filt(mapping: Mapping[K, V]) -> dict[K, V]:
     """Filter nodes and leaves of a mapping recursively."""
-    return apply(mapping, node_cond_after=node_cond, leaf_cond_after=leaf_cond)
+    return apply(mapping, del_node=is_falsey)
 
 
 def sort_by_keys_pattern(

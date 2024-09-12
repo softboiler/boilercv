@@ -18,7 +18,6 @@ from seaborn import move_legend, set_theme
 
 from boilercv_pipeline.models.column import Col
 from boilercv_pipeline.models.column.types import Ps
-from boilercv_pipeline.models.contexts import BoilercvPipelineCtxDict
 from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T, Preview
 from boilercv_pipeline.models.stage import Stage
 
@@ -169,13 +168,9 @@ class Params(Stage, Generic[Deps_T, Outs_T]):
     format: Ann[Format, Arg(hidden=True)] = Field(default_factory=Format)
     """Format parameters."""
 
-    @classmethod
-    def context_post_init(  # pyright: ignore[reportIncompatibleMethodOverride]
-        cls, context: BoilercvPipelineCtxDict
-    ) -> BoilercvPipelineCtxDict:
+    def model_post_init(self, _context):
         """Unset kinds to avoid re-checking them."""
-        context["boilercv_pipeline"].kinds = {}
-        return context
+        self.context["boilercv_pipeline"].kinds = {}
 
 
 class DataParams(Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T, Data_T]):

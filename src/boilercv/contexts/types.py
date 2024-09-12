@@ -1,7 +1,7 @@
 """Types."""
 
 from collections.abc import MutableMapping
-from typing import Any, Generic, Literal, Protocol, TypeAlias, TypeVar
+from typing import Any, Generic, Protocol, TypeAlias, TypeVar
 
 import pydantic
 from pydantic import BaseModel, ConfigDict
@@ -9,7 +9,6 @@ from typing_extensions import TypedDict
 
 Data: TypeAlias = BaseModel | MutableMapping[str, Any]
 """Data."""
-Mode: TypeAlias = Literal["python", "json", "strings"]
 
 
 class AnyTypedDict(TypedDict):
@@ -54,7 +53,29 @@ class SerializationInfo(pydantic.SerializationInfo, Protocol[Context_T]):
     def context(self) -> Context_T | Any: ...  # noqa: D102
 
 
+class FieldSerializationInfo(pydantic.FieldSerializationInfo, Protocol[Context_T]):
+    """Pydantic validation info with a guaranteed context."""
+
+    @property
+    def context(self) -> Context_T | Any: ...  # noqa: D102
+
+
 class ContextPluginSettings(TypedDict, Generic[Context_T]):
     """Context model Pydantic plugin settings."""
 
     context: Context_T
+
+
+Config: TypeAlias = PluginConfigDict[ContextPluginSettings[Context]]
+PluginSettings: TypeAlias = ContextPluginSettings[Context]
+ContextTree: TypeAlias = dict[str, "ContextNode"]
+"""Context tree."""
+
+
+class ContextNode(TypedDict):
+    """Context tree."""
+
+    config: Config
+    plugins: PluginSettings
+    context: Context
+    context_tree: ContextTree

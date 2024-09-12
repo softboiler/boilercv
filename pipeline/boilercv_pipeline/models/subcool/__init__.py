@@ -14,7 +14,7 @@ from boilercv_pipeline.models.params import DataParams
 from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stage import DataStage, StagePaths
+from boilercv_pipeline.models.stage import DataStage, Deps
 from boilercv_pipeline.models.stage.types import DfsPlotsOuts_T
 from boilercv_pipeline.models.subcool.types import FilledDeps_T
 
@@ -87,7 +87,7 @@ class SubcoolParams(
     """Include patterns."""
 
 
-class FilledDeps(StagePaths):
+class FilledDeps(Deps):
     """Dependencies for subcooled boiling study including filled video dataset."""
 
     stage: DirectoryPathSerPosix

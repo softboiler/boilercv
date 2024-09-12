@@ -8,12 +8,10 @@ from boilercore.notebooks.namespaces import get_nb_ns
 
 from boilercv_pipeline.models.params import DataParams
 from boilercv_pipeline.models.params.types import Data_T
-from boilercv_pipeline.models.stage import StagePaths
+from boilercv_pipeline.models.stage import Deps, Outs
 
 
-def apply_to_nb(
-    nb: str, params: DataParams[StagePaths, StagePaths, Data_T], **kwds: Any
-) -> Data_T:
+def apply_to_nb(nb: str, params: DataParams[Deps, Outs, Data_T], **kwds: Any) -> Data_T:
     """Apply a process to a notebook."""
     return get_nb_ns(
         nb=nb, params={"PARAMS": params.model_dump_json(), **kwds}
@@ -23,7 +21,7 @@ def apply_to_nb(
 def submit_nb_process(
     executor: ProcessPoolExecutor,
     nb: str,
-    params: DataParams[StagePaths, StagePaths, Data_T],
+    params: DataParams[Deps, Outs, Data_T],
     **kwds: Any,
 ) -> Future[Data_T]:
     """Submit a notebook process to an executor."""

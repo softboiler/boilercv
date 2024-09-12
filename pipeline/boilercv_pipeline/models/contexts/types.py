@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Literal, TypeAlias
 
 from boilercv.contexts.types import (
     ContextPluginSettings,
+    FieldSerializationInfo,
     PluginConfigDict,
     SerializationInfo,
     ValidationInfo,
@@ -18,6 +19,9 @@ BoilercvPipelineConfigDict: TypeAlias = PluginConfigDict[
 ]
 BoilercvPipelineValidationInfo: TypeAlias = ValidationInfo["BoilercvPipelineCtxDict"]
 BoilercvPipelineSerializationInfo: TypeAlias = SerializationInfo[
+    "BoilercvPipelineCtxDict"
+]
+BoilercvPipelineFieldSerializationInfo: TypeAlias = FieldSerializationInfo[
     "BoilercvPipelineCtxDict"
 ]
 Kind: TypeAlias = Literal["DataDir", "DataFile", "DocsDir", "DocsFile"]

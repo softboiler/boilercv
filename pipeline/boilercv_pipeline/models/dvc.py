@@ -21,13 +21,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 
-from collections.abc import Mapping, Sequence
 from types import NoneType
 from typing import Annotated, Any, TypeAlias
 
-from pydantic import ConfigDict, Field
-
-from boilercv.models import BaseModelDefaultAsNone
+from pydantic import BaseModel, ConfigDict, Field
 
 FilePath: TypeAlias = str
 VarKey: TypeAlias = str
@@ -38,7 +35,7 @@ PlotColumns: TypeAlias = str
 PlotTemplateName: TypeAlias = str
 
 
-class DvcBaseModel(BaseModelDefaultAsNone, use_attribute_docstrings=True): ...
+class DvcBaseModel(BaseModel, use_attribute_docstrings=True): ...
 
 
 class OutFlags(DvcBaseModel):
@@ -53,9 +50,9 @@ class OutFlags(DvcBaseModel):
     """User description for the output"""
     type: str | None = None
     """User assigned type of the output"""
-    labels: Sequence[str] | None = None
+    labels: list[str] = Field(default_factory=list)  # | None
     """User assigned labels of the output"""
-    meta: Mapping[str, Any] | None = None
+    meta: dict[str, Any] = Field(default_factory=dict)  # | None
     """Custom metadata of the output."""
     remote: str | None = None
     """Name of the remote to use for pushing/fetching"""
@@ -80,10 +77,10 @@ class PlotFlags(OutFlags):
     """Default plot template"""
 
 
-X: TypeAlias = Annotated[Mapping[FilePath, PlotColumn] | None, Field(default=None)]
+X: TypeAlias = Annotated[dict[FilePath, PlotColumn] | None, Field(default=None)]
 
 
-Y: TypeAlias = Annotated[Mapping[FilePath, PlotColumns] | None, Field(default=None)]
+Y: TypeAlias = Annotated[dict[FilePath, PlotColumns] | None, Field(default=None)]
 
 
 class TopLevelPlotFlags(DvcBaseModel):
@@ -113,9 +110,9 @@ class TopLevelArtifactFlags(DvcBaseModel):
     """Type of the artifact"""
     desc: str | None = None
     """Description for the artifact"""
-    meta: Mapping[str, Any] | None = None
+    meta: dict[str, Any] = Field(default_factory=dict)  # | None
     """Custom metadata for the artifact"""
-    labels: Sequence[str] | None = None
+    labels: list[str] = Field(default_factory=list)  # | None
     """Labels for the artifact"""
 
 
@@ -125,7 +122,7 @@ DepModel: TypeAlias = Annotated[
 ]
 
 
-Dependencies: TypeAlias = Sequence[DepModel]
+Dependencies: TypeAlias = list[DepModel]
 
 
 ParamKey: TypeAlias = Annotated[
@@ -134,13 +131,13 @@ ParamKey: TypeAlias = Annotated[
 
 
 CustomParamFileKeys: TypeAlias = Annotated[
-    Mapping[FilePath, Sequence[ParamKey]],
+    dict[FilePath, list[ParamKey]],
     Field(description="Path to YAML/JSON/TOML/Python params file."),
 ]
 
 
 EmptyParamFileKeys: TypeAlias = Annotated[
-    Mapping[FilePath, None],
+    dict[FilePath, None],
     Field(description="Path to YAML/JSON/TOML/Python params file."),
 ]
 
@@ -148,57 +145,57 @@ EmptyParamFileKeys: TypeAlias = Annotated[
 Param = ParamKey | CustomParamFileKeys | EmptyParamFileKeys
 
 
-Params = Sequence[Param]
+Params = list[Param]
 
 
 Out: TypeAlias = Annotated[
-    FilePath | Mapping[FilePath, OutFlags],
+    FilePath | dict[FilePath, OutFlags],
     Field(description="Path to an output file or dir of the stage."),
 ]
 
 
-Outs = Sequence[Out]
+Outs = list[Out]
 
 
 Metric: TypeAlias = Annotated[
-    FilePath | Mapping[FilePath, OutFlags],
+    FilePath | dict[FilePath, OutFlags],
     Field(description="Path to a JSON/TOML/YAML metrics output of the stage."),
 ]
 
 
 Plot: TypeAlias = Annotated[
-    FilePath | Mapping[FilePath, PlotFlags],
+    FilePath | dict[FilePath, PlotFlags],
     Field(
         description="""Path to plots file or dir of the stage.\n\nData files may be JSON/YAML/CSV/TSV.\n\nImage files may be JPEG/GIF/PNG."""
     ),
 ]
-Plots = Sequence[Plot]
+Plots = list[Plot]
 VarPath: TypeAlias = Annotated[
     str, Field(description="Path to params file with values for substitution.")
 ]
 VarDecl: TypeAlias = Annotated[
-    Mapping[VarKey, Any], Field(description="Dict of values for substitution.")
+    dict[VarKey, Any], Field(description="Dict of values for substitution.")
 ]
-Vars = Sequence[VarPath | VarDecl]
+Vars = list[VarPath | VarDecl]
 
 
 class Stage(DvcBaseModel):
     """A named stage of a pipeline."""
 
     model_config = ConfigDict(extra="forbid")
-    cmd: str | Sequence[str]
+    cmd: str | list[str]
     """(Required) Command to run (anything your system terminal can run).\n\nCan be a string or a list of commands."""
     wdir: str | None = None
     """Working directory for the cmd, relative to `dvc.yaml`"""
-    deps: Dependencies | None = None
+    deps: Dependencies = Field(default_factory=list)  # | None
     """List of the dependencies for the stage."""
-    params: Params | None = None
+    params: Params = Field(default_factory=list)  # | None
     """List of dot-separated parameter dependency keys to track from `params.yaml`.\n\nMay contain other YAML/JSON/TOML/Python parameter file names, with a sub-list of the param names to track in them (leave empty to include all)."""
-    outs: Outs | None = None
+    outs: Outs = Field(default_factory=list)  # | None
     """List of the outputs of the stage."""
-    metrics: Outs | None = None
+    metrics: Outs = Field(default_factory=list)  # | None
     """List of metrics of the stage written to JSON/TOML/YAML."""
-    plots: Plots | None = None
+    plots: Plots = Field(default_factory=list)  # | None
     """List of plots of the stage for visualization.
 
     Plots may be written to JSON/YAML/CSV/TSV for data or JPEG/GIF/PNG for images."""
@@ -206,7 +203,7 @@ class Stage(DvcBaseModel):
     """Assume stage as unchanged"""
     always_changed: bool | None = False
     """Assume stage as always changed"""
-    vars: Vars | None = None
+    vars: Vars = Field(default_factory=list)  # | None
     """List of stage-specific values for substitution.
 
     May include any dict or a path to a params file.
@@ -224,7 +221,7 @@ ParametrizedString: TypeAlias = Annotated[str, Field(pattern=r"^\$\{.*?\}$")]
 
 class ForeachDo(DvcBaseModel):
     model_config = ConfigDict(frozen=False, extra="forbid")
-    foreach: ParametrizedString | Sequence[Any] | Mapping[str, Any]
+    foreach: ParametrizedString | list[Any] | dict[str, Any]
     """Iterable to loop through in foreach. Can be a parametrized string, list or a dict.\n\nThe stages will be generated by iterating through this data, by substituting data in the `do` block."""
     do: Stage
     """Parametrized stage definition that'll be substituted over for each of the value from the foreach data."""
@@ -232,33 +229,32 @@ class ForeachDo(DvcBaseModel):
 
 class Matrix(Stage):
     model_config = ConfigDict(frozen=False, extra="forbid")
-    matrix: Mapping[str, Sequence[Any] | ParametrizedString] = Field(
-        description="""Generate stages based on combination of variables.\n\nThe variable can be a list of values, or a parametrized string referencing a list."""
-    )
+    matrix: dict[str, list[Any] | ParametrizedString] = Field(default_factory=dict)
+    """Generate stages based on combination of variables.\n\nThe variable can be a list of values, or a parametrized string referencing a list."""
 
 
 Definition = ForeachDo | Matrix | Stage
-TopLevelPlots: TypeAlias = Mapping[
+TopLevelPlots: TypeAlias = dict[
     PlotIdOrFilePath, TopLevelPlotFlags | EmptyTopLevelPlotFlags
 ]
-TopLevelPlotsList: TypeAlias = Sequence[PlotIdOrFilePath | TopLevelPlots]
+TopLevelPlotsList: TypeAlias = list[PlotIdOrFilePath | TopLevelPlots]
 ArtifactIdOrFilePath: TypeAlias = Annotated[
     str, Field(pattern=r"^[a-z0-9]([a-z0-9-/]*[a-z0-9])?$")
 ]
-TopLevelArtifacts: TypeAlias = Mapping[ArtifactIdOrFilePath, TopLevelArtifactFlags]
+TopLevelArtifacts: TypeAlias = dict[ArtifactIdOrFilePath, TopLevelArtifactFlags]
 
 
 class DvcYamlModel(DvcBaseModel):
     model_config = ConfigDict(title="dvc.yaml", extra="forbid")
     vars: Vars | None = Field(default=None, title="Variables")
     """List of values for substitution.\n\nMay include any dict or a path to a params file which may be a string or a dict to params in the file).\n\nUse elsewhere in `dvc.yaml` with the `${}` substitution expression."""
-    stages: Mapping[StageName, Definition] | None = None
+    stages: dict[StageName, Definition] = Field(default_factory=dict)  # | None
     """List of stages that form a pipeline."""
-    plots: TopLevelPlots | TopLevelPlotsList | None = None
+    plots: TopLevelPlots | TopLevelPlotsList = Field(default_factory=list)  # | None
     """Top level plots definition."""
-    params: Sequence[FilePath] | None = None
+    params: list[FilePath] = Field(default_factory=list)  # | None
     """List of parameter files"""
-    metrics: Sequence[FilePath] | None = None
+    metrics: list[FilePath] = Field(default_factory=list)  # | None
     """List of metric files"""
-    artifacts: TopLevelArtifacts | None = None
+    artifacts: TopLevelArtifacts = Field(default_factory=list)  # | None
     """Top level artifacts definition."""

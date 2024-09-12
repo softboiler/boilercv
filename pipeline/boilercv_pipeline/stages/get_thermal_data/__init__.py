@@ -8,7 +8,7 @@ from matplotlib.figure import Figure
 from pandas import DataFrame
 from pydantic import Field
 
-from boilercv_pipeline.models import columns, data
+from boilercv_pipeline.models import columns, data, stage
 from boilercv_pipeline.models.column import Col, IdentityCol, Kind, LinkedCol
 from boilercv_pipeline.models.deps import DirSlicer
 from boilercv_pipeline.models.path import (
@@ -18,11 +18,10 @@ from boilercv_pipeline.models.path import (
     DocsFile,
 )
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stage import StagePaths
 from boilercv_pipeline.models.subcool import SubcoolParams, const
 
 
-class Deps(StagePaths):
+class Deps(stage.Deps):
     stage: DirectoryPathSerPosix = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
     thermal: DataDir = paths.thermal
@@ -35,7 +34,7 @@ class Deps(StagePaths):
         ).paths
 
 
-class Outs(StagePaths):
+class Outs(stage.Outs):
     df: DataFile = paths.e230920_thermal
     plots: DataDir = paths.e230920_thermal_plots
 

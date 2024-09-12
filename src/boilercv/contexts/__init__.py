@@ -18,21 +18,31 @@ from pydantic import (
     model_validator,
 )
 from pydantic._internal import _repr
+from pydantic.fields import FieldInfo
 from pydantic.main import IncEx, _object_setattr
 from pydantic.root_model import RootModelRootType, _RootModelMetaclass
 from pydantic_core import PydanticUndefined
 
 from boilercv.contexts.types import (
     Context,
+    ContextNode,
     ContextPluginSettings,
+    ContextTree,
     Data,
     Data_T,
     K,
     PluginConfigDict,
     V,
+    ValidationInfo,
 )
-from boilercv.mappings import apply
+from boilercv.mappings import apply, filt, update
 
+CONFIG = "config"
+"""Config key."""
+CONTEXT_TREE = "context_tree"
+"""Context tree key."""
+PLUGINS = "plugins"
+"""Plugin settings key."""
 CONTEXT = "context"
 """Context attribute name."""
 ROOT = "root"
@@ -41,8 +51,14 @@ _CONTEXT = "_context"
 """Context temporary key name."""
 MODEL_CONFIG = "model_config"
 """Model config attribute name."""
+MODEL_FIELDS = "model_fields"
+"""Model fields attribute name."""
 PLUGIN_SETTINGS = "plugin_settings"
 """Model config plugin settings key."""
+
+DEFAULT_PLUGIN_CONFIG_DICT = PluginConfigDict(
+    plugin_settings=ContextPluginSettings(context=Context()), protected_namespaces=()
+)
 
 
 def context_validate_before(data: Data_T) -> Data_T:
@@ -50,6 +66,44 @@ def context_validate_before(data: Data_T) -> Data_T:
     if not isinstance(data, BaseModel) and _CONTEXT in data:
         data.pop(_CONTEXT)
     return data
+
+
+def get_context_tree(klass: type[BaseModel] | Any = None) -> ContextNode:
+    """Get context tree."""
+    nodes: ContextTree = {}
+    fields: dict[str, FieldInfo] = getattr(klass, MODEL_FIELDS, {})
+    for f, i in fields.items():
+        if f not in [ROOT, CONTEXT] and filt(node := get_context_tree(i.annotation)):
+            nodes[f] = node
+    config = deepcopy(getattr(klass, MODEL_CONFIG, {})) if klass else {}  # pyright: ignore[reportArgumentType]
+    return ContextNode(
+        config=config,  # pyright: ignore[reportArgumentType]
+        plugins=(p := config.get(PLUGIN_SETTINGS, {})),
+        context=p.get(CONTEXT, {}),
+        context_tree=nodes,
+    )
+
+
+def get_data(
+    data: MutableMapping[str, Any], tree: ContextTree, context: Context
+) -> dict[str, Any]:
+    """Get data."""
+    data = copy(data)
+    for field, node in tree.items():
+        inner_data = data.get(field) or {}
+        if isinstance(inner_data, BaseModel):
+            continue
+        data[field] = get_data(
+            inner_data, node[CONTEXT_TREE], merge_context(data, node, context)
+        )
+    return {**data, _CONTEXT: context}
+
+
+def merge_context(
+    data: MutableMapping[str, Any], node: ContextNode, context: Context | None = None
+) -> Context:
+    """Merge context."""
+    return {**node[CONTEXT], **data.get(_CONTEXT, Context()), **(context or Context())}
 
 
 class ContextBase(BaseModel):
@@ -62,23 +116,50 @@ class ContextBase(BaseModel):
         )
     )
 
+    _context_tree: ClassVar[ContextTree] = {}
+
+    @classmethod
+    def __pydantic_init_subclass__(cls, **_kwargs):  # noqa: PLW3201
+        cls._context_tree = get_context_tree(klass=cls)[CONTEXT_TREE]
+
     def __init__(self, /, **data: Data):
+        self.__context_init__(data=data)
+
+    def __context_init__(self, data: Data, context: Context | None = None):  # noqa: PLW3201
+        if not isinstance(data, BaseModel):
+            data = self.context_pre_init(data, self.context_get(data))
+            context = {**data.get(_CONTEXT, Context()), **(context or Context())}
         self.__pydantic_validator__.validate_python(
-            input=self.context_pre_init(data),
-            self_instance=self,
-            context=data.get(_CONTEXT) or Context(),
+            input=data, self_instance=self, context=context
         )
 
     @classmethod
-    def context_pre_init(cls, data: Data_T | Any) -> Data_T | Any:
-        """Update data before initialization."""
-        return data
+    def context_get(cls, data: Data) -> Context:
+        """Get context from data."""
+        return (
+            Context()
+            if isinstance(data, BaseModel)
+            else {
+                **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
+                **data.get(_CONTEXT, Context()),
+            }
+        )
 
-    @model_validator(mode="before")
     @classmethod
-    def context_validate_before(cls, data: Any) -> Any:
-        """Validate context before."""
-        return context_validate_before(data)
+    def context_pre_init(cls, data: Data_T, context: Context | None = None) -> Data_T:
+        """Sync nested contexts before validation."""
+        if isinstance(data, BaseModel):
+            return data
+        context = {**data.get(_CONTEXT, Context()), **(context or Context())}
+        return update(  # pyright: ignore[reportReturnType]
+            {**data, _CONTEXT: context},
+            skip_key=lambda k: k == _CONTEXT,
+            skip_node=lambda v: isinstance(v, BaseModel),
+            node_fun=lambda v: {
+                **v,
+                _CONTEXT: {**data.get(_CONTEXT, Context()), **context},
+            },
+        )
 
     @classmethod
     def model_validate(
@@ -92,7 +173,7 @@ class ContextBase(BaseModel):
         """Contextualizable model validate."""
         context = context or Context()
         return cls.__pydantic_validator__.validate_python(
-            input={**obj, _CONTEXT: context},
+            input=cls.context_pre_init(obj, context),
             strict=strict,
             from_attributes=from_attributes,
             context=context,
@@ -239,17 +320,17 @@ class ContextRoot(  # noqa: PLW1641
             )
         super().__init_subclass__(**kwargs)
 
-    def __init__(self, /, root: RootModelRootType = PydanticUndefined, **data) -> None:
+    def __init__(
+        self, /, root: RootModelRootType | Any = PydanticUndefined, **data: Any
+    ) -> None:
         if data:
             if root is not PydanticUndefined:
                 raise ValueError(
                     '"ContextRoot.__init__" accepts either a single positional argument or arbitrary keyword arguments'
                 )
-            root = data  # pyright: ignore[reportAssignmentType]
+            root = data
         self.__pydantic_validator__.validate_python(
-            input=self.context_pre_init(root),
-            self_instance=self,
-            context=root.get(_CONTEXT, Context()),  # pyright: ignore[reportAttributeAccessIssue]
+            input=root, self_instance=self, context=Context()
         )
 
     @classmethod
@@ -357,29 +438,29 @@ class RootMapping(  # noqa: PLW1641
 
     root: MutableMapping[K, V] = Field(default_factory=dict)
 
+    @model_validator(mode="before")
+    @classmethod
+    def context_validate_before(cls, data: Any) -> Any:
+        """Validate context before."""
+        return context_validate_before(data)
+
     def __init__(
         self,
         /,
-        root: MutableMapping[K, V] = PydanticUndefined,  # pyright: ignore[reportArgumentType]
-        **data,
+        root: MutableMapping[K, V] | PydanticUndefined = PydanticUndefined,
+        **data: V,
     ) -> None:
         if data:
             if root is not PydanticUndefined:
-                super().__init__(root=root, **data)
-            root = data  # pyright: ignore[reportAssignmentType]
-        super().__init__(root=self.context_pre_init(root))
-
-    @classmethod
-    def context_pre_init(  # pyright: ignore[reportIncompatibleMethodOverride]
-        cls, data: MutableMapping[K, V]
-    ) -> MutableMapping[K, V]:
-        """Update data before initialization."""
-        if isinstance(data, BaseModel):
-            return data
-        return apply(
-            data,
-            node_fun=lambda v: {**v, _CONTEXT: data.get(_CONTEXT, Context())},  # pyright: ignore[reportArgumentType]
-        )
+                raise ValueError(
+                    '"RootMapping.__init__" accepts either a single positional argument or arbitrary keyword arguments'
+                )
+            root = data
+        # NB: `reportArgumentType` raised because `K` isn't bound by `str`, necessary to
+        # ... allow subclasses to use literal strings for `K`.
+        context = root.get(_CONTEXT, Context())  # pyright: ignore[reportArgumentType]
+        # NB: `reportArgumentType` raised because of unexpressible root/context types
+        self.__context_init__(data=root, context=context)  # pyright: ignore[reportArgumentType]
 
     @classmethod
     def from_mapping(
@@ -401,11 +482,12 @@ class RootMapping(  # noqa: PLW1641
     def __eq__(self, other: object) -> bool:
         return self.root == (other.root if isinstance(other, RootMapping) else other)
 
-    # `MutableMapping` methods adapted from `collections.UserDict`, but with `data`
-    # replaced by `root`and `hasattr` guard changed to equivalent `getattr(..., None)`
-    # pattern in `__getitem__`. This is done to prevent inheriting directly from
-    # `UserDict`, which doesn't play nicely with `pydantic.RootModel`.
-    # Source: https://github.com/python/cpython/blob/7d7eec595a47a5cd67ab420164f0059eb8b9aa28/Lib/collections/__init__.py#L1121-L1211
+    # NB: `MutableMapping` methods adapted from `collections.UserDict`, but with `data`
+    # ... replaced by `root`and `hasattr` guard changed to equivalent
+    # ... `getattr(..., None)` pattern in `__getitem__`. This is done to prevent
+    # ... inheriting directly from `UserDict`, which doesn't play nicely with
+    # ... `pydantic.RootModel`.
+    # ... https://github.com/python/cpython/blob/7d7eec595a47a5cd67ab420164f0059eb8b9aa28/Lib/collections/__init__.py#L1121-L1211
 
     @classmethod
     def fromkeys(cls, iterable, value=None):  # noqa: D102
@@ -421,7 +503,8 @@ class RootMapping(  # noqa: PLW1641
             return missing(self, key)
         raise KeyError(key)
 
-    def __iter__(self) -> Iterator[K]:  # pyright: ignore[reportIncompatibleMethodOverride] iterate over `root` instead of `self`
+    # NB: iterate over `root` instead of `self`
+    def __iter__(self) -> Iterator[K]:  # pyright: ignore[reportIncompatibleMethodOverride]
         return iter(self.root)
 
     def __setitem__(self, key: K, item: V):
@@ -430,7 +513,7 @@ class RootMapping(  # noqa: PLW1641
     def __delitem__(self, key: K):
         del self.root[key]
 
-    # Modify __contains__ to work correctly when __missing__ is present
+    # NB: Modify __contains__ to work correctly when __missing__ is present
     def __contains__(self, key: K):  # pyright: ignore[reportIncompatibleMethodOverride]
         return key in self.root
 
@@ -438,14 +521,14 @@ class RootMapping(  # noqa: PLW1641
         if isinstance(other, Mapping) and isinstance(other, BaseModel):
             return self.model_construct(self.model_dump() | other.model_dump())
         if isinstance(other, Mapping):
-            return self.model_construct(self.model_dump() | other)  # pyright: ignore[reportOperatorIssue]
+            return self.model_construct(self.model_dump() | other)
         return NotImplemented
 
     def __ror__(self, other: BaseModel | Mapping[Any, Any] | Any) -> Self:
         if isinstance(other, Mapping) and isinstance(other, BaseModel):
             return self.model_construct(other.model_dump() | self.model_dump())
         if isinstance(other, Mapping):
-            return self.model_construct(other | self.model_dump())  # pyright: ignore[reportOperatorIssue]
+            return self.model_construct(other | self.model_dump())
         return NotImplemented
 
     def __ior__(self, other) -> Self:
@@ -456,42 +539,37 @@ class ContextModel(ContextBase):
     """Model that guarantees a dictionary context is available during validation."""
 
     context: Context = Context()
-    _context_handlers: ClassVar[dict[str, type[BaseModel]]] = {}
 
-    def __init__(self, /, **data: Data):
-        if isinstance(data, ContextModel):
-            context: Context = data.context
-        elif isinstance(data, BaseModel):
-            context = Context()
-        else:
-            context: Context = {  # pyright: ignore[reportAssignmentType]
-                k: self._context_handlers[k].model_validate(obj=v)
-                for k, v in {
-                    **deepcopy(self.model_config[PLUGIN_SETTINGS][CONTEXT]),
-                    **data.get(_CONTEXT, Context()),  # pyright: ignore[reportGeneralTypeIssues]
-                    **data.get(CONTEXT, Context()),  # pyright: ignore[reportGeneralTypeIssues]
-                }.items()
-            }
-        super().__init__(**{**data, _CONTEXT: context})  # pyright: ignore[reportArgumentType]
-        self.context = self.context_post_init(context)
+    @model_validator(mode="before")
+    @classmethod
+    def validate_context_bef(
+        cls, data: dict[str, Any], info: ValidationInfo[Context]
+    ) -> dict[str, Any]:
+        """Set context after validation."""
+        data[CONTEXT] = info.context
+        return data
 
     @classmethod
-    def context_pre_init(cls, data: Data_T) -> Data_T:
+    def context_pre_init(cls, data: Data_T, context: Context | None = None) -> Data_T:
         """Sync nested contexts before validation."""
+        data = super().context_pre_init(data, context)
         if isinstance(data, BaseModel):
             return data
-        for field, info in cls.model_fields.items():
-            if (
-                plugin_settings := deepcopy(
-                    getattr(info.annotation, MODEL_CONFIG, {}).get(PLUGIN_SETTINGS, {})
-                )
-            ) and isinstance(plugin_settings[CONTEXT], Mapping):
-                inner_context = {**plugin_settings[CONTEXT], **data[_CONTEXT]}
-                value = data.get(field) or {}
-                if isinstance(value, BaseModel):
-                    continue
-                data[field] = {**value, _CONTEXT: inner_context}
-        return data
+        return get_data(data, cls._context_tree, context or Context())
+
+    @classmethod
+    def context_get(cls, data: Data) -> Context:
+        """Get context from data."""
+        if isinstance(data, ContextModel):
+            return data.context
+        elif isinstance(data, BaseModel):
+            return Context()
+        else:
+            return {
+                **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
+                **data.get(_CONTEXT, Context()),
+                **data.get(CONTEXT, Context()),
+            }
 
     @classmethod
     def context_post_init(cls, context: Context) -> Context:
@@ -504,7 +582,7 @@ class ContextModel(ContextBase):
         value: dict[str, Any],
         nxt: SerializerFunctionWrapHandler,
         info: FieldSerializationInfo,
-    ) -> Any:
+    ) -> dict[str, Any]:
         """Serialize context."""
         context = info.context or Context()
         return {
@@ -541,13 +619,13 @@ class ContextModel(ContextBase):
         serialize_as_any: bool = False,
     ) -> dict[str, Any]:
         """Contextulizable model dump."""
-        self.context_sync_after(context)
+        # self.context_sync_after(context)
         return super().model_dump(
             mode=mode,
             by_alias=by_alias,
             include=include,
             exclude=exclude,
-            context=self.context,
+            context={**self.context, **(context or Context())},
             exclude_unset=exclude_unset,
             exclude_defaults=exclude_defaults,
             exclude_none=exclude_none,
@@ -572,12 +650,12 @@ class ContextModel(ContextBase):
         serialize_as_any: bool = False,
     ) -> str:
         """Contextulizable JSON model dump."""
-        self.context_sync_after(context)
+        # self.context_sync_after(context)
         return super().model_dump_json(
             indent=indent,
             include=include,
             exclude=exclude,
-            context=self.context,
+            context={**self.context, **(context or Context())},
             by_alias=by_alias,
             exclude_unset=exclude_unset,
             exclude_defaults=exclude_defaults,

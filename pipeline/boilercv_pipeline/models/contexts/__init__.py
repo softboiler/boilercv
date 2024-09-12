@@ -7,6 +7,9 @@ from pydantic import BaseModel, Field
 from boilercv.contexts.types import Context
 from boilercv_pipeline.config import const
 from boilercv_pipeline.models.contexts.types import Kinds
+from boilercv_pipeline.models.dvc import DvcYamlModel
+
+BOILERCV_PIPELINE = "boilercv_pipeline"
 
 
 class Roots(BaseModel):
@@ -33,6 +36,10 @@ class BoilercvPipelineCtx(BaseModel):
     """Whether to track kinds."""
     resolve_rooted: bool = True
     """Whether to resolve rooted paths when serializing."""
+    sync_dvc: bool = False
+    """Whether to synchronize `dvc.yaml` configuration."""
+    dvc: DvcYamlModel = Field(default_factory=DvcYamlModel)
+    """Synchronized `dvc.yaml` configuration."""
 
 
 class BoilercvPipelineCtxDict(Context):

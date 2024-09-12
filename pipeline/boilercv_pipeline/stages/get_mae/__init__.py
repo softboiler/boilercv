@@ -13,7 +13,7 @@ from boilercv_pipeline.models.path import (
     DocsFile,
 )
 from boilercv_pipeline.models.paths import paths
-from boilercv_pipeline.models.stage import DfsPlotsOuts, StagePaths
+from boilercv_pipeline.models.stage import DfsPlotsOuts
 from boilercv_pipeline.models.subcool import (
     SubcoolParams,
     validate_deps_paths,
@@ -22,7 +22,7 @@ from boilercv_pipeline.models.subcool import (
 from boilercv_pipeline.stages import find_tracks
 
 
-class Deps(StagePaths):
+class Deps(stage.Deps):
     stage: DirectoryPathSerPosix = Path(__file__).parent
     nb: DocsFile = paths.notebooks[stage.stem]
     thermal: DataFile = paths.e230920_thermal

@@ -11,9 +11,8 @@ from typing import Any, ClassVar, Generic, Self, get_args
 
 from pydantic import BaseModel, model_validator
 
-from boilercv.contexts import _CONTEXT, ContextBase, context_validate_before
-from boilercv.contexts.types import ContextPluginSettings, Data_T, PluginConfigDict
-from boilercv.mappings import apply
+from boilercv.contexts import ContextBase, context_validate_before
+from boilercv.contexts.types import ContextPluginSettings, PluginConfigDict
 from boilercv.morphs import Morph
 from boilercv.pipelines.contexts import (
     PipelineContext,
@@ -50,13 +49,6 @@ class PipelineBase(ContextBase):
             ),
         )
     )
-
-    @classmethod
-    def context_pre_init(cls, data: Data_T) -> Data_T:
-        """Update data before initialization."""
-        if isinstance(data, BaseModel):
-            return data
-        return apply(data, node_fun=lambda v: {**v, _CONTEXT: data[_CONTEXT]})
 
     @model_validator(mode="before")
     @classmethod
@@ -202,17 +194,10 @@ class Pipeline(Morph[K, V], Generic[K, V]):
                 value_model = value_model or v
         keys = keys or get_args(cls.morph_get_inner_types().key)
         if value_model:
-            factory = (
-                partial(
-                    value_model.model_validate,
-                    context=get_pipeline_context(value_context),
-                )
-                if issubclass(value_model, Pipeline | PipelineBase)
-                else partial(
-                    value_model.model_validate,
-                    obj={},
-                    context=get_pipeline_context(value_context),
-                )
+            factory = partial(
+                value_model.model_validate,
+                obj={},
+                context=get_pipeline_context(value_context),
             )
         defaults = (
             Defaults(mapping=mapping, value_copier=value_copier)
