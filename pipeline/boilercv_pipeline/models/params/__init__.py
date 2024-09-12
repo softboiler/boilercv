@@ -168,10 +168,6 @@ class Params(Stage, Generic[Deps_T, Outs_T]):
     format: Ann[Format, Arg(hidden=True)] = Field(default_factory=Format)
     """Format parameters."""
 
-    def model_post_init(self, _context):
-        """Unset kinds to avoid re-checking them."""
-        self.context["boilercv_pipeline"].kinds = {}
-
 
 class DataParams(Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T, Data_T]):
     """Stage parameters."""

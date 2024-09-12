@@ -1,8 +1,9 @@
 """Contexts."""
 
 from pathlib import Path
+from typing import Annotated as Ann
 
-from pydantic import BaseModel, Field
+from pydantic import AfterValidator, BaseModel, Field
 
 from boilercv.contexts.types import Context
 from boilercv_pipeline.config import const
@@ -38,7 +39,12 @@ class BoilercvPipelineCtx(BaseModel):
     """Whether to resolve rooted paths when serializing."""
     sync_dvc: bool = False
     """Whether to synchronize `dvc.yaml` configuration."""
-    dvc: DvcYamlModel = Field(default_factory=DvcYamlModel)
+    dvc: Ann[
+        DvcYamlModel | None,
+        AfterValidator(
+            lambda v, i: v or DvcYamlModel() if i.data["sync_dvc"] else None
+        ),
+    ] = None
     """Synchronized `dvc.yaml` configuration."""
 
 

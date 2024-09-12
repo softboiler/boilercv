@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from functools import partial
 from pathlib import Path
 from re import search
-from typing import Annotated, ClassVar, TypeAlias
+from typing import Annotated, ClassVar, Self, TypeAlias
 
 from boilercore.paths import ISOLIKE, dt_fromisolike
 from cappa.arg import Arg
@@ -15,10 +16,16 @@ from pydantic import (
     FilePath,
     SerializerFunctionWrapHandler,
     WrapSerializer,
+    model_validator,
 )
 
 from boilercv.contexts import ContextModel
-from boilercv.contexts.types import ContextPluginSettings, PluginConfigDict
+from boilercv.contexts.types import (
+    Context,
+    ContextPluginSettings,
+    Data,
+    PluginConfigDict,
+)
 from boilercv_pipeline.models.contexts import (
     BOILERCV_PIPELINE,
     BoilercvPipelineCtx,
@@ -104,6 +111,24 @@ class BoilercvPipelineCtxModel(ContextModel):
     context: HiddenContext = BoilercvPipelineCtxDict(  # pyright: ignore[reportIncompatibleVariableOverride]
         boilercv_pipeline=BoilercvPipelineCtx()
     )
+
+    @classmethod
+    def context_get(cls, data: Data, context: Context | None = None) -> Context:
+        """Get context from data."""
+        return BoilercvPipelineCtxDict({  # pyright: ignore[reportArgumentType]
+            k: (
+                {BOILERCV_PIPELINE: BoilercvPipelineCtx}[k].model_validate(v)
+                if isinstance(v, Mapping)
+                else v
+            )
+            for k, v in super().context_get(data, context).items()
+        })
+
+    @model_validator(mode="after")
+    def unset_kinds(self) -> Self:
+        """Unset kinds to avoid re-checking them."""
+        self.context[BOILERCV_PIPELINE].kinds = {}
+        return self
 
 
 make_path_args: dict[tuple[Key, bool], Kind] = {

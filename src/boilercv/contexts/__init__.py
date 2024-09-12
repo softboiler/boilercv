@@ -39,7 +39,7 @@ from boilercv.mappings import apply, filt, update
 
 CONFIG = "config"
 """Config key."""
-CONTEXT_TREE = "context_tree"
+_CONTEXT_TREE = "context_tree"
 """Context tree key."""
 PLUGINS = "plugins"
 """Plugin settings key."""
@@ -94,7 +94,7 @@ def get_data(
         if isinstance(inner_data, BaseModel):
             continue
         data[field] = get_data(
-            inner_data, node[CONTEXT_TREE], merge_context(data, node, context)
+            inner_data, node[_CONTEXT_TREE], merge_context(data, node, context)
         )
     return {**data, _CONTEXT: context}
 
@@ -116,25 +116,19 @@ class ContextBase(BaseModel):
         )
     )
 
-    _context_tree: ClassVar[ContextTree] = {}
-
-    @classmethod
-    def __pydantic_init_subclass__(cls, **_kwargs):  # noqa: PLW3201
-        cls._context_tree = get_context_tree(klass=cls)[CONTEXT_TREE]
-
     def __init__(self, /, **data: Data):
         self.__context_init__(data=data)
 
     def __context_init__(self, data: Data, context: Context | None = None):  # noqa: PLW3201
         if not isinstance(data, BaseModel):
-            data = self.context_pre_init(data, self.context_get(data))
+            data = self.context_pre_init(data, context)
             context = {**data.get(_CONTEXT, Context()), **(context or Context())}
         self.__pydantic_validator__.validate_python(
             input=data, self_instance=self, context=context
         )
 
     @classmethod
-    def context_get(cls, data: Data) -> Context:
+    def context_get(cls, data: Data, context: Context | None = None) -> Context:
         """Get context from data."""
         return (
             Context()
@@ -142,6 +136,7 @@ class ContextBase(BaseModel):
             else {
                 **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
                 **data.get(_CONTEXT, Context()),
+                **(context or Context()),
             }
         )
 
@@ -150,7 +145,7 @@ class ContextBase(BaseModel):
         """Sync nested contexts before validation."""
         if isinstance(data, BaseModel):
             return data
-        context = {**data.get(_CONTEXT, Context()), **(context or Context())}
+        context = cls.context_get(data, context)
         return update(  # pyright: ignore[reportReturnType]
             {**data, _CONTEXT: context},
             skip_key=lambda k: k == _CONTEXT,
@@ -540,6 +535,34 @@ class ContextModel(ContextBase):
 
     context: Context = Context()
 
+    @classmethod
+    def context_get(cls, data: Data, context: Context | None = None) -> Context:
+        """Get context from data."""
+        if isinstance(data, ContextModel):
+            return data.context
+        elif isinstance(data, BaseModel):
+            return Context()
+        else:
+            return {
+                **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
+                **data.get(_CONTEXT, Context()),
+                **data.get(CONTEXT, Context()),
+                **(context or Context()),
+            }
+
+    def context_get_own(self, data: Data, context: Context | None = None) -> Context:
+        """Get context from self."""
+        return {**self.context, **self.context_get(data, context)}
+
+    def context_sync_after(self, context: Context | None = None):
+        """Sync nested contexts after validation."""
+        self.context = {**self.context, **(context or Context())}
+        for field in self.model_fields_set:
+            if field == CONTEXT:
+                continue
+            if isinstance(inner := getattr(self, field), ContextModel):
+                inner.context_sync_after(self.context)  # pyright: ignore[reportAttributeAccessIssue]
+
     @model_validator(mode="before")
     @classmethod
     def validate_context_bef(
@@ -552,24 +575,11 @@ class ContextModel(ContextBase):
     @classmethod
     def context_pre_init(cls, data: Data_T, context: Context | None = None) -> Data_T:
         """Sync nested contexts before validation."""
-        data = super().context_pre_init(data, context)
         if isinstance(data, BaseModel):
             return data
-        return get_data(data, cls._context_tree, context or Context())
-
-    @classmethod
-    def context_get(cls, data: Data) -> Context:
-        """Get context from data."""
-        if isinstance(data, ContextModel):
-            return data.context
-        elif isinstance(data, BaseModel):
-            return Context()
-        else:
-            return {
-                **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
-                **data.get(_CONTEXT, Context()),
-                **data.get(CONTEXT, Context()),
-            }
+        return get_data(
+            data, get_context_tree(cls)[_CONTEXT_TREE], cls.context_get(data, context)
+        )
 
     @classmethod
     def context_post_init(cls, context: Context) -> Context:
@@ -579,11 +589,12 @@ class ContextModel(ContextBase):
     @field_serializer(CONTEXT, mode="wrap")
     def context_ser(
         self,
-        value: dict[str, Any],
+        v: dict[str, Any],
         nxt: SerializerFunctionWrapHandler,
         info: FieldSerializationInfo,
     ) -> dict[str, Any]:
         """Serialize context."""
+        # return nxt(v)
         context = info.context or Context()
         return {
             k: v.model_dump(
@@ -600,7 +611,7 @@ class ContextModel(ContextBase):
             )
             if isinstance(v, BaseModel)
             else nxt(v)
-            for k, v in (value or context).items()
+            for k, v in (v or context).items()
         }
 
     def model_dump(
@@ -625,7 +636,7 @@ class ContextModel(ContextBase):
             by_alias=by_alias,
             include=include,
             exclude=exclude,
-            context={**self.context, **(context or Context())},
+            context=self.context_get_own(self, context),
             exclude_unset=exclude_unset,
             exclude_defaults=exclude_defaults,
             exclude_none=exclude_none,
@@ -655,7 +666,7 @@ class ContextModel(ContextBase):
             indent=indent,
             include=include,
             exclude=exclude,
-            context={**self.context, **(context or Context())},
+            context=self.context_get_own(self, context),
             by_alias=by_alias,
             exclude_unset=exclude_unset,
             exclude_defaults=exclude_defaults,
@@ -679,14 +690,5 @@ class ContextModel(ContextBase):
             obj,
             strict=strict,
             from_attributes=from_attributes,
-            context=context or obj[CONTEXT] or Context(),
+            context=cls.context_get(obj, context),
         )
-
-    def context_sync_after(self, context: Context | None = None):
-        """Sync nested contexts after validation."""
-        self.context = {**self.context, **(context or Context())}
-        for field in self.model_fields_set:
-            if field == CONTEXT:
-                continue
-            if isinstance(inner := getattr(self, field), ContextModel):
-                inner.context_sync_after(self.context)  # pyright: ignore[reportAttributeAccessIssue]

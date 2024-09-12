@@ -5,8 +5,9 @@ from pathlib import Path
 from typing import Annotated as Ann
 from typing import Generic
 
-from pydantic import AfterValidator, BaseModel, Field, ValidationInfo
+from pydantic import AfterValidator, BaseModel, BeforeValidator, Field, ValidationInfo
 
+from boilercv import peek
 from boilercv.data import FRAME
 from boilercv_pipeline.models.deps import DirSlicer, first_slicer, get_slicers
 from boilercv_pipeline.models.deps.types import Slicers
@@ -119,7 +120,9 @@ class FilledParams(
     dfs: Ann[list[Path], validate_outs_paths("dfs")] = Field(default_factory=list)
     """Paths to data frame stage outputs."""
     # TODO: revert to `Field(default_factory=dict)`
-    slicer_patterns: dict[str, Slicers] = const.nb_slicer_patterns
+    slicer_patterns: Ann[
+        dict[str, Slicers], BeforeValidator(peek), AfterValidator(peek)
+    ] = const.nb_slicer_patterns
     """Slicer patterns."""
     filled: Ann[list[Path], validate_deps_paths("filled")] = Field(default_factory=list)
     """Paths to filled video datasets."""
