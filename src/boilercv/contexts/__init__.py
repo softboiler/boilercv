@@ -456,10 +456,10 @@ class RootMapping(  # noqa: PLW1641
                     '"RootMapping.__init__" accepts either a single positional argument or arbitrary keyword arguments'
                 )
             root = data
-        # NB: `reportArgumentType` raised because `K` isn't bound by `str`, necessary to
-        # ... allow subclasses to use literal strings for `K`.
+        # ? `reportArgumentType` raised because `K` isn't bound by `str`, necessary to
+        # ? allow subclasses to use literal strings for `K`.
         context = root.get(_CONTEXT, Context())  # pyright: ignore[reportArgumentType]
-        # NB: `reportArgumentType` raised because of unexpressible root/context types
+        # ?`reportArgumentType` raised because of unexpressible root/context types
         self.__context_init__(data=root, context=context)  # pyright: ignore[reportArgumentType]
 
     @classmethod
@@ -482,12 +482,12 @@ class RootMapping(  # noqa: PLW1641
     def __eq__(self, other: object) -> bool:
         return self.root == (other.root if isinstance(other, RootMapping) else other)
 
-    # NB: `MutableMapping` methods adapted from `collections.UserDict`, but with `data`
-    # ... replaced by `root`and `hasattr` guard changed to equivalent
-    # ... `getattr(..., None)` pattern in `__getitem__`. This is done to prevent
-    # ... inheriting directly from `UserDict`, which doesn't play nicely with
-    # ... `pydantic.RootModel`.
-    # ... https://github.com/python/cpython/blob/7d7eec595a47a5cd67ab420164f0059eb8b9aa28/Lib/collections/__init__.py#L1121-L1211
+    # ?`MutableMapping` methods adapted from `collections.UserDict`, but with `data`
+    # ? replaced by `root`and `hasattr` guard changed to equivalent
+    # ? `getattr(..., None)` pattern in `__getitem__`. This is done to prevent
+    # ? inheriting directly from `UserDict`, which doesn't play nicely with
+    # ? `pydantic.RootModel`.
+    # ? https://github.com/python/cpython/blob/7d7eec595a47a5cd67ab420164f0059eb8b9aa28/Lib/collections/__init__.py#L1121-L1211
 
     @classmethod
     def fromkeys(cls, iterable, value=None):  # noqa: D102
@@ -503,7 +503,7 @@ class RootMapping(  # noqa: PLW1641
             return missing(self, key)
         raise KeyError(key)
 
-    # NB: iterate over `root` instead of `self`
+    # ?iterate over `root` instead of `self`
     def __iter__(self) -> Iterator[K]:  # pyright: ignore[reportIncompatibleMethodOverride]
         return iter(self.root)
 
@@ -513,7 +513,7 @@ class RootMapping(  # noqa: PLW1641
     def __delitem__(self, key: K):
         del self.root[key]
 
-    # NB: Modify __contains__ to work correctly when __missing__ is present
+    # ?Modify __contains__ to work correctly when __missing__ is present
     def __contains__(self, key: K):  # pyright: ignore[reportIncompatibleMethodOverride]
         return key in self.root
 
