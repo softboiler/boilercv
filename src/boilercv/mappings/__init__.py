@@ -16,8 +16,11 @@ def apply(
     del_node_pre: Callable[[Node], bool] = lambda _: False,
     node_fun: Callable[[Node], Any] = lambda n: n,
     del_node: Callable[[Node], bool] = lambda _: False,
-    skip_leaf: Callable[[Node], bool] = lambda _: False,
+    leaf_fun_pre: Callable[[Leaf], Any] = lambda v: v,
+    skip_leaf: Callable[[Leaf], bool] = lambda _: False,
+    del_leaf_pre: Callable[[Leaf], bool] = lambda _: False,
     leaf_fun: Callable[[Leaf], Any] = lambda v: v,
+    del_leaf: Callable[[Leaf], bool] = lambda _: False,
 ) -> dict[K, V]:
     """Apply functions conditionally to nodes and leaves of a mapping."""
     return update(
@@ -28,12 +31,15 @@ def apply(
         del_node_pre=del_node_pre,
         node_fun=node_fun,
         del_node=del_node,
+        leaf_fun_pre=lambda v: leaf_fun_pre(copy(v)),
         skip_leaf=skip_leaf,
-        leaf_fun=lambda v: leaf_fun(copy(v)),
+        del_leaf_pre=del_leaf_pre,
+        leaf_fun=leaf_fun,
+        del_leaf=del_leaf,
     )
 
 
-def update(
+def update(  # noqa: C901
     mapping: MutableNode_T,
     skip_key: Callable[[Any], bool] = lambda _: False,
     node_fun_pre: Callable[[MutableNode_T], Any] = lambda n: n,
@@ -41,8 +47,11 @@ def update(
     del_node_pre: Callable[[MutableNode_T], bool] = lambda _: False,
     node_fun: Callable[[MutableNode_T], Any] = lambda n: n,
     del_node: Callable[[MutableNode_T], bool] = lambda _: False,
+    leaf_fun_pre: Callable[[Leaf], Any] = lambda v: v,
     skip_leaf: Callable[[Leaf], bool] = lambda _: False,
+    del_leaf_pre: Callable[[Leaf], bool] = lambda _: False,
     leaf_fun: Callable[[Leaf], Any] = lambda v: v,
+    del_leaf: Callable[[Leaf], bool] = lambda _: False,
 ) -> MutableNode_T:
     """Update in-place by applying functions conditionally to nodes and leaves."""
     # ? `deepcopy` is wasteful and has side-effects on some leaves (e.g. SymPy exprs)
@@ -67,17 +76,27 @@ def update(
                     del_node_pre=del_node_pre,
                     node_fun=node_fun,
                     del_node=del_node,
+                    leaf_fun_pre=leaf_fun_pre,
                     skip_leaf=skip_leaf,
+                    del_leaf_pre=del_leaf_pre,
                     leaf_fun=leaf_fun,
+                    del_leaf=del_leaf,
                 )
             )
             if del_node(node):
                 marks.append(key)
             continue
         leaf = value
+        mapping[key] = leaf = leaf_fun_pre(leaf)
         if skip_leaf(leaf):
             continue
+        if del_leaf_pre(leaf):
+            marks.append(key)
+            continue
         mapping[key] = leaf_fun(leaf)
+        if del_leaf(leaf):
+            marks.append(key)
+            continue
     for mark in marks:
         del mapping[mark]
     return mapping
@@ -90,7 +109,7 @@ def is_falsey(v: Any) -> bool:
 
 def filt(mapping: Mapping[K, V]) -> dict[K, V]:
     """Filter nodes and leaves of a mapping recursively."""
-    return apply(mapping, del_node=is_falsey)
+    return apply(mapping, del_node=is_falsey, del_leaf=is_falsey)
 
 
 def sort_by_keys_pattern(

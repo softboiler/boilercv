@@ -7,16 +7,7 @@ from copy import copy, deepcopy
 from json import loads
 from typing import TYPE_CHECKING, Any, ClassVar, Generic, Literal, Self
 
-from pydantic import (
-    BaseModel,
-    Field,
-    FieldSerializationInfo,
-    PydanticUserError,
-    RootModel,
-    SerializerFunctionWrapHandler,
-    field_serializer,
-    model_validator,
-)
+from pydantic import BaseModel, Field, PydanticUserError, RootModel, model_validator
 from pydantic._internal import _repr
 from pydantic.fields import FieldInfo
 from pydantic.main import IncEx, _object_setattr
@@ -35,7 +26,7 @@ from boilercv.contexts.types import (
     V,
     ValidationInfo,
 )
-from boilercv.mappings import apply, filt, update
+from boilercv.mappings import apply, filt
 
 CONFIG = "config"
 """Config key."""
@@ -140,13 +131,16 @@ class ContextBase(BaseModel):
             }
         )
 
+    # TODO: This indiscriminately applies contexts to mappings which may not be an
+    # ..... actual model. Yet the context-aware `context_pre_init` doesn't handle
+    # ..... root models. This is necessary for equations models to work.
     @classmethod
     def context_pre_init(cls, data: Data_T, context: Context | None = None) -> Data_T:
         """Sync nested contexts before validation."""
         if isinstance(data, BaseModel):
             return data
         context = cls.context_get(data, context)
-        return update(  # pyright: ignore[reportReturnType]
+        return apply(  # pyright: ignore[reportReturnType]
             {**data, _CONTEXT: context},
             skip_key=lambda k: k == _CONTEXT,
             skip_node=lambda v: isinstance(v, BaseModel),
@@ -550,19 +544,6 @@ class ContextModel(ContextBase):
                 **(context or Context()),
             }
 
-    def context_get_own(self, data: Data, context: Context | None = None) -> Context:
-        """Get context from self."""
-        return {**self.context, **self.context_get(data, context)}
-
-    def context_sync_after(self, context: Context | None = None):
-        """Sync nested contexts after validation."""
-        self.context = {**self.context, **(context or Context())}
-        for field in self.model_fields_set:
-            if field == CONTEXT:
-                continue
-            if isinstance(inner := getattr(self, field), ContextModel):
-                inner.context_sync_after(self.context)  # pyright: ignore[reportAttributeAccessIssue]
-
     @model_validator(mode="before")
     @classmethod
     def validate_context_bef(
@@ -581,38 +562,9 @@ class ContextModel(ContextBase):
             data, get_context_tree(cls)[_CONTEXT_TREE], cls.context_get(data, context)
         )
 
-    @classmethod
-    def context_post_init(cls, context: Context) -> Context:
-        """Update context after initialization."""
-        return context
-
-    @field_serializer(CONTEXT, mode="wrap")
-    def context_ser(
-        self,
-        v: dict[str, Any],
-        nxt: SerializerFunctionWrapHandler,
-        info: FieldSerializationInfo,
-    ) -> dict[str, Any]:
-        """Serialize context."""
-        # return nxt(v)
-        context = info.context or Context()
-        return {
-            k: v.model_dump(
-                mode=info.mode,
-                by_alias=info.by_alias,
-                include=info.include,  # pyright: ignore[reportArgumentType]
-                exclude=info.exclude,  # pyright: ignore[reportArgumentType]
-                context=context,
-                exclude_unset=info.exclude_unset,
-                exclude_defaults=info.exclude_defaults,
-                exclude_none=info.exclude_none,
-                round_trip=info.round_trip,  # pyright: ignore[reportArgumentType]
-                serialize_as_any=info.serialize_as_any,
-            )
-            if isinstance(v, BaseModel)
-            else nxt(v)
-            for k, v in (v or context).items()
-        }
+    def context_get_own(self, data: Data, context: Context | None = None) -> Context:
+        """Get context from self."""
+        return {**self.context, **self.context_get(data, context)}
 
     def model_dump(
         self,
@@ -630,7 +582,6 @@ class ContextModel(ContextBase):
         serialize_as_any: bool = False,
     ) -> dict[str, Any]:
         """Contextulizable model dump."""
-        # self.context_sync_after(context)
         return super().model_dump(
             mode=mode,
             by_alias=by_alias,
@@ -661,7 +612,6 @@ class ContextModel(ContextBase):
         serialize_as_any: bool = False,
     ) -> str:
         """Contextulizable JSON model dump."""
-        # self.context_sync_after(context)
         return super().model_dump_json(
             indent=indent,
             include=include,
