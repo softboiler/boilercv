@@ -9,7 +9,6 @@
     "docs/boilercv_docs/settings_schema.json": "docs/boilercv_docs/settings.yaml",
     "docs/boilercv_docs/settings_plugin_schema.json": "docs/boilercv_docs/settings_plugin.yaml",
     // ? `boilercv_pipeline`
-    "params_schema.json": "params.yaml",
     "pipeline/boilercv_pipeline/settings_schema.json": "pipeline/boilercv_pipeline/settings.yaml",
     "pipeline/boilercv_pipeline/settings_plugin_schema.json": "pipeline/boilercv_pipeline/settings_plugin.yaml",
     // ? `boilercv_tests`

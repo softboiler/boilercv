@@ -11,6 +11,7 @@ from boilercv.data import FRAME, PX, XPX, YPX, X, Y
 from boilercv_pipeline.models import columns, data, stage
 from boilercv_pipeline.models.column import Col, ConstCol, Kind, LinkedCol
 from boilercv_pipeline.models.columns import get_cols
+from boilercv_pipeline.models.params.types import BoolParam, IntParam
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DfsPlotsOuts
@@ -112,9 +113,9 @@ class FindObjects(FilledParams[Deps, Outs, Data]):
     """Stage data."""
     cols: Ann[Cols, Arg(hidden=True)] = Field(default_factory=Cols)
     """Columns."""
-    compare_with_trackpy: bool = False
+    compare_with_trackpy: BoolParam = False
     """Whether to get objects using the Trackpy approach."""
-    guess_diameter: int = 21
+    guess_diameter: IntParam = 21
     """Guess diameter for the Trackpy approach. (px)"""
     contours: Ann[list[Path], validate_deps_paths("contours")] = Field(
         default_factory=list

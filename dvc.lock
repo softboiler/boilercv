@@ -90,8 +90,8 @@ stages:
       nfiles: 336
     - path: pipeline/boilercv_pipeline/stages/fill
       hash: md5
-      md5: e9aa33d74d1d1f15761c339a4587a9d5.dir
-      size: 2656
+      md5: 77dcb7eaf429ce636eafe916b7ba0b8c.dir
+      size: 2645
       nfiles: 2
     outs:
     - path: data/filled
@@ -248,8 +248,8 @@ stages:
       nfiles: 336
     - path: pipeline/boilercv_pipeline/stages/find_contours
       hash: md5
-      md5: ea842c8f6c77837eb2c3c2d2dfa62b09.dir
-      size: 4344
+      md5: b291dca512e5accefda0dbf6b679683f.dir
+      size: 4333
       nfiles: 2
     outs:
     - path: data/contours
@@ -426,8 +426,8 @@ stages:
       nfiles: 17
     - path: pipeline/boilercv_pipeline/stages/binarize
       hash: md5
-      md5: 295238291ab2ba4a5c9a67a086c43693.dir
-      size: 2405
+      md5: 33072159795162da893b233836617c6c.dir
+      size: 2394
       nfiles: 2
     outs:
     - path: data/rois
@@ -450,8 +450,8 @@ stages:
       nfiles: 16
     - path: pipeline/boilercv_pipeline/stages/convert
       hash: md5
-      md5: 730be861c1af4b45a2aee0ccb3d4cc9b.dir
-      size: 2271
+      md5: 58a0e02f975ec51b2467b2768b76d841.dir
+      size: 2260
       nfiles: 2
     outs:
     - path: data/large_sources
@@ -699,7 +699,7 @@ stages:
       md5: facddf4259acd1c99fd6246cf904a673
       size: 506031
   find_objects:
-    cmd: boilercv-pipeline stage find-objects
+    cmd: boilercv-pipeline stage find-objects --compare-with-trackpy false
     deps:
     - path: data/contours
       hash: md5
@@ -717,13 +717,16 @@ stages:
       size: 10643
     - path: pipeline/boilercv_pipeline/stages/find_objects
       hash: md5
-      md5: b43f8da14bede187277609889955adb8.dir
-      size: 5690
+      md5: cb8ecf12842734df2043383c07b41bc8.dir
+      size: 5996
       nfiles: 2
+    params:
+      params.yaml:
+        compare_with_trackpy: false
     outs:
     - path: data/e230920/objects
       hash: md5
-      md5: bae04c790d7e092f9bdd97f80c9f6ffa.dir
+      md5: b60ab7f99bed8b7d316a17057135557e.dir
       size: 2356628
       nfiles: 1
     - path: data/e230920/objects_plots/composite.png

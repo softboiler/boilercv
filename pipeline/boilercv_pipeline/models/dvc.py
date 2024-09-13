@@ -246,7 +246,7 @@ TopLevelArtifacts: TypeAlias = dict[ArtifactIdOrFilePath, TopLevelArtifactFlags]
 
 class DvcYamlModel(DvcBaseModel):
     model_config = ConfigDict(title="dvc.yaml", extra="forbid")
-    vars: Vars | None = Field(default=None, title="Variables")
+    vars: Vars = Field(default_factory=list, title="Variables")  # | None
     """List of values for substitution.\n\nMay include any dict or a path to a params file which may be a string or a dict to params in the file).\n\nUse elsewhere in `dvc.yaml` with the `${}` substitution expression."""
     stages: dict[StageName, Definition] = Field(default_factory=dict)  # | None
     """List of stages that form a pipeline."""
@@ -256,5 +256,5 @@ class DvcYamlModel(DvcBaseModel):
     """List of parameter files"""
     metrics: list[FilePath] = Field(default_factory=list)  # | None
     """List of metric files"""
-    artifacts: TopLevelArtifacts = Field(default_factory=list)  # | None
+    artifacts: TopLevelArtifacts = Field(default_factory=dict)  # | None
     """Top level artifacts definition."""

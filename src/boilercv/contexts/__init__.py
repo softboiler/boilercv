@@ -59,44 +59,6 @@ def context_validate_before(data: Data_T) -> Data_T:
     return data
 
 
-def get_context_tree(klass: type[BaseModel] | Any = None) -> ContextNode:
-    """Get context tree."""
-    nodes: ContextTree = {}
-    fields: dict[str, FieldInfo] = getattr(klass, MODEL_FIELDS, {})
-    for f, i in fields.items():
-        if f not in [ROOT, CONTEXT] and filt(node := get_context_tree(i.annotation)):
-            nodes[f] = node
-    config = deepcopy(getattr(klass, MODEL_CONFIG, {})) if klass else {}  # pyright: ignore[reportArgumentType]
-    return ContextNode(
-        config=config,  # pyright: ignore[reportArgumentType]
-        plugins=(p := config.get(PLUGIN_SETTINGS, {})),
-        context=p.get(CONTEXT, {}),
-        context_tree=nodes,
-    )
-
-
-def get_data(
-    data: MutableMapping[str, Any], tree: ContextTree, context: Context
-) -> dict[str, Any]:
-    """Get data."""
-    data = copy(data)
-    for field, node in tree.items():
-        inner_data = data.get(field) or {}
-        if isinstance(inner_data, BaseModel):
-            continue
-        data[field] = get_data(
-            inner_data, node[_CONTEXT_TREE], merge_context(data, node, context)
-        )
-    return {**data, _CONTEXT: context}
-
-
-def merge_context(
-    data: MutableMapping[str, Any], node: ContextNode, context: Context | None = None
-) -> Context:
-    """Merge context."""
-    return {**node[CONTEXT], **data.get(_CONTEXT, Context()), **(context or Context())}
-
-
 class ContextBase(BaseModel):
     """Context base model that guarantees context is available during validation."""
 
@@ -119,13 +81,20 @@ class ContextBase(BaseModel):
         )
 
     @classmethod
-    def context_get(cls, data: Data, context: Context | None = None) -> Context:
+    def context_get(
+        cls,
+        data: Data,
+        context: Context | None = None,
+        context_base: Context | None = None,
+    ) -> Context:
         """Get context from data."""
         return (
             Context()
             if isinstance(data, BaseModel)
             else {
-                **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
+                **(
+                    context_base or deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT])
+                ),
                 **data.get(_CONTEXT, Context()),
                 **(context or Context()),
             }
@@ -492,7 +461,7 @@ class RootMapping(  # noqa: PLW1641
             return missing(self, key)
         raise KeyError(key)
 
-    # ?iterate over `root` instead of `self`
+    # ? Iterate over `root` instead of `self`
     def __iter__(self) -> Iterator[K]:  # pyright: ignore[reportIncompatibleMethodOverride]
         return iter(self.root)
 
@@ -502,7 +471,7 @@ class RootMapping(  # noqa: PLW1641
     def __delitem__(self, key: K):
         del self.root[key]
 
-    # ?Modify __contains__ to work correctly when __missing__ is present
+    # ? Modify __contains__ to work correctly when __missing__ is present
     def __contains__(self, key: K):  # pyright: ignore[reportIncompatibleMethodOverride]
         return key in self.root
 
@@ -524,13 +493,34 @@ class RootMapping(  # noqa: PLW1641
         return self | other
 
 
+def get_context_tree(klass: type[BaseModel] | Any = None) -> ContextNode:
+    """Get context tree."""
+    nodes: ContextTree = {}
+    fields: dict[str, FieldInfo] = getattr(klass, MODEL_FIELDS, {})
+    for f, i in fields.items():
+        if f not in [ROOT, CONTEXT] and filt(node := get_context_tree(i.annotation)):
+            nodes[f] = node
+    config = deepcopy(getattr(klass, MODEL_CONFIG, {})) if klass else {}  # pyright: ignore[reportArgumentType]
+    return ContextNode(
+        config=config,  # pyright: ignore[reportArgumentType]
+        plugins=(p := config.get(PLUGIN_SETTINGS, {})),
+        context=p.get(CONTEXT, {}),
+        context_tree=nodes,
+    )
+
+
 class ContextModel(ContextBase):
     """Model that guarantees a dictionary context is available during validation."""
 
     context: Context = Context()
 
     @classmethod
-    def context_get(cls, data: Data, context: Context | None = None) -> Context:
+    def context_get(
+        cls,
+        data: Data,
+        context: Context | None = None,
+        context_base: Context | None = None,
+    ) -> Context:
         """Get context from data."""
         if isinstance(data, ContextModel):
             return data.context
@@ -538,7 +528,9 @@ class ContextModel(ContextBase):
             return Context()
         else:
             return {
-                **deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT]),
+                **(
+                    context_base or deepcopy(cls.model_config[PLUGIN_SETTINGS][CONTEXT])
+                ),
                 **data.get(_CONTEXT, Context()),
                 **data.get(CONTEXT, Context()),
                 **(context or Context()),
@@ -558,13 +550,37 @@ class ContextModel(ContextBase):
         """Sync nested contexts before validation."""
         if isinstance(data, BaseModel):
             return data
-        return get_data(
-            data, get_context_tree(cls)[_CONTEXT_TREE], cls.context_get(data, context)
+        return cls.context_get_data(
+            data,
+            tree=get_context_tree(cls)[_CONTEXT_TREE],
+            context=cls.context_get(data, context),
         )
 
-    def context_get_own(self, data: Data, context: Context | None = None) -> Context:
+    @classmethod
+    def context_get_data(
+        cls, data: MutableMapping[str, Any], tree: ContextTree, context: Context
+    ) -> dict[str, Any]:
+        """Get data."""
+        data = copy(data)
+        for field, node in tree.items():
+            inner_data = data.get(field) or {}
+            if isinstance(inner_data, BaseModel):
+                continue
+            data[field] = cls.context_get_data(
+                data=inner_data,
+                tree=node[_CONTEXT_TREE],
+                context=cls.context_get(data, context, context_base=node[CONTEXT]),
+            )
+        return {**data, _CONTEXT: context}
+
+    def context_get_own(
+        self,
+        data: Data,
+        context: Context | None = None,
+        context_base: Context | None = None,
+    ) -> Context:
         """Get context from self."""
-        return {**self.context, **self.context_get(data, context)}
+        return {**self.context, **self.context_get(data, context, context_base)}
 
     def model_dump(
         self,

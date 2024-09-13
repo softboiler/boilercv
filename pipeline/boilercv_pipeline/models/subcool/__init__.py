@@ -11,7 +11,14 @@ from boilercv.data import FRAME
 from boilercv_pipeline.models.deps import DirSlicer, first_slicer, get_slicers
 from boilercv_pipeline.models.deps.types import Slicers
 from boilercv_pipeline.models.params import DataParams
-from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T
+from boilercv_pipeline.models.params.types import (
+    BoolParam,
+    Data_T,
+    Deps_T,
+    IntParam,
+    Outs_T,
+    StrParam,
+)
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DataStage, Deps
@@ -24,12 +31,17 @@ class Constants(BaseModel):
 
     day: str = "2024-07-18"
     time: str = "17-44-35"
-    # TODO: Revert to `first_slicer(n=10, step=100)`
-    # nb_slicer_patterns: dict[str, Slicers] = {r".+": {FRAME: first_slicer()}}
-    nb_slicer_patterns: dict[str, Slicers] = {
-        r".+": {FRAME: first_slicer(n=10, step=100)}
-    }
-    """Slicer patterns representing a small subset of frames."""
+
+    nb_frame_count: int = 10
+    nb_frame_step: int = 100
+
+    @property
+    def nb_slicer_patterns(self) -> dict[str, Slicers]:
+        """Slicer patterns for notebook runs."""
+        return {
+            r".+": {FRAME: first_slicer(n=self.nb_frame_count, step=self.nb_frame_step)}
+        }
+
     data_stage: DataStage = DataStage()
     """Common stages of data processing."""
 
@@ -75,15 +87,27 @@ def validate_outs_paths(field: str) -> AfterValidator:
     return AfterValidator(partial(_get_paths, False, field))
 
 
+def get_include_patterns(
+    include_patterns: list[str], info: ValidationInfo
+) -> list[str]:
+    """Get include patterns."""
+    if info.data["only_sample"]:
+        return [rf"^.*{info.data['sample']}.*$"]
+    return include_patterns
+
+
 class SubcoolParams(
     DataParams[Deps_T, Outs_T, Data_T], Generic[Deps_T, Outs_T, Data_T]
 ):
     """Stage parameters for the subcooled boiling study."""
 
-    sample: str = const.sample
+    sample: StrParam = const.sample
     """Sample to process."""
-    # TODO: Revert to `const.include_patterns`
-    include_patterns: list[str] = const.nb_include_patterns
+    only_sample: BoolParam = False
+    """Only process the sample."""
+    include_patterns: Ann[list[str], AfterValidator(get_include_patterns)] = (
+        const.include_patterns
+    )
     """Include patterns."""
 
 
@@ -100,7 +124,19 @@ def _get_slicers(
 ) -> list[Slicers]:
     """Get slicers for a given paths field in parameters."""
     return slicers or [
-        get_slicers(path, slicer_patterns=info.data["slicer_patterns"])
+        get_slicers(
+            path,
+            slicer_patterns=(
+                info.data["slicer_patterns"]
+                or {
+                    r".+": {
+                        FRAME: first_slicer(
+                            n=info.data["frame_count"], step=info.data["frame_step"]
+                        )
+                    }
+                }
+            ),
+        )
         for path in info.data.get(paths, [])
     ]
 
@@ -118,8 +154,11 @@ class FilledParams(
 
     dfs: Ann[list[Path], validate_outs_paths("dfs")] = Field(default_factory=list)
     """Paths to data frame stage outputs."""
-    # TODO: revert to `Field(default_factory=dict)`
-    slicer_patterns: dict[str, Slicers] = const.nb_slicer_patterns
+    frame_count: IntParam = 0
+    """Count of frames."""
+    frame_step: IntParam = 1
+    """Step between frames."""
+    slicer_patterns: dict[str, Slicers] = Field(default_factory=dict)
     """Slicer patterns."""
     filled: Ann[list[Path], validate_deps_paths("filled")] = Field(default_factory=list)
     """Paths to filled video datasets."""

@@ -5,25 +5,51 @@ from __future__ import annotations
 from collections.abc import Iterable
 from contextlib import contextmanager
 from typing import Annotated as Ann
-from typing import Generic
+from typing import Any, Generic
 
 import matplotlib
 from cappa.arg import Arg
 from IPython.display import Markdown, display
 from matplotlib.axes import Axes
+from more_itertools import last, only
 from numpy import set_printoptions
 from pandas import DataFrame, options
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 from seaborn import move_legend, set_theme
 
+from boilercv_pipeline.models import dvc
 from boilercv_pipeline.models.column import Col
 from boilercv_pipeline.models.column.types import Ps
-from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T, Preview
-from boilercv_pipeline.models.stage import Stage
+from boilercv_pipeline.models.contexts import BOILERCV_PIPELINE
+from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
+from boilercv_pipeline.models.params.types import (
+    Data_T,
+    Deps_T,
+    FloatParam,
+    Outs_T,
+    Param,
+    Preview,
+)
+from boilercv_pipeline.models.stage import Stage, get_dvc_stage
+
+
+class Constants(BaseModel):
+    """Parameter constants."""
+
+    scale: float = 1.3
+    paper_scale: float = 1.0
+
+
+const = Constants()
+
+
+def get_param(metadata: list[Any]) -> Param | None:
+    """Get a parameter type from metadata."""
+    return only(m for m in metadata if isinstance(m, Param))
 
 
 def set_display_options(
-    font_scale: float = 1.3, precision: int = 3, display_rows: int = 12
+    font_scale: float = const.scale, precision: int = 3, display_rows: int = 12
 ):
     """Set display options."""
     float_spec = f"#.{precision}g"
@@ -82,10 +108,46 @@ def get_floatfmt(precision: int = 3) -> str:
     return f"#.{precision}g"
 
 
-class Format(BaseModel):
+class StageParams(Stage):
+    """Stage parameters."""
+
+    @field_validator("*", mode="after", check_fields=False)
+    @classmethod
+    def dvc_validate_param(
+        cls, value: bool, info: BoilercvPipelineValidationInfo
+    ) -> bool:
+        """Validate param for `dvc.yaml`."""
+        if (
+            (field := info.field_name)
+            and (ctx := info.context[BOILERCV_PIPELINE]).sync_dvc
+            and (param := get_param(cls.model_fields[field].metadata))
+        ):
+            stage: dvc.Stage = (
+                last(ctx.dvc.stages.values())  # pyright: ignore[reportArgumentType]
+                if issubclass(cls, Format)
+                else get_dvc_stage(cls, ctx.dvc)
+            )
+            match param:
+                case Param.any:
+                    stage.cmd = [
+                        *(
+                            stage.cmd
+                            if isinstance(stage.cmd, list)
+                            else stage.cmd.split(" ")
+                        ),
+                        f"--{field.replace('_', '-')}",
+                        f"${{{field}}}",
+                    ]
+                case _:
+                    raise ValueError(f"Got unsupported parameter kind `{param}`")
+            ctx.dvc_params[field] = value
+        return value
+
+
+class Format(StageParams):
     """Plotting parameters."""
 
-    scale: float = 1.3
+    scale: FloatParam = const.scale
     """Plot scale."""
     marker_scale: float = 20
     """Marker scale."""
@@ -158,7 +220,7 @@ class Format(BaseModel):
             self.set_display_options()
 
 
-class Params(Stage, Generic[Deps_T, Outs_T]):
+class Params(StageParams, Generic[Deps_T, Outs_T]):
     """Stage parameters."""
 
     deps: Deps_T

@@ -59,7 +59,6 @@ def get_boilercv_pipeline_context(
     roots: Roots | None = None,
     kinds_from: BoilercvPipelineCtxModel | None = None,
     track_kinds: bool = False,
-    resolve_rooted: bool = True,
     sync_dvc: bool = False,
 ) -> BoilercvPipelineCtxDict:
     """Context for {mod}`~boilercv_pipeline`."""
@@ -73,7 +72,6 @@ def get_boilercv_pipeline_context(
             roots=roots or Roots(),
             kinds=ctx_from[BOILERCV_PIPELINE].kinds,
             track_kinds=track_kinds,
-            resolve_rooted=resolve_rooted,
             sync_dvc=sync_dvc,
         )
     )
@@ -83,7 +81,6 @@ def get_boilercv_pipeline_config(
     roots: Roots | None = None,
     kinds_from: BoilercvPipelineCtxModel | None = None,
     track_kinds: bool = False,
-    resolve_rooted: bool = True,
     sync_dvc: bool = False,
 ) -> BoilercvPipelineConfigDict:
     """Model config for {mod}`~boilercv_pipeline`."""
@@ -94,7 +91,6 @@ def get_boilercv_pipeline_config(
                 roots=roots,
                 kinds_from=kinds_from,
                 track_kinds=track_kinds,
-                resolve_rooted=resolve_rooted,
                 sync_dvc=sync_dvc,
             )
         ),
@@ -113,7 +109,12 @@ class BoilercvPipelineCtxModel(ContextModel):
     )
 
     @classmethod
-    def context_get(cls, data: Data, context: Context | None = None) -> Context:
+    def context_get(
+        cls,
+        data: Data,
+        context: Context | None = None,
+        context_base: Context | None = None,
+    ) -> Context:
         """Get context from data."""
         return BoilercvPipelineCtxDict({  # pyright: ignore[reportArgumentType]
             k: (
@@ -121,7 +122,7 @@ class BoilercvPipelineCtxModel(ContextModel):
                 if isinstance(v, Mapping)
                 else v
             )
-            for k, v in super().context_get(data, context).items()
+            for k, v in super().context_get(data, context, context_base).items()
         })
 
     @model_validator(mode="after")
@@ -173,7 +174,7 @@ def ser_rooted_path(
     ctx = info.context[BOILERCV_PIPELINE]
     return (
         resolve_path(value, nxt)
-        if ctx.resolve_rooted and getattr(ctx.roots, key, None)
+        if getattr(ctx.roots, key, None)
         else nxt(Path(value).as_posix())
     )
 
