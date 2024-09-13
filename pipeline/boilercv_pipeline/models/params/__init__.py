@@ -129,7 +129,7 @@ class StageParams(Stage):
             )
             match param:
                 case Param.any:
-                    stage.cmd = [
+                    stage.cmd = " ".join([
                         *(
                             stage.cmd
                             if isinstance(stage.cmd, list)
@@ -137,9 +137,10 @@ class StageParams(Stage):
                         ),
                         f"--{field.replace('_', '-')}",
                         f"${{{field}}}",
-                    ]
+                    ])
                 case _:
                     raise ValueError(f"Got unsupported parameter kind `{param}`")
+            stage.params.append(field)
             ctx.dvc_params[field] = value
         return value
 
@@ -220,6 +221,11 @@ class Format(StageParams):
             self.set_display_options()
 
 
+def get_format(v) -> Format:
+    """Get format."""
+    return Format(scale=v)
+
+
 class Params(StageParams, Generic[Deps_T, Outs_T]):
     """Stage parameters."""
 
@@ -227,7 +233,7 @@ class Params(StageParams, Generic[Deps_T, Outs_T]):
     """Stage dependencies."""
     outs: Outs_T
     """Stage outputs."""
-    format: Ann[Format, Arg(hidden=True)] = Field(default_factory=Format)
+    format: Ann[Format, Arg(parse=get_format)] = Field(default_factory=Format)
     """Format parameters."""
 
 

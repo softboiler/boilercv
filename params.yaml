@@ -3,6 +3,6 @@ frame_count: 0
 frame_step: 1
 guess_diameter: 21
 load_src_from_outs: false
-only_sample: false
+only_sample: true
 sample: 2024-07-18T17-44-35
 scale: 1.3

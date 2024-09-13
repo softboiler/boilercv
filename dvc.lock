@@ -33,7 +33,7 @@ stages:
       md5: 5598ee8b69f8591e2035194a9054f2c3
       size: 147879321
   preview_binarized:
-    cmd: boilercv-pipeline stage preview-binarized
+    cmd: boilercv-pipeline stage preview-binarized --format 1.3
     deps:
     - path: data/rois
       hash: md5
@@ -47,9 +47,12 @@ stages:
       nfiles: 336
     - path: pipeline/boilercv_pipeline/stages/preview_binarized
       hash: md5
-      md5: 99dce72a090ce5fa4a690e9ba092589d.dir
-      size: 2203
+      md5: 5f59775268396b1be41e3015b8d4c243.dir
+      size: 2192
       nfiles: 2
+    params:
+      params.yaml:
+        scale: 1.3
     outs:
     - path: data/previews/binarized_preview.nc
       hash: md5
@@ -71,7 +74,7 @@ stages:
       size: 4279876062
       nfiles: 308
   fill:
-    cmd: boilercv-pipeline stage fill
+    cmd: boilercv-pipeline stage fill --format 1.3
     deps:
     - path: data/contours
       hash: md5
@@ -93,6 +96,9 @@ stages:
       md5: 77dcb7eaf429ce636eafe916b7ba0b8c.dir
       size: 2645
       nfiles: 2
+    params:
+      params.yaml:
+        scale: 1.3
     outs:
     - path: data/filled
       hash: md5
@@ -234,7 +240,7 @@ stages:
       size: 0
       nfiles: 0
   find_contours:
-    cmd: boilercv-pipeline stage find-contours
+    cmd: boilercv-pipeline stage find-contours --format 1.3
     deps:
     - path: data/rois
       hash: md5
@@ -251,6 +257,9 @@ stages:
       md5: b291dca512e5accefda0dbf6b679683f.dir
       size: 4333
       nfiles: 2
+    params:
+      params.yaml:
+        scale: 1.3
     outs:
     - path: data/contours
       hash: md5
@@ -258,7 +267,7 @@ stages:
       size: 4427447588
       nfiles: 337
   preview_filled:
-    cmd: boilercv-pipeline stage preview-filled
+    cmd: boilercv-pipeline stage preview-filled --format 1.3
     deps:
     - path: data/filled
       hash: md5
@@ -272,16 +281,19 @@ stages:
       nfiles: 337
     - path: pipeline/boilercv_pipeline/stages/preview_filled
       hash: md5
-      md5: ddfca8782e1536634f78eebecb70d77b.dir
-      size: 2107
+      md5: 0ce2215702cf3c2943ef7c034962c5d1.dir
+      size: 2096
       nfiles: 2
+    params:
+      params.yaml:
+        scale: 1.3
     outs:
     - path: data/previews/filled_preview.nc
       hash: md5
       md5: e43b9ddb4ad1ad6a3a1603996604e599
       size: 1693748
   preview_gray:
-    cmd: boilercv-pipeline stage preview-gray
+    cmd: boilercv-pipeline stage preview-gray --format 1.3
     deps:
     - path: data/large_sources
       hash: md5
@@ -290,9 +302,12 @@ stages:
       nfiles: 17
     - path: pipeline/boilercv_pipeline/stages/preview_gray
       hash: md5
-      md5: 0f458f2041b3048d3c8b111365fa206f.dir
-      size: 1915
+      md5: ec3c8a1cb86d8ed7b32550ea8c29d83c.dir
+      size: 1904
       nfiles: 2
+    params:
+      params.yaml:
+        scale: 1.3
     outs:
     - path: data/previews/gray_preview.nc
       hash: md5
@@ -417,7 +432,7 @@ stages:
       size: 10710
       nfiles: 7
   binarize:
-    cmd: boilercv-pipeline stage binarize
+    cmd: boilercv-pipeline stage binarize --format 1.3
     deps:
     - path: data/large_sources
       hash: md5
@@ -429,6 +444,9 @@ stages:
       md5: 33072159795162da893b233836617c6c.dir
       size: 2394
       nfiles: 2
+    params:
+      params.yaml:
+        scale: 1.3
     outs:
     - path: data/rois
       hash: md5
@@ -441,7 +459,7 @@ stages:
       size: 7512414707
       nfiles: 336
   convert:
-    cmd: boilercv-pipeline stage convert
+    cmd: boilercv-pipeline stage convert --format 1.3
     deps:
     - path: data/cines
       hash: md5
@@ -453,6 +471,9 @@ stages:
       md5: 58a0e02f975ec51b2467b2768b76d841.dir
       size: 2260
       nfiles: 2
+    params:
+      params.yaml:
+        scale: 1.3
     outs:
     - path: data/large_sources
       hash: md5
@@ -652,7 +673,10 @@ stages:
       md5: d41d8cd98f00b204e9800998ecf8427e
       size: 0
   skip_cloud:
-    cmd: boilercv-pipeline stage skip-cloud
+    cmd: boilercv-pipeline stage skip-cloud --format 1.3
+    params:
+      params.yaml:
+        scale: 1.3
     outs:
     - path: data/cines
       hash: md5

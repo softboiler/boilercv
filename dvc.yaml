@@ -1,134 +1,106 @@
 stages:
   skip_cloud:
-    cmd:
-      - boilercv-pipeline
-      - stage
-      - skip-cloud
-      - --scale
-      - ${scale}
+    cmd: boilercv-pipeline stage skip-cloud --format ${scale}
+    params:
+      - scale
     outs:
       - data/cines:
           cache: false
           persist: true
           push: false
   convert:
-    cmd:
-      - boilercv-pipeline
-      - stage
-      - convert
-      - --scale
-      - ${scale}
+    cmd: boilercv-pipeline stage convert --format ${scale}
     deps:
       - pipeline/boilercv_pipeline/stages/convert
       - data/cines
+    params:
+      - scale
     outs:
       - data/large_sources:
           cache: false
           persist: true
           push: false
   binarize:
-    cmd:
-      - boilercv-pipeline
-      - stage
-      - binarize
-      - --scale
-      - ${scale}
+    cmd: boilercv-pipeline stage binarize --format ${scale}
     deps:
       - pipeline/boilercv_pipeline/stages/binarize
       - data/large_sources
+    params:
+      - scale
     outs:
       - data/sources:
           persist: true
       - data/rois:
           persist: true
   preview_gray:
-    cmd:
-      - boilercv-pipeline
-      - stage
-      - preview-gray
-      - --scale
-      - ${scale}
+    cmd: boilercv-pipeline stage preview-gray --format ${scale}
     deps:
       - pipeline/boilercv_pipeline/stages/preview_gray
       - data/large_sources
+    params:
+      - scale
     outs:
       - data/previews/gray_preview.nc:
           persist: true
   preview_binarized:
-    cmd:
-      - boilercv-pipeline
-      - stage
-      - preview-binarized
-      - --scale
-      - ${scale}
+    cmd: boilercv-pipeline stage preview-binarized --format ${scale}
     deps:
       - pipeline/boilercv_pipeline/stages/preview_binarized
       - data/sources
       - data/rois
+    params:
+      - scale
     outs:
       - data/previews/binarized_preview.nc:
           persist: true
   find_contours:
-    cmd:
-      - boilercv-pipeline
-      - stage
-      - find-contours
-      - --scale
-      - ${scale}
+    cmd: boilercv-pipeline stage find-contours --format ${scale}
     deps:
       - pipeline/boilercv_pipeline/stages/find_contours
       - data/sources
       - data/rois
+    params:
+      - scale
     outs:
       - data/contours:
           persist: true
   fill:
-    cmd:
-      - boilercv-pipeline
-      - stage
-      - fill
-      - --scale
-      - ${scale}
+    cmd: boilercv-pipeline stage fill --format ${scale}
     deps:
       - pipeline/boilercv_pipeline/stages/fill
       - data/sources
       - data/rois
       - data/contours
+    params:
+      - scale
     outs:
       - data/filled:
           persist: true
   preview_filled:
-    cmd:
-      - boilercv-pipeline
-      - stage
-      - preview-filled
-      - --scale
-      - ${scale}
+    cmd: boilercv-pipeline stage preview-filled --format ${scale}
     deps:
       - pipeline/boilercv_pipeline/stages/preview_filled
       - data/filled
       - data/rois
+    params:
+      - scale
     outs:
       - data/previews/filled_preview.nc:
           persist: true
   get_thermal_data:
     cmd:
-      - boilercv-pipeline
-      - stage
-      - get-thermal-data
-      - --scale
-      - ${scale}
-      - --sample
-      - ${sample}
-      - --only-sample
-      - ${only_sample}
-      - --load-src-from-outs
-      - ${load_src_from_outs}
+      boilercv-pipeline stage get-thermal-data --format ${scale} --sample ${sample}
+      --only-sample ${only_sample} --load-src-from-outs ${load_src_from_outs}
     deps:
       - pipeline/boilercv_pipeline/stages/get_thermal_data
       - docs/notebooks/get_thermal_data.ipynb
       - data/thermal
       - data/models
+    params:
+      - scale
+      - sample
+      - only_sample
+      - load_src_from_outs
     outs:
       - data/e230920/thermal.h5:
           persist: true
@@ -138,28 +110,22 @@ stages:
       - data/e230920/thermal_plots/superheat.png
   find_objects:
     cmd:
-      - boilercv-pipeline
-      - stage
-      - find-objects
-      - --scale
-      - ${scale}
-      - --sample
-      - ${sample}
-      - --only-sample
-      - ${only_sample}
-      - --frame-count
-      - ${frame_count}
-      - --frame-step
-      - ${frame_step}
-      - --compare-with-trackpy
-      - ${compare_with_trackpy}
-      - --guess-diameter
-      - ${guess_diameter}
+      boilercv-pipeline stage find-objects --format ${scale} --sample ${sample}
+      --only-sample ${only_sample} --frame-count ${frame_count} --frame-step ${frame_step}
+      --compare-with-trackpy ${compare_with_trackpy} --guess-diameter ${guess_diameter}
     deps:
       - pipeline/boilercv_pipeline/stages/find_objects
       - docs/notebooks/find_objects.ipynb
       - data/filled
       - data/contours
+    params:
+      - scale
+      - sample
+      - only_sample
+      - frame_count
+      - frame_step
+      - compare_with_trackpy
+      - guess_diameter
     outs:
       - data/e230920/objects:
           persist: true
@@ -167,25 +133,20 @@ stages:
       - data/e230920/objects_plots/composite.png
   find_tracks:
     cmd:
-      - boilercv-pipeline
-      - stage
-      - find-tracks
-      - --scale
-      - ${scale}
-      - --sample
-      - ${sample}
-      - --only-sample
-      - ${only_sample}
-      - --frame-count
-      - ${frame_count}
-      - --frame-step
-      - ${frame_step}
+      boilercv-pipeline stage find-tracks --format ${scale} --sample ${sample} --only-sample
+      ${only_sample} --frame-count ${frame_count} --frame-step ${frame_step}
     deps:
       - pipeline/boilercv_pipeline/stages/find_tracks
       - docs/notebooks/find_tracks.ipynb
       - data/filled
       - data/e230920/objects
       - data/e230920/thermal.h5
+    params:
+      - scale
+      - sample
+      - only_sample
+      - frame_count
+      - frame_step
     outs:
       - data/e230920/tracks:
           persist: true
@@ -194,20 +155,17 @@ stages:
       - data/e230920/tracks_plots/multi.png
   get_mae:
     cmd:
-      - boilercv-pipeline
-      - stage
-      - get-mae
-      - --scale
-      - ${scale}
-      - --sample
-      - ${sample}
-      - --only-sample
-      - ${only_sample}
+      boilercv-pipeline stage get-mae --format ${scale} --sample ${sample} --only-sample
+      ${only_sample}
     deps:
       - pipeline/boilercv_pipeline/stages/get_mae
       - docs/notebooks/get_mae.ipynb
       - data/e230920/thermal.h5
       - data/e230920/tracks
+    params:
+      - scale
+      - sample
+      - only_sample
     outs:
       - data/e230920/mae:
           persist: true
