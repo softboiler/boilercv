@@ -51,6 +51,7 @@ dependencies = [
 deps = ["docs/pyproject.toml"]
 code = ["docs"]
 ignore_undeclared = [
+  "boilercv_docs",
   "boilercv_pipeline",
   "boilercv_tests",
   "boilercv_tools",

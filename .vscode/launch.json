@@ -27,7 +27,6 @@
       "name": "Python: Current file",
       "type": "debugpy",
       "request": "launch",
-      // "purpose": ["debug-in-terminal", "debug-test"],
       "program": "${file}",
       "console": "internalConsole",
       "env": {
