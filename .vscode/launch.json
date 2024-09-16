@@ -46,17 +46,6 @@
       }
     },
     {
-      "name": "Python: Debug bootstrapping Python install script",
-      "type": "debugpy",
-      "request": "launch",
-      "python": "${workspaceFolder}/bin/sys_venv/bin/python",
-      "program": "${workspaceFolder}/scripts/install.py",
-      "env": {
-        "BOILERCV_DEBUG": "True",
-        "BOILERCV_PREVIEW": "True"
-      }
-    },
-    {
       "name": "Python: Build docs",
       "type": "debugpy",
       "request": "launch",

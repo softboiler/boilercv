@@ -117,15 +117,7 @@ showcontent = true
 
 [tool.pyright]
 stubPath = "submodules/stubs/stubs"
-exclude = [
-  "**/node_modules",
-  "**/__pycache__",
-  "**/.*",
-  ".cache",
-  "bin",
-  "submodules",
-  "scripts/install.py",
-]
+exclude = ["**/node_modules", "**/__pycache__", "**/.*", ".cache", "bin", "submodules"]
 ignore = ["**/node_modules", "**/__pycache__", "**/.*", ".cache", "bin"]
 typeCheckingMode = "strict"
 # Default "true" in strict
@@ -225,7 +217,7 @@ reportUnusedCallResult = "none"
 
 [tool.ruff]
 cache-dir = ".cache/.ruff_cache"
-extend-exclude = ["bin", "submodules", "scripts/install.py"]
+extend-exclude = ["bin", "submodules"]
 extend-include = ["*.ipynb"]
 src = ["src", "docs", "pipeline", "scripts", "tests"]
 output-format = "grouped"
