@@ -118,15 +118,15 @@ showcontent = true
 [tool.pyright]
 stubPath = "submodules/stubs/stubs"
 exclude = [
-  "**/.*",
-  "**/__pycache__",
   "**/node_modules",
+  "**/__pycache__",
+  "**/.*",
   ".cache",
   "bin",
   "submodules",
   "scripts/install.py",
 ]
-ignore = ["**/.*", "**/__pycache__", "**/node_modules", ".cache", "bin"]
+ignore = ["**/node_modules", "**/__pycache__", "**/.*", ".cache", "bin"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true
