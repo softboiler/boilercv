@@ -4,32 +4,19 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from pydantic import BaseModel, field_validator
+from pydantic import BaseModel
 
 from boilercv.contexts import CONTEXT
+from boilercv.validators import context_field_validator
 from boilercv_pipeline.models import dvc
-from boilercv_pipeline.models.contexts import BOILERCV_PIPELINE, ROOTED
-from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
+from boilercv_pipeline.models.contexts import DVC, ROOTED
+from boilercv_pipeline.models.contexts.types import BoilercvPipelineFieldValidationInfo
 from boilercv_pipeline.models.path import (
-    BoilercvPipelineCtxModel,
+    BoilercvPipelineContextModel,
     DataDir,
     get_boilercv_pipeline_config,
 )
 from boilercv_pipeline.models.paths import paths
-
-
-def get_dvc_stage(
-    pipeline_type: type[BoilercvPipelineCtxModel], dvc_model: dvc.DvcYamlModel
-) -> dvc.Stage:
-    """Get DVC stage."""
-    name = pipeline_type.__module__.split(".")[-1]
-    if stage := dvc_model.stages.get(name):
-        if not isinstance(stage, dvc.Stage):
-            raise TypeError(f"Expected stage `{name}` to be a {dvc.Stage}.")
-        return stage
-    stage = dvc.Stage(cmd=f"boilercv-pipeline stage {name.replace('_', '-')}")
-    dvc_model.stages[name] = stage
-    return stage
 
 
 class Constants(BaseModel):
@@ -48,36 +35,32 @@ class Constants(BaseModel):
 const = Constants()
 
 
-class Stage(BoilercvPipelineCtxModel):
+class Stage(BoilercvPipelineContextModel):
     """Base of pipeline stage models."""
 
     model_config = get_boilercv_pipeline_config(ROOTED, kinds_from=paths)
 
 
-class StagePaths(BoilercvPipelineCtxModel):
+class StagePaths(BoilercvPipelineContextModel):
     """Paths for stage dependencies and outputs."""
 
     model_config = get_boilercv_pipeline_config(ROOTED, kinds_from=paths)
 
-    @field_validator("*", mode="after")
+    @context_field_validator("*", mode="after")
     @classmethod
     def dvc_validate_out(
-        cls, value: Path, info: BoilercvPipelineValidationInfo
+        cls, value: Path, info: BoilercvPipelineFieldValidationInfo
     ) -> Path:
         """Serialize path for `dvc.yaml`."""
-        if (
-            info.field_name != CONTEXT
-            and (ctx := info.context[BOILERCV_PIPELINE]).sync_dvc
-        ):
-            stage = get_dvc_stage(cls, ctx.dvc)
+        if info.field_name != CONTEXT and (dvc := info.context.get(DVC)):
             path = Path(value).resolve().relative_to(Path.cwd())
             if info.field_name == "plots":
                 if plots := [p.as_posix() for p in path.iterdir()]:
-                    stage.plots.extend(plots)
+                    dvc.stage.plots.extend(plots)
                 return value
             path = path.as_posix()
             kind = "deps" if issubclass(cls, Deps) else "outs"
-            getattr(stage, kind).append(
+            getattr(dvc.stage, kind).append(
                 path
                 if kind == "deps"
                 else (

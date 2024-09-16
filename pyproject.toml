@@ -27,7 +27,7 @@ dependencies = [
   "numpydantic>=1.0.0",
   "pandas[hdf5,performance]>=2.2.2",
   "pillow>=10.3.0",
-  "pydantic>=2.6.1",
+  "pydantic>=2.8.2",
   "pytz>=2023.3",
   "sympy>=1.12",
   "typing_extensions>=4.12.2",
@@ -307,6 +307,18 @@ convention = "numpy"
   "F821", # Allow undefined names, such as `display`
   "S101", # Allow assert
   "T201", # Allow print in notebooks
+]
+"src/boilercv/serializers/**/*.py" = [
+  "D10",  # Allow missing docstrings in serializers that closely mirror Pydantic
+  "N802", # Classlike function names in serializers that closely mirror Pydantic
+]
+"src/boilercv/validators/**/*.py" = [
+  "D10",  # Allow missing docstrings in validators that closely mirror Pydantic
+  "N802", # Classlike function names in validators that closely mirror Pydantic
+]
+"tests/boilercv_tests/test_context_validators_serializers.py" = [
+  "D10",  # Allow missing docstrings in validators that closely mirror Pydantic
+  "N802", # Classlike function names in validators that closely mirror Pydantic
 ]
 "scripts/boilercv_tools/add_changes.py" = [
   "S603", # Allow shell expressions here

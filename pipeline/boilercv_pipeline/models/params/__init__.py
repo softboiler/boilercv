@@ -11,26 +11,28 @@ import matplotlib
 from cappa.arg import Arg
 from IPython.display import Markdown, display
 from matplotlib.axes import Axes
-from more_itertools import last, only
 from numpy import set_printoptions
 from pandas import DataFrame, options
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field
 from seaborn import move_legend, set_theme
 
-from boilercv_pipeline.models import dvc
+from boilercv.validators import context_field_validator, context_model_validator
+from boilercv_pipeline.models import dvc as _dvc
 from boilercv_pipeline.models.column import Col
 from boilercv_pipeline.models.column.types import Ps
-from boilercv_pipeline.models.contexts import BOILERCV_PIPELINE
-from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
+from boilercv_pipeline.models.contexts import DVC
+from boilercv_pipeline.models.contexts.types import (
+    BoilercvPipelineFieldValidationInfo,
+    BoilercvPipelineValidationInfo,
+)
 from boilercv_pipeline.models.params.types import (
     Data_T,
     Deps_T,
     FloatParam,
     Outs_T,
-    Param,
     Preview,
 )
-from boilercv_pipeline.models.stage import Stage, get_dvc_stage
+from boilercv_pipeline.models.stage import Stage
 
 
 class Constants(BaseModel):
@@ -41,11 +43,6 @@ class Constants(BaseModel):
 
 
 const = Constants()
-
-
-def get_param(metadata: list[Any]) -> Param | None:
-    """Get a parameter type from metadata."""
-    return only(m for m in metadata if isinstance(m, Param))
 
 
 def set_display_options(
@@ -111,37 +108,31 @@ def get_floatfmt(precision: int = 3) -> str:
 class StageParams(Stage):
     """Stage parameters."""
 
-    @field_validator("*", mode="after", check_fields=False)
+    @context_field_validator("*", mode="after")
     @classmethod
-    def dvc_validate_param(
-        cls, value: bool, info: BoilercvPipelineValidationInfo
+    def dvc_add_param(
+        cls, value: bool, info: BoilercvPipelineFieldValidationInfo
     ) -> bool:
-        """Validate param for `dvc.yaml`."""
+        """Add param to `dvc.yaml`."""
         if (
-            (field := info.field_name)
-            and (ctx := info.context[BOILERCV_PIPELINE]).sync_dvc
-            and (param := get_param(cls.model_fields[field].metadata))
-        ):
-            stage: dvc.Stage = (
-                last(ctx.dvc.stages.values())  # pyright: ignore[reportArgumentType]
-                if issubclass(cls, Format)
-                else get_dvc_stage(cls, ctx.dvc)
+            (dvc := info.context.get(DVC))
+            and (info.field_name not in dvc.stage.params)
+            and (
+                (ann := (param := cls.model_fields[info.field_name]).annotation)
+                in {bool, int, float, str}
             )
-            match param:
-                case Param.any:
-                    stage.cmd = " ".join([
-                        *(
-                            stage.cmd
-                            if isinstance(stage.cmd, list)
-                            else stage.cmd.split(" ")
-                        ),
-                        f"--{field.replace('_', '-')}",
-                        f"${{{field}}}",
+        ):
+            match ann:
+                case bool():
+                    dvc.cmd = " ".join([
+                        *(dvc.cmd if isinstance(dvc.cmd, list) else dvc.cmd.split(" ")),
+                        f"--{info.field_name.replace('_', '-')}",
+                        f"${{{info.field_name}}}",
                     ])
                 case _:
                     raise ValueError(f"Got unsupported parameter kind `{param}`")
-            stage.params.append(field)
-            ctx.dvc_params[field] = value
+            dvc.stage.params.append(info.field_name)
+            dvc.params[info.field_name] = value
         return value
 
 
@@ -228,6 +219,21 @@ def get_format(v) -> Format:
 
 class Params(StageParams, Generic[Deps_T, Outs_T]):
     """Stage parameters."""
+
+    @context_model_validator(mode="before")
+    @classmethod
+    def dvc_prepare_stage(
+        cls, data: dict[str, Any], info: BoilercvPipelineValidationInfo
+    ) -> dict[str, Any]:
+        """Validate param for `dvc.yaml`."""
+        if dvc := info.context.get(DVC):
+            name = cls.__module__.split(".")[-1]
+            stage = dvc.model.stages.get(name, dvc.stage)
+            if not isinstance(stage, _dvc.Stage):
+                raise TypeError(f"Expected stage `{name}` to be a {_dvc.Stage}.")
+            dvc.model.stages[name] = stage
+            dvc.cmd = f"boilercv-pipeline stage {name.replace('_', '-')}"
+        return data
 
     deps: Deps_T
     """Stage dependencies."""

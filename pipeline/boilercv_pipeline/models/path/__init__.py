@@ -6,12 +6,12 @@ from collections.abc import Mapping
 from functools import partial
 from pathlib import Path
 from re import search
-from typing import Annotated, ClassVar, Self, TypeAlias
+from typing import Annotated as Ann
+from typing import ClassVar, Self, TypeAlias
 
 from boilercore.paths import ISOLIKE, dt_fromisolike
 from cappa.arg import Arg
 from pydantic import (
-    AfterValidator,
     DirectoryPath,
     FilePath,
     SerializerFunctionWrapHandler,
@@ -26,10 +26,14 @@ from boilercv.contexts.types import (
     Data,
     PluginConfigDict,
 )
+from boilercv.serializers import ContextWrapSerializer
+from boilercv.validators import ContextAfterValidator
 from boilercv_pipeline.models.contexts import (
     BOILERCV_PIPELINE,
+    DVC,
+    BoilercvPipelineContext,
     BoilercvPipelineCtx,
-    BoilercvPipelineCtxDict,
+    DvcCtx,
     Roots,
 )
 from boilercv_pipeline.models.contexts.types import (
@@ -57,31 +61,31 @@ def get_time(path: Path) -> str:
 
 def get_boilercv_pipeline_context(
     roots: Roots | None = None,
-    kinds_from: BoilercvPipelineCtxModel | None = None,
+    kinds_from: BoilercvPipelineContextModel | None = None,
     track_kinds: bool = False,
     sync_dvc: bool = False,
-) -> BoilercvPipelineCtxDict:
+) -> BoilercvPipelineContext:
     """Context for {mod}`~boilercv_pipeline`."""
-    ctx_from: BoilercvPipelineCtxDict = getattr(
+    ctx_from: BoilercvPipelineContext = getattr(
         kinds_from,
         "context",
-        BoilercvPipelineCtxDict(boilercv_pipeline=BoilercvPipelineCtx()),
+        BoilercvPipelineContext(boilercv_pipeline=BoilercvPipelineCtx()),
     )
-    return BoilercvPipelineCtxDict(
+    return BoilercvPipelineContext(
         boilercv_pipeline=BoilercvPipelineCtx(
             roots=roots or Roots(),
             kinds=ctx_from[BOILERCV_PIPELINE].kinds,
             track_kinds=track_kinds,
-            sync_dvc=sync_dvc,
-        )
+        ),
+        **({DVC: DvcCtx()} if sync_dvc else {}),
     )
 
 
 def get_boilercv_pipeline_config(
     roots: Roots | None = None,
-    kinds_from: BoilercvPipelineCtxModel | None = None,
+    kinds_from: BoilercvPipelineContextModel | None = None,
     track_kinds: bool = False,
-    sync_dvc: bool = False,
+    dvc: bool = False,
 ) -> BoilercvPipelineConfigDict:
     """Model config for {mod}`~boilercv_pipeline`."""
     return PluginConfigDict(
@@ -91,20 +95,21 @@ def get_boilercv_pipeline_config(
                 roots=roots,
                 kinds_from=kinds_from,
                 track_kinds=track_kinds,
-                sync_dvc=sync_dvc,
+                sync_dvc=dvc,
             )
         ),
     )
 
 
-HiddenContext: TypeAlias = Annotated[BoilercvPipelineCtxDict, Arg(hidden=True)]
+HiddenContext = Ann[BoilercvPipelineContext, Arg(hidden=True)]
+"""Pipeline context as a hidden argument."""
 
 
-class BoilercvPipelineCtxModel(ContextModel):
+class BoilercvPipelineContextModel(ContextModel):
     """Context model for {mod}`~boilercv_pipeline`."""
 
     model_config: ClassVar[BoilercvPipelineConfigDict] = get_boilercv_pipeline_config()  # pyright: ignore[reportIncompatibleVariableOverride]
-    context: HiddenContext = BoilercvPipelineCtxDict(  # pyright: ignore[reportIncompatibleVariableOverride]
+    context: HiddenContext = BoilercvPipelineContext(  # pyright: ignore[reportIncompatibleVariableOverride]
         boilercv_pipeline=BoilercvPipelineCtx()
     )
 
@@ -116,7 +121,7 @@ class BoilercvPipelineCtxModel(ContextModel):
         context_base: Context | None = None,
     ) -> Context:
         """Get context from data."""
-        return BoilercvPipelineCtxDict({  # pyright: ignore[reportArgumentType]
+        return BoilercvPipelineContext({  # pyright: ignore[reportArgumentType]
             k: (
                 {BOILERCV_PIPELINE: BoilercvPipelineCtx}[k].model_validate(v)
                 if isinstance(v, Mapping)
@@ -179,34 +184,32 @@ def ser_rooted_path(
     )
 
 
-FilePathSerPosix: TypeAlias = Annotated[FilePath, WrapSerializer(resolve_path)]
+FilePathSerPosix: TypeAlias = Ann[FilePath, WrapSerializer(resolve_path)]
 """Directory path that serializes as POSIX."""
-DirectoryPathSerPosix: TypeAlias = Annotated[
-    DirectoryPath, WrapSerializer(resolve_path)
-]
+DirectoryPathSerPosix: TypeAlias = Ann[DirectoryPath, WrapSerializer(resolve_path)]
 """Directory path that serializes as POSIX."""
-DataDir: TypeAlias = Annotated[
+DataDir: TypeAlias = Ann[
     Path,
-    AfterValidator(partial(make_path, key="data", file=False)),
-    WrapSerializer(partial(ser_rooted_path, key="data")),
+    ContextAfterValidator(partial(make_path, key="data", file=False)),
+    ContextWrapSerializer(partial(ser_rooted_path, key="data")),
 ]
 """Data directory path made upon validation."""
-DataFile: TypeAlias = Annotated[
+DataFile: TypeAlias = Ann[
     Path,
-    AfterValidator(partial(make_path, key="data", file=True)),
-    WrapSerializer(partial(ser_rooted_path, key="data")),
+    ContextAfterValidator(partial(make_path, key="data", file=True)),
+    ContextWrapSerializer(partial(ser_rooted_path, key="data")),
 ]
 """Data file path made upon validation."""
-DocsDir: TypeAlias = Annotated[
+DocsDir: TypeAlias = Ann[
     Path,
-    AfterValidator(partial(make_path, key="docs", file=False)),
-    WrapSerializer(partial(ser_rooted_path, key="docs")),
+    ContextAfterValidator(partial(make_path, key="docs", file=False)),
+    ContextWrapSerializer(partial(ser_rooted_path, key="docs")),
 ]
 """Docs directory path made upon validation."""
-DocsFile: TypeAlias = Annotated[
+DocsFile: TypeAlias = Ann[
     Path,
-    AfterValidator(partial(make_path, key="docs", file=True)),
-    WrapSerializer(partial(ser_rooted_path, key="docs")),
+    ContextAfterValidator(partial(make_path, key="docs", file=True)),
+    ContextWrapSerializer(partial(ser_rooted_path, key="docs")),
 ]
 """Docs file path made upon validation."""
 
