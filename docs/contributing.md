@@ -310,7 +310,7 @@ This repository features tooling that bootstraps the entire development environm
 
 - Sets some environment variables and error handling.
 - Installs [`uv`](https://github.com/astral-sh/uv).
-- Creates a virtual enviornment of the appropriate Python version.
+- Creates a virtual environment.
 - Syncs submodules.
 - Syncs a Python [virtual environment](#virtual-environment) to platform-specific dependencies in `lock.json`.
 - Installs pre-commit hooks.

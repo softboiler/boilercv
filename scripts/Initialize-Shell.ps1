@@ -40,7 +40,7 @@ function Set-Env {
     }
     if (!(Get-Command 'boilercv_tools' -ErrorAction 'Ignore')) {
         'Installing tools' | Write-Progress
-        uv tool install --python-version $Version --resolution 'lowest-direct' 'scripts/.'
+        uv tool install --python $Version --resolution 'lowest-direct' 'scripts/.'
         'Tools installed' | Write-Progress -Done
     }
 

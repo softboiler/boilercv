@@ -170,7 +170,7 @@
       "backgroundColor": "transparent",
       "bold": false,
       "italic": false
-    },
+    }
   ],
   //* GitHub Actions
   "github-actions.workflows.pinned.workflows": [".github/workflows/ci.yml"],
@@ -263,5 +263,5 @@
   "evenBetterToml.taplo.configFile.path": ".taplo.toml",
   //! Other
   //? Other automatically added settings below
-  "": "",
+  "": ""
 }
