@@ -3,7 +3,6 @@
 from datetime import date
 from hashlib import sha256
 from pathlib import Path
-from typing import Annotated
 
 from pydantic import BaseModel, Field
 from ruamel.yaml import YAML
@@ -60,18 +59,14 @@ def dpath(path: Path, rel: Path = rooted_paths.docs) -> str:
 class Answers(BaseModel, extra="ignore"):
     """Answers."""
 
-    user: Annotated[str, Field(alias="project_owner_github_username")]
+    user: str = Field(alias="project_owner_github_username")
     """Name of the project owner."""
-    repo: Annotated[str, Field(alias="github_repo_name")]
+    repo: str = Field(alias="github_repo_name")
     """GitHub repository name."""
-    package: Annotated[str, Field(alias="project_name")]
+    package: str = Field(alias="project_name")
     """Package name."""
-    version: Annotated[str, Field(alias="project_version")]
+    version: str = Field(alias="project_version")
     """Package version."""
-
-
-# ? Force rebuild to resolve Sphinx build issue
-Answers.model_rebuild()
 
 
 class Constants(BaseModel):
