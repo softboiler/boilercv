@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated as Ann
 
 from cappa.arg import Arg
 from cappa.base import command
@@ -26,5 +26,5 @@ class Outs(stage.Outs):
 class Fill(Params[Deps, Outs]):
     """Fill bubble contours."""
 
-    deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
-    outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
+    deps: Ann[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
+    outs: Ann[Outs, Arg(hidden=True)] = Field(default_factory=Outs)

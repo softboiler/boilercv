@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated as Ann
 
 from cappa.arg import Arg
 from cappa.base import command
@@ -21,5 +21,5 @@ class Outs(stage.Outs):
 class SkipCloud(Params[Deps, Outs]):
     """The outs of this stage are too large and unwieldy to cache or push to cloud storage."""
 
-    deps: Annotated[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
-    outs: Annotated[Outs, Arg(hidden=True)] = Field(default_factory=Outs)
+    deps: Ann[Deps, Arg(hidden=True)] = Field(default_factory=Deps)
+    outs: Ann[Outs, Arg(hidden=True)] = Field(default_factory=Outs)

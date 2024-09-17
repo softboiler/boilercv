@@ -2,12 +2,10 @@
 
 # TODO: https://github.com/softboiler/boilercv/issues/232
 # pyright:reportInvalidTypeVarUse=none
-
 from collections.abc import Callable, Mapping
 from dataclasses import asdict, dataclass
 from typing import (
     TYPE_CHECKING,
-    Annotated,
     Any,
     Literal,
     ParamSpec,
@@ -17,6 +15,7 @@ from typing import (
     _LiteralGenericAlias,  # pyright: ignore[reportAttributeAccessIssue]
     overload,
 )
+from typing import Annotated as Ann
 
 import sympy
 from numpydantic import NDArray, Shape
@@ -216,7 +215,7 @@ VALIDATORS: dict[Validator, Any] = {
 """Validators."""
 
 S = TypeVar(
-    "S", bound=Annotated[LiteralKeys, TypeValidator(str), StrSerializer("json")] | str
+    "S", bound=Ann[LiteralKeys, TypeValidator(str), StrSerializer("json")] | str
 )
 """Keys representing symbols."""
 
@@ -240,16 +239,14 @@ def sympify_expr(expr: str | sympy.Eq, sympify_params: SympifyParams):
 # * MARK: Annotated types for Pydantic
 
 
-Basic: TypeAlias = Annotated[
-    sympy.Basic, TypeValidator(sympy.Basic), StrSerializer("json")
-]
+Basic: TypeAlias = Ann[sympy.Basic, TypeValidator(sympy.Basic), StrSerializer("json")]
 """Annotated {class}`~sympy.core.basic.Basic` suitable for use in Pydantic models."""
 
 
 trivial = sympy.Eq(1, 0, evaluate=False)
 """Trivial equation that won't evaluate to a `True` instance of `sympy.boolean.linalg.BooleanAtom`."""
 
-Eq: TypeAlias = Annotated[
+Eq: TypeAlias = Ann[
     Basic,
     BeforeValidator(validator(SympifyParams)(sympify_expr)),
     BeforeValidator(
@@ -268,7 +265,7 @@ Eq: TypeAlias = Annotated[
 ]
 """{data}`~boilercv.correlations.types.Basic` narrowed to {class}`~sympy.core.relational.Eq`."""
 
-Expr: TypeAlias = Annotated[
+Expr: TypeAlias = Ann[
     Basic,
     BeforeValidator(validator(SympifyParams)(sympify_expr)),
     TypeValidator(sympy.Expr, "after"),
@@ -279,7 +276,7 @@ trivial_expr = sympy.Expr()
 """Trivial boolean that won't evaluate to a `True` instance of `sympy.boolean.linalg.BooleanAtom`."""
 
 
-AnyExpr: TypeAlias = Annotated[
+AnyExpr: TypeAlias = Ann[
     Basic,
     BeforeValidator(validator(SympifyParams)(sympify_expr)),
     BeforeValidator(

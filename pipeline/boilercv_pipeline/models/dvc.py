@@ -22,7 +22,8 @@ limitations under the License.
 """
 
 from types import NoneType
-from typing import Annotated, Any, TypeAlias
+from typing import Annotated as Ann
+from typing import Any, TypeAlias
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -77,10 +78,10 @@ class PlotFlags(OutFlags):
     """Default plot template"""
 
 
-X: TypeAlias = Annotated[dict[FilePath, PlotColumn] | None, Field(default=None)]
+X: TypeAlias = Ann[dict[FilePath, PlotColumn] | None, Field(default=None)]
 
 
-Y: TypeAlias = Annotated[dict[FilePath, PlotColumns] | None, Field(default=None)]
+Y: TypeAlias = Ann[dict[FilePath, PlotColumns] | None, Field(default=None)]
 
 
 class TopLevelPlotFlags(DvcBaseModel):
@@ -99,7 +100,7 @@ class TopLevelPlotFlags(DvcBaseModel):
     """Default plot template"""
 
 
-EmptyTopLevelPlotFlags: TypeAlias = Annotated[NoneType, Field(default=None)]
+EmptyTopLevelPlotFlags: TypeAlias = Ann[NoneType, Field(default=None)]
 
 
 class TopLevelArtifactFlags(DvcBaseModel):
@@ -116,7 +117,7 @@ class TopLevelArtifactFlags(DvcBaseModel):
     """Labels for the artifact"""
 
 
-DepModel: TypeAlias = Annotated[
+DepModel: TypeAlias = Ann[
     FilePath,
     Field(description="Path to a dependency (input) file or directory for the stage."),
 ]
@@ -125,18 +126,16 @@ DepModel: TypeAlias = Annotated[
 Dependencies: TypeAlias = list[DepModel]
 
 
-ParamKey: TypeAlias = Annotated[
-    str, Field(description="Parameter name (dot-separated).")
-]
+ParamKey: TypeAlias = Ann[str, Field(description="Parameter name (dot-separated).")]
 
 
-CustomParamFileKeys: TypeAlias = Annotated[
+CustomParamFileKeys: TypeAlias = Ann[
     dict[FilePath, list[ParamKey]],
     Field(description="Path to YAML/JSON/TOML/Python params file."),
 ]
 
 
-EmptyParamFileKeys: TypeAlias = Annotated[
+EmptyParamFileKeys: TypeAlias = Ann[
     dict[FilePath, None],
     Field(description="Path to YAML/JSON/TOML/Python params file."),
 ]
@@ -148,7 +147,7 @@ Param = ParamKey | CustomParamFileKeys | EmptyParamFileKeys
 Params = list[Param]
 
 
-Out: TypeAlias = Annotated[
+Out: TypeAlias = Ann[
     FilePath | dict[FilePath, OutFlags],
     Field(description="Path to an output file or dir of the stage."),
 ]
@@ -157,23 +156,23 @@ Out: TypeAlias = Annotated[
 Outs = list[Out]
 
 
-Metric: TypeAlias = Annotated[
+Metric: TypeAlias = Ann[
     FilePath | dict[FilePath, OutFlags],
     Field(description="Path to a JSON/TOML/YAML metrics output of the stage."),
 ]
 
 
-Plot: TypeAlias = Annotated[
+Plot: TypeAlias = Ann[
     FilePath | dict[FilePath, PlotFlags],
     Field(
         description="""Path to plots file or dir of the stage.\n\nData files may be JSON/YAML/CSV/TSV.\n\nImage files may be JPEG/GIF/PNG."""
     ),
 ]
 Plots = list[Plot]
-VarPath: TypeAlias = Annotated[
+VarPath: TypeAlias = Ann[
     str, Field(description="Path to params file with values for substitution.")
 ]
-VarDecl: TypeAlias = Annotated[
+VarDecl: TypeAlias = Ann[
     dict[VarKey, Any], Field(description="Dict of values for substitution.")
 ]
 Vars = list[VarPath | VarDecl]
@@ -216,7 +215,7 @@ class Stage(DvcBaseModel):
     """Additional information/metadata"""
 
 
-ParametrizedString: TypeAlias = Annotated[str, Field(pattern=r"^\$\{.*?\}$")]
+ParametrizedString: TypeAlias = Ann[str, Field(pattern=r"^\$\{.*?\}$")]
 
 
 class ForeachDo(DvcBaseModel):
@@ -238,7 +237,7 @@ TopLevelPlots: TypeAlias = dict[
     PlotIdOrFilePath, TopLevelPlotFlags | EmptyTopLevelPlotFlags
 ]
 TopLevelPlotsList: TypeAlias = list[PlotIdOrFilePath | TopLevelPlots]
-ArtifactIdOrFilePath: TypeAlias = Annotated[
+ArtifactIdOrFilePath: TypeAlias = Ann[
     str, Field(pattern=r"^[a-z0-9]([a-z0-9-/]*[a-z0-9])?$")
 ]
 TopLevelArtifacts: TypeAlias = dict[ArtifactIdOrFilePath, TopLevelArtifactFlags]
