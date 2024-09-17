@@ -4,15 +4,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from context_models import CONTEXT
+from context_models.validators import context_field_validator
+from context_models.validators.types import ContextValidationInfo
 from pydantic import BaseModel
 
-from boilercv.contexts import CONTEXT
-from boilercv.validators import context_field_validator
 from boilercv_pipeline.models import dvc
-from boilercv_pipeline.models.contexts import DVC, ROOTED
-from boilercv_pipeline.models.contexts.types import BoilercvPipelineFieldValidationInfo
+from boilercv_pipeline.models.contexts import DVC, ROOTED, BoilercvPipelineContexts
 from boilercv_pipeline.models.path import (
-    BoilercvPipelineContextModel,
+    BoilercvPipelineContextStore,
     DataDir,
     get_boilercv_pipeline_config,
 )
@@ -35,13 +35,13 @@ class Constants(BaseModel):
 const = Constants()
 
 
-class Stage(BoilercvPipelineContextModel):
+class Stage(BoilercvPipelineContextStore):
     """Base of pipeline stage models."""
 
     model_config = get_boilercv_pipeline_config(ROOTED, kinds_from=paths)
 
 
-class StagePaths(BoilercvPipelineContextModel):
+class StagePaths(BoilercvPipelineContextStore):
     """Paths for stage dependencies and outputs."""
 
     model_config = get_boilercv_pipeline_config(ROOTED, kinds_from=paths)
@@ -49,7 +49,7 @@ class StagePaths(BoilercvPipelineContextModel):
     @context_field_validator("*", mode="after")
     @classmethod
     def dvc_validate_out(
-        cls, value: Path, info: BoilercvPipelineFieldValidationInfo
+        cls, value: Path, info: ContextValidationInfo[BoilercvPipelineContexts]
     ) -> Path:
         """Serialize path for `dvc.yaml`."""
         if info.field_name != CONTEXT and (dvc := info.context.get(DVC)):

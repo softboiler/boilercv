@@ -18,6 +18,7 @@ classifiers = [
   # "Programming Language :: Python :: 3.14",  # ? Not yet beta (https://peps.python.org/pep-0745)
 ]
 dependencies = [
+  "context-models>=0.0.1",
   "matplotlib>=3.7.2",
   "numpy>=1.24.4",
   "numpydantic>=1.0.0",
@@ -26,7 +27,6 @@ dependencies = [
   "pydantic>=2.9.1",
   "pytz>=2023.3",
   "sympy>=1.12",
-  "typing_extensions>=4.12.2",
   "xarray[accel,io,parallel]>=2023.7.0",
   # ? https://github.com/softboiler/boilercv/issues/213
   "netcdf4>=1.6.5",
@@ -60,6 +60,7 @@ code = ["src"]
 ignore_undeclared = ["_typeshed"]
 ignore_unused = ["netcdf4"]
 [tool.fawltydeps.custom_mapping]
+context_models = ["context_models"]
 pydantic = ["pydantic", "pydantic_core"]
 
 [tool.pytest.ini_options]
@@ -295,18 +296,6 @@ convention = "numpy"
   "F821", # Allow undefined names, such as `display`
   "S101", # Allow assert
   "T201", # Allow print in notebooks
-]
-"src/boilercv/serializers/**/*.py" = [
-  "D10",  # Allow missing docstrings in serializers that closely mirror Pydantic
-  "N802", # Classlike function names in serializers that closely mirror Pydantic
-]
-"src/boilercv/validators/**/*.py" = [
-  "D10",  # Allow missing docstrings in validators that closely mirror Pydantic
-  "N802", # Classlike function names in validators that closely mirror Pydantic
-]
-"tests/boilercv_tests/test_context_validators_serializers.py" = [
-  "D10",  # Allow missing docstrings in validators that closely mirror Pydantic
-  "N802", # Classlike function names in validators that closely mirror Pydantic
 ]
 "scripts/boilercv_tools/add_changes.py" = [
   "S603", # Allow shell expressions here

@@ -2,12 +2,13 @@
 
 from typing import TypeAlias
 
-from boilercv.contexts.types import (
+from context_models.types import (
     ContextPluginSettings,
     PluginConfigDict,
     SerializationInfo,
     ValidationInfo,
 )
+
 from boilercv.pipelines.contexts import PipelineCtxDict
 
 PipelineConfigDict: TypeAlias = PluginConfigDict[ContextPluginSettings[PipelineCtxDict]]

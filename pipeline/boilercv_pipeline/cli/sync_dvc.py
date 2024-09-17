@@ -8,16 +8,16 @@ from types import NoneType
 from typing import Any, ClassVar, get_args
 
 from cappa.base import command
+from context_models import CONTEXT
 from more_itertools import one
 from pydantic import BaseModel, Field, create_model
 from yaml import safe_dump
 
-from boilercv.contexts import CONTEXT
 from boilercv_pipeline.cli.types import Model_T, RelativePath, Stages
 from boilercv_pipeline.models import dvc as _dvc
 from boilercv_pipeline.models.contexts import BOILERCV_PIPELINE, DVC, PARAMS, ROOTED
 from boilercv_pipeline.models.path import (
-    BoilercvPipelineContextModel,
+    BoilercvPipelineContextStore,
     get_boilercv_pipeline_config,
 )
 
@@ -66,7 +66,7 @@ class SyncDVC(BaseModel):
     @classmethod
     def get_dvc_model(cls) -> SyncedDvcModel:
         """Get DVC model."""
-        Model = BoilercvPipelineContextModel  # noqa: N806
+        Model = BoilercvPipelineContextStore  # noqa: N806
         config = Model.model_config
         try:
             Model.model_config = get_boilercv_pipeline_config(ROOTED, dvc=True)

@@ -3,10 +3,10 @@
 from pathlib import Path
 from typing import Any, NotRequired
 
+from context_models.types import Context
 from more_itertools import only
 from pydantic import BaseModel, Field
 
-from boilercv.contexts.types import Context
 from boilercv_pipeline.config import const
 from boilercv_pipeline.models.contexts.types import Kinds
 from boilercv_pipeline.models.dvc import DvcYamlModel, Stage
@@ -34,7 +34,7 @@ ROOTED = Roots(data=const.data, docs=const.docs)
 """Paths rooted to their directories."""
 
 
-class DvcCtx(BaseModel):
+class DvcContext(BaseModel):
     """DVC context."""
 
     model: DvcYamlModel = Field(default_factory=DvcYamlModel)
@@ -61,7 +61,7 @@ class DvcCtx(BaseModel):
         self.stage.cmd = cmd
 
 
-class BoilercvPipelineCtx(BaseModel):
+class BoilercvPipelineContext(BaseModel):
     """Root directory context."""
 
     roots: Roots = Field(default_factory=Roots)
@@ -72,8 +72,8 @@ class BoilercvPipelineCtx(BaseModel):
     """Whether to track kinds."""
 
 
-class BoilercvPipelineContext(Context):
+class BoilercvPipelineContexts(Context):
     """Boilercv pipeline context."""
 
-    boilercv_pipeline: BoilercvPipelineCtx
-    boilercv_dvc: NotRequired[DvcCtx]
+    boilercv_pipeline: BoilercvPipelineContext
+    boilercv_dvc: NotRequired[DvcContext]

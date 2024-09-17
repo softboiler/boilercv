@@ -9,6 +9,7 @@ from typing import Any, Generic
 
 import matplotlib
 from cappa.arg import Arg
+from context_models.validators import context_field_validator, context_model_validator
 from IPython.display import Markdown, display
 from matplotlib.axes import Axes
 from numpy import set_printoptions
@@ -16,15 +17,11 @@ from pandas import DataFrame, options
 from pydantic import BaseModel, Field
 from seaborn import move_legend, set_theme
 
-from boilercv.validators import context_field_validator, context_model_validator
 from boilercv_pipeline.models import dvc as _dvc
 from boilercv_pipeline.models.column import Col
 from boilercv_pipeline.models.column.types import Ps
 from boilercv_pipeline.models.contexts import DVC
-from boilercv_pipeline.models.contexts.types import (
-    BoilercvPipelineFieldValidationInfo,
-    BoilercvPipelineValidationInfo,
-)
+from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
 from boilercv_pipeline.models.params.types import (
     Data_T,
     Deps_T,
@@ -110,9 +107,7 @@ class StageParams(Stage):
 
     @context_field_validator("*", mode="after")
     @classmethod
-    def dvc_add_param(
-        cls, value: bool, info: BoilercvPipelineFieldValidationInfo
-    ) -> bool:
+    def dvc_add_param(cls, value: bool, info: BoilercvPipelineValidationInfo) -> bool:
         """Add param to `dvc.yaml`."""
         if (
             (dvc := info.context.get(DVC))

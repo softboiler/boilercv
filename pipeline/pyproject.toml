@@ -11,6 +11,7 @@ dependencies = [
   "boilercine>=2024.1.1",
   "boilercore>=2024.1.3",
   "cappa>=0.22.4",
+  "context-models>=0.0.1",
   "cmasher>=1.7.2",
   "colorcet>=3.0.1",
   "copykitten>=1.1.1",
@@ -57,4 +58,5 @@ ignore_unused = [
 [tool.fawltydeps.custom_mapping]
 boilercine = ["boilercine"]
 boilercore = ["boilercore"]
+context_models = ["context_models"]
 ipykernel = ["IPython"]

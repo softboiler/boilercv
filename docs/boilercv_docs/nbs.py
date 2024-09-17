@@ -11,12 +11,12 @@ from IPython.utils.capture import capture_output
 from boilercv_docs.config import default
 from boilercv_docs.models.paths import rooted_paths
 from boilercv_docs.types import BuildMode
-from boilercv_pipeline.models.contexts import BoilercvPipelineContext, Roots
+from boilercv_pipeline.models.contexts import BoilercvPipelineContexts, Roots
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 from boilercv_tools.warnings import filter_boilercv_warnings
 
 
-def init(force_mode: BuildMode = default.build.mode) -> BoilercvPipelineContext:
+def init(force_mode: BuildMode = default.build.mode) -> BoilercvPipelineContexts:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
     filter_boilercv_warnings()

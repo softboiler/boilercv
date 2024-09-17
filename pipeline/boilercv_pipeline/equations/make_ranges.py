@@ -1,11 +1,11 @@
 """Make empty ranges file."""
 
+from context_models.mappings import sync
 from cyclopts import App
 from tomlkit import parse
 
 from boilercv.correlations import RANGES_TOML
 from boilercv.correlations.models import Equations
-from boilercv.mappings import sync
 from boilercv_pipeline.equations import SYMS, get_raw_equations_context, make_raw
 
 APP = App()

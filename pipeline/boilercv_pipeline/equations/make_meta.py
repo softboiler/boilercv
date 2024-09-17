@@ -1,11 +1,11 @@
 """Make empty meta file."""
 
+from context_models.mappings import sync
 from cyclopts import App
 from tomlkit import TOMLDocument, parse
 
 from boilercv.correlations import META_TOML
 from boilercv.correlations.models import Metadata
-from boilercv.mappings import sync
 from boilercv.pipelines.contexts import get_pipeline_context
 
 APP = App()

@@ -13,3 +13,6 @@
 [submodule "cachier"]
 	path = submodules/cachier
 	url = https://github.com/blakeNaccarato/cachier.git
+[submodule "context_models"]
+	path = submodules/context_models
+	url = https://github.com/softboiler/context_models.git

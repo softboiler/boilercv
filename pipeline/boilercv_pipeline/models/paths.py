@@ -5,7 +5,7 @@ from typing import get_args
 
 from boilercv_pipeline.models.generated.types.stages import StageName
 from boilercv_pipeline.models.path import (
-    BoilercvPipelineContextModel,
+    BoilercvPipelineContextStore,
     DataDir,
     DataFile,
     DocsFile,
@@ -13,7 +13,7 @@ from boilercv_pipeline.models.path import (
 )
 
 
-class Paths(BoilercvPipelineContextModel):
+class Paths(BoilercvPipelineContextStore):
     """Pipeline paths."""
 
     model_config = get_boilercv_pipeline_config(track_kinds=True)

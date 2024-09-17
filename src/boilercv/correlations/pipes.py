@@ -8,10 +8,10 @@ from re import Pattern, compile
 from string import whitespace
 from typing import Any
 
+from context_models.mappings import Repl, replace, replace_pattern, sort_by_keys_pattern
 from sympy import Symbol, symbols
 
 from boilercv.correlations.types import CVL, Kind, P, Ps, R, SympifyParams, Transform
-from boilercv.mappings import Repl, replace, replace_pattern, sort_by_keys_pattern
 from boilercv.morphs import Morph
 from boilercv.pipelines import Defaults, compose_context
 from boilercv.pipelines.contexts import PipelineCtx

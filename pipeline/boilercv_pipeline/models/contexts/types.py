@@ -3,30 +3,24 @@
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal, TypeAlias
 
-from boilercv.contexts.types import ContextPluginSettings, PluginConfigDict
-from boilercv.serializers.types import (
-    ContextFieldSerializationInfo,
-    ContextSerializationInfo,
-)
-from boilercv.validators.types import ContextFieldValidationInfo, ContextValidationInfo
+from context_models.serializers.types import ContextSerializationInfo
+from context_models.types import ContextPluginSettings, PluginConfigDict
+from context_models.validators.types import ContextValidationInfo
 
 if TYPE_CHECKING:
-    from boilercv_pipeline.models.contexts import BoilercvPipelineContext
+    from boilercv_pipeline.models.contexts import BoilercvPipelineContexts
 
 BoilercvPipelineConfigDict: TypeAlias = PluginConfigDict[
-    ContextPluginSettings["BoilercvPipelineContext"]
+    ContextPluginSettings["BoilercvPipelineContexts"]
 ]
 BoilercvPipelineValidationInfo: TypeAlias = ContextValidationInfo[
-    "BoilercvPipelineContext"
-]
-BoilercvPipelineFieldValidationInfo: TypeAlias = ContextFieldValidationInfo[
-    "BoilercvPipelineContext"
+    "BoilercvPipelineContexts"
 ]
 BoilercvPipelineSerializationInfo: TypeAlias = ContextSerializationInfo[
-    "BoilercvPipelineContext"
+    "BoilercvPipelineContexts"
 ]
-BoilercvPipelineFieldSerializationInfo: TypeAlias = ContextFieldSerializationInfo[
-    "BoilercvPipelineContext"
+BoilercvPipelineFieldSerializationInfo: TypeAlias = ContextSerializationInfo[
+    "BoilercvPipelineContexts"
 ]
 Kind: TypeAlias = Literal["DataDir", "DataFile", "DocsDir", "DocsFile"]
 """File or directory kind."""

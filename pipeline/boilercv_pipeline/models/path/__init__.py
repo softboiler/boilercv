@@ -11,6 +11,10 @@ from typing import ClassVar, Self, TypeAlias
 
 from boilercore.paths import ISOLIKE, dt_fromisolike
 from cappa.arg import Arg
+from context_models import ContextStore
+from context_models.serializers import ContextWrapSerializer
+from context_models.types import Context, ContextPluginSettings, Data, PluginConfigDict
+from context_models.validators import ContextAfterValidator
 from pydantic import (
     DirectoryPath,
     FilePath,
@@ -19,21 +23,12 @@ from pydantic import (
     model_validator,
 )
 
-from boilercv.contexts import ContextModel
-from boilercv.contexts.types import (
-    Context,
-    ContextPluginSettings,
-    Data,
-    PluginConfigDict,
-)
-from boilercv.serializers import ContextWrapSerializer
-from boilercv.validators import ContextAfterValidator
 from boilercv_pipeline.models.contexts import (
     BOILERCV_PIPELINE,
     DVC,
     BoilercvPipelineContext,
-    BoilercvPipelineCtx,
-    DvcCtx,
+    BoilercvPipelineContexts,
+    DvcContext,
     Roots,
 )
 from boilercv_pipeline.models.contexts.types import (
@@ -61,29 +56,29 @@ def get_time(path: Path) -> str:
 
 def get_boilercv_pipeline_context(
     roots: Roots | None = None,
-    kinds_from: BoilercvPipelineContextModel | None = None,
+    kinds_from: BoilercvPipelineContextStore | None = None,
     track_kinds: bool = False,
     sync_dvc: bool = False,
-) -> BoilercvPipelineContext:
+) -> BoilercvPipelineContexts:
     """Context for {mod}`~boilercv_pipeline`."""
-    ctx_from: BoilercvPipelineContext = getattr(
+    ctx_from: BoilercvPipelineContexts = getattr(
         kinds_from,
         "context",
-        BoilercvPipelineContext(boilercv_pipeline=BoilercvPipelineCtx()),
+        BoilercvPipelineContexts(boilercv_pipeline=BoilercvPipelineContext()),
     )
-    return BoilercvPipelineContext(
-        boilercv_pipeline=BoilercvPipelineCtx(
+    return BoilercvPipelineContexts(
+        boilercv_pipeline=BoilercvPipelineContext(
             roots=roots or Roots(),
             kinds=ctx_from[BOILERCV_PIPELINE].kinds,
             track_kinds=track_kinds,
         ),
-        **({DVC: DvcCtx()} if sync_dvc else {}),
+        **({DVC: DvcContext()} if sync_dvc else {}),
     )
 
 
 def get_boilercv_pipeline_config(
     roots: Roots | None = None,
-    kinds_from: BoilercvPipelineContextModel | None = None,
+    kinds_from: BoilercvPipelineContextStore | None = None,
     track_kinds: bool = False,
     dvc: bool = False,
 ) -> BoilercvPipelineConfigDict:
@@ -101,16 +96,16 @@ def get_boilercv_pipeline_config(
     )
 
 
-HiddenContext = Ann[BoilercvPipelineContext, Arg(hidden=True)]
+HiddenContext = Ann[BoilercvPipelineContexts, Arg(hidden=True)]
 """Pipeline context as a hidden argument."""
 
 
-class BoilercvPipelineContextModel(ContextModel):
+class BoilercvPipelineContextStore(ContextStore):
     """Context model for {mod}`~boilercv_pipeline`."""
 
     model_config: ClassVar[BoilercvPipelineConfigDict] = get_boilercv_pipeline_config()  # pyright: ignore[reportIncompatibleVariableOverride]
-    context: HiddenContext = BoilercvPipelineContext(  # pyright: ignore[reportIncompatibleVariableOverride]
-        boilercv_pipeline=BoilercvPipelineCtx()
+    context: HiddenContext = BoilercvPipelineContexts(  # pyright: ignore[reportIncompatibleVariableOverride]
+        boilercv_pipeline=BoilercvPipelineContext()
     )
 
     @classmethod
@@ -121,9 +116,9 @@ class BoilercvPipelineContextModel(ContextModel):
         context_base: Context | None = None,
     ) -> Context:
         """Get context from data."""
-        return BoilercvPipelineContext({  # pyright: ignore[reportArgumentType]
+        return BoilercvPipelineContexts({  # pyright: ignore[reportArgumentType]
             k: (
-                {BOILERCV_PIPELINE: BoilercvPipelineCtx}[k].model_validate(v)
+                {BOILERCV_PIPELINE: BoilercvPipelineContext}[k].model_validate(v)
                 if isinstance(v, Mapping)
                 else v
             )

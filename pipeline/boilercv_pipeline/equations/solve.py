@@ -5,6 +5,7 @@ from tomllib import loads
 from warnings import catch_warnings, filterwarnings
 
 import sympy
+from context_models.mappings import filt, sync
 from cyclopts import App
 from loguru import logger
 from numpy import finfo
@@ -16,7 +17,6 @@ from tqdm import tqdm
 from boilercv.correlations.models import Solutions, SolvedEquations, SymbolSolutions
 from boilercv.correlations.pipes import LocalSymbols
 from boilercv.correlations.types import Corr, Equation, trivial
-from boilercv.mappings import filt, sync
 from boilercv.morphs import Morph
 from boilercv.pipelines.contexts import PipelineCtxDict, get_pipeline_context
 from boilercv_pipeline.equations import EQUATIONS, SOLUTIONS, SOLVE_SYMS, SUBSTITUTIONS

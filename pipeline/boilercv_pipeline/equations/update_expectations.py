@@ -4,6 +4,7 @@ from inspect import Signature, getmembers, isfunction
 from tomllib import loads
 from typing import cast
 
+from context_models.mappings import sync
 from cyclopts import App
 from tomlkit import TOMLDocument, parse
 from tqdm import tqdm
@@ -12,7 +13,6 @@ from boilercv.correlations import SYMBOLS, beta
 from boilercv.correlations.models import Expectations
 from boilercv.correlations.pipes import equation_name_pattern
 from boilercv.correlations.types import Corr
-from boilercv.mappings import sync
 from boilercv_pipeline.equations import EXPECTATIONS, SUBSTITUTIONS
 
 default_substitutions = cast(

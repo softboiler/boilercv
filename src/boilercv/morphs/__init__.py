@@ -6,9 +6,9 @@ from collections.abc import Mapping
 from contextlib import suppress
 from typing import Any, Generic, Self, TypeVar, get_args, get_type_hints, overload
 
+from context_models import RootMapping
 from pydantic import ValidationError, model_validator
 
-from boilercv.contexts import RootMapping
 from boilercv.morphs.types import (
     RK,
     RV,

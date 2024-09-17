@@ -9,10 +9,10 @@ from functools import partial
 from itertools import chain
 from typing import Any, ClassVar, Generic, Self, get_args
 
+from context_models import ContextBase, context_validate_before
+from context_models.types import ContextPluginSettings, PluginConfigDict
 from pydantic import BaseModel, model_validator
 
-from boilercv.contexts import ContextBase, context_validate_before
-from boilercv.contexts.types import ContextPluginSettings, PluginConfigDict
 from boilercv.morphs import Morph
 from boilercv.pipelines.contexts import (
     PipelineContext,

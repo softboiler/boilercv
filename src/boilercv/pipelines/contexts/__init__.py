@@ -8,7 +8,8 @@ from dataclasses import dataclass, field
 from itertools import chain
 from typing import Any, Self
 
-from boilercv.contexts.types import Context
+from context_models.types import Context
+
 from boilercv.pipelines.pipes import ContextValue
 from boilercv.pipelines.pipes.types import CV, AnyPipe
 
