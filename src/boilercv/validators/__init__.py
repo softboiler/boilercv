@@ -44,6 +44,7 @@ from pydantic._internal._decorators import (
     ModelValidatorDecoratorInfo,
     PydanticDescriptorProxy,
 )
+from pydantic_core import PydanticUndefined
 from pydantic_core.core_schema import (
     NoInfoValidatorFunction,
     NoInfoWrapValidatorFunction,
@@ -56,21 +57,16 @@ from boilercv.validators.types import (
     AnyContextModelWrapValidator,
     AnyModeBeforeValidator,
     Before,
-    FieldMode,
-    # FieldMode,
-    # FieldModeNoWrap,
+    BeforePlain,
+    FieldValidatorModes,
     Mode,
     Model_T,
+    V2BeforeAfterOrPlainContextValidatorType,
+    V2ContextWrapValidatorType,
     WithInfoContextValidatorFunction,
     WithInfoContextWrapValidatorFunction,
     Wrap,
 )
-
-# if TYPE_CHECKING:
-#     from boilercv.validators.types import (
-#         V2BeforeAfterOrPlainContextValidatorType,
-#         V2ContextWrapValidatorType,
-#     )
 
 
 @overload
@@ -98,28 +94,52 @@ def context_model_validator(*, mode: Mode) -> Any:
     return model_validator(mode=mode)
 
 
-# @overload
-# def context_field_validator(
-#     field: str,
-#     /,
-#     *fields: str,
-#     mode: FieldModeNoWrap = ...,
-#     check_fields: bool | None = ...,
-# ) -> Callable[
-#     [V2BeforeAfterOrPlainContextValidatorType], V2BeforeAfterOrPlainContextValidatorType
-# ]: ...
-# @overload
-# def context_field_validator(
-#     field: str, /, *fields: str, mode: Wrap = ..., check_fields: bool | None = ...
-# ) -> Callable[[V2ContextWrapValidatorType], V2ContextWrapValidatorType]: ...
+@overload
 def context_field_validator(
     field: str,
     /,
     *fields: str,
-    mode: FieldMode = "after",
+    mode: Wrap,
+    check_fields: bool | None = ...,
+    json_schema_input_type: Any = ...,
+) -> Callable[[V2ContextWrapValidatorType], V2ContextWrapValidatorType]: ...
+@overload
+def context_field_validator(
+    field: str,
+    /,
+    *fields: str,
+    mode: BeforePlain,
+    check_fields: bool | None = ...,
+    json_schema_input_type: Any = ...,
+) -> Callable[
+    [V2BeforeAfterOrPlainContextValidatorType], V2BeforeAfterOrPlainContextValidatorType
+]: ...
+@overload
+def context_field_validator(
+    field: str,
+    /,
+    *fields: str,
+    mode: After = ...,
+    check_fields: bool | None = ...,
+    json_schema_input_type: Any = ...,
+) -> Callable[
+    [V2BeforeAfterOrPlainContextValidatorType], V2BeforeAfterOrPlainContextValidatorType
+]: ...
+def context_field_validator(
+    field: str,
+    /,
+    *fields: str,
+    mode: FieldValidatorModes = "after",
     check_fields: bool | None = None,
+    json_schema_input_type: Any = PydanticUndefined,
 ) -> Callable[[Any], Any]:
-    return field_validator(field, *fields, mode=mode, check_fields=check_fields)
+    return field_validator(  # pyright: ignore[reportCallIssue]
+        field,
+        *fields,
+        mode=mode,  # pyright: ignore[reportArgumentType]
+        check_fields=check_fields,
+        json_schema_input_type=json_schema_input_type,
+    )
 
 
 if TYPE_CHECKING:

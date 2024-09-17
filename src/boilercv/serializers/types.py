@@ -30,7 +30,7 @@ SOFTWARE.
 """
 
 from collections.abc import Callable
-from typing import Any, Literal, Protocol, TypeAlias
+from typing import Any, Literal, Protocol, TypeAlias, TypeVar
 
 from pydantic import SerializationInfo, SerializerFunctionWrapHandler
 from pydantic_core.core_schema import (
@@ -45,7 +45,7 @@ class ContextSerializationInfo(SerializationInfo, Protocol[Context_T_out]):
     """Pydantic validation info with a guaranteed context."""
 
     @property
-    def context(self) -> Context_T_out: ...
+    def context(self) -> Context_T_out: ...  # pyright: ignore[incompatibleMethodOverride]
 
 
 class ContextFieldSerializationInfo(
@@ -55,8 +55,38 @@ class ContextFieldSerializationInfo(
     def field_name(self) -> str: ...
 
 
-WhenUsed: TypeAlias = Literal["always", "unless-none", "json", "json-unless-none"]
+ContextModelPlainSerializerWithInfo: TypeAlias = Callable[
+    [Any, ContextSerializationInfo[Context_T_out]], Any
+]
+ModelPlainSerializerWithoutInfo: TypeAlias = Callable[[Any], Any]
+ContextModelPlainSerializer: TypeAlias = (
+    ContextModelPlainSerializerWithInfo[Context_T_out] | ModelPlainSerializerWithoutInfo
+)
+ContextModelWrapSerializerWithInfo: TypeAlias = Callable[
+    [Any, SerializerFunctionWrapHandler, ContextSerializationInfo[Context_T_out]], Any
+]
+ModelWrapSerializerWithoutInfo: TypeAlias = Callable[
+    [Any, SerializerFunctionWrapHandler], Any
+]
+ContextModelWrapSerializer: TypeAlias = (
+    ContextModelWrapSerializerWithInfo[Context_T_out] | ModelWrapSerializerWithoutInfo
+)
+ContextModelSerializer: TypeAlias = (
+    ContextModelPlainSerializer[Context_T_out]
+    | ContextModelWrapSerializer[Context_T_out]
+)
 
+# ? `Any` because higher-kinded types aren't supported
+AnyContextModelPlainSerializer: TypeAlias = ContextModelPlainSerializer[Any]
+ContextModelPlainSerializer_T = TypeVar(
+    "ContextModelPlainSerializer_T", bound=AnyContextModelPlainSerializer
+)
+AnyContextModelWrapSerializer: TypeAlias = ContextModelWrapSerializer[Any]
+ContextModelWrapSerializer_T = TypeVar(
+    "ContextModelWrapSerializer_T", bound=AnyContextModelWrapSerializer
+)
+
+WhenUsed: TypeAlias = Literal["always", "unless-none", "json", "json-unless-none"]
 GeneralContextWrapInfoSerializerFunction: TypeAlias = Callable[
     [Any, SerializerFunctionWrapHandler, ContextSerializationInfo[Context_T_out]], Any
 ]

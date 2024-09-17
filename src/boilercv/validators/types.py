@@ -30,6 +30,7 @@ SOFTWARE.
 """
 
 from collections.abc import Callable
+from functools import partialmethod
 from typing import Any, Literal, Protocol, TypeAlias, TypeVar
 
 from pydantic import ValidationInfo, ValidatorFunctionWrapHandler
@@ -39,6 +40,10 @@ from pydantic.functional_validators import (
     ModelBeforeValidatorWithoutInfo,
     ModelWrapValidatorHandler,
     ModelWrapValidatorWithoutInfo,
+)
+from pydantic_core.core_schema import (
+    NoInfoValidatorFunction,
+    NoInfoWrapValidatorFunction,
 )
 
 from boilercv.contexts.types import Context_T_in, Context_T_out
@@ -115,50 +120,58 @@ Mode: TypeAlias = Literal["wrap", "before", "after"]
 Wrap: TypeAlias = Literal["wrap"]
 Before: TypeAlias = Literal["before"]
 After: TypeAlias = Literal["after"]
-FieldMode: TypeAlias = Literal["before", "after", "wrap", "plain"]
-# FieldModeNoWrap: TypeAlias = Literal["before", "after", "plain"]
 
-# if TYPE_CHECKING:
+FieldValidatorModes: TypeAlias = Literal["before", "after", "wrap", "plain"]
+BeforePlain: TypeAlias = Literal["before", "plain"]
 
-#     class V2ContextValidatorClsMethod(Protocol[Context_T_in]):
-#         def __call__(
-#             self, cls: Any, value: Any, info: ContextValidationInfo[Context_T_in], /
-#         ) -> Any: ...
 
-#     class V2ContextWrapValidatorClsMethod(Protocol[Context_T_in]):
-#         def __call__(
-#             self,
-#             cls: Any,
-#             value: Any,
-#             handler: ValidatorFunctionWrapHandler,
-#             info: ContextValidationInfo[Context_T_in],
-#             /,
-#         ) -> Any: ...
+class OnlyValueValidatorClsMethod(Protocol):
+    def __call__(self, cls: Any, value: Any, /) -> Any: ...
 
-#     class OnlyValueValidatorClsMethod(Protocol):
-#         def __call__(self, cls: Any, value: Any, /) -> Any: ...
 
-#     V2ContextValidator: TypeAlias = (
-#         V2ContextValidatorClsMethod[Context]
-#         | WithInfoContextValidatorFunction[Context]
-#         | OnlyValueValidatorClsMethod
-#         | NoInfoValidatorFunction
-#     )
-#     V2ContextWrapValidator: TypeAlias = (
-#         V2ContextWrapValidatorClsMethod[Context]
-#         | WithInfoContextWrapValidatorFunction[Context]
-#     )
+class V2ContextValidatorClsMethod(Protocol[Context_T_in]):
+    def __call__(
+        self, cls: Any, value: Any, info: ContextValidationInfo[Context_T_in], /
+    ) -> Any: ...
 
-#     PartialClsOrStaticMethod: TypeAlias = (
-#         classmethod[Any, Any, Any] | staticmethod[Any, Any] | partialmethod[Any]
-#     )
-#     V2BeforeAfterOrPlainContextValidatorType = TypeVar(
-#         "V2BeforeAfterOrPlainContextValidatorType",
-#         V2ContextValidatorClsMethod[Context],
-#         PartialClsOrStaticMethod,
-#     )
-#     V2ContextWrapValidatorType = TypeVar(
-#         "V2ContextWrapValidatorType",
-#         V2ContextWrapValidatorClsMethod[Context],
-#         PartialClsOrStaticMethod,
-#     )
+
+class OnlyValueWrapValidatorClsMethod(Protocol):
+    def __call__(
+        self, cls: Any, value: Any, handler: ValidatorFunctionWrapHandler, /
+    ) -> Any: ...
+
+
+class V2ContextWrapValidatorClsMethod(Protocol[Context_T_in]):
+    def __call__(
+        self,
+        cls: Any,
+        value: Any,
+        handler: ValidatorFunctionWrapHandler,
+        info: ContextValidationInfo[Context_T_in],
+        /,
+    ) -> Any: ...
+
+
+V2ContextValidator: TypeAlias = (
+    V2ContextValidatorClsMethod[Context_T_in]
+    | WithInfoContextValidatorFunction[Context_T_out]
+    | OnlyValueValidatorClsMethod
+    | NoInfoValidatorFunction
+)
+V2ContextWrapValidator: TypeAlias = (
+    V2ContextWrapValidatorClsMethod[Context_T_in]
+    | WithInfoContextWrapValidatorFunction[Context_T_out]
+    | OnlyValueWrapValidatorClsMethod
+    | NoInfoWrapValidatorFunction
+)
+PartialClsOrStaticMethod: TypeAlias = classmethod | staticmethod | partialmethod[Any]  # pyright: ignore[reportMissingTypeArgument]
+
+# ? `Any` because higher-kinded types aren't supported
+V2BeforeAfterOrPlainContextValidatorType = TypeVar(
+    "V2BeforeAfterOrPlainContextValidatorType",
+    bound=V2ContextValidator[Any, Any] | PartialClsOrStaticMethod,
+)
+V2ContextWrapValidatorType = TypeVar(
+    "V2ContextWrapValidatorType",
+    bound=V2ContextWrapValidator[Any, Any] | PartialClsOrStaticMethod,
+)

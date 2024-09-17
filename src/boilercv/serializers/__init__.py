@@ -29,16 +29,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Generic
+from typing import TYPE_CHECKING, Any, Generic, Literal, overload
 
-from pydantic import PlainSerializer, WrapSerializer
-from pydantic import model_serializer as context_model_serializer  # noqa: F401
+from pydantic import PlainSerializer, WrapSerializer, model_serializer
 from pydantic_core import PydanticUndefined
 from pydantic_core.core_schema import SerializerFunction
 
 from boilercv.contexts.types import Context_T_out
-from boilercv.serializers.types import ContextWrapSerializerFunction, WhenUsed
+from boilercv.serializers.types import (
+    ContextModelPlainSerializer_T,
+    ContextModelWrapSerializer_T,
+    ContextWrapSerializerFunction,
+    WhenUsed,
+)
+
+
+@overload
+def context_model_serializer(
+    f: ContextModelPlainSerializer_T, /
+) -> ContextModelPlainSerializer_T: ...
+@overload
+def context_model_serializer(
+    *, mode: Literal["wrap"], when_used: WhenUsed = "always", return_type: Any = ...
+) -> Callable[[ContextModelWrapSerializer_T], ContextModelWrapSerializer_T]: ...
+@overload
+def context_model_serializer(
+    *,
+    mode: Literal["plain"] = ...,
+    when_used: WhenUsed = "always",
+    return_type: Any = ...,
+) -> Callable[[ContextModelPlainSerializer_T], ContextModelPlainSerializer_T]: ...
+def context_model_serializer(
+    f: ContextModelPlainSerializer_T | ContextModelWrapSerializer_T | None = None,
+    /,
+    *,
+    mode: Literal["plain", "wrap"] = "plain",
+    when_used: WhenUsed = "always",
+    return_type: Any = PydanticUndefined,
+) -> (
+    ContextModelPlainSerializer_T
+    | Callable[[ContextModelWrapSerializer_T], ContextModelWrapSerializer_T]
+    | Callable[[ContextModelPlainSerializer_T], ContextModelPlainSerializer_T]
+):
+    return model_serializer(f, mode=mode, when_used=when_used, return_type=return_type)  # pyright: ignore[reportCallIssue]
+
 
 if TYPE_CHECKING:
 
