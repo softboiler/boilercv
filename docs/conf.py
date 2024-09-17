@@ -70,6 +70,10 @@ class Answers(BaseModel, extra="ignore"):
     """Package version."""
 
 
+# ? Force rebuild to resolve Sphinx build issue
+Answers.model_rebuild()
+
+
 class Constants(BaseModel):
     """Constants."""
 
@@ -87,7 +91,6 @@ class Constants(BaseModel):
     """Copier answers file."""
     authors: str = "Blake Naccarato, Kwang Jin Kim"
     """Authors of the project."""
-    # * MARK:  Template answers
     ans: Answers = Answers(**YAML().load(copier_answers.read_text(encoding="utf-8")))
     """Project template answers."""
     ispx_mapping: dict[str, IspxMappingValue] = {
