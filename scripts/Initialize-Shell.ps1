@@ -163,7 +163,7 @@ function Set-Env {
         Set-Content $RequirementsPath
     Pop-Location
     Move-Item $DefaultLockPath $Lock -Force
-    uv pip sync $Requirements (Get-Item $RequirementsPath)
+    uv pip sync (Get-Item $RequirementsPath)
 
     # ? Get environment variables from `pyproject.toml`
     boilercv_tools init-shell |
