@@ -104,7 +104,7 @@ function Sync-DevEnv {
     # ? Get environment variables to update in `.env`
     $Keys = @()
     $Lines = Get-Content $EnvFile | ForEach-Object {
-        $_ -replace '^(?<Key>.+)=(?<Value>.+)$', {
+        $_ -Replace '^(?<Key>.+)=(?<Value>.+)$', {
             $Key = $_.Groups['Key'].Value
             if ($EnvVars.ContainsKey($Key)) {
                 $Keys += $Key
