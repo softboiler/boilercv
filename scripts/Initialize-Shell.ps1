@@ -110,6 +110,7 @@ function Set-Env {
             return Get-Item 'bin/uv.*'
         }
     }
+    '****** SYNCING' | Write-Progress
     Sync-Uv -Version '0.4.10'
 
     if ($CI) {
@@ -200,17 +201,18 @@ function Set-Env {
 
 Set-Env
 
-'****** RUNNING POST-SYNC TASKS' | Write-Progress
+'RUNNING POST-SYNC TASKS' | Write-Progress
 'CHECKING ENVIRONMENT TYPE' | Write-Progress
 if (!$Release -and $CI) { $msg = 'CI' }
 elseif ($Devcontainer) { $msg = 'devcontainer' }
 elseif ($Release) { $msg = 'release' }
-"Will run $msg steps" | Write-Progress -Info
+else { $msg = 'local' }
 if ($Release) {
     "Finished $msg steps" | Write-Progress -Info
     '****** DONE ******' | Write-Progress -Done
     return
 }
+"Will run $msg steps" | Write-Progress -Info
 if ($CI) { boilercv_tools elevate-pyright-warnings }
 if (!$CI -and !$Devcontainer -and
     (Get-Command -Name 'code' -ErrorAction 'Ignore') -and
@@ -260,4 +262,4 @@ if (!$CI) {
     'PRE-COMMIT HOOKS INSTALLED' | Write-Progress -Done
     '' | Write-Host
 }
-'****** POST-SYNC DONE ******' | Write-Progress -Done
+'****** DONE ******' | Write-Progress -Done
