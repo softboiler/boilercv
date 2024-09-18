@@ -32,18 +32,22 @@ $High = $High ? $High : [bool]$Env:SYNC_PY_HIGH
 $CI = $Env:SYNC_PY_DISABLE_CI ? $null : $Env:CI
 $Devcontainer = $Env:SYNC_PY_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER
 
-if ($CI) {
-    'SYNCING PROJECT WITH TEMPLATE' | Write-Progress
-    try { scripts/Sync-Template.ps1 -Stay } catch
-    [System.Management.Automation.NativeCommandExitException] {
-        git stash save --include-untracked
-        scripts/Sync-Template.ps1 -Stay
-        git stash pop
-        git add .
-    }
-    'PROJECT SYNCED WITH TEMPLATE' | Write-Progress
+# if ($CI) {
+#     'SYNCING PROJECT WITH TEMPLATE' | Write-Progress
+#     try { scripts/Sync-Template.ps1 -Stay } catch
+#     [System.Management.Automation.NativeCommandExitException] {
+#         git stash save --include-untracked
+#         scripts/Sync-Template.ps1 -Stay
+#         git stash pop
+#         git add .
+#     }
+#     'PROJECT SYNCED WITH TEMPLATE' | Write-Progress
+# }
+if (!$CI) {
+    Sync-Uv -Version '0.4.10'
+    Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 | Remove-Item
+    git submodule update --init --merge
 }
-else {Sync-Uv -Version '0.4.10'}
 
 if ($High) { Sync-Env -High } else { Sync-Env }
 if ($Release) { return }
@@ -61,8 +65,6 @@ if ($Devcontainer) {
 
 if ($CI) { dev elevate-pyright-warnings }
 else {
-    Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 | Remove-Item
-    git submodule update --init --merge
     $Hooks = '.git/hooks'
     if (!(Test-Path "$Hooks/post-checkout") -or !(Test-Path "$Hooks/pre-commit") -or
         !(Test-Path "$Hooks/pre-push")
