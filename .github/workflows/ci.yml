@@ -11,8 +11,6 @@ on:
 defaults:
   run:
     shell: "pwsh"
-env:
-  UV_CACHE_DIR: ".cache/uv"
 jobs:
   sync:
     strategy:
@@ -27,6 +25,7 @@ jobs:
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
+          enable-cache: true
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
@@ -37,10 +36,6 @@ jobs:
           path: |
             uv.lock
             requirements/requirements.txt
-      - uses: "actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
-        with:
-          path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
   build-docs:
     needs: "sync"
     strategy:
@@ -55,13 +50,10 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
-        with:
-          path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
+          enable-cache: true
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
@@ -98,13 +90,10 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
-        with:
-          path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
+          enable-cache: true
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
@@ -123,13 +112,10 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
-        with:
-          path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
+          enable-cache: true
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
@@ -151,17 +137,15 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
-        with:
-          path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
+          enable-cache: true
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Env.ps1; Add-Content $GITHUB_PATH ($PWD/.venv/bin, $PWD/.venv/scripts)"
+      - run: |
+          "scripts/Sync-Env.ps1; Add-Content $GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts")
       - uses: "jakebailey/pyright-action@3bdde3b31d26f0f1f5de051b1fbd7a536a9a4e7f" # v2.3.1
         with:
           pylance-version: "${{ env.PYRIGHT_PYTHON_PYLANCE_VERSION }}"
@@ -188,13 +172,10 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
-        with:
-          path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
+          enable-cache: true
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
@@ -232,13 +213,10 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
-      - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
-        with:
-          path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
+          enable-cache: true
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
