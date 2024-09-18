@@ -13,7 +13,6 @@ defaults:
     shell: "pwsh"
 env:
   UV_CACHE_DIR: ".cache/uv"
-  UV_SYSTEM_PYTHON: "true"
 jobs:
   sync:
     strategy:
