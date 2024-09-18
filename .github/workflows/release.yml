@@ -29,9 +29,6 @@ jobs:
         with:
           version: "0.4.10"
           enable-cache: true
-      - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
-        with:
-          python-version: "${{ matrix.python }}"
       - run: "scripts/Sync-Env.ps1 -Release; uv build"
       - uses: actions/attest-build-provenance@5e9cb68e95676991667494a6a4e59b8a2f13e1d0 # v1.3.3
         with:

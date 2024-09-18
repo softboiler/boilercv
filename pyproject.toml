@@ -172,7 +172,17 @@ showcontent = true
 
 [tool.pyright]
 stubPath = "typings/stubs"
-exclude = ["**/node_modules", "**/__pycache__", "**/.*", ".cache", "bin", "submodules"]
+exclude = [
+  "**/node_modules",
+  "**/__pycache__",
+  "**/.*",
+  ".cache",
+  "bin",
+  "packages/boilercine",
+  "packages/boilercore",
+  "packages/cachier",
+  "packages/context_models",
+]
 ignore = ["**/node_modules", "**/__pycache__", "**/.*", ".cache", "bin"]
 typeCheckingMode = "strict"
 # Default "true" in strict
@@ -272,8 +282,8 @@ reportUnusedCallResult = "none"
 
 [tool.ruff]
 cache-dir = ".cache/.ruff_cache"
-extend-exclude = ["bin", "submodules"]
-extend-include = ["*.ipynb"]
+extend-exclude = ["bin", "packages"]
+extend-include = ["*.ipynb", "packages/_dev", "packages/pipeline"]
 src = ["src", "docs", "pipeline", "scripts", "tests"]
 output-format = "grouped"
 fix = true
