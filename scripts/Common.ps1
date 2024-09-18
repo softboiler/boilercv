@@ -49,7 +49,7 @@ function Sync-Uv {
         if ($IsWindows) { Invoke-RestMethod "https://github.com/astral-sh/uv/releases/download/$Version/uv-installer.ps1" | Invoke-Expression }
         else { curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/astral-sh/uv/releases/download/$Version/uv-installer.sh" | sh }
         Move-Item -Force 'bin/uv.*', 'bin/uvx.*' '.'
-        Remove-Item 'bin'
+        if (!$Env:CI -and (Test-Path 'bin')) { Remove-Item 'bin' }
         if ($OrigCargoHome) { $Env:CARGO_HOME = $OrigCargoHome }
     }
 }

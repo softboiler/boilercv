@@ -1,6 +1,5 @@
 """Configuration."""
 
-import docs
 from boilercore.settings_models import (
     customise_sources,
     get_settings_paths,
@@ -8,6 +7,7 @@ from boilercore.settings_models import (
 )
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
+from dev import docs
 from dev.docs.models import Build
 
 settings_paths = get_settings_paths(docs)
