@@ -19,6 +19,22 @@
   ],
   "customManagers": [
     {
+      "description": "uv",
+      "customType": "regex",
+      "fileMatch": ["^scripts/Sync-Env\\.ps1$"],
+      "matchStrings": ["Sync-Uv -Version '(?<currentValue>.+)'"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "astral-sh/uv"
+    },
+    {
+      "description": "Copier",
+      "customType": "regex",
+      "fileMatch": ["^scripts/Sync-Template\\.ps1$"],
+      "matchStrings": ["$Copier = 'copier@(?<currentValue>.+)'"],
+      "datasourceTemplate": "pypi",
+      "depNameTemplate": "copier"
+    },
+    {
       "description": "Pylance",
       "customType": "regex",
       "fileMatch": [
@@ -39,6 +55,12 @@
   },
   "ignorePaths": ["requirements.txt", "requirements/requirements.txt"],
   "packageRules": [
+    {
+      "description": "Sync uv version",
+      "groupName": "uv",
+      "matchManagers": ["github-actions", "regex"],
+      "matchDepNames": ["astral-sh/uv", "astral-sh/setup-uv"]
+    },
     {
       "description": "Sync with template",
       "groupName": "template",
