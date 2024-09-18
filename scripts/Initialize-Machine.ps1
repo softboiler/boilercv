@@ -1,8 +1,6 @@
 <#.SYNOPSIS
 Finish machine initialization (cross-platform).#>
 
-. scripts/Initialize-Shell.ps1
-
 # ? Set Git username if missing
 try { $name = git config 'user.name' }
 catch [System.Management.Automation.NativeCommandExitException] { $name = '' }
@@ -24,8 +22,4 @@ if (!$email) {
 }
 
 # ? Log in to GitHub API
-if (! (gh auth status)) {
-    'LOGGING IN TO GITHUB API' | Write-Progress
-    gh auth login
-    'GITHUB API LOGIN COMPLETE' | Write-Progress -Done
-}
+if (! (gh auth status)) { gh auth login -Done }
