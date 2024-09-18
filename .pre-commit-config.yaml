@@ -37,7 +37,7 @@ repos:
         pass_filenames: false
         language: "system"
         entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1; scripts/Sync-Py.ps1"
+          pwsh -Command ". scripts/Initialize-Shell.ps1"
       - id: "fawltydeps-src"
         name: "fawltydeps-src"
         pass_filenames: false

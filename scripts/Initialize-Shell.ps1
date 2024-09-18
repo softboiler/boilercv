@@ -1,8 +1,14 @@
-<#
-.SYNOPSIS
-Initialization commands for PowerShell shells in pre-commit and tasks.#>
+<#.SYNOPSIS
+Initialize shell environment.#>
 
-. scripts/Common.ps1
+Param(
+    # Python version.
+    [string]$Version,
+    # Sync to highest dependencies.
+    [switch]$High,
+    # Perform minimal sync for release workflow.
+    [switch]$Release
+)
 
 # ? Error-handling
 $ErrorActionPreference = 'Stop'
@@ -17,15 +23,50 @@ if ($IsWindows) {
     [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 }
 
-# ? Environment setup
+function Find-Pattern {
+    <#.SYNOPSIS
+    Find the first match to a pattern in a string.#>
+    Param(
+        [Parameter(Mandatory)][string]$Pattern,
+        [Parameter(Mandatory, ValueFromPipeline)][string]$String
+    )
+    process {
+        if ($Groups = ($String | Select-String -Pattern $Pattern).Matches.Groups) {
+            return $Groups[1].value
+        }
+    }
+}
+
+$Version = $Version ? $Version : (Get-Content '.copier-answers.yml' |
+        Find-Pattern '^python_version:\s?["'']([^"'']+)["'']$' |
+        Find-Pattern '^([^.]+\.[^.]+).*$')
+$High = $High ? $High : [bool]$Env:SYNC_PY_HIGH
+$CI = $Env:SYNC_PY_DISABLE_CI ? $null : $Env:CI
+$Devcontainer = $Env:SYNC_PY_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER
+
+function Write-Progress {
+    <#.SYNOPSIS
+    Write progress and completion messages.#>
+    Param(
+        [Parameter(Mandatory, ValueFromPipeline)][string]$Message,
+        [switch]$Done,
+        [switch]$Info
+    )
+    begin {
+        $InProgress = !$Done -and !$Info
+        if ($Info) { $Color = 'Magenta' }
+        elseif ($Done) { $Color = 'Green' }
+        else { $Color = 'Yellow' }
+    }
+    process {
+        if ($InProgress) { Write-Host }
+        "$Message$($InProgress ? '...' : '')" | Write-Host -ForegroundColor $Color
+    }
+}
+
 function Set-Env {
     <#.SYNOPSIS
     Activate virtual environment and set environment variables.#>
-
-    Param([string]$Version = $(Get-Content '.copier-answers.yml' |
-                Find-Pattern '^python_version:\s?["'']([^"'']+)["'']$' |
-                Find-Pattern '^([^.]+\.[^.]+).*$')
-    )
 
     # ? Track environment variables to update `.env` with later
     $EnvVars = @{}
@@ -44,17 +85,59 @@ function Set-Env {
     # ? Add local `bin` to path
     $Path = $Env:PATH = "$Bin$Sep$Env:PATH"
     # ? Set `uv` tool directory to local `bin`
-    $Env:UV_TOOL_BIN_DIR = $Bin
-    $EnvVars.Add('UV_TOOL_BIN_DIR', $Bin)
+    $UvToolBinDirKey = 'UV_TOOL_BIN_DIR'
+    Set-Item "Env:$UvToolBinDirKey" $Bin
+    $EnvVars.Add($UvToolBinDirKey, $Bin)
 
-    # ? Sync local `uv` version
-    Sync-Uv
+
+    function Sync-Uv {
+        <#.SYNOPSIS
+        Sync local `uv` version.#>
+        Param([string]$Version)
+        if (Get-Command 'uv' -ErrorAction 'Ignore') { $Uv = 'uv' }
+        else {
+            $Uv = Get-Item 'bin/uv.*' -ErrorAction 'Ignore'
+        }
+        if ((!$Uv -or !(& $Uv --version | Select-String $Version))) {
+            'Installing uv' | Write-Progress
+            $OrigCargoHome = $Env:CARGO_HOME
+            $Env:CARGO_HOME = '.'
+            $Env:INSTALLER_NO_MODIFY_PATH = $true
+            if ($IsWindows) { Invoke-RestMethod "https://github.com/astral-sh/uv/releases/download/$Version/uv-installer.ps1" | Invoke-Expression }
+            else { curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/astral-sh/uv/releases/download/$Version/uv-installer.sh" | sh }
+            if ($OrigCargoHome) { $Env:CARGO_HOME = $OrigCargoHome }
+            'uv installed' | Write-Progress -Done
+            return Get-Item 'bin/uv.*'
+        }
+    }
+    Sync-Uv -Version '0.4.10'
+
+    if ($CI) {
+        'SYNCING PROJECT WITH TEMPLATE' | Write-Progress
+        try { scripts/Sync-Template.ps1 -Stay } catch [System.Management.Automation.NativeCommandExitException] {
+            git stash save --include-untracked
+            scripts/Sync-Template.ps1 -Stay
+            git stash pop
+            git add .
+        }
+        'PROJECT SYNCED WITH TEMPLATE' | Write-Progress
+    }
 
     # ? Sync contributor virtual environment
-    $CI = $Env:SYNC_PY_DISABLE_CI ? $null : $Env:CI
+    $VenvPath = '.venv'
     if (!$CI) {
-        if (!(Test-Path '.venv')) { uv venv --python $Version }
+        if (!(Test-Path $VenvPath)) { uv venv --python $Version }
+
+        # ? Set `uv` project environment to `.venv`
+        $Venv = Get-Item $VenvPath
+        $UvProjectEnvironment = 'UV_PROJECT_ENVIRONMENT'
+        Set-Item "Env:$UvProjectEnvironment" $Venv
+        $EnvVars.Add($UvProjectEnvironment, $Venv)
+
+        # ? Activate the environment
         if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+
+        # ? Recreate and reactivate it if it's the incorrect Python version
         if (!(python --version | Select-String -Pattern $([Regex]::Escape($Version)))) {
             'Virtual environment is the wrong Python version.' | Write-Progress -Info
             'Creating virtual environment with correct Python version' | Write-Progress
@@ -63,11 +146,23 @@ function Set-Env {
             if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
         }
     }
-    if (!(Get-Command 'boilercv_tools' -ErrorAction 'Ignore')) {
-        'Installing tools' | Write-Progress
-        uv tool install --force --python $Version --resolution 'lowest-direct' --editable 'scripts/.'
-        'Tools installed' | Write-Progress -Done
+
+    # ? Sync environment
+    $RequirementsDir = Get-Item 'requirements'
+    $RequirementsPath = $High ? "$RequirementsDir/requirements_high.txt" : "$RequirementsDir/requirements.txt"
+    $DefaultLockPath = "$RequirementsDir/uv.lock"
+    $LockPath = $High ? "$RequirementsDir/uv_high.lock" : 'uv.lock'
+    if (!($Lock = Get-Item $LockPath -ErrorAction 'Ignore')) {
+        New-Item $LockPath
+        $Lock = Get-Item $LockPath
     }
+    Push-Location $RequirementsDir
+    $(if ($High) { uv export --resolution highest } else { uv export --resolution lowest-direct }) |
+        ForEach-Object { $_ -Replace '^\.', '-e ' } |
+        Set-Content $RequirementsPath
+    Pop-Location
+    Move-Item $DefaultLockPath $Lock -Force
+    uv pip sync $Requirements (Get-Item $RequirementsPath)
 
     # ? Get environment variables from `pyproject.toml`
     boilercv_tools init-shell |
@@ -104,3 +199,65 @@ function Set-Env {
 }
 
 Set-Env
+
+'****** RUNNING POST-SYNC TASKS' | Write-Progress
+'CHECKING ENVIRONMENT TYPE' | Write-Progress
+if (!$Release -and $CI) { $msg = 'CI' }
+elseif ($Devcontainer) { $msg = 'devcontainer' }
+elseif ($Release) { $msg = 'release' }
+"Will run $msg steps" | Write-Progress -Info
+if ($Release) {
+    "Finished $msg steps" | Write-Progress -Info
+    '****** DONE ******' | Write-Progress -Done
+    return
+}
+if ($CI) { boilercv_tools elevate-pyright-warnings }
+if (!$CI -and !$Devcontainer -and
+    (Get-Command -Name 'code' -ErrorAction 'Ignore') -and
+    ($Env:PYRIGHT_PYTHON_PYLANCE_VERSION)
+) {
+    'INSTALLING PYLANCE LOCALLY' | Write-Progress
+    $LocalExtensions = '.vscode/extensions'
+    $Pylance = 'ms-python.vscode-pylance'
+    $Install = @(
+        "--extensions-dir=$LocalExtensions",
+        "--install-extension=$Pylance@$Env:PYRIGHT_PYTHON_PYLANCE_VERSION"
+    )
+    code @Install
+    if (!(Test-Path $LocalExtensions)) {
+        'COULD NOT INSTALL PYLANCE LOCALLY' | Write-Progress -Info
+        'PROCEEDING WITHOUT LOCAL PYLANCE INSTALL' | Write-Progress -Done
+    }
+    else {
+        $PylanceExtension = Get-ChildItem -Path $LocalExtensions -Filter "$Pylance-*"
+        # Remove other files
+        Get-ChildItem -Path $LocalExtensions |
+            Where-Object { Compare-Object $_ $PylanceExtension } |
+            Remove-Item -Recurse
+        # Remove local Pylance bundled stubs
+        $PylanceExtension |
+            ForEach-Object { Get-ChildItem "$_/dist/bundled" -Filter '*stubs' } |
+            Remove-Item -Recurse
+        'INSTALLED PYLANCE LOCALLY' | Write-Progress -Done
+    }
+}
+if ($Devcontainer) {
+    $repo = Get-ChildItem '/workspaces'
+    $submodules = Get-ChildItem "$repo/submodules"
+    $safeDirs = @($repo) + $submodules
+    foreach ($dir in $safeDirs) {
+        if (!($safeDirs -contains $dir)) { git config --global --add safe.directory $dir }
+    }
+}
+if (!$CI) {
+    'SYNCING SUBMODULES' | Write-Progress
+    Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 | Remove-Item
+    git submodule update --init --merge
+    'SUBMODULES SYNCED' | Write-Progress -Done
+    '' | Write-Host
+    'INSTALLING PRE-COMMIT HOOKS' | Write-Progress
+    pre-commit install
+    'PRE-COMMIT HOOKS INSTALLED' | Write-Progress -Done
+    '' | Write-Host
+}
+'****** POST-SYNC DONE ******' | Write-Progress -Done

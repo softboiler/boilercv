@@ -11,7 +11,6 @@ Param(
     [switch]$Stay
 )
 begin {
-    . scripts/Initialize-Shell.ps1
     $Template = 'submodules/template'
     $Copier = 'copier@9.2.0'
     $TemplateExists = $Template | Test-Path

@@ -13,7 +13,7 @@
     #   boilercv-pipeline
 accessible-pygments==0.0.5
     # via pydata-sphinx-theme
-aiohttp==3.9.5
+aiohttp==3.10.2
     # via
     #   aiohttp-retry
     #   fsspec
@@ -180,7 +180,7 @@ contourpy==1.2.1
     #   matplotlib
 copykitten==1.1.1
     # via boilercv-pipeline
-cryptography==42.0.8
+cryptography==43.0.1
     # via asyncssh
 cycler==0.12.1
     # via matplotlib
@@ -256,7 +256,7 @@ fastjsonschema==2.20.0
     # via nbformat
 filelock==3.15.4
     # via iterative-telemetry
-fiona==1.9.6
+fiona==1.10.1
     # via geopandas
 flatten-dict==0.4.2
     # via dvc
@@ -411,7 +411,7 @@ jupyter-server==2.14.1
     #   notebook-shim
 jupyter-server-terminals==0.5.3
     # via jupyter-server
-jupyterlab==4.2.3
+jupyterlab==4.2.5
     # via notebook
 jupyterlab-pygments==0.3.0
     # via nbconvert
@@ -525,7 +525,7 @@ networkx==3.3
     # via
     #   dvc
     #   scikit-image
-notebook==7.2.1
+notebook==7.2.2
     # via -r requirements/binder.in
 notebook-shim==0.2.4
     # via
