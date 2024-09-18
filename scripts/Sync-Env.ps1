@@ -49,7 +49,7 @@ if (!$CI) {
     git submodule update --init --merge
 }
 
-if ($High) { Sync-Env -High } else { Sync-Env }
+if ($High) { Sync-DevEnv -High } else { Sync-DevEnv }
 if ($Release) { return }
 
 if ($Devcontainer) {

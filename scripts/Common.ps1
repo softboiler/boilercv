@@ -54,7 +54,7 @@ function Sync-Uv {
     }
 }
 
-function Sync-Env {
+function Sync-DevEnv {
     <#.SYNOPSIS
     Sync virtual environment and set environment variables.#>
 
