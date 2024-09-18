@@ -1,0 +1,65 @@
+[build-system]
+requires = ["hatchling==1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "dev"
+version = "0.0.0"
+description = "Dev"
+dependencies = [
+  # ? Tools
+  "cyclopts==2.9.3",
+  "dulwich==0.22.1",
+  "pydantic-settings>=2.5.2",
+  "python-dotenv==1.0.1",
+  "toml==0.10.2 ; python_version < '3.11'",
+  # ? Core docs
+  "docutils==0.21.2",
+  "more-itertools==10.4.0",
+  "nbformat==5.10.4",
+  "numpydoc==1.7.0",
+  "ruamel-yaml==0.18.6",
+  "sphinx==7.3.7",
+  # ? Other docs
+  "boilercore>=2024.1.3",
+  "colorcet>=3.0.1",
+  "devtools>=0.12.2",
+  "geopandas>=0.14.3",
+  "ipykernel>=6.29.4",
+  "matplotlib>=3.7.2",
+  "numpy>=1.24.4",
+  "pandas[hdf5,performance]>=2.2.2",
+  "pydantic-settings>=2.5.2",
+  "pydantic>=2.9.1",
+  "seaborn>=0.13.2",
+  "shapely>=2.0.3",
+  "sympy>=1.12",
+  "trackpy>=0.6.2",
+  # ? https://nvd.nist.gov/vuln/detail/CVE-2024-37891
+  # ? via sphinx
+  "urllib3>=2.2.2",
+  # ? Core testing
+  "pytest-cov==5.0.0",
+  "pytest-custom-exit-code==0.3.0",
+  "pytest-github-actions-annotate-failures==0.2.0",
+  "pytest==8.2.2",
+  # ? Other testing deps
+  "cachier>=3.0.0",
+  "matplotlib>=3.7.2",
+  "numpy>=1.24.4",
+  "pandas[hdf5,performance]>=2.2.2",
+  "pydantic>=2.9.1",
+  "pydantic-settings>=2.5.2",
+  "seaborn>=0.13.2",
+]
+[project.scripts]
+"dev" = "dev.tools.__main__:main"
+
+[tool.fawltydeps]
+deps = ["packages/_dev/pyproject.toml"]
+code = ["packages/_dev/dev", "docs", "tests"]
+ignore_undeclared = ["boilercore", "boilercv_pipeline", "boilercv"]
+[tool.fawltydeps.custom_mapping]
+boilercore = ["boilercore"]
+ipykernel = ["IPython"]
+ruamel-yaml = ["ruamel"]

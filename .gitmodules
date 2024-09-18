@@ -1,18 +1,15 @@
-[submodule "template"]
-	path = submodules/template
-	url = https://github.com/blakeNaccarato/copier-python.git
 [submodule "stubs"]
-	path = submodules/stubs
+	path = typings
 	url = https://github.com/softboiler/python-type-stubs
 [submodule "boilercine"]
-	path = submodules/boilercine
+	path = packages/boilercine
 	url = https://github.com/softboiler/boilercine.git
 [submodule "boilercore"]
-	path = submodules/boilercore
+	path = packages/boilercore
 	url = https://github.com/softboiler/boilercore.git
 [submodule "cachier"]
-	path = submodules/cachier
+	path = packages/cachier
 	url = https://github.com/blakeNaccarato/cachier.git
 [submodule "context_models"]
-	path = submodules/context_models
+	path = packages/context_models
 	url = https://github.com/softboiler/context_models.git

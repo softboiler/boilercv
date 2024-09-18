@@ -25,7 +25,7 @@ jobs:
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Initialize-Shell.ps1"
+      - run: "scripts/Sync-Env.ps1"
       - uses: "actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b" # v4.3.4
         with:
           name: "lock"
@@ -47,7 +47,7 @@ jobs:
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Initialize-Shell.ps1"
+      - run: "scripts/Sync-Env.ps1"
       - run: "sphinx-build -EaT docs _site"
       - uses: "actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa" # v3.0.1
   ruff:
@@ -67,7 +67,7 @@ jobs:
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Initialize-Shell.ps1"
+      - run: "scripts/Sync-Env.ps1"
       - run: "ruff check --no-fix --output-format github ."
   fawltydeps:
     needs: "sync"
@@ -86,13 +86,10 @@ jobs:
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Initialize-Shell.ps1"
+      - run: "scripts/Sync-Env.ps1"
       - run: |
           pre-commit run fawltydeps-src
-          pre-commit run fawltydeps-docs
-          pre-commit run fawltydeps-pipeline
-          pre-commit run fawltydeps-scripts
-          pre-commit run fawltydeps-tests
+          pre-commit run fawltydeps-dev
   pyright:
     needs: "sync"
     strategy:
@@ -110,7 +107,7 @@ jobs:
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Initialize-Shell.ps1"
+      - run: "scripts/Sync-Env.ps1"
       - uses: "jakebailey/pyright-action@3bdde3b31d26f0f1f5de051b1fbd7a536a9a4e7f" # v2.3.1
         with:
           pylance-version: "${{ env.PYRIGHT_PYTHON_PYLANCE_VERSION }}"
@@ -136,7 +133,7 @@ jobs:
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Initialize-Shell.ps1 -Version '${{ matrix.python }}'"
+      - run: "scripts/Sync-Env.ps1 -Version '${{ matrix.python }}'"
       - run: "pytest"
   lock:
     needs:

@@ -17,7 +17,7 @@ git add .
 try { git commit --no-verify -m 'Add template and type stub submodules' }
 catch [System.Management.Automation.NativeCommandExitException] { $HadSubmodules = $true }
 
-. scripts/Initialize-Shell.ps1
+. scripts/Sync-Env.ps1
 
 git add .
 try { git commit --no-verify -m 'Lock' }

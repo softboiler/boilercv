@@ -259,13 +259,13 @@ It should only trigger if you have allowed VSCode Tasks to run automatically and
 
 ### Cross-platform PowerShell
 
-PowerShell, once a Windows-only system shell, is now supported on Windows, MacOS, and Linux alike. This repository features tooling that sets up the environment with [`scripts/Sync-Py.ps1`](<https://github.com/softboiler/boilercv/blob/main/scripts/Sync-Py.ps1>), to be run on cross-platform PowerShell. The contents of [`scripts/Initialize-Shell.ps1`](<https://github.com/softboiler/boilercv/blob/main/scripts/Initialize-Shell.ps1>) represents a sort of "profile" for your PowerShell terminal sessions. But you are not required to add it to your user shell profile. Instead, it is explicitly invoked whenever needed, including in other shell scripts, local `pre-commit` hooks and in VSCode Tasks.
+PowerShell, once a Windows-only system shell, is now supported on Windows, MacOS, and Linux alike. This repository features tooling that sets up the environment with [`scripts/Sync-Py.ps1`](<https://github.com/softboiler/boilercv/blob/main/scripts/Sync-Py.ps1>), to be run on cross-platform PowerShell. The contents of [`scripts/Sync-Env.ps1`](<https://github.com/softboiler/boilercv/blob/main/scripts/Sync-Env.ps1>) represents a sort of "profile" for your PowerShell terminal sessions. But you are not required to add it to your user shell profile. Instead, it is explicitly invoked whenever needed, including in other shell scripts, local `pre-commit` hooks and in VSCode Tasks.
 
-However, if you do want to add it to your user shell profile, you may do so by running `code $PROFILE` in `pwsh` after you have installed it, which will open your `pwsh` user profile in VSCode. You may then copy the contents of [`scripts/Initialize-Shell.ps1`](<https://github.com/softboiler/boilercv/blob/main/scripts/Initialize-Shell.ps1>) into a conditional statement that checks whether you are in this project's directory (e.g. `boilercv`), like so:
+However, if you do want to add it to your user shell profile, you may do so by running `code $PROFILE` in `pwsh` after you have installed it, which will open your `pwsh` user profile in VSCode. You may then copy the contents of [`scripts/Sync-Env.ps1`](<https://github.com/softboiler/boilercv/blob/main/scripts/Sync-Env.ps1>) into a conditional statement that checks whether you are in this project's directory (e.g. `boilercv`), like so:
 
 ```PowerShell
 if ((Get-Item '.' | Select-Object -ExpandProperty 'Name') -eq 'boilercv') {
-  # Paste the contents of `scripts/Initialize-Shell.ps1` here
+  # Paste the contents of `scripts/Sync-Env.ps1` here
 }
 ```
 

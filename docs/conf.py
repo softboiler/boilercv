@@ -4,17 +4,16 @@ from datetime import date
 from hashlib import sha256
 from pathlib import Path
 
+from dev.docs.config import default
+from dev.docs.intersphinx import get_ispx, get_rtd, get_url
+from dev.docs.models.paths import rooted_paths
+from dev.docs.patch_nbs import patch_nbs
+from dev.docs.types import IspxMappingValue
+from dev.tools.environment import init_shell
+from dev.tools.warnings import filter_boilercv_warnings
 from pydantic import BaseModel, Field
 from ruamel.yaml import YAML
 from sphinx.application import Sphinx
-
-from boilercv_docs.config import default
-from boilercv_docs.intersphinx import get_ispx, get_rtd, get_url
-from boilercv_docs.models.paths import rooted_paths
-from boilercv_docs.patch_nbs import patch_nbs
-from boilercv_docs.types import IspxMappingValue
-from boilercv_tools.environment import init_shell
-from boilercv_tools.warnings import filter_boilercv_warnings
 
 # * MARK: Helper functions
 

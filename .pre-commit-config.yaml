@@ -8,10 +8,8 @@ ci:
   skip:
     - "sync"
     - "fawltydeps-src"
-    - "fawltydeps-docs"
+    - "fawltydeps-dev"
     - "fawltydeps-pipeline"
-    - "fawltydeps-scripts"
-    - "fawltydeps-tests"
     - "pytest-fast-only"
     - "dvc-post-checkout"
     - "dvc-pre-push"
@@ -37,52 +35,42 @@ repos:
         pass_filenames: false
         language: "system"
         entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1"
+          pwsh -Command ". scripts/Sync-Env.ps1"
       - id: "fawltydeps-src"
         name: "fawltydeps-src"
         pass_filenames: false
         language: "system"
         entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1; fawltydeps --config-file pyproject.toml"
+          pwsh -Command ". scripts/Sync-Env.ps1; fawltydeps --config-file pyproject.toml"
         files: |
           (?x)^(
             pyproject.toml
             |src/.*$
           )$
-      - id: "fawltydeps-docs"
-        name: "fawltydeps-docs"
+      - id: "fawltydeps-dev"
+        name: "fawltydeps-dev"
         pass_filenames: false
         language: "system"
-        files: "^docs/.*$"
         entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1; fawltydeps --config-file docs/pyproject.toml"
+          pwsh -Command ". scripts/Sync-Env.ps1; fawltydeps --config-file packages/_dev/pyproject.toml"
+        files: |
+          ^(
+            (packages/_dev/.*)
+            |(docs/.*)
+          )$"
       - id: "fawltydeps-pipeline"
         name: "fawltydeps-pipeline"
         pass_filenames: false
         language: "system"
         entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1; fawltydeps --config-file pipeline/pyproject.toml"
-        files: "^pipeline/.*$"
-      - id: "fawltydeps-scripts"
-        name: "fawltydeps-scripts"
-        pass_filenames: false
-        language: "system"
-        files: "^scripts/.*$"
-        entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1; fawltydeps --config-file scripts/pyproject.toml"
-      - id: "fawltydeps-tests"
-        name: "fawltydeps-tests"
-        pass_filenames: false
-        language: "system"
-        files: "^tests/.*$"
-        entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1; fawltydeps --config-file tests/pyproject.toml"
+          pwsh -Command ". scripts/Sync-Env.ps1; fawltydeps --config-file packages/pipeline/pyproject.toml"
+        files: "^packages/pipeline/.*$"
       - id: "pytest-fast-only"
         name: "pytest-fast-only"
         pass_filenames: false
         language: "system"
         entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1; pytest -m 'not slow'"
+          pwsh -Command ". scripts/Sync-Env.ps1; pytest -m 'not slow'"
         files: |
           (?x)^(
             .*/pyproject\.toml
@@ -97,7 +85,7 @@ repos:
         pass_filenames: false
         language: "system"
         entry: |
-          pwsh -Command ". scripts/Initialize-Shell.ps1; python -m boilercv_docs.patch_nbs"
+          pwsh -Command ". scripts/Sync-Env.ps1; python -m dev.docs.patch_nbs"
         files: |
           (?x)^(
             docs/.*\.ipynb
