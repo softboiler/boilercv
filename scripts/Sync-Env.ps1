@@ -32,7 +32,6 @@ $High = $High ? $High : [bool]$Env:SYNC_PY_HIGH
 $CI = $Env:SYNC_PY_DISABLE_CI ? $null : $Env:CI
 $Devcontainer = $Env:SYNC_PY_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER
 
-Sync-Uv -Version '0.4.10'
 if ($CI) {
     'SYNCING PROJECT WITH TEMPLATE' | Write-Progress
     try { scripts/Sync-Template.ps1 -Stay } catch
@@ -44,6 +43,7 @@ if ($CI) {
     }
     'PROJECT SYNCED WITH TEMPLATE' | Write-Progress
 }
+else {Sync-Uv -Version '0.4.10'}
 
 if ($High) { Sync-Env -High } else { Sync-Env }
 if ($Release) { return }
