@@ -177,13 +177,13 @@ exclude = [
   "**/__pycache__",
   "**/.*",
   ".cache",
-  "bin",
+  "typings",
   "packages/boilercine",
   "packages/boilercore",
   "packages/cachier",
   "packages/context_models",
 ]
-ignore = ["**/node_modules", "**/__pycache__", "**/.*", ".cache", "bin"]
+ignore = ["**/node_modules", "**/__pycache__", "**/.*", ".cache", "typings"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true
@@ -282,7 +282,7 @@ reportUnusedCallResult = "none"
 
 [tool.ruff]
 cache-dir = ".cache/.ruff_cache"
-extend-exclude = ["bin", "packages"]
+extend-exclude = ["packages", "typings"]
 extend-include = ["*.ipynb", "packages/_dev", "packages/pipeline"]
 src = ["src", "docs", "pipeline", "scripts", "tests"]
 output-format = "grouped"
