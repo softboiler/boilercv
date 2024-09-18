@@ -37,22 +37,20 @@ function Find-Pattern {
 
 function Sync-Uv {
     <#.SYNOPSIS
-    Sync local `uv` version.#>
+    Sync `uv` version.#>
     Param([string]$Version)
-    if (Get-Command 'uv' -ErrorAction 'Ignore') { $Uv = 'uv' }
-    else {
-        $Uv = Get-Item 'bin/uv.*' -ErrorAction 'Ignore'
-    }
-    if ((!$Uv -or !(& $Uv --version | Select-String $Version))) {
-        'Installing uv' | Write-Progress
+    if (
+        !(Get-Command 'uv' -ErrorAction 'Ignore') -or
+        !(uv --version | Select-String $Version)
+    ) {
         $OrigCargoHome = $Env:CARGO_HOME
         $Env:CARGO_HOME = '.'
         $Env:INSTALLER_NO_MODIFY_PATH = $true
         if ($IsWindows) { Invoke-RestMethod "https://github.com/astral-sh/uv/releases/download/$Version/uv-installer.ps1" | Invoke-Expression }
         else { curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/astral-sh/uv/releases/download/$Version/uv-installer.sh" | sh }
+        Move-Item -Force 'bin/uv.*', 'bin/uvx.*' '.'
+        Remove-Item 'bin'
         if ($OrigCargoHome) { $Env:CARGO_HOME = $OrigCargoHome }
-        'uv installed' | Write-Progress -Done
-        return Get-Item 'bin/uv.*'
     }
 }
 

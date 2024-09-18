@@ -38,7 +38,9 @@
     "packages/boilercore": true,
     "packages/cachier": true,
     "packages/context_models": true,
-    "uv.lock": true
+    "typings": true,
+    "uv.lock": true,
+    "requirements/uv_high.lock": true
   },
   //! File nesting
   "explorer.sortOrder": "foldersNestsFiles",

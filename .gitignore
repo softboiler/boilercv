@@ -14,6 +14,11 @@ tests/plots
 # * -------------------------------------------------------------------------------- * #
 # * Template gitignore
 
+# Ignore local uv
+uv
+uv.exe
+uvx
+uvx.exe
 # Ignore local dev environment settings
 *.env
 # local workspace extensions directory
