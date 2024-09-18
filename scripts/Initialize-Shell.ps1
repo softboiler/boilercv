@@ -153,16 +153,12 @@ function Set-Env {
     $RequirementsPath = $High ? "$RequirementsDir/requirements_high.txt" : "$RequirementsDir/requirements.txt"
     $DefaultLockPath = "$RequirementsDir/uv.lock"
     $LockPath = $High ? "$RequirementsDir/uv_high.lock" : 'uv.lock'
-    if (!($Lock = Get-Item $LockPath -ErrorAction 'Ignore')) {
-        New-Item $LockPath
-        $Lock = Get-Item $LockPath
-    }
     Push-Location $RequirementsDir
     $(if ($High) { uv export --resolution highest } else { uv export --resolution lowest-direct }) |
         ForEach-Object { $_ -Replace '^\.', '-e ' } |
         Set-Content $RequirementsPath
     Pop-Location
-    Move-Item $DefaultLockPath $Lock -Force
+    Move-Item $DefaultLockPath (Get-Item $LockPath) -Force
     uv pip sync (Get-Item $RequirementsPath)
 
     # ? Get environment variables from `pyproject.toml`
