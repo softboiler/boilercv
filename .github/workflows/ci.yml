@@ -28,15 +28,15 @@ jobs:
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Py.ps1"
+      - run: "scripts/Initialize-Shell.ps1"
       - uses: "actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b" # v4.3.4
         with:
           name: "lock"
-          path: "lock.json"
+          path: "uv.lock"
       - uses: "actions/cache/save@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
   build-docs:
     needs: "sync"
     strategy:
@@ -54,11 +54,11 @@ jobs:
       - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Py.ps1"
+      - run: "scripts/Initialize-Shell.ps1"
       - run: "sphinx-build -EaT docs _site"
       - uses: "actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa" # v3.0.1
   deploy-docs:
@@ -95,11 +95,11 @@ jobs:
       - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Py.ps1"
+      - run: "scripts/Initialize-Shell.ps1"
       - run: "ruff check --no-fix --output-format github ."
   fawltydeps:
     needs: "sync"
@@ -118,11 +118,11 @@ jobs:
       - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Py.ps1"
+      - run: "scripts/Initialize-Shell.ps1"
       - run: |
           pre-commit run fawltydeps-src
           pre-commit run fawltydeps-docs
@@ -146,11 +146,11 @@ jobs:
       - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Py.ps1"
+      - run: "scripts/Initialize-Shell.ps1"
       - uses: "jakebailey/pyright-action@3bdde3b31d26f0f1f5de051b1fbd7a536a9a4e7f" # v2.3.1
         with:
           pylance-version: "${{ env.PYRIGHT_PYTHON_PYLANCE_VERSION }}"
@@ -180,11 +180,11 @@ jobs:
       - uses: "actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Py.ps1 -Version '${{ matrix.python }}'"
+      - run: "scripts/Initialize-Shell.ps1 -Version '${{ matrix.python }}'"
       - if: (!(startsWith(matrix.runner, 'ubuntu') && (matrix.python == '3.11')))
         run: "pytest"
       # ! https://github.com/pytest-dev/pytest-cov/issues/479#issuecomment-1247444988
@@ -220,11 +220,11 @@ jobs:
       - uses: "actions/cache/restore@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Py.ps1"
+      - run: "scripts/Initialize-Shell.ps1"
       - uses: "stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842" # v5.0.1
         with:
           commit_message: "Sync and lock"

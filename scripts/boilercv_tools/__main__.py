@@ -11,7 +11,6 @@ from cyclopts import App
 
 from boilercv_tools import add_changes, environment
 from boilercv_tools.environment import escape, run
-from boilercv_tools.sync import check_compilation
 from boilercv_tools.types import ChangeType
 
 if version_info >= (3, 11):  # noqa: UP036, RUF100
@@ -31,12 +30,6 @@ def main():  # noqa: D103
 def init_shell():
     """Initialize shell."""
     log(environment.init_shell())
-
-
-@APP.command
-def compile(high: bool = False):  # noqa: A001
-    """Compile."""
-    log(check_compilation(high))
 
 
 @APP.command

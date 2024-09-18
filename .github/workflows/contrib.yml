@@ -5,14 +5,14 @@ on:
   pull_request:
     paths:
       - ".github/workflows/contrib.yml"
-      - "scripts/Sync-Py.ps1"
+      - "scripts/Initialize-Shell.ps1"
       - "scripts/boilercv_tools/**"
       - "scripts/pyproject.toml"
   push:
     branches: ["main"]
     paths:
       - ".github/workflows/contrib.yml"
-      - "scripts/Sync-Py.ps1"
+      - "scripts/Initialize-Shell.ps1"
       - "scripts/boilercv_tools/**"
       - "scripts/pyproject.toml"
 defaults:
@@ -38,11 +38,11 @@ jobs:
       - uses: "actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('uv.lock') }}"
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
-      - run: "scripts/Sync-Py.ps1 -Version '3.11'"
+      - run: "scripts/Initialize-Shell.ps1 -Version '3.11'"
   spaces-in-path:
     strategy:
       matrix:
@@ -61,9 +61,9 @@ jobs:
       - uses: "actions/cache@0c45773b623bea8c8e75f6c82b208c3cf94ea4f9" # v4.0.2
         with:
           path: "${{ env.UV_CACHE_DIR }}"
-          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('repo path with spaces/lock.json') }}"
+          key: "uv-${{ matrix.runner }}-${{ matrix.python }}-${{ hashFiles('repo path with spaces/uv.lock') }}"
       - uses: "actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f" # v5.1.1
         with:
           python-version: "${{ matrix.python }}"
       - working-directory: "repo path with spaces"
-        run: "scripts/Sync-Py.ps1 -Version '3.11'"
+        run: "scripts/Initialize-Shell.ps1 -Version '3.11'"

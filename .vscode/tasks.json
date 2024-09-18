@@ -261,7 +261,7 @@
     {
       "label": "setup: Sync contributor environment",
       "type": "shell",
-      "command": "if (!$Env:DEVCONTAINER) {scripts/Sync-Py.ps1}",
+      "command": "if (!$Env:DEVCONTAINER) {scripts/Initialize-Shell.ps1}",
       "icon": { "id": "file-symlink-directory" },
       "problemMatcher": [],
       "runOptions": {
