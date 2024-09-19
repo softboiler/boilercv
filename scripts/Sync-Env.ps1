@@ -86,9 +86,8 @@ if ($CI) { Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts")
 # ? Track environment variables to update `.env` with later
 $EnvVars = @{}
 $EnvVars.Add('PYRIGHT_PYTHON_PYLANCE_VERSION', $PylanceVersion)
-if (!(Test-Path ($EnvFile = "$PWD/$($Env:GITHUB_ENV ? $Env:GITHUB_ENV : '.env')"))) {
-    New-Item $EnvFile
-}
+$EnvFile = $Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env"
+if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
 # ? Get environment variables from `pyproject.toml`
 dev init-shell |
     Select-String -Pattern '^(.+)=(.+)$' |
