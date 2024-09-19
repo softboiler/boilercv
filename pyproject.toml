@@ -96,19 +96,18 @@ dev-dependencies = [
   "pytest-plt==1.1.1",
   "pytest-xdist[psutil,setproctitle]==3.6.1",
 ]
-resolution = "lowest-direct"
+[tool.uv.pip]
+all-extras = true
 [tool.uv.workspace]
 members = ["packages/*"]
 exclude = ["packages/cachier"]
 [tool.uv.sources]
-cachier = { path = "packages/cachier" }
+cachier = { path = "packages/cachier", editable = true }
 dev = { workspace = true }
 boilercine = { workspace = true }
 boilercore = { workspace = true }
 boilercv_pipeline = { workspace = true }
 context_models = { workspace = true }
-[tool.uv.pip]
-all-extras = true
 
 [tool.coverage.run]
 branch = true
@@ -140,10 +139,9 @@ markers = "slow"
 testpaths = "tests"
 xfail_strict = true
 
-[tool.boilercv_env]
+[tool.env]
 COVERAGE_CORE = "sysmon"
 JUPYTER_PLATFORM_DIRS = "1"
-PYRIGHT_PYTHON_PYLANCE_VERSION = "2024.6.1"
 PYDEVD_DISABLE_FILE_VALIDATION = "1"
 PYTHONIOENCODING = "utf-8:strict"
 PYTHONUTF8 = "1"

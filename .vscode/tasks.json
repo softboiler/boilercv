@@ -74,6 +74,12 @@
   ],
   "tasks": [
     {
+      "label": "test",
+      "type": "shell",
+      "command": "Write-Output hello",
+      "problemMatcher": []
+    },
+    {
       "label": "proj: Sync Binder requirements",
       "type": "shell",
       "command": ". scripts/Sync-Env.ps1; uv pip compile --universal --exclude-newer (Get-Date).ToUniversalTime().ToString('o') --python-version 3.11 --resolution lowest-direct requirements/binder.in > requirements.txt",

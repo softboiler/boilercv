@@ -32,9 +32,8 @@ jobs:
           name: "lock"
           path: |
             uv.lock
-            requirements/requirements.txt
+            requirements
   build-docs:
-    needs: "sync"
     strategy:
       matrix:
         runner: ["ubuntu-22.04"]
@@ -44,9 +43,6 @@ jobs:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
-      - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
-        with:
-          name: "lock"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
@@ -71,7 +67,6 @@ jobs:
       - id: "deployment"
         uses: "actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e" # v4.0.5
   ruff:
-    needs: "sync"
     strategy:
       matrix:
         runner: ["ubuntu-22.04"]
@@ -81,16 +76,12 @@ jobs:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
-      - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
-        with:
-          name: "lock"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
           enable-cache: true
       - run: "scripts/Sync-Env.ps1; ruff check --no-fix --output-format github ."
   fawltydeps:
-    needs: "sync"
     strategy:
       matrix:
         runner: ["ubuntu-22.04"]
@@ -100,19 +91,12 @@ jobs:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
-      - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
-        with:
-          name: "lock"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
           enable-cache: true
-      - run: |
-          scripts/Sync-Env.ps1
-          pre-commit run fawltydeps-src
-          pre-commit run fawltydeps-dev
+      - run: "scripts/Sync-Env.ps1; pre-commit run fawltydeps-src; pre-commit run fawltydeps-dev"
   pyright:
-    needs: "sync"
     strategy:
       matrix:
         runner: ["ubuntu-22.04"]
@@ -122,20 +106,15 @@ jobs:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
-      - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
-        with:
-          name: "lock"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
           enable-cache: true
-      - run: |
-          scripts/Sync-Env.ps1; Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts")
+      - run: "scripts/Sync-Env.ps1"
       - uses: "jakebailey/pyright-action@3bdde3b31d26f0f1f5de051b1fbd7a536a9a4e7f" # v2.3.1
         with:
           pylance-version: "${{ env.PYRIGHT_PYTHON_PYLANCE_VERSION }}"
   test:
-    needs: "sync"
     strategy:
       matrix:
         runner:
@@ -154,50 +133,16 @@ jobs:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
           submodules: True
-      - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
-        with:
-          name: "lock"
       - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
         with:
           version: "0.4.10"
           enable-cache: true
-      - if: (!(startsWith(matrix.runner, 'ubuntu') && (matrix.python == '3.11')))
-        run: "scripts/Sync-Env.ps1 -Version '${{ matrix.python }}'; pytest"
       # ! https://github.com/pytest-dev/pytest-cov/issues/479#issuecomment-1247444988
       - if: startsWith(matrix.runner, 'ubuntu') && matrix.python == '3.11'
-        run: |
-          scripts/Sync-Env.ps1
-          pytest --cov --cov-config=pyproject.toml --cov-report=xml
+        run: "scripts/Sync-Env.ps1; pytest --cov --cov-config=pyproject.toml --cov-report=xml"
       - if: startsWith(matrix.runner, 'ubuntu') && matrix.python == '3.11'
         uses: "codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673" # v4.5.0
         env:
           CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
-  lock:
-    needs:
-      - "build-docs"
-      - "ruff"
-      - "fawltydeps"
-      - "pyright"
-      - "test"
-    permissions:
-      contents: "write"
-    strategy:
-      matrix:
-        runner: ["ubuntu-22.04"]
-        python: ["3.11"]
-    runs-on: "${{ matrix.runner }}"
-    steps:
-      - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
-        with:
-          submodules: True
-      - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
-        with:
-          name: "lock"
-      - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
-        with:
-          version: "0.4.10"
-          enable-cache: true
-      - run: "scripts/Sync-Env.ps1 -Locked"
-      - uses: "stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842" # v5.0.1
-        with:
-          commit_message: "Sync and lock"
+      - if: (!(startsWith(matrix.runner, 'ubuntu') && (matrix.python == '3.11')))
+        run: "scripts/Sync-Env.ps1 -PythonVersion '${{ matrix.python }}'; pytest"

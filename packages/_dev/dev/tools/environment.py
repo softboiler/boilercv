@@ -41,10 +41,10 @@ def run(args: str | Sequence[str]):
 
 
 class Environment(BaseSettings):
-    """Get environment variables from `pyproject.toml:[tool.boilercv_env]`."""
+    """Get environment variables from `pyproject.toml:[tool.env]`."""
 
     model_config = SettingsConfigDict(
-        extra="allow", pyproject_toml_table_header=("tool", "boilercv_env")
+        extra="allow", pyproject_toml_table_header=("tool", "env")
     )
 
     @classmethod

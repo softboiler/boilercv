@@ -22,7 +22,7 @@ resolution-markers = [
 ]
 
 [options]
-resolution-mode = "lowest-direct"
+resolution-mode = "highest"
 
 [manifest]
 members = [
@@ -182,15 +182,15 @@ sdist = { url = "https://files.pythonhosted.org/packages/3e/38/7859ff46355f76f8d
 
 [[package]]
 name = "anyio"
-version = "4.4.0"
+version = "4.5.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "idna" },
     { name = "sniffio" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/e6/e3/c4c8d473d6780ef1853d630d581f70d655b4f8d7553c6997958c283039a2/anyio-4.4.0.tar.gz", hash = "sha256:5aadc6a1bbb7cdb0bede386cac5e2940f5e2ff3aa20277e991cf028e0585ce94", size = 163930 }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/44/66874c5256e9fbc30103b31927fd9341c8da6ccafd4721b2b3e81e6ef176/anyio-4.5.0.tar.gz", hash = "sha256:c5a275fe5ca0afd788001f58fca1e69e29ce706d746e317d660e21f70c530ef9", size = 169376 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/7b/a2/10639a79341f6c019dedc95bd48a4928eed9f1d1197f4c04f546fc7ae0ff/anyio-4.4.0-py3-none-any.whl", hash = "sha256:c1b2d8f46a8a812513012e1107cb0e68c17159a7a594208005a57dc776e1bdc7", size = 86780 },
+    { url = "https://files.pythonhosted.org/packages/3b/68/f9e9bf6324c46e6b8396610aef90ad423ec3e18c9079547ceafea3dce0ec/anyio-4.5.0-py3-none-any.whl", hash = "sha256:fdeb095b7cc5a5563175eedd926ec4ae55413bb4be5770c424af0ba46ccb4a78", size = 89250 },
 ]
 
 [[package]]
@@ -441,7 +441,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cachier", directory = "packages/cachier" },
+    { name = "cachier", editable = "packages/cachier" },
     { name = "dill", specifier = ">=0.3.7" },
     { name = "dulwich", specifier = ">=0.21.5" },
     { name = "dvc", specifier = ">=3.10.1" },
@@ -549,7 +549,7 @@ dev = [
     { name = "boilercine", editable = "packages/boilercine" },
     { name = "boilercore", editable = "packages/boilercore" },
     { name = "boilercv-pipeline", editable = "packages/pipeline" },
-    { name = "cachier", directory = "packages/cachier" },
+    { name = "cachier", editable = "packages/cachier" },
     { name = "context-models", editable = "packages/context_models" },
     { name = "debugpy", specifier = "==1.8.2" },
     { name = "dev", editable = "packages/_dev" },
@@ -725,7 +725,7 @@ wheels = [
 [[package]]
 name = "cachier"
 version = "3.0.0.dev0+db7f394"
-source = { directory = "packages/cachier" }
+source = { editable = "packages/cachier" }
 dependencies = [
     { name = "dill" },
     { name = "portalocker" },
@@ -1368,7 +1368,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "boilercore", editable = "packages/boilercore" },
-    { name = "cachier", directory = "packages/cachier" },
+    { name = "cachier", editable = "packages/cachier" },
     { name = "colorcet", specifier = ">=3.0.1" },
     { name = "cyclopts", specifier = "==2.9.3" },
     { name = "devtools", specifier = ">=0.12.2" },
@@ -2595,15 +2595,16 @@ wheels = [
 
 [[package]]
 name = "kombu"
-version = "5.4.1"
+version = "5.4.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "amqp" },
+    { name = "tzdata" },
     { name = "vine" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/16/2c/079a5d59a167543205fbf54d663bbdc171e2a29f4d45fa6a8bc315e57192/kombu-5.4.1.tar.gz", hash = "sha256:1c05178826dab811f8cab5b0a154d42a7a33d8bcdde9fa3d7b4582e43c3c03db", size = 442786 }
+sdist = { url = "https://files.pythonhosted.org/packages/38/4d/b93fcb353d279839cc35d0012bee805ed0cf61c07587916bfc35dbfddaf1/kombu-5.4.2.tar.gz", hash = "sha256:eef572dd2fd9fc614b37580e3caeafdd5af46c1eff31e7fba89138cdb406f2cf", size = 442858 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c1/78/c556bf2954bd36f166959ac33d23cde4a8967e61cdb74678585a66edbae0/kombu-5.4.1-py3-none-any.whl", hash = "sha256:621d365f234e4c089596f3a2510f1ade07026efc28caca426161d8f458786cab", size = 201338 },
+    { url = "https://files.pythonhosted.org/packages/87/ec/7811a3cf9fdfee3ee88e54d08fcbc3fabe7c1b6e4059826c59d7b795651c/kombu-5.4.2-py3-none-any.whl", hash = "sha256:14212f5ccf022fc0a70453bb025a1dcc32782a588c49ea866884047d66e14763", size = 201349 },
 ]
 
 [[package]]

@@ -58,7 +58,8 @@
     ".sourcery.yaml": "yaml",
     "*ipython-input*": "python",
     "*requirements*.in": "pip-requirements",
-    "pyrightconfig.json": "jsonc"
+    "pyrightconfig.json": "jsonc",
+    "uv.lock": "toml",
   },
   //! Git
   "git.allowNoVerifyCommit": true,

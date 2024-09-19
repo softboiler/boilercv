@@ -2,13 +2,11 @@
 Initialize shell environment.#>
 
 Param(
-    # Python version.
-    [string]$Version,
-    # Sync to highest dependencies.
+    [string]$PythonVersion,
+    [string]$UvVersion,
+    [switch]$Low,
     [switch]$High,
-    # Perform minimal sync for release workflow.
-    [switch]$Release,
-    # Just check the lock is valid when syncing.
+    [switch]$Build,
     [switch]$Locked
 )
 
@@ -27,27 +25,99 @@ if ($IsWindows) {
     [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 }
 
-$Version = $Version ? $Version : (Get-Content '.copier-answers.yml' |
-        Find-Pattern '^python_version:\s?["'']([^"'']+)["'']$' |
-        Find-Pattern '^([^.]+\.[^.]+).*$')
-$High = $High ? $High : [bool]$Env:SYNC_PY_HIGH
-$CI = $Env:SYNC_PY_DISABLE_CI ? $null : $Env:CI
-$Devcontainer = $Env:SYNC_PY_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER
+$PythonVersion = $PythonVersion ? $PythonVersion : (Get-Content '.python-version')
+$UvVersion = $UvVersion ? $UvVersion : (Get-Content '.uv-version')
+$PylanceVersion = $PylanceVersion ? $PylanceVersion : (Get-Content '.pylance-version')
+
+$CI = $Env:SYNC_ENV_DISABLE_CI ? $null : $Env:CI
+$Devcontainer = $Env:SYNC_ENV_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER
+
+$Locked = $Locked ? $Locked : $CI
 
 if (!$CI) {
-    Sync-Uv -Version '0.4.10'
+    if (Get-Command 'uv' -ErrorAction 'Ignore') {
+        if (!(uv --version | Select-String $UvVersion)) { uv self update $UvVersion }
+    }
+    else {
+        if ($IsWindows) { Invoke-RestMethod "https://github.com/astral-sh/uv/releases/download/$UvVersion/uv-installer.ps1" | Invoke-Expression }
+        else { curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/astral-sh/uv/releases/download/$UvVersion/uv-installer.sh" | sh }
+        $Env:Path = "~/.cargo/bin;$Env:Path"
+    }
     Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 | Remove-Item
     git submodule update --init --merge
 }
 
-if ($Locked) {
-    if ($High) { Sync-DevEnv -Locked -High } else { Sync-DevEnv -Locked }
+# ? Sync the environment
+if ($Low) {
+    uv sync --resolution lowest-direct --python $PythonVersion
+    uv export --resolution lowest-direct --frozen --no-hashes --python $PythonVersion |
+        Set-Content "$PWD/requirements/requirements_low.txt"
+}
+elseif ($High) {
+    uv sync --upgrade --python $PythonVersion
+    uv export --frozen --no-hashes --python $PythonVersion |
+        Set-Content "$PWD/requirements/requirements_high.txt"
+}
+elseif ($Build) {
+    uv sync --no-sources --no-dev --python $PythonVersion
+    uv export --frozen  --no-dev --no-hashes --python $PythonVersion |
+        Set-Content "$PWD/requirements/requirements_prod.txt"
+    uv build --python $PythonVersion
+    if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+    return
+}
+elseif ($Locked) {
+    uv sync --locked --python $PythonVersion
+    uv export --frozen --no-hashes --python $PythonVersion |
+        Set-Content "$PWD/requirements/requirements_dev.txt"
 }
 else {
-    if ($High) { Sync-DevEnv -High } else { Sync-DevEnv }
+    if ($Env:SYNC_ENV_SYNCED) {
+        if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+        return
+    }
+    uv sync --python $PythonVersion
+    uv export --frozen --no-hashes --python $PythonVersion |
+        Set-Content "$PWD/requirements/requirements_dev.txt"
+    $Env:SYNC_ENV_SYNCED = $true
 }
-if ($Release) { return }
+if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+if ($CI) { Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts") }
 
+# ? Track environment variables to update `.env` with later
+$EnvVars = @{}
+$EnvVars.Add('PYRIGHT_PYTHON_PYLANCE_VERSION', $PylanceVersion)
+if (!(Test-Path ($EnvFile = "$PWD/$($Env:GITHUB_ENV ? $Env:GITHUB_ENV : '.env')"))) {
+    New-Item $EnvFile
+}
+# ? Get environment variables from `pyproject.toml`
+dev init-shell |
+    Select-String -Pattern '^(.+)=(.+)$' |
+    ForEach-Object {
+        $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
+        if ($EnvVars -notcontains $Key) { $EnvVars.Add($Key, $Value) }
+    }
+# ? Get environment variables to update in `.env`
+$Keys = @()
+$Lines = Get-Content $EnvFile | ForEach-Object {
+    $_ -Replace '^(?<Key>.+)=(?<Value>.+)$', {
+        $Key = $_.Groups['Key'].Value
+        if ($EnvVars.ContainsKey($Key)) {
+            $Keys += $Key
+            return "$Key=$($EnvVars[$Key])"
+        }
+        return $_
+    }
+}
+# ? Sync environment variables and those in `.env`
+$NewLines = $EnvVars.GetEnumerator() | ForEach-Object {
+    $Key, $Value = $_.Key, $_.Value
+    Set-Item "Env:$Key" $Value
+    if ($Keys -notcontains $Key) { return "$Key=$Value" }
+}
+@($Lines, $NewLines) | Set-Content $EnvFile
+
+# ? Environment-specific setup
 if ($Devcontainer) {
     $Repo = Get-ChildItem '/workspaces'
     $Packages = Get-ChildItem "$Repo/packages"
@@ -58,29 +128,22 @@ if ($Devcontainer) {
         }
     }
 }
-
-if ($CI) { dev elevate-pyright-warnings }
+elseif ($CI) { dev elevate-pyright-warnings }
 else {
     $Hooks = '.git/hooks'
     if (!(Test-Path "$Hooks/post-checkout") -or !(Test-Path "$Hooks/pre-commit") -or
         !(Test-Path "$Hooks/pre-push")
-    ) { pre-commit install }
-    if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore') -and
-        $Env:PYRIGHT_PYTHON_PYLANCE_VERSION
-    ) {
+    ) { pre-commit install --install-hooks }
+    if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
         $LocalExtensions = '.vscode/extensions'
         $Pylance = 'ms-python.vscode-pylance'
-        if (!(Test-Path "$LocalExtensions/$Pylance-$Env:PYRIGHT_PYTHON_PYLANCE_VERSION")) {
+        if (!(Test-Path "$LocalExtensions/$Pylance-$PylanceVersion")) {
             $Install = @(
                 "--extensions-dir=$LocalExtensions",
-                "--install-extension=$Pylance@$Env:PYRIGHT_PYTHON_PYLANCE_VERSION"
+                "--install-extension=$Pylance@$PylanceVersion"
             )
             code @Install
-            if (!(Test-Path $LocalExtensions)) {
-                'COULD NOT INSTALL PYLANCE LOCALLY' | Write-Progress -Info
-                'PROCEEDING WITHOUT LOCAL PYLANCE INSTALL' | Write-Progress -Done
-            }
-            else {
+            if (Test-Path $LocalExtensions) {
                 $PylanceExtension = Get-ChildItem -Path $LocalExtensions -Filter "$Pylance-*"
                 # ? Remove other files
                 Get-ChildItem -Path $LocalExtensions |
@@ -90,7 +153,6 @@ else {
                 $PylanceExtension |
                     ForEach-Object { Get-ChildItem "$_/dist/bundled" -Filter '*stubs' } |
                     Remove-Item -Recurse
-                'INSTALLED PYLANCE LOCALLY' | Write-Progress -Done
             }
         }
     }

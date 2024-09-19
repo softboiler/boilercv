@@ -13,8 +13,7 @@ Param(
 
 . scripts/Common.ps1
 
-$Copier = 'copier@9.2.0'
-
+$Copier = "copier@$(Get-Content '.copier-version')"
 $Ref = $Stay ? (Get-Content '.copier-answers.yml' | Find-Pattern '^_commit:\s.+([^-]+)$') : $Ref
 if ($Recopy) {
     if ($Prompt) { return uvx $Copier $Subcommand $Defaults --vcs-ref=$Ref }

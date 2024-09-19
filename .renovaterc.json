@@ -3,8 +3,9 @@
   "description": "Establish base config, schedule, and manager defaults",
   "addLabels": ["dependencies"],
   "extends": ["config:base", "group:all", ":enablePreCommit"],
-  "dependencyDashboardApproval": false,
+  "dependencyDashboardApproval": true,
   "schedule": ["on the 16th day of the month"],
+  "lockFileMaintenance": { "enabled": true },
   "git-submodules": { "enabled": true },
   "enabledManagers": [
     "custom.regex",
@@ -18,50 +19,55 @@
     {
       "description": "uv",
       "customType": "regex",
-      "fileMatch": ["^scripts/Sync-Env\\.ps1$"],
-      "matchStrings": ["Sync-Uv -Version '(?<currentValue>.+)'"],
+      "fileMatch": ["^\\.uv-version$"],
+      "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "astral-sh/uv"
     },
     {
       "description": "Copier",
       "customType": "regex",
-      "fileMatch": ["^scripts/Sync-Template\\.ps1$"],
-      "matchStrings": ["$Copier = 'copier@(?<currentValue>.+)'"],
+      "fileMatch": ["^\\.copier-version$"],
+      "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "pypi",
       "depNameTemplate": "copier"
     },
     {
       "description": "Pylance",
       "customType": "regex",
-      "fileMatch": [
-        "^pyproject\\.toml$",
-        "^\\.devcontainer/devcontainer\\.json$"
-      ],
-      "matchStrings": [
-        "PYRIGHT_PYTHON_PYLANCE_VERSION = \"(?<currentValue>.+)\"",
-        "ms-python\\.vscode-pylance@(?<currentValue>[^\"]+)"
-      ],
+      "fileMatch": ["^\\.pylance-version$"],
+      "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "microsoft/pylance-release"
     }
   ],
   "packageRules": [
     {
-      "description": "Update regex pins separately from PEP 621",
+      "groupName": "all dependencies",
+      "groupSlug": "all",
+      "matchPackageNames": ["*"]
+    },
+    {
+      "description": "Update regex pins separately",
       "groupName": "regex",
       "matchManagers": ["regex"]
     },
     {
-      "description": "Manually test `.devcontainer` updates separately",
+      "description": "Update `.devcontainer` updates separately for manual testing",
       "groupName": "devcontainer",
       "matchManagers": ["devcontainer"]
     },
     {
-      "description": "Stubs for pandas sometimes lag",
+      "description": "Pandas stubs lag pandas",
+      "groupName": "pandas-stubs",
+      "matchManagers": ["pep621"],
+      "matchDepNames": ["pandas-stubs"]
+    },
+    {
+      "description": "Pandas leads pandas-stubs",
       "groupName": "pandas",
       "matchManagers": ["pep621"],
-      "matchDepNames": ["pandas", "pandas-stubs"]
+      "matchDepNames": ["pandas"]
     },
     {
       "description": "Imageio sometimes lags pillow.",
