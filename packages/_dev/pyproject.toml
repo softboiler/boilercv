@@ -57,7 +57,7 @@ dependencies = [
 
 [tool.fawltydeps]
 deps = ["packages/_dev/pyproject.toml"]
-code = ["packages/_dev/dev", "docs", "tests"]
+code = ["packages/_dev", "docs", "tests"]
 ignore_undeclared = ["boilercore", "boilercv_pipeline", "boilercv"]
 [tool.fawltydeps.custom_mapping]
 boilercore = ["boilercore"]

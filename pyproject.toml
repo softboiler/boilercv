@@ -70,7 +70,6 @@ dev-dependencies = [
   "pipx==1.6.0",
   "pre-commit==3.7.1",
   "pyright==1.1.371",
-  "pyside6==6.7.2",
   "ruff==0.5.1",
   "snakeviz==2.2.0",
   "sourcery==1.21.0",

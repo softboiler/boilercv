@@ -28,6 +28,7 @@ dependencies = [
   "pyarrow>=14.0.1",
   "pydantic>=2.9.1",
   "pyqtgraph>=0.13.3",
+  "pyside6>=6.7.2",
   "ruamel.yaml>=0.17.32",
   "scikit-image>=0.23.1",
   "scipy>=1.11.1",
@@ -50,8 +51,8 @@ cv = ["opencv-python>=4.10.0.84"]
 
 [tool.fawltydeps]
 deps = ["packages/pipeline/pyproject.toml"]
-code = ["packages/pipeline/boilercv_pipeline"]
-ignore_undeclared = ["boilercv", "PySide6"]
+code = ["packages/pipeline"]
+ignore_undeclared = ["boilercv"]
 ignore_unused = [
   "pyarrow", # Used in `boilercv_pipeline.__init__`
 ]

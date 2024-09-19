@@ -21,9 +21,6 @@ resolution-markers = [
     "(python_full_version >= '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'linux') or (python_full_version >= '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'linux')",
 ]
 
-[options]
-resolution-mode = "highest"
-
 [manifest]
 members = [
     "boilercine",
@@ -507,7 +504,6 @@ dev = [
     { name = "pre-commit" },
     { name = "pycine" },
     { name = "pyright" },
-    { name = "pyside6" },
     { name = "pytest-harvest" },
     { name = "pytest-plt" },
     { name = "pytest-xdist", extra = ["psutil", "setproctitle"] },
@@ -565,7 +561,6 @@ dev = [
     { name = "pre-commit", specifier = "==3.7.1" },
     { name = "pycine", git = "https://github.com/ottomatic-io/pycine?rev=815cfca06cafc50745a43b2cd0168982225c6dca#815cfca06cafc50745a43b2cd0168982225c6dca" },
     { name = "pyright", specifier = "==1.1.371" },
-    { name = "pyside6", specifier = "==6.7.2" },
     { name = "pytest-harvest", specifier = "==1.10.5" },
     { name = "pytest-plt", specifier = "==1.1.1" },
     { name = "pytest-xdist", extras = ["psutil", "setproctitle"], specifier = "==3.6.1" },
@@ -611,6 +606,7 @@ dependencies = [
     { name = "pyarrow" },
     { name = "pydantic" },
     { name = "pyqtgraph" },
+    { name = "pyside6" },
     { name = "pyyaml" },
     { name = "ruamel-yaml" },
     { name = "scikit-image" },
@@ -654,6 +650,7 @@ requires-dist = [
     { name = "pyarrow", specifier = ">=14.0.1" },
     { name = "pydantic", specifier = ">=2.9.1" },
     { name = "pyqtgraph", specifier = ">=0.13.3" },
+    { name = "pyside6", specifier = ">=6.7.2" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "ruamel-yaml", specifier = ">=0.17.32" },
     { name = "scikit-image", specifier = ">=0.23.1" },

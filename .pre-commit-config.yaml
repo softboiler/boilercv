@@ -3,7 +3,7 @@ exclude: |
     \.copier-answers\.yml
     |changelog/towncrier_template\.md\.jinja
     |lock.*\.json
-  $)
+  )$
 ci:
   skip:
     - "sync"
@@ -44,8 +44,8 @@ repos:
           pwsh -Command ". scripts/Sync-Env.ps1; fawltydeps --config-file pyproject.toml"
         files: |
           (?x)^(
-            pyproject.toml
-            |src/.*$
+            pyproject\.toml
+            |src/.*
           )$
       - id: "fawltydeps-dev"
         name: "fawltydeps-dev"
@@ -54,17 +54,23 @@ repos:
         entry: |
           pwsh -Command ". scripts/Sync-Env.ps1; fawltydeps --config-file packages/_dev/pyproject.toml"
         files: |
-          ^(
-            (packages/_dev/.*)
-            |(docs/.*)
-          )$"
+          (?x)^(
+            packages/_dev/pyproject\.toml
+            |docs/.*
+            |tests/.*
+          )$
       - id: "fawltydeps-pipeline"
         name: "fawltydeps-pipeline"
         pass_filenames: false
         language: "system"
         entry: |
           pwsh -Command ". scripts/Sync-Env.ps1; fawltydeps --config-file packages/pipeline/pyproject.toml"
-        files: "^packages/pipeline/.*$"
+        files: |
+          (?x)^(
+            packages/pipeline/pyproject\.toml
+            |docs/.*
+            |tests/.*
+          )$
       - id: "pytest-fast-only"
         name: "pytest-fast-only"
         pass_filenames: false

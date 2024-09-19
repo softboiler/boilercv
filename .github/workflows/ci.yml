@@ -13,11 +13,7 @@ defaults:
     shell: "pwsh"
 jobs:
   sync:
-    strategy:
-      matrix:
-        runner: ["ubuntu-22.04"]
-        python: ["3.11"]
-    runs-on: "${{ matrix.runner }}"
+    runs-on: "ubuntu-22.04"
     steps:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
@@ -34,11 +30,7 @@ jobs:
             uv.lock
             requirements
   build-docs:
-    strategy:
-      matrix:
-        runner: ["ubuntu-22.04"]
-        python: ["3.11"]
-    runs-on: "${{ matrix.runner }}"
+    runs-on: "ubuntu-22.04"
     steps:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
@@ -55,23 +47,15 @@ jobs:
     permissions:
       pages: "write"
       id-token: "write"
-    strategy:
-      matrix:
-        runner: ["ubuntu-22.04"]
-        python: ["3.11"]
     environment:
       name: "github-pages"
       url: "${{ steps.deployment.outputs.page_url }}"
-    runs-on: "${{ matrix.runner }}"
+    runs-on: "ubuntu-22.04"
     steps:
       - id: "deployment"
         uses: "actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e" # v4.0.5
   ruff:
-    strategy:
-      matrix:
-        runner: ["ubuntu-22.04"]
-        python: ["3.11"]
-    runs-on: "${{ matrix.runner }}"
+    runs-on: "ubuntu-22.04"
     steps:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
@@ -82,11 +66,7 @@ jobs:
           enable-cache: true
       - run: "scripts/Sync-Env.ps1; ruff check --no-fix --output-format github ."
   fawltydeps:
-    strategy:
-      matrix:
-        runner: ["ubuntu-22.04"]
-        python: ["3.11"]
-    runs-on: "${{ matrix.runner }}"
+    runs-on: "ubuntu-22.04"
     steps:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
@@ -97,11 +77,7 @@ jobs:
           enable-cache: true
       - run: "scripts/Sync-Env.ps1; pre-commit run fawltydeps-src; pre-commit run fawltydeps-dev"
   pyright:
-    strategy:
-      matrix:
-        runner: ["ubuntu-22.04"]
-        python: ["3.11"]
-    runs-on: "${{ matrix.runner }}"
+    runs-on: "ubuntu-22.04"
     steps:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
         with:
