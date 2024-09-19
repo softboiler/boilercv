@@ -55,7 +55,7 @@ repos:
           pwsh -Command ". scripts/Sync-Env.ps1; fawltydeps --config-file packages/_dev/pyproject.toml"
         files: |
           (?x)^(
-            packages/_dev/pyproject\.toml
+            packages/_dev/.*
             |docs/.*
             |tests/.*
           )$

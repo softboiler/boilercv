@@ -34,13 +34,13 @@ $Devcontainer = [bool]($Env:SYNC_ENV_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONT
 $Locked = [bool]($Locked ? $Locked : $CI)
 
 if (!$CI) {
+    $Env:PATH = "$HOME/.cargo/bin;$Env:PATH"
     if (Get-Command 'uv' -ErrorAction 'Ignore') {
         if (!(uv --version | Select-String $UvVersion)) { uv self update $UvVersion }
     }
     else {
         if ($IsWindows) { Invoke-RestMethod "https://github.com/astral-sh/uv/releases/download/$UvVersion/uv-installer.ps1" | Invoke-Expression }
         else { curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/astral-sh/uv/releases/download/$UvVersion/uv-installer.sh" | sh }
-        $Env:Path = "~/.cargo/bin;$Env:Path"
     }
     Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 | Remove-Item
     git submodule update --init --merge
@@ -66,8 +66,8 @@ elseif ($Build) {
     return
 }
 elseif ($Locked) {
-    uv sync --locked --python $PythonVersion
-    uv export --frozen --no-hashes --python $PythonVersion |
+    uv sync --resolution lowest-direct --locked --python $PythonVersion
+    uv export --resolution lowest-direct --frozen --no-hashes --python $PythonVersion |
         Set-Content "$PWD/requirements/requirements_dev.txt"
 }
 else {
@@ -75,8 +75,8 @@ else {
         if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
         return
     }
-    uv sync --python $PythonVersion
-    uv export --frozen --no-hashes --python $PythonVersion |
+    uv sync --resolution lowest-direct --python $PythonVersion
+    uv export --resolution lowest-direct --frozen --no-hashes --python $PythonVersion |
         Set-Content "$PWD/requirements/requirements_dev.txt"
     $Env:SYNC_ENV_SYNCED = $true
 }

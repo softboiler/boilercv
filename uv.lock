@@ -21,6 +21,9 @@ resolution-markers = [
     "(python_full_version >= '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'linux') or (python_full_version >= '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'linux')",
 ]
 
+[options]
+resolution-mode = "lowest-direct"
+
 [manifest]
 members = [
     "boilercine",
@@ -33,6 +36,7 @@ members = [
 constraints = [
     { name = "fiona", specifier = ">=1.10.1" },
     { name = "setuptools", specifier = ">=70.0.0" },
+    { name = "urllib3", specifier = ">=2.2.2" },
 ]
 
 [[package]]
@@ -504,7 +508,9 @@ dev = [
     { name = "pre-commit" },
     { name = "pycine" },
     { name = "pyright" },
-    { name = "pytest-harvest" },
+    { name = "pytest-cov" },
+    { name = "pytest-custom-exit-code" },
+    { name = "pytest-github-actions-annotate-failures" },
     { name = "pytest-plt" },
     { name = "pytest-xdist", extra = ["psutil", "setproctitle"] },
     { name = "ruff" },
@@ -561,7 +567,9 @@ dev = [
     { name = "pre-commit", specifier = "==3.7.1" },
     { name = "pycine", git = "https://github.com/ottomatic-io/pycine?rev=815cfca06cafc50745a43b2cd0168982225c6dca#815cfca06cafc50745a43b2cd0168982225c6dca" },
     { name = "pyright", specifier = "==1.1.371" },
-    { name = "pytest-harvest", specifier = "==1.10.5" },
+    { name = "pytest-cov", specifier = "==5.0.0" },
+    { name = "pytest-custom-exit-code", specifier = "==0.3.0" },
+    { name = "pytest-github-actions-annotate-failures", specifier = "==0.2.0" },
     { name = "pytest-plt", specifier = "==1.1.1" },
     { name = "pytest-xdist", extras = ["psutil", "setproctitle"], specifier = "==3.6.1" },
     { name = "ruff", specifier = "==0.5.1" },
@@ -1334,6 +1342,7 @@ dependencies = [
     { name = "boilercore" },
     { name = "cachier" },
     { name = "colorcet" },
+    { name = "context-models" },
     { name = "cyclopts" },
     { name = "devtools" },
     { name = "docutils" },
@@ -1342,6 +1351,8 @@ dependencies = [
     { name = "ipykernel" },
     { name = "matplotlib" },
     { name = "more-itertools" },
+    { name = "myst-nb" },
+    { name = "myst-parser" },
     { name = "nbformat" },
     { name = "numpy" },
     { name = "numpydoc" },
@@ -1349,17 +1360,15 @@ dependencies = [
     { name = "pydantic" },
     { name = "pydantic-settings" },
     { name = "pytest" },
-    { name = "pytest-cov" },
-    { name = "pytest-custom-exit-code" },
-    { name = "pytest-github-actions-annotate-failures" },
+    { name = "pytest-harvest" },
     { name = "python-dotenv" },
     { name = "ruamel-yaml" },
     { name = "seaborn" },
     { name = "shapely" },
     { name = "sphinx" },
     { name = "sympy" },
+    { name = "toml" },
     { name = "trackpy" },
-    { name = "urllib3" },
 ]
 
 [package.metadata]
@@ -1367,6 +1376,7 @@ requires-dist = [
     { name = "boilercore", editable = "packages/boilercore" },
     { name = "cachier", editable = "packages/cachier" },
     { name = "colorcet", specifier = ">=3.0.1" },
+    { name = "context-models", editable = "packages/context_models" },
     { name = "cyclopts", specifier = "==2.9.3" },
     { name = "devtools", specifier = ">=0.12.2" },
     { name = "docutils", specifier = "==0.21.2" },
@@ -1375,6 +1385,8 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29.4" },
     { name = "matplotlib", specifier = ">=3.7.2" },
     { name = "more-itertools", specifier = "==10.4.0" },
+    { name = "myst-nb", specifier = "==1.1.1" },
+    { name = "myst-parser", specifier = "==3.0.1" },
     { name = "nbformat", specifier = "==5.10.4" },
     { name = "numpy", specifier = ">=1.24.4" },
     { name = "numpydoc", specifier = "==1.7.0" },
@@ -1382,18 +1394,15 @@ requires-dist = [
     { name = "pydantic", specifier = ">=2.9.1" },
     { name = "pydantic-settings", specifier = ">=2.5.2" },
     { name = "pytest", specifier = "==8.2.2" },
-    { name = "pytest-cov", specifier = "==5.0.0" },
-    { name = "pytest-custom-exit-code", specifier = "==0.3.0" },
-    { name = "pytest-github-actions-annotate-failures", specifier = "==0.2.0" },
+    { name = "pytest-harvest", specifier = "==1.10.5" },
     { name = "python-dotenv", specifier = "==1.0.1" },
     { name = "ruamel-yaml", specifier = "==0.18.6" },
     { name = "seaborn", specifier = ">=0.13.2" },
     { name = "shapely", specifier = ">=2.0.3" },
     { name = "sphinx", specifier = "==7.3.7" },
     { name = "sympy", specifier = ">=1.12" },
-    { name = "toml", marker = "python_full_version < '3.11'", specifier = "==0.10.2" },
+    { name = "toml", specifier = "==0.10.2" },
     { name = "trackpy", specifier = ">=0.6.2" },
-    { name = "urllib3", specifier = ">=2.2.2" },
 ]
 
 [[package]]
@@ -2043,7 +2052,7 @@ wheels = [
 
 [[package]]
 name = "google-api-core"
-version = "2.19.2"
+version = "2.20.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-auth" },
@@ -2052,23 +2061,23 @@ dependencies = [
     { name = "protobuf" },
     { name = "requests" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/78/14/99c2514b3ccc5aad1e0776f0ae8295c9f7153aead4f41d07dd126cecdc14/google_api_core-2.19.2.tar.gz", hash = "sha256:ca07de7e8aa1c98a8bfca9321890ad2340ef7f2eb136e558cee68f24b94b0a8f", size = 149057 }
+sdist = { url = "https://files.pythonhosted.org/packages/c8/5c/31c1742a53b79c8a0c4757b5fae2e8ab9c519cbd7b98c587d4294e1d2d16/google_api_core-2.20.0.tar.gz", hash = "sha256:f74dff1889ba291a4b76c5079df0711810e2d9da81abfdc99957bc961c1eb28f", size = 152583 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/79/53/2e340a6ed897fa2bdd6c1bf166b98c047fbb648463dfd2b209ca7d501984/google_api_core-2.19.2-py3-none-any.whl", hash = "sha256:53ec0258f2837dd53bbd3d3df50f5359281b3cc13f800c941dd15a9b5a415af4", size = 139427 },
+    { url = "https://files.pythonhosted.org/packages/c8/dc/6143f67acf5f30717c9e1b1c48fc04c0f59b869be046e6639d3f171640ae/google_api_core-2.20.0-py3-none-any.whl", hash = "sha256:ef0591ef03c30bb83f79b3d0575c3f31219001fc9c5cf37024d08310aeffed8a", size = 142162 },
 ]
 
 [[package]]
 name = "google-auth"
-version = "2.34.0"
+version = "2.35.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachetools" },
     { name = "pyasn1-modules" },
     { name = "rsa" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/0f/ae/634dafb151366d91eb848a25846a780dbce4326906ef005d199723fbbca0/google_auth-2.34.0.tar.gz", hash = "sha256:8eb87396435c19b20d32abd2f984e31c191a15284af72eb922f10e5bde9c04cc", size = 257875 }
+sdist = { url = "https://files.pythonhosted.org/packages/a1/37/c854a8b1b1020cf042db3d67577c6f84cd1e8ff6515e4f5498ae9e444ea5/google_auth-2.35.0.tar.gz", hash = "sha256:f4c64ed4e01e8e8b646ef34c018f8bf3338df0c8e37d8b3bba40e7f574a3278a", size = 267223 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bb/fb/9af9e3f2996677bdda72734482934fe85a3abde174e5f0783ac2f817ba98/google_auth-2.34.0-py2.py3-none-any.whl", hash = "sha256:72fd4733b80b6d777dcde515628a9eb4a577339437012874ea286bca7261ee65", size = 200870 },
+    { url = "https://files.pythonhosted.org/packages/27/1f/3a72917afcb0d5cd842cbccb81bf7a8a7b45b4c66d8dc4556ccb3b016bfc/google_auth-2.35.0-py2.py3-none-any.whl", hash = "sha256:25df55f327ef021de8be50bad0dfd4a916ad0de96da86cd05661c9297723ad3f", size = 208968 },
 ]
 
 [[package]]
@@ -5194,6 +5203,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/44/6f/38d2335a2b70b9982d112bb177e3dbe169746423e33f718bf5e9c7b3ddd3/tinycss2-1.3.0.tar.gz", hash = "sha256:152f9acabd296a8375fbca5b84c961ff95971fcfc32e79550c8df8e29118c54d", size = 67360 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/2c/4d/0db5b8a613d2a59bbc29bc5bb44a2f8070eb9ceab11c50d477502a8a0092/tinycss2-1.3.0-py3-none-any.whl", hash = "sha256:54a8dbdffb334d536851be0226030e9505965bb2f30f21a4a82c55fb2a80fae7", size = 22532 },
+]
+
+[[package]]
+name = "toml"
+version = "0.10.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/be/ba/1f744cdc819428fc6b5084ec34d9b30660f6f9daaf70eead706e3203ec3c/toml-0.10.2.tar.gz", hash = "sha256:b3bda1d108d5dd99f4a20d24d9c348e91c4db7ab1b749200bded2f839ccbe68f", size = 22253 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/44/6f/7120676b6d73228c96e17f1f794d8ab046fc910d781c8d151120c3f1569e/toml-0.10.2-py2.py3-none-any.whl", hash = "sha256:806143ae5bfb6a3c6e736a764057db0e6a0e05e338b5630894a5f779cabb4f9b", size = 16588 },
 ]
 
 [[package]]
