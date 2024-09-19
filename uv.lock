@@ -1330,7 +1330,6 @@ name = "dev"
 version = "0.0.0"
 source = { editable = "packages/_dev" }
 dependencies = [
-    { name = "cachier" },
     { name = "colorcet" },
     { name = "cyclopts" },
     { name = "devtools" },
@@ -1362,7 +1361,6 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "cachier", editable = "packages/cachier" },
     { name = "colorcet", specifier = ">=3.0.1" },
     { name = "cyclopts", specifier = "==2.9.3" },
     { name = "devtools", specifier = ">=0.12.2" },

@@ -5,7 +5,7 @@ build-backend = "flit_core.buildapi"
 [project]
 name = "boilercv_pipeline"
 version = "0.0.0"
-description = "Data pipeline."
+description = "Data pipeline"
 dependencies = [
   "astroid>=3.3.1",
   "cappa>=0.22.4",

@@ -57,11 +57,11 @@ dev-dependencies = [
   # TODO
   "pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca",
   # ? Workspaces
-  "dev",
-  "boilercv_pipeline",
   "boilercine",
   "boilercore",
+  "boilercv_pipeline",
   "context_models",
+  "dev",
   # ? Path-sourced deps
   "cachier",
   # ? Dev
