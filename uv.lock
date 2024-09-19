@@ -21,9 +21,6 @@ resolution-markers = [
     "(python_full_version >= '3.13' and platform_machine != 'aarch64' and platform_system != 'Darwin' and sys_platform != 'linux') or (python_full_version >= '3.13' and platform_system != 'Darwin' and platform_system != 'Linux' and sys_platform != 'linux')",
 ]
 
-[options]
-resolution-mode = "lowest-direct"
-
 [manifest]
 members = [
     "boilercine",

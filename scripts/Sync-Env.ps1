@@ -68,8 +68,8 @@ else {
         if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
         return
     }
-    uv sync --resolution lowest-direct --python $PythonVersion
-    uv export --resolution lowest-direct --frozen --no-hashes --python $PythonVersion |
+    uv sync --python $PythonVersion
+    uv export --frozen --no-hashes --python $PythonVersion |
         Set-Content "$PWD/requirements/requirements_dev.txt"
     $Env:SYNC_ENV_SYNCED = $true
 }
