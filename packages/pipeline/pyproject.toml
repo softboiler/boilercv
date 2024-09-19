@@ -51,7 +51,7 @@ cv = ["opencv-python>=4.10.0.84"]
 [tool.fawltydeps]
 deps = ["packages/pipeline/pyproject.toml"]
 code = ["packages/pipeline/boilercv_pipeline"]
-ignore_undeclared = ["boilercv", "boilercv_docs", "PySide6"]
+ignore_undeclared = ["boilercv", "PySide6"]
 ignore_unused = [
   "pyarrow", # Used in `boilercv_pipeline.__init__`
 ]
