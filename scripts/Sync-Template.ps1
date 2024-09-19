@@ -16,7 +16,6 @@ Param(
 $Copier = 'copier@9.2.0'
 
 if (!$Stay) {
-    git submodule update --init --remote --merge $Template
     git add .
     $Ref = $Ref ? $Ref : (Get-Content '.copier-answers.yml' | Find-Pattern '^_commit:\s.+([^-]+)$')
     try { git commit --no-verify -m "Update template digest to $Ref" }
