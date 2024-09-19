@@ -56,6 +56,11 @@
   "ignorePaths": ["requirements.txt", "requirements/requirements.txt", "requirements/requirements_high.txt"],
   "packageRules": [
     {
+      "description": "Update regex pins separately from PEP 621",
+      "groupName": "regex",
+      "matchManagers": ["regex"]
+    },
+    {
       "description": "Manually test `.devcontainer` updates separately",
       "groupName": "devcontainer",
       "matchManagers": ["devcontainer"]
