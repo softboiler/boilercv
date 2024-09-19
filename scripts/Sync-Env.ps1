@@ -32,7 +32,6 @@ $CI = [bool]($Env:SYNC_ENV_DISABLE_CI ? $null : $Env:CI)
 $Devcontainer = [bool]($Env:SYNC_ENV_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER)
 
 if (!$CI) {
-    $Env:PATH = "$HOME/.cargo/bin;$Env:PATH"
     if (Get-Command 'uv' -ErrorAction 'Ignore') {
         if (!(uv --version | Select-String $UvVersion)) { uv self update $UvVersion }
     }
@@ -48,12 +47,12 @@ if (!$CI) {
 if ($Low) {
     uv sync --resolution lowest-direct --python $PythonVersion
     uv export --resolution lowest-direct --frozen --no-hashes --python $PythonVersion |
-        Set-Content "$PWD/requirements/requirements_low.txt"
+        Set-Content "$PWD/requirements/requirements_dev_low.txt"
 }
 elseif ($High) {
     uv sync --upgrade --python $PythonVersion
     uv export --frozen --no-hashes --python $PythonVersion |
-        Set-Content "$PWD/requirements/requirements_high.txt"
+        Set-Content "$PWD/requirements/requirements_dev_high.txt"
 }
 elseif ($Build) {
     uv sync --no-sources --no-dev --python $PythonVersion

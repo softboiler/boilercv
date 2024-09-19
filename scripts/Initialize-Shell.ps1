@@ -16,3 +16,4 @@ if ($IsWindows) {
 if (Test-Path '.venv') {
     if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
 }
+if (!$Env:CI) { $Env:PATH = "$HOME/.cargo/bin;$Env:PATH" }
