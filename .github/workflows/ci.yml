@@ -75,7 +75,7 @@ jobs:
         with:
           version: "0.4.12"
           enable-cache: true
-      - run: "scripts/Sync-Env.ps1; pre-commit run fawltydeps-src; pre-commit run fawltydeps-dev"
+      - run: "scripts/Sync-Env.ps1; pre-commit run fawltydeps-src; pre-commit run fawltydeps-dev; pre-commit run fawltydeps-pipeline"
   pyright:
     runs-on: "ubuntu-22.04"
     steps:
