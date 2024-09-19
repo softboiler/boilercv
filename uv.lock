@@ -591,12 +591,9 @@ version = "0.0.0"
 source = { editable = "packages/pipeline" }
 dependencies = [
     { name = "astroid" },
-    { name = "boilercine" },
-    { name = "boilercore" },
     { name = "cappa" },
     { name = "cmasher" },
     { name = "colorcet" },
-    { name = "context-models" },
     { name = "copykitten" },
     { name = "cyclopts" },
     { name = "imageio", extra = ["pyav"] },
@@ -634,12 +631,9 @@ cv = [
 [package.metadata]
 requires-dist = [
     { name = "astroid", specifier = ">=3.3.1" },
-    { name = "boilercine", editable = "packages/boilercine" },
-    { name = "boilercore", editable = "packages/boilercore" },
     { name = "cappa", specifier = ">=0.22.4" },
     { name = "cmasher", specifier = ">=1.7.2" },
     { name = "colorcet", specifier = ">=3.0.1" },
-    { name = "context-models", editable = "packages/context_models" },
     { name = "copykitten", specifier = ">=1.1.1" },
     { name = "cyclopts", specifier = ">=2.6.1" },
     { name = "imageio", extras = ["pyav"], specifier = ">=2.34.1" },
@@ -1336,10 +1330,8 @@ name = "dev"
 version = "0.0.0"
 source = { editable = "packages/_dev" }
 dependencies = [
-    { name = "boilercore" },
     { name = "cachier" },
     { name = "colorcet" },
-    { name = "context-models" },
     { name = "cyclopts" },
     { name = "devtools" },
     { name = "docutils" },
@@ -1370,10 +1362,8 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "boilercore", editable = "packages/boilercore" },
     { name = "cachier", editable = "packages/cachier" },
     { name = "colorcet", specifier = ">=3.0.1" },
-    { name = "context-models", editable = "packages/context_models" },
     { name = "cyclopts", specifier = "==2.9.3" },
     { name = "devtools", specifier = ">=0.12.2" },
     { name = "docutils", specifier = "==0.21.2" },
