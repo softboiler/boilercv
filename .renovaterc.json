@@ -53,7 +53,7 @@
     "description": "Additionally monitor these files",
     "fileMatch": ["(^|/)requirements/.+$"]
   },
-  "ignorePaths": ["requirements.txt", "requirements/requirements.txt"],
+  "ignorePaths": ["requirements.txt", "requirements/requirements.txt", "requirements/requirements_high.txt"],
   "packageRules": [
     {
       "description": "Sync uv version",
