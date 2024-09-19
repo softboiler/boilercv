@@ -33,6 +33,14 @@
       "depNameTemplate": "astral-sh/uv"
     },
     {
+      "description": "uv-gha",
+      "customType": "regex",
+      "fileMatch": ["^\\.github/workflows/.*$"],
+      "matchStrings": ["- uses: \"astral-sh/setup-uv@.+\\n\\s+with:\\n\\s+version: \"(?<currentValue>.+)\""],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "astral-sh/uv"
+    },
+    {
       "description": "Copier",
       "customType": "regex",
       "fileMatch": ["^\\.copier-version$"],
