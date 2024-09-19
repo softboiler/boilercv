@@ -48,7 +48,7 @@ function Sync-Uv {
         $Env:INSTALLER_NO_MODIFY_PATH = $true
         if ($IsWindows) { Invoke-RestMethod "https://github.com/astral-sh/uv/releases/download/$Version/uv-installer.ps1" | Invoke-Expression }
         else { curl --proto '=https' --tlsv1.2 -LsSf "https://github.com/astral-sh/uv/releases/download/$Version/uv-installer.sh" | sh }
-        Move-Item -Force 'bin/uv.*', 'bin/uvx.*' '.'
+        Move-Item -Force ('bin/uv.*', 'bin/uvx.*') '.'
         if (Test-Path 'bin') { Remove-Item 'bin' }
         if ($OrigCargoHome) { $Env:CARGO_HOME = $OrigCargoHome }
     }
@@ -58,7 +58,7 @@ function Sync-DevEnv {
     <#.SYNOPSIS
     Sync virtual environment and set environment variables.#>
 
-    Param([switch]$High)
+    Param([switch]$High, [switch]$Locked)
 
     # ? Track environment variables to update `.env` with later
     $EnvVars = @{}
@@ -75,16 +75,16 @@ function Sync-DevEnv {
     if ($High) {
         uv sync --resolution highest
         $DefaultLockPath = 'uv.lock'
-        Move-Item -Force $DefaultLockPath "$RequirementsDir/uv_high.lock"
+        $HighLockPath = "$RequirementsDir/uv_high.lock"
+        Move-Item -Force $DefaultLockPath $HighLockPath
         $PostCheckoutPath = '.git/hooks/post-checkout'
         if ($PostCheckoutHook = (Test-Path $PostCheckoutPath)) { Move-Item $PostCheckoutPath .git/hooks/_post-checkout }
         git checkout -- $DefaultLockPath
         if ($PostCheckoutHook) { Move-Item '.git/hooks/_post-checkout' $PostCheckoutPath }
-        $LockPath = $High ? "$RequirementsDir/uv_high.lock" : 'uv.lock'
-        Move-Item 'uv.lock' $LockPath -Force
         (uv export --no-hashes --resolution highest --output-file $RequirementsPath) |
             Set-Content $RequirementsPath
     }
+    elseif ($Locked) { $uv sync --locked }
     else {
         uv sync
         (uv export --no-hashes --output-file $RequirementsPath) |
