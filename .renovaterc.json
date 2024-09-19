@@ -5,18 +5,17 @@
   "extends": ["config:base", "group:all", ":enablePreCommit"],
   "dependencyDashboardApproval": false,
   "schedule": ["on the 16th day of the month"],
-  "git-submodules": {
-    "enabled": true
-  },
+  "git-submodules": { "enabled": true },
   "enabledManagers": [
     "custom.regex",
     "devcontainer",
     "git-submodules",
     "github-actions",
     "pep621",
-    "pip_requirements",
     "pre-commit"
   ],
+  "pep621": { "rangeStrategy": "bump" },
+  "ignorePaths": ["requirements.txt", "requirements/requirements.txt", "requirements/requirements_high.txt"],
   "customManagers": [
     {
       "description": "uv",
@@ -49,11 +48,6 @@
       "depNameTemplate": "microsoft/pylance-release"
     }
   ],
-  "pip_requirements": {
-    "description": "Additionally monitor these files",
-    "fileMatch": ["(^|/)requirements/.+$"]
-  },
-  "ignorePaths": ["requirements.txt", "requirements/requirements.txt", "requirements/requirements_high.txt"],
   "packageRules": [
     {
       "description": "Update regex pins separately from PEP 621",
@@ -68,19 +62,19 @@
     {
       "description": "Stubs for pandas sometimes lag",
       "groupName": "pandas",
-      "matchManagers": ["pep621", "pip_requirements"],
+      "matchManagers": ["pep621"],
       "matchDepNames": ["pandas", "pandas-stubs"]
     },
     {
       "description": "Imageio sometimes lags pillow.",
       "groupName": "imageio",
-      "matchManagers": ["pep621", "pip_requirements"],
+      "matchManagers": ["pep621"],
       "matchDepNames": ["imageio"]
     },
     {
       "description": "Pillow sometimes leads imageio.",
       "groupName": "pillow",
-      "matchManagers": ["pep621", "pip_requirements"],
+      "matchManagers": ["pep621"],
       "matchDepNames": ["pillow"]
     }
   ]
