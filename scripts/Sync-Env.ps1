@@ -1,5 +1,5 @@
 <#.SYNOPSIS
-Initialize shell environment.#>
+Sync environment.#>
 
 Param(
     [string]$PythonVersion,
@@ -9,7 +9,7 @@ Param(
     [switch]$Build
 )
 
-. scripts/Common.ps1
+. scripts/Initialize-Shell.ps1
 
 # ? Error-handling
 $ErrorActionPreference = 'Stop'

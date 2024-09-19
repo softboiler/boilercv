@@ -1,6 +1,8 @@
 <#.SYNOPSIS
 Initialize repository.#>
 
+. scripts/Initialize-Shell.ps1
+
 git init
 
 # ? Modify GitHub repo later on only if there were not already commits in this repo

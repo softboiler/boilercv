@@ -1,6 +1,8 @@
 <#.SYNOPSIS
 Initialize Windows machine.#>
 
+. scripts/Initialize-Shell.ps1
+
 $origPreference = $ErrorActionPreference
 $ErrorActionPreference = 'SilentlyContinue'
 # Common winget options

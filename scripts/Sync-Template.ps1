@@ -12,6 +12,7 @@ Param(
 )
 
 . scripts/Common.ps1
+. scripts/Initialize-Shell.ps1
 
 $Copier = "copier@$(Get-Content '.copier-version')"
 $Ref = $Stay ? (Get-Content '.copier-answers.yml' | Find-Pattern '^_commit:\s.+([^-]+)$') : $Ref

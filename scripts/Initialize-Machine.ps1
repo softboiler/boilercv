@@ -1,6 +1,8 @@
 <#.SYNOPSIS
 Finish machine initialization (cross-platform).#>
 
+. scripts/Initialize-Shell.ps1
+
 # ? Set Git username if missing
 try { $name = git config 'user.name' }
 catch [System.Management.Automation.NativeCommandExitException] { $name = '' }
