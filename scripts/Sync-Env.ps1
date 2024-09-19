@@ -6,8 +6,7 @@ Param(
     [string]$UvVersion,
     [switch]$Low,
     [switch]$High,
-    [switch]$Build,
-    [switch]$Locked
+    [switch]$Build
 )
 
 . scripts/Common.ps1
@@ -31,7 +30,6 @@ $PylanceVersion = $PylanceVersion ? $PylanceVersion : (Get-Content '.pylance-ver
 
 $CI = [bool]($Env:SYNC_ENV_DISABLE_CI ? $null : $Env:CI)
 $Devcontainer = [bool]($Env:SYNC_ENV_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER)
-$Locked = [bool]($Locked ? $Locked : $CI)
 
 if (!$CI) {
     $Env:PATH = "$HOME/.cargo/bin;$Env:PATH"
@@ -64,11 +62,6 @@ elseif ($Build) {
     uv build --python $PythonVersion
     if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
     return
-}
-elseif ($Locked) {
-    uv sync --resolution lowest-direct --locked --python $PythonVersion
-    uv export --resolution lowest-direct --frozen --no-hashes --python $PythonVersion |
-        Set-Content "$PWD/requirements/requirements_dev.txt"
 }
 else {
     if ($Env:SYNC_ENV_SYNCED) {
