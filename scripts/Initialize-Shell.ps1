@@ -13,4 +13,6 @@ if ($IsWindows) {
     # ? See: https://github.com/PowerShell/PowerShell/issues/7233#issuecomment-640243647
     [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 }
-if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+if (Test-Path '.venv') {
+    if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+}
