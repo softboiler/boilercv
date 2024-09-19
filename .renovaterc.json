@@ -6,6 +6,7 @@
   "dependencyDashboardApproval": true,
   "schedule": ["on the 16th day of the month"],
   "lockFileMaintenance": { "enabled": true },
+  "separateMajorMinor": false,
   "git-submodules": { "enabled": true },
   "enabledManagers": [
     "custom.regex",
@@ -15,7 +16,6 @@
     "pep621",
     "pre-commit"
   ],
-  "pep621": { "rangeStrategy": "bump" },
   "customManagers": [
     {
       "description": "uv",
