@@ -7,7 +7,9 @@ Param(
     # Sync to highest dependencies.
     [switch]$High,
     # Perform minimal sync for release workflow.
-    [switch]$Release
+    [switch]$Release,
+    # Just check the lock is valid when syncing.
+    [switch]$Locked
 )
 
 . scripts/Common.ps1
@@ -32,25 +34,20 @@ $High = $High ? $High : [bool]$Env:SYNC_PY_HIGH
 $CI = $Env:SYNC_PY_DISABLE_CI ? $null : $Env:CI
 $Devcontainer = $Env:SYNC_PY_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER
 
-# if ($CI) {
-#     'SYNCING PROJECT WITH TEMPLATE' | Write-Progress
-#     try { scripts/Sync-Template.ps1 -Stay } catch
-#     [System.Management.Automation.NativeCommandExitException] {
-#         git stash save --include-untracked
-#         scripts/Sync-Template.ps1 -Stay
-#         git stash pop
-#         git add .
-#     }
-#     'PROJECT SYNCED WITH TEMPLATE' | Write-Progress
-# }
 if (!$CI) {
     Sync-Uv -Version '0.4.10'
     Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 | Remove-Item
     git submodule update --init --merge
 }
 
-if ($High) { Sync-DevEnv -High } else { Sync-DevEnv }
-if ($Release) { return }
+if ($Locked) {
+    if ($High) { Sync-DevEnv -High } else { Sync-DevEnv }
+    if ($Release) { return }
+}
+else {
+    if ($High) { Sync-DevEnv -Locked } else { Sync-DevEnv }
+    if ($Release) { return }
+}
 
 if ($Devcontainer) {
     $Repo = Get-ChildItem '/workspaces'

@@ -160,6 +160,7 @@ jobs:
       - uses: "actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16" # v4.1.8
         with:
           name: "lock"
+      - run: "scripts/Sync-Env.ps1 -High -Locked"
       - uses: "stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842" # v5.0.1
         with:
           commit_message: "Sync and lock highest dependencies"

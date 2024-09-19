@@ -56,18 +56,6 @@
   "ignorePaths": ["requirements.txt", "requirements/requirements.txt", "requirements/requirements_high.txt"],
   "packageRules": [
     {
-      "description": "Sync uv version",
-      "groupName": "uv",
-      "matchManagers": ["github-actions", "regex"],
-      "matchDepNames": ["astral-sh/uv", "astral-sh/setup-uv"]
-    },
-    {
-      "description": "Sync with template",
-      "groupName": "template",
-      "matchManagers": ["git-submodules"],
-      "matchDepNames": ["submodules/template"]
-    },
-    {
       "description": "Manually test `.devcontainer` updates separately",
       "groupName": "devcontainer",
       "matchManagers": ["devcontainer"]

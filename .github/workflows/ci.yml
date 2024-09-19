@@ -197,7 +197,7 @@ jobs:
         with:
           version: "0.4.10"
           enable-cache: true
-      - run: "scripts/Sync-Env.ps1"
+      - run: "scripts/Sync-Env.ps1 -Locked"
       - uses: "stefanzweifel/git-auto-commit-action@8621497c8c39c72f3e2a999a26b4ca1b5058a842" # v5.0.1
         with:
           commit_message: "Sync and lock"
