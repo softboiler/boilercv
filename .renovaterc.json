@@ -14,8 +14,6 @@
     "pep621",
     "pre-commit"
   ],
-  "pep621": { "rangeStrategy": "bump" },
-  "ignorePaths": ["requirements.txt", "requirements/requirements.txt", "requirements/requirements_high.txt"],
   "customManagers": [
     {
       "description": "uv",
