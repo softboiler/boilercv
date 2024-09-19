@@ -41,13 +41,12 @@ if (!$CI) {
 }
 
 if ($Locked) {
-    if ($High) { Sync-DevEnv -High } else { Sync-DevEnv }
-    if ($Release) { return }
+    if ($High) { Sync-DevEnv -Locked -High } else { Sync-DevEnv -Locked }
 }
 else {
-    if ($High) { Sync-DevEnv -Locked } else { Sync-DevEnv }
-    if ($Release) { return }
+    if ($High) { Sync-DevEnv -High } else { Sync-DevEnv }
 }
+if ($Release) { return }
 
 if ($Devcontainer) {
     $Repo = Get-ChildItem '/workspaces'
@@ -65,13 +64,7 @@ else {
     $Hooks = '.git/hooks'
     if (!(Test-Path "$Hooks/post-checkout") -or !(Test-Path "$Hooks/pre-commit") -or
         !(Test-Path "$Hooks/pre-push")
-    ) {
-        New-Item $Hooks -ItemType 'Directory'
-        'INSTALLING PRE-COMMIT HOOKS' | Write-Progress
-        pre-commit install
-        'PRE-COMMIT HOOKS INSTALLED' | Write-Progress -Done
-        '' | Write-Host
-    }
+    ) { pre-commit install }
     if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore') -and
         $Env:PYRIGHT_PYTHON_PYLANCE_VERSION
     ) {
