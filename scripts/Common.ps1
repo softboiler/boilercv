@@ -84,7 +84,7 @@ function Sync-DevEnv {
         (uv export --no-hashes --resolution highest --output-file $RequirementsPath) |
             Set-Content $RequirementsPath
     }
-    elseif ($Locked) { $uv sync --locked }
+    elseif ($Locked) { uv sync --locked }
     else {
         uv sync
         (uv export --no-hashes --output-file $RequirementsPath) |
