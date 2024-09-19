@@ -29,10 +29,9 @@ $PythonVersion = $PythonVersion ? $PythonVersion : (Get-Content '.python-version
 $UvVersion = $UvVersion ? $UvVersion : (Get-Content '.uv-version')
 $PylanceVersion = $PylanceVersion ? $PylanceVersion : (Get-Content '.pylance-version')
 
-$CI = $Env:SYNC_ENV_DISABLE_CI ? $null : $Env:CI
-$Devcontainer = $Env:SYNC_ENV_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER
-
-$Locked = $Locked ? $Locked : $CI
+$CI = [bool]($Env:SYNC_ENV_DISABLE_CI ? $null : $Env:CI)
+$Devcontainer = [bool]($Env:SYNC_ENV_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER)
+$Locked = [bool]($Locked ? $Locked : $CI)
 
 if (!$CI) {
     if (Get-Command 'uv' -ErrorAction 'Ignore') {
