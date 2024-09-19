@@ -2,12 +2,19 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "description": "Establish base config, schedule, and manager defaults",
   "addLabels": ["dependencies"],
-  "extends": ["config:base", ":enablePreCommit"],
+  "extends": [
+    ":dependencyDashboard",
+    ":semanticPrefixFixDepsChoreOthers",
+    ":ignoreModulesAndTests",
+    "replacements:all",
+    "workarounds:all"
+  ],
   "dependencyDashboardApproval": true,
   "schedule": ["on the 16th day of the month"],
   "lockFileMaintenance": { "enabled": true },
   "separateMajorMinor": false,
   "git-submodules": { "enabled": true },
+  "pre-commit": { "enabled": true },
   "enabledManagers": [
     "custom.regex",
     "devcontainer",
