@@ -40,7 +40,6 @@
     "packages/context_models": true,
     "typings": true,
     "uv.lock": true,
-    "requirements/uv_high.lock": true
   },
   //! File nesting
   "explorer.sortOrder": "foldersNestsFiles",

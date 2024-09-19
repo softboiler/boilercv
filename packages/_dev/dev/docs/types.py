@@ -22,8 +22,6 @@ class IspxMappingValue(NamedTuple):
 
 
 # * MARK: docstrings
-
-
 SeeAlsoReference: TypeAlias = tuple[str, None]
 """In all examples given, there is a "None" here, like (numpy.dot, None)."""
 SeeAlsoRelationship: TypeAlias = list[str]

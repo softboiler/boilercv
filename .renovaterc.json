@@ -10,7 +10,6 @@
     "workarounds:all"
   ],
   "dependencyDashboardApproval": true,
-  "schedule": ["on the 16th day of the month"],
   "lockFileMaintenance": { "enabled": true },
   "separateMajorMinor": false,
   "git-submodules": { "enabled": true },
@@ -72,30 +71,6 @@
       "description": "Update `.devcontainer` updates separately for manual testing",
       "groupName": "devcontainer",
       "matchManagers": ["devcontainer"]
-    },
-    {
-      "description": "Pandas stubs lag pandas",
-      "groupName": "pandas-stubs",
-      "matchManagers": ["pep621"],
-      "matchDepNames": ["pandas-stubs"]
-    },
-    {
-      "description": "Pandas leads pandas-stubs",
-      "groupName": "pandas",
-      "matchManagers": ["pep621"],
-      "matchDepNames": ["pandas"]
-    },
-    {
-      "description": "Imageio sometimes lags pillow.",
-      "groupName": "imageio",
-      "matchManagers": ["pep621"],
-      "matchDepNames": ["imageio"]
-    },
-    {
-      "description": "Pillow sometimes leads imageio.",
-      "groupName": "pillow",
-      "matchManagers": ["pep621"],
-      "matchDepNames": ["pillow"]
     }
   ]
 }
