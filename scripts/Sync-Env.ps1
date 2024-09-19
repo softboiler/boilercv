@@ -44,6 +44,7 @@ if (!$CI) {
 }
 
 # ? Sync the environment
+if (!(Test-Path 'requirements')) { New-Item 'requirements' -ItemType 'Directory' }
 if ($Low) {
     uv sync --resolution lowest-direct --python $PythonVersion
     uv export --resolution lowest-direct --frozen --no-hashes --python $PythonVersion |
