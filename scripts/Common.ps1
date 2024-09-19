@@ -78,7 +78,7 @@ function Sync-DevEnv {
         $HighLockPath = "$RequirementsDir/uv_high.lock"
         Move-Item -Force $DefaultLockPath $HighLockPath
         $PostCheckoutPath = '.git/hooks/post-checkout'
-        if ($PostCheckoutHook = (Test-Path $PostCheckoutPath)) { Move-Item $PostCheckoutPath .git/hooks/_post-checkout }
+        if ($PostCheckoutHook = (Test-Path $PostCheckoutPath)) { Move-Item $PostCheckoutPath '.git/hooks/_post-checkout' }
         git checkout -- $DefaultLockPath
         if ($PostCheckoutHook) { Move-Item '.git/hooks/_post-checkout' $PostCheckoutPath }
         (uv export --no-hashes --resolution highest --output-file $RequirementsPath) |
