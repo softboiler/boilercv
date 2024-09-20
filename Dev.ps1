@@ -213,7 +213,7 @@ function Sync-Template {
     $Copier = "copier@$(Get-Content '.copier-version')"
     $Ref = $Stay ? (Get-Content '.copier-answers.yml' | Find-Pattern '^_commit:\s.+([^-]+)$') : $Ref
     if ($Recopy) {
-        if ($Prompt) { return uvx $Copier $Subcommand $Defaults --vcs-ref=$Ref }
+        if ($Prompt) { return uvx $Copier recopy $Defaults --vcs-ref=$Ref }
         return uvx $Copier recopy --overwrite --defaults
     }
     if ($Prompt) { return uvx $Copier update --vcs-ref=$Ref }
