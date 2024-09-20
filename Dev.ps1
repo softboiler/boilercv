@@ -3,7 +3,7 @@ Common utilities.#>
 
 # ? Error-handling
 $ErrorActionPreference = 'Stop'
-$PSNativeCommandUseErrorActionPreference = $true
+$PSNativeCommandUseErrorActionPreference = $True
 $ErrorView = 'NormalView'
 
 # ? Fix leaky UTF-8 encoding settings on Windows
@@ -48,11 +48,16 @@ function Install-Uv {
 
 }
 
+function New-Switch {
+    Param($Cond = $False, $Alt = $False)
+    return [switch]($Cond ? $True : $Alt)
+}
+
 
 function Invoke-Uv {
     <#.SYNOPSIS
     Invoke `uv`.#>
-    [CmdletBinding(PositionalBinding = $false)]
+    [CmdletBinding(PositionalBinding = $False)]
     Param(
         [switch]$Sync,
         [switch]$Update,
@@ -60,12 +65,11 @@ function Invoke-Uv {
         [switch]$High,
         [switch]$Build,
         [switch]$Force,
+        [switch]$CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI)),
+        [switch]$Devcontainer = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER)),
         [string]$PythonVersion = (Get-Content '.python-version'),
         [string]$PylanceVersion = (Get-Content '.pylance-version'),
-        [switch]$CI = $Env:SYNC_ENV_DISABLE_CI ? $null : $Env:CI,
-        [switch]$Devcontainer =
-        $Env:SYNC_ENV_DISABLE_DEVCONTAINER ? $null : $Env:DEVCONTAINER,
-        [Parameter(ValueFromRemainingArguments = $true)][string[]]$Run
+        [Parameter(ValueFromRemainingArguments = $True)][string[]]$Run
     )
     if ($CI -or $Sync) {
         if (!$CI) {
@@ -102,7 +106,7 @@ function Invoke-Uv {
             if ($CI) {
                 Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts")
             }
-            $Env:ENV_SYNCED = $true
+            $Env:ENV_SYNCED = $True
         }
         # ? Track environment variables to update `.env` with later
         $EnvVars = @{}
@@ -224,22 +228,22 @@ function Initialize-Repo {
 
     # ? Modify GitHub repo later on only if there were not already commits in this repo
     try { git rev-parse HEAD }
-    catch [System.Management.Automation.NativeCommandExitException] { $Fresh = $true }
+    catch [System.Management.Automation.NativeCommandExitException] { $Fresh = $True }
 
     git add .
     try { git commit --no-verify -m 'Prepare template using blakeNaccarato/copier-python' }
-    catch [System.Management.Automation.NativeCommandExitException] { $AlreadyTemplated = $true }
+    catch [System.Management.Automation.NativeCommandExitException] { $AlreadyTemplated = $True }
 
     git submodule add --force --name 'typings' 'https://github.com/microsoft/python-type-stubs.git' 'typings'
     git add .
     try { git commit --no-verify -m 'Add template and type stub submodules' }
-    catch [System.Management.Automation.NativeCommandExitException] { $HadSubmodules = $true }
+    catch [System.Management.Automation.NativeCommandExitException] { $HadSubmodules = $True }
 
     Invoke-Uv -Sync -Update
 
     git add .
     try { git commit --no-verify -m 'Lock' }
-    catch [System.Management.Automation.NativeCommandExitException] { $AlreadyLocked = $true }
+    catch [System.Management.Automation.NativeCommandExitException] { $AlreadyLocked = $True }
 
     # ? Modify GitHub repo if there were not already commits in this repo
     if ($Fresh) {
