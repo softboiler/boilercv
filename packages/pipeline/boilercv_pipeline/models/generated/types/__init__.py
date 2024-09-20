@@ -56,10 +56,7 @@ def sync_stages():
             args=[
                 "pwsh",
                 "-Command",
-                sep.join([
-                    f"scripts/Sync-Env.ps1;"
-                    f"ruff format {quote(stages_literals.as_posix())}"
-                ]),
+                f"./Invoke-Uv.ps1 ruff format {quote(stages_literals.as_posix())}"
             ],
         )
 

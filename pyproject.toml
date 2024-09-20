@@ -100,6 +100,7 @@ dev-dependencies = [
   "pytest-xdist[psutil,setproctitle]==3.6.1",
 ]
 [tool.uv.pip]
+python-version = "3.11"
 all-extras = true
 [tool.uv.workspace]
 members = ["packages/*"]

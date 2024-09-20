@@ -227,7 +227,7 @@ class Params(StageParams, Generic[Deps_T, Outs_T]):
             if not isinstance(stage, _dvc.Stage):
                 raise TypeError(f"Expected stage `{name}` to be a {_dvc.Stage}.")
             dvc.model.stages[name] = stage
-            dvc.cmd = f"boilercv-pipeline stage {name.replace('_', '-')}"
+            dvc.cmd = f"./Invoke-Uv.ps1 boilercv-pipeline stage {name.replace('_', '-')}"
         return data
 
     deps: Deps_T
