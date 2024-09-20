@@ -44,8 +44,12 @@ function Install-Uv {
         if ($Update) { uv self update }
         return
     }
-    if ($IsWindows) { Invoke-RestMethod 'https://astral.sh/uv/install.ps1' | Invoke-Expression }
-    else { curl --proto '=https' --tlsv1.2 -LsSf 'https://astral.sh/uv/install.sh' | sh }
+    if ($IsWindows) {
+        Invoke-RestMethod 'https://astral.sh/uv/install.ps1' | Invoke-Expression
+    }
+    else {
+        curl --proto '=https' --tlsv1.2 -LsSf 'https://astral.sh/uv/install.sh' | sh
+    }
 
 }
 
@@ -53,7 +57,6 @@ function New-Switch {
     Param($Cond = $False, $Alt = $False)
     return [switch]($Cond ? $True : $Alt)
 }
-
 
 function Invoke-Uv {
     <#.SYNOPSIS
@@ -76,11 +79,14 @@ function Invoke-Uv {
         if (!$CI) {
             Install-Uv -Update:$Update
             # ? Sync submodules
-            Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 | Remove-Item
+            Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 |
+                Remove-Item
             git submodule update --init --merge
         }
         # ? Sync the environment
-        if (!(Test-Path 'requirements')) { New-Item 'requirements' -ItemType 'Directory' }
+        if (!(Test-Path 'requirements')) {
+            New-Item 'requirements' -ItemType 'Directory'
+        }
         if ($Low) {
             uv sync --resolution lowest-direct --python $PythonVersion
             uv export --resolution lowest-direct --frozen --no-hashes --python $PythonVersion |
@@ -151,10 +157,13 @@ function Invoke-Uv {
                 }
             }
         }
-        elseif ($CI) { uv run --no-sync --python $PythonVersion dev elevate-pyright-warnings }
+        elseif ($CI) {
+            uv run --no-sync --python $PythonVersion dev elevate-pyright-warnings
+        }
         else {
             $Hooks = '.git/hooks'
-            if (!(Test-Path "$Hooks/post-checkout") -or !(Test-Path "$Hooks/pre-commit") -or
+            if (!(Test-Path "$Hooks/post-checkout") -or
+                !(Test-Path "$Hooks/pre-commit") -or
                 !(Test-Path "$Hooks/pre-push")
             ) { pre-commit install --install-hooks }
             if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
@@ -167,15 +176,17 @@ function Invoke-Uv {
                     )
                     code @Install
                     if (Test-Path $LocalExtensions) {
-                        $PylanceExtension = Get-ChildItem -Path $LocalExtensions -Filter "$Pylance-*"
+                        $PylanceExtension = (
+                            Get-ChildItem -Path $LocalExtensions -Filter "$Pylance-*"
+                        )
                         # ? Remove other files
                         Get-ChildItem -Path $LocalExtensions |
                             Where-Object { Compare-Object $_ $PylanceExtension } |
                             Remove-Item -Recurse
                         # ? Remove local Pylance bundled stubs
-                        $PylanceExtension |
-                            ForEach-Object { Get-ChildItem "$_/dist/bundled" -Filter '*stubs' } |
-                            Remove-Item -Recurse
+                        $PylanceExtension | ForEach-Object {
+                            Get-ChildItem "$_/dist/bundled" -Filter '*stubs'
+                        } | Remove-Item -Recurse
                     }
                 }
             }
@@ -209,7 +220,6 @@ function Sync-Template {
     return uvx $Copier update --defaults --vcs-ref=$Ref
 }
 
-
 function Initialize-Repo {
     <#.SYNOPSIS
     Initialize repository.#>
@@ -222,18 +232,18 @@ function Initialize-Repo {
 
     git add .
     try { git commit --no-verify -m 'Prepare template using blakeNaccarato/copier-python' }
-    catch [System.Management.Automation.NativeCommandExitException] { $AlreadyTemplated = $True }
+    catch [System.Management.Automation.NativeCommandExitException] {}
 
     git submodule add --force --name 'typings' 'https://github.com/microsoft/python-type-stubs.git' 'typings'
     git add .
     try { git commit --no-verify -m 'Add template and type stub submodules' }
-    catch [System.Management.Automation.NativeCommandExitException] { $HadSubmodules = $True }
+    catch [System.Management.Automation.NativeCommandExitException] {}
 
     Invoke-Uv -Sync -Update
 
     git add .
     try { git commit --no-verify -m 'Lock' }
-    catch [System.Management.Automation.NativeCommandExitException] { $AlreadyLocked = $True }
+    catch [System.Management.Automation.NativeCommandExitException] {}
 
     # ? Modify GitHub repo if there were not already commits in this repo
     if ($Fresh) {
@@ -241,13 +251,15 @@ function Initialize-Repo {
             git remote add origin 'https://github.com/softboiler/boilercv.git'
             git branch --move --force main
         }
-        gh repo edit --description (Get-Content '.copier-answers.yml' | Find-Pattern '^project_description:\s(.+)$')
+        gh repo edit --description (
+            Get-Content '.copier-answers.yml' |
+                Find-Pattern '^project_description:\s(.+)$'
+        )
         gh repo edit --homepage 'https://softboiler.github.io/boilercv/'
     }
 
     git push --set-upstream origin main
 }
-
 
 
 function Initialize-Machine {
@@ -286,9 +298,6 @@ function Initialize-Windows {
     # ? Install and update `uv`
     Install-Uv -Update
 
-    # ? Install PowerShell Core
-    winget install --id 'Microsoft.PowerShell' --override '/quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ADD_PATH=1 ENABLE_MU=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1'
-
     # ? Common winget options
     $Install = @(
         'install',
@@ -300,6 +309,8 @@ function Initialize-Windows {
         '--silent',
         '--source=winget'
     )
+    # ? Install PowerShell Core
+    winget @Install --id='Microsoft.PowerShell' --override='/quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ADD_PATH=1 ENABLE_MU=1 ENABLE_PSREMOTING=1 REGISTER_MANIFEST=1 USE_MU=1'
     # ? Install VSCode
     winget @Install --id='Microsoft.VisualStudioCode'
     # ? Install Windows Terminal
