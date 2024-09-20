@@ -286,8 +286,14 @@ reportUnusedCallResult = "none"
 
 [tool.ruff]
 cache-dir = ".cache/.ruff_cache"
-extend-exclude = ["packages", "typings"]
-extend-include = ["*.ipynb", "packages/_dev", "packages/pipeline"]
+extend-exclude = [
+  "typings",
+  "packages/boilercine",
+  "packages/boilercore",
+  "packages/cachier",
+  "packages/context_models",
+]
+extend-include = ["*.ipynb"]
 src = ["src", "docs", "pipeline", "scripts", "tests"]
 output-format = "grouped"
 fix = true

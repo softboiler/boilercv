@@ -1,12 +1,12 @@
 """Contributor environment."""
 
 import subprocess
-from collections.abc import Iterable, Sequence
+from collections.abc import Iterable
 from contextlib import chdir, nullcontext
 from io import StringIO
 from pathlib import Path
-from shlex import quote, split
-from sys import platform
+from shlex import quote
+from sys import executable
 
 from dotenv import load_dotenv
 from pydantic_settings import (
@@ -30,12 +30,14 @@ def run(args: str | Iterable[str] | None = None):
     sep = " "
     subprocess.run(
         check=True,
-        args=split(
+        args=[
+            "pwsh",
+            "-Command",
             sep.join([
-                "pwsh -Command ./Invoke-Uv.ps1",
+                f"& {quote(executable)} -m",
                 *(([args] if isinstance(args, str) else args) or []),
-            ])
-        ),
+            ]),
+        ],
     )
 
 

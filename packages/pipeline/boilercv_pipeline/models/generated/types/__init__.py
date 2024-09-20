@@ -3,6 +3,7 @@
 from re import sub
 from shlex import quote
 from subprocess import run
+from sys import executable
 from textwrap import dedent
 
 from astroid import AnnAssign, Const, Subscript, Tuple, extract_node
@@ -50,13 +51,12 @@ def sync_stages():
                 """Stage."""
                 '''),
         )
-        sep = " "
         run(
             check=True,
             args=[
                 "pwsh",
                 "-Command",
-                f"./Invoke-Uv.ps1 ruff format {quote(stages_literals.as_posix())}"
+                f"& {quote(executable)} -m ruff format {quote(stages_literals.as_posix())}",
             ],
         )
 
