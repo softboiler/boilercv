@@ -38,7 +38,7 @@ function Install-Uv {
     <#.SYNOPSIS
     Invoke `uv`.#>
     Param([switch]$Update)
-    $Env:PATH = "$HOME/.cargo/bin;$Env:PATH"
+    $Env:PATH = "$HOME/.cargo/bin$([System.IO.Path]::PathSeparator)$Env:PATH"
     if (Get-Command 'uv' -ErrorAction 'Ignore') {
         if ($Update) { uv self update }
         return

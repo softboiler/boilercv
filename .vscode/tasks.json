@@ -209,7 +209,7 @@
     {
       "label": "dvc: dag",
       "type": "shell",
-      "command": "(./Invoke-Uv.ps1 dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/_static/dag.md; markdownlint-cli2 docs/_static/dag.md",
+      "command": ". ./Dev.ps1 && (iuv dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/_static/dag.md && iuv markdownlint-cli2 docs/_static/dag.md",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -333,7 +333,7 @@
     {
       "label": "task: pre-commit (clean and format notebooks)",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 pre-commit run --all-files patch-nbs --verbose; pre-commit run --all-files nb-clean --verbose; pre-commit run --all-files ruff --verbose; pre-commit run --all-files ruff-format --verbose",
+      "command": "./Dev.ps1 && iuv pre-commit run --all-files patch-nbs --verbose && iuv pre-commit run --all-files nb-clean --verbose && iuv pre-commit run --all-files ruff --verbose && iuv pre-commit run --all-files ruff-format --verbose",
       "icon": { "id": "git-commit" },
       "problemMatcher": []
     },
@@ -361,7 +361,7 @@
     {
       "label": "task: Run ruff",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 ruff check .; ruff format .",
+      "command": ". ./Dev.ps1 && iuv ruff check . && iuv ruff format .",
       "icon": { "id": "check" },
       "problemMatcher": []
     },
@@ -396,14 +396,14 @@
     {
       "label": "task: Bump version",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 && uvx copier@9.2.0 update --vcs-ref=HEAD --defaults --data project_version='${input:version}'; towncrier build --yes --version '${input:version}'; git add .; git commit -m '${input:version}'",
+      "command": ". ./Dev.ps1 && uvx copier@9.2.0 update --vcs-ref=HEAD --defaults --data project_version='${input:version}' && iuv towncrier build --yes --version '${input:version}' && git add . && git commit -m '${input:version}'",
       "icon": { "id": "tag" },
       "problemMatcher": []
     },
     {
       "label": "task: Release version",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 && ($version = (Get-Content '.copier-answers.yml' | Select-String -Pattern '^project_version:\\s(.+)$').Matches.Groups[1].value; git tag --sign -m $version $version; git push; gh release create --discussion-category='announcements' --notes='' --title=$version --verify-tag $version)",
+      "command": "./Invoke-Uv.ps1 && ($version = (Get-Content '.copier-answers.yml' | Select-String -Pattern '^project_version:\\s(.+)$').Matches.Groups[1].value && git tag --sign -m $version $version && git push && gh release create --discussion-category='announcements' --notes='' --title=$version --verify-tag $version)",
       "icon": { "id": "tag" },
       "problemMatcher": []
     },

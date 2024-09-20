@@ -87,7 +87,7 @@ jobs:
           cache-dependency-glob: |
             **/uv.lock
             .github/workflows/**
-      - run: "./Invoke-Uv.ps1 pre-commit run fawltydeps-src; pre-commit run fawltydeps-dev; pre-commit run fawltydeps-pipeline"
+      - run: ". ./Dev.ps1 && iuv pre-commit run fawltydeps-src && iuv pre-commit run fawltydeps-dev && iuv pre-commit run fawltydeps-pipeline"
   pyright:
     runs-on: "ubuntu-22.04"
     steps:
