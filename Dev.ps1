@@ -17,7 +17,8 @@ if ($IsWindows) {
 function Initialize-Shell {
     <#.SYNOPSIS
     Initialize shell.#>
-    Invoke-Uv
+    if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Update -Force }
+    if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
 }
 
 function Find-Pattern {
@@ -114,7 +115,7 @@ function Invoke-Uv {
         $EnvFile = $Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env"
         if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
         # ? Get environment variables from `pyproject.toml`
-        uv run --no-sync dev init-shell |
+        uv run --no-sync --python $PythonVersion dev init-shell |
             Select-String -Pattern '^(.+)=(.+)$' |
             ForEach-Object {
                 $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
@@ -150,7 +151,7 @@ function Invoke-Uv {
                 }
             }
         }
-        elseif ($CI) { uv run --no-sync dev elevate-pyright-warnings }
+        elseif ($CI) { uv run --no-sync --python $PythonVersion dev elevate-pyright-warnings }
         else {
             $Hooks = '.git/hooks'
             if (!(Test-Path "$Hooks/post-checkout") -or !(Test-Path "$Hooks/pre-commit") -or
@@ -180,18 +181,9 @@ function Invoke-Uv {
             }
         }
     }
-    if (!$CI) { Initialize-Venv }
-    if ($Run) { uv run --no-sync $Run }
+    if ($Run) { uv run --no-sync --python $PythonVersion $Run }
 }
 Set-Alias -Name 'iuv' -Value 'Invoke-Uv'
-
-function Initialize-Venv {
-    <#.SYNOPSIS
-    Activate the virtual environment.#>
-    if (Test-Path '.venv') {
-        if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
-    }
-}
 
 function Sync-Template {
     <#.SYNOPSIS
@@ -206,9 +198,7 @@ function Sync-Template {
         # Stay on the current template version when updating.
         [switch]$Stay
     )
-
-    Initialize-Shell
-
+    if (!(Get-Command 'uv' -ErrorAction 'Ignore')) { Install-Uv -Update }
     $Copier = "copier@$(Get-Content '.copier-version')"
     $Ref = $Stay ? (Get-Content '.copier-answers.yml' | Find-Pattern '^_commit:\s.+([^-]+)$') : $Ref
     if ($Recopy) {
