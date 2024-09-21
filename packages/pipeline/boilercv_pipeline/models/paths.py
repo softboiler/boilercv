@@ -24,7 +24,6 @@ class Paths(BoilercvPipelineContextStore):
     large_examples: DataDir = Path("large_examples")
     large_sources: DataDir = Path("large_sources")
     notes: DataDir = Path("notes")
-    profiles: DataDir = Path("profiles")
     sheets: DataDir = Path("sheets")
     # ! Uncompressed data
     uncompressed_contours: DataDir = Path("uncompressed_contours")
@@ -35,16 +34,7 @@ class Paths(BoilercvPipelineContextStore):
     large_example_cine: DataFile = example_cines / "2022-01-06T16-57-31.cine"
 
     # * Local results
-    docx: DataDir = Path("docx")
-    html: DataDir = Path("html")
-    md: DataDir = Path("md")
     media: DataDir = Path("media")
-
-    # * Git-tracked inputs
-    # ! Plotting config
-    plot_config: DataDir = Path("plotting")
-    mpl_base: DataFile = plot_config / "base.mplstyle"
-    mpl_hide_title: DataFile = plot_config / "hide_title.mplstyle"
 
     # * DVC-tracked imports
     modelfunctions: DataDir = Path("models")
@@ -63,7 +53,6 @@ class Paths(BoilercvPipelineContextStore):
     contours: DataDir = Path("contours")
     examples: DataDir = Path("examples")
     filled: DataDir = Path("filled")
-    lifetimes: DataDir = Path("lifetimes")
 
     e230920: DataDir = Path("e230920")
 
