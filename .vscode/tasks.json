@@ -1,4 +1,4 @@
-// Run tasks like `pwsh -C "./Invoke-Uv.ps1 && {task}` to run profile-like
+// Run tasks like `pwsh -Command "./Invoke-Uv.ps1 && {task}` to run profile-like
 // commands without requiring users to modify global profile.
 
 {

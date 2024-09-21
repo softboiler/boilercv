@@ -109,7 +109,7 @@ jobs:
     strategy:
       matrix:
         runner:
-          - "macos-14"
+          - "macos-13"
           - "ubuntu-22.04"
           - "windows-2022"
         python:
@@ -138,5 +138,5 @@ jobs:
         uses: "codecov/codecov-action@e28ff129e5465c2c0dcc6f003fc735cb6ae0c673" # v4.5.0
         env:
           CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"
-      - if: (!(startsWith(matrix.runner, 'ubuntu') && (matrix.python == '3.11')))
+      - if: (!(startsWith(matrix.runner, 'ubuntu') && matrix.python == '3.11'))
         run: "./Invoke-Uv.ps1 -PythonVersion '${{ matrix.python }}' pytest"

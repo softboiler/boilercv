@@ -1,8 +1,7 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
-_commit: 2024.1.1-230-gaf9dada
+_commit: 2024.1.1-246-gd187ad2
 _src_path: gh:blakeNaccarato/copier-python
 actions_runner: ubuntu-22.04
-active: true
 github_repo_name: boilercv
 project_description: Computer vision routines suitable for nucleate pool boiling bubble
     analysis
