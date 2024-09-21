@@ -1,6 +1,6 @@
 # Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
 _commit: 2024.1.1-255-gecf70cc
-_src_path: gh:blakeNaccarato/copier-python
+_src_path: gh:softboiler/copier-pipeline
 actions_runner: ubuntu-22.04
 github_repo_name: boilercv
 project_description: Computer vision routines suitable for nucleate pool boiling bubble
