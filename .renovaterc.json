@@ -1,6 +1,5 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Establish base config, schedule, and manager defaults",
   "addLabels": ["dependencies"],
   "extends": [
     ":dependencyDashboard",
@@ -26,7 +25,7 @@
     {
       "description": "uv",
       "customType": "regex",
-      "fileMatch": ["^\\.uv-version$"],
+      "fileMatch": ["[^|/]\\.uv-version[^/]*$"],
       "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "astral-sh/uv"
@@ -34,23 +33,23 @@
     {
       "description": "uv-gha",
       "customType": "regex",
-      "fileMatch": ["^\\.github/workflows/.*$"],
+      "fileMatch": ["[^|/]\\.github/workflows/[^/]*$"],
       "matchStrings": ["- uses: \"astral-sh/setup-uv@.+\\n\\s+with:\\n\\s+version: \"(?<currentValue>.+)\""],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "astral-sh/uv"
     },
     {
-      "description": "Copier",
+      "description": "copier",
       "customType": "regex",
-      "fileMatch": ["^\\.copier-version$"],
+      "fileMatch": ["[^|/]\\.copier-version[^/]*$"],
       "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "pypi",
       "depNameTemplate": "copier"
     },
     {
-      "description": "Pylance",
+      "description": "pylance",
       "customType": "regex",
-      "fileMatch": ["^\\.pylance-version$"],
+      "fileMatch": ["[^|/]\\.pylance-version[^/]*$"],
       "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "microsoft/pylance-release"
@@ -58,37 +57,50 @@
   ],
   "packageRules": [
     {
-      "groupName": "all dependencies",
-      "groupSlug": "all",
+      "groupName": "all",
       "matchPackageNames": ["*"]
     },
     {
-      "description": "Update uv separately",
+      "groupName": "dev",
+      "matchDepTypes": ["devDependencies"]
+    },
+    {
+      "groupName": "gha",
+      "matchManagers": ["github-actions"]
+    },
+    {
+      "groupName": "dev package",
+      "matchFileNames": ["[^|/]packages/_dev/pyproject.toml[^/]*$"]
+    },
+    {
       "groupName": "uv",
-      "matchPackageNames": ["astral-sh/uv"]
+      "matchPackageNames": ["astral-sh/setup-uv"]
     },
     {
-      "description": "Update ruff separately",
       "groupName": "ruff",
-      "matchPackageNames": ["ruff", "charliermarsh/ruff-pre-commit"]
+      "matchPackageNames": ["/^.*ruff.*$/"]
     },
     {
-      "description": "Update fawltydeps separately",
       "groupName": "fawltydeps",
-      "matchPackageNames": ["fawltydeps"]
+      "matchPackageNames": ["/^.*fawltydeps.*$/"]
     },
     {
-      "description": "Update Pylance separately",
       "groupName": "pylance",
       "matchPackageNames": ["microsoft/pylance-release"]
     },
     {
-      "description": "Update Copier separately",
       "groupName": "copier",
       "matchPackageNames": ["copier"]
     },
     {
-      "description": "Update `.devcontainer` updates separately for manual testing",
+      "groupName": "tests",
+      "matchPackageNames": ["/^.*pytest.*$/"]
+    },
+    {
+      "groupName": "docs",
+      "matchPackageNames": ["docutils", "numpydoc", "/^.*sphinx.*$/", "/^.*myst.*$/"]
+    },
+    {
       "groupName": "devcontainer",
       "matchManagers": ["devcontainer"]
     }
