@@ -21,7 +21,7 @@ jobs:
       url: "https://pypi.org/p/boilercv"
     steps:
       - uses: "actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332" # v4.1.7
-      - uses: "astral-sh/setup-uv@9f1f1fece28798fe5e7ece00f4243abe886974b2" # v3.0.0
+      - uses: "astral-sh/setup-uv@abac0ce7b0768476333db78faaf98b1130f5face" # v3.1.1
         with:
           version: "0.4.15"
           enable-cache: true
