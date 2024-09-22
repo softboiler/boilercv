@@ -103,6 +103,8 @@ function Invoke-Uv {
             $Env:ENV_SYNCED = $null
         }
         elseif ($Build) {
+            $LockedArg = $null
+            $FrozenArg = '--frozen'
             uv sync $LockedArg --no-sources --no-dev --python $PythonVersion
             uv export $LockedArg $FrozenArg --no-dev --no-hashes --python $PythonVersion |
                 Set-Content "$PWD/requirements/requirements_prod.txt"
@@ -219,7 +221,7 @@ function Sync-Template {
     )
     if (!(Get-Command 'uv' -ErrorAction 'Ignore')) { Install-Uv -Update }
     $Copier = "copier@$(Get-Content '.copier-version')"
-    $Ref = $Stay ? (Get-Content '.copier-answers.yml' | Find-Pattern '^_commit:\s.+([^-]+)$') : $Ref
+    $Ref = $Stay ? (Get-Content '.copier-answers.yml' | Find-Pattern '^_commit:\s.+-(.+)$') : $Ref
     if ($Recopy) {
         if ($Prompt) { return uvx $Copier recopy $Defaults --vcs-ref=$Ref }
         return uvx $Copier recopy --overwrite --defaults
