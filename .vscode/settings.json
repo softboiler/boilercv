@@ -13,7 +13,7 @@
     "packages/_dev/dev/tests/settings_plugin_schema.json": "tests/boilercv_tests/settings_plugin.yaml",
     // ? `boilercv_pipeline`
     "pipeline/boilercv_pipeline/settings_schema.json": "pipeline/boilercv_pipeline/settings.yaml",
-    "pipeline/boilercv_pipeline/settings_plugin_schema.json": "pipeline/boilercv_pipeline/settings_plugin.yaml",
+    "pipeline/boilercv_pipeline/settings_plugin_schema.json": "pipeline/boilercv_pipeline/settings_plugin.yaml"
   },
   // * ----------------------------------------------------------------------------- * #
   //! Terminal
@@ -39,7 +39,7 @@
     "packages/cachier": true,
     "packages/context_models": true,
     "typings": true,
-    "uv.lock": true,
+    "uv.lock": true
   },
   //! File nesting
   "explorer.sortOrder": "foldersNestsFiles",
@@ -58,7 +58,7 @@
     "*ipython-input*": "python",
     "*requirements*.in": "pip-requirements",
     "pyrightconfig.json": "jsonc",
-    "uv.lock": "toml",
+    "uv.lock": "toml"
   },
   //! Git
   "git.allowNoVerifyCommit": true,

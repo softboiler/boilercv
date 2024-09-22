@@ -8,21 +8,21 @@ version = "0.0.0"
 description = "Dev"
 dependencies = [
   # ? Dev
-  "cyclopts==2.9.3",
-  "dulwich==0.22.1",
+  "cyclopts>=2.9.3",
+  "dulwich>=0.22.1",
   "pydantic-settings>=2.5.2",
   "pydantic>=2.9.1",
-  "python-dotenv==1.0.1",
-  "toml==0.10.2",
+  "python-dotenv>=1.0.1",
+  "toml>=0.10.2",
   # ? Docs
-  "docutils==0.21.2",
-  "more-itertools==10.4.0",
-  "myst-nb==1.1.1",
-  "myst-parser==3.0.1",
-  "nbformat==5.10.4",
-  "numpydoc==1.7.0",
-  "ruamel-yaml==0.18.6",
-  "sphinx==7.3.7",
+  "docutils>=0.21.2",
+  "more-itertools>=10.4.0",
+  "myst-nb>=1.1.1",
+  "myst-parser>=3.0.1",
+  "nbformat>=5.10.4",
+  "numpydoc>=1.7.0",
+  "ruamel-yaml>=0.18.6",
+  "sphinx>=7.3.7",
   # ? Other docs
   "colorcet>=3.0.1",
   "devtools>=0.12.2",
@@ -36,8 +36,8 @@ dependencies = [
   "sympy>=1.12",
   "trackpy>=0.6.2",
   # ? Tests
-  "pytest-harvest==1.10.5",
-  "pytest==8.2.2",
+  "pytest-harvest>=1.10.5",
+  "pytest>=8.2.2",
 ]
 [project.scripts]
 "dev" = "dev.tools.__main__:main"

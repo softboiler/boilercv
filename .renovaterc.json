@@ -25,7 +25,7 @@
     {
       "description": "uv",
       "customType": "regex",
-      "fileMatch": ["[^|/]\\.uv-version[^/]*$"],
+      "fileMatch": ["(^|/)\\.uv-version[^/]*$"],
       "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "astral-sh/uv"
@@ -33,23 +33,17 @@
     {
       "description": "uv-gha",
       "customType": "regex",
-      "fileMatch": ["[^|/]\\.github/workflows/[^/]*$"],
-      "matchStrings": ["- uses: \"astral-sh/setup-uv@.+\\n\\s+with:\\n\\s+version: \"(?<currentValue>.+)\""],
+      "fileMatch": ["(^|/)\\.github/workflows/[^/]*$"],
+      "matchStrings": [
+        "- uses: \"astral-sh/setup-uv@.+\\n\\s+with:\\n\\s+version:\\s\"(?<currentValue>.+)\""
+      ],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "astral-sh/uv"
     },
     {
-      "description": "copier",
-      "customType": "regex",
-      "fileMatch": ["[^|/]\\.copier-version[^/]*$"],
-      "matchStrings": ["(?<currentValue>[^\\n]+)"],
-      "datasourceTemplate": "pypi",
-      "depNameTemplate": "copier"
-    },
-    {
       "description": "pylance",
       "customType": "regex",
-      "fileMatch": ["[^|/]\\.pylance-version[^/]*$"],
+      "fileMatch": ["(^|/)\\.pylance-version[^/]*$"],
       "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "microsoft/pylance-release"
@@ -61,36 +55,12 @@
       "matchPackageNames": ["*"]
     },
     {
-      "groupName": "dev",
-      "matchDepTypes": ["devDependencies"]
-    },
-    {
-      "groupName": "gha",
-      "matchManagers": ["github-actions"]
-    },
-    {
-      "groupName": "dev package",
-      "matchFileNames": ["[^|/]packages/_dev/pyproject.toml[^/]*$"]
-    },
-    {
-      "groupName": "uv",
-      "matchPackageNames": ["astral-sh/setup-uv"]
-    },
-    {
       "groupName": "ruff",
       "matchPackageNames": ["/^.*ruff.*$/"]
     },
     {
-      "groupName": "fawltydeps",
-      "matchPackageNames": ["/^.*fawltydeps.*$/"]
-    },
-    {
       "groupName": "pylance",
       "matchPackageNames": ["microsoft/pylance-release"]
-    },
-    {
-      "groupName": "copier",
-      "matchPackageNames": ["copier"]
     },
     {
       "groupName": "tests",
@@ -98,7 +68,12 @@
     },
     {
       "groupName": "docs",
-      "matchPackageNames": ["docutils", "numpydoc", "/^.*sphinx.*$/", "/^.*myst.*$/"]
+      "matchPackageNames": [
+        "docutils",
+        "numpydoc",
+        "/^.*sphinx.*$/",
+        "/^.*myst.*$/"
+      ]
     },
     {
       "groupName": "devcontainer",
