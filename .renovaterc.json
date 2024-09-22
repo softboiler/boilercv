@@ -1,16 +1,77 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "addLabels": ["dependencies"],
-  "extends": ["config:recommended"],
+  "extends": ["config:best-practices"],
   "dependencyDashboardApproval": true,
   "separateMajorMinor": false,
-  "lockFileMaintenance": { "enabled": true },
-  "enabledManagers": ["pep621"],
+  "git-submodules": { "enabled": true },
   "pep621": { "cloneSubmodules": true },
+  "pre-commit": { "enabled": true },
+  "enabledManagers": [
+    "custom.regex",
+    "devcontainer",
+    "git-submodules",
+    "github-actions",
+    "pep621",
+    "pre-commit"
+  ],
+  "customManagers": [
+    {
+      "description": "uv",
+      "customType": "regex",
+      "fileMatch": ["(^|/)\\.uv-version[^/]*$"],
+      "matchStrings": ["(?<currentValue>[^\\n]+)"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "astral-sh/uv"
+    },
+    {
+      "description": "uv-gha",
+      "customType": "regex",
+      "fileMatch": ["(^|/)\\.github/workflows/[^/]*$"],
+      "matchStrings": [
+        "- uses: \"astral-sh/setup-uv@.+\\n\\s+with:\\n\\s+version:\\s\"(?<currentValue>.+)\""
+      ],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "astral-sh/uv"
+    },
+    {
+      "description": "pylance",
+      "customType": "regex",
+      "fileMatch": ["(^|/)\\.pylance-version[^/]*$"],
+      "matchStrings": ["(?<currentValue>[^\\n]+)"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "microsoft/pylance-release"
+    }
+  ],
   "packageRules": [
     {
       "groupName": "all",
       "matchPackageNames": ["*"]
+    },
+    {
+      "groupName": "ruff",
+      "matchPackageNames": ["/^.*ruff.*$/"]
+    },
+    {
+      "groupName": "pylance",
+      "matchPackageNames": ["microsoft/pylance-release"]
+    },
+    {
+      "groupName": "tests",
+      "matchPackageNames": ["/^.*pytest.*$/"]
+    },
+    {
+      "groupName": "docs",
+      "matchPackageNames": [
+        "docutils",
+        "numpydoc",
+        "/^.*sphinx.*$/",
+        "/^.*myst.*$/"
+      ]
+    },
+    {
+      "groupName": "devcontainer",
+      "matchManagers": ["devcontainer"]
     }
   ]
 }
