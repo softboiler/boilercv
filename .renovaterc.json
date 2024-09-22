@@ -5,7 +5,7 @@
   "dependencyDashboardApproval": true,
   "separateMajorMinor": false,
   "git-submodules": { "enabled": true },
-  "pep621": { "cloneSubmodules": true },
+  "pep621": { "cloneSubmodules": true, "rangeStrategy": "update-lockfile" },
   "pre-commit": { "enabled": true },
   "enabledManagers": [
     "custom.regex",
