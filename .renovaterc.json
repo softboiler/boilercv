@@ -55,8 +55,8 @@
       "matchPackageNames": ["*"]
     },
     {
-      "groupName": "git-submodules",
-      "matchManagers": ["git-submodules"]
+      "groupName": "pep621",
+      "matchManagers": ["pep621"]
     },
     {
       "groupName": "ruff",
