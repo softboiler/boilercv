@@ -4,10 +4,5 @@
   "extends": ["config:recommended"],
   "lockFileMaintenance": { "enabled": true },
   "enabledManagers": ["pep621"],
-  "packageRules": [
-    {
-      "groupName": "all",
-      "matchPackageNames": ["*"]
-    }
-  ]
+  "pep621": { "rangeStrategy": "update-lockfile" }
 }
