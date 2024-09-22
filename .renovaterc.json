@@ -55,6 +55,10 @@
       "matchPackageNames": ["*"]
     },
     {
+      "groupName": "git-submodules",
+      "matchManagers": ["git-submodules"]
+    },
+    {
       "groupName": "ruff",
       "matchPackageNames": ["/^.*ruff.*$/"]
     },
