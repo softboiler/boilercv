@@ -6,5 +6,11 @@
   "separateMajorMinor": false,
   "lockFileMaintenance": { "enabled": true },
   "enabledManagers": ["pep621"],
-  "pep621": { "rangeStrategy": "update-lockfile" }
+  "pep621": { "rangeStrategy": "update-lockfile" },
+  "packageRules": [
+    {
+      "groupName": "all",
+      "matchPackageNames": ["*"]
+    }
+  ]
 }
