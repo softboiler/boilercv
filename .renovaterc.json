@@ -3,5 +3,11 @@
   "addLabels": ["dependencies"],
   "extends": ["config:recommended"],
   "lockFileMaintenance": { "enabled": true },
-  "enabledManagers": ["pep621"]
+  "enabledManagers": ["pep621"],
+  "packageRules": [
+    {
+      "groupName": "all",
+      "matchPackageNames": ["*"]
+    }
+  ]
 }
