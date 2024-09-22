@@ -6,7 +6,7 @@
   "separateMajorMinor": false,
   "lockFileMaintenance": { "enabled": true },
   "enabledManagers": ["pep621"],
-  "pep621": { "rangeStrategy": "update-lockfile" },
+  "pep621": { "cloneSubmodules": true },
   "packageRules": [
     {
       "groupName": "all",
