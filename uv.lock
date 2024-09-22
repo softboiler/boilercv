@@ -640,7 +640,7 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29.4" },
     { name = "loguru", specifier = ">=0.7.0" },
     { name = "matplotlib", specifier = ">=3.7.2" },
-    { name = "more-itertools", specifier = "==10.4.0" },
+    { name = "more-itertools", specifier = ">=10.4.0" },
     { name = "numpy", specifier = ">=1.24.4" },
     { name = "opencv-python", marker = "extra == 'cv'", specifier = ">=4.10.0.84" },
     { name = "pandas", extras = ["hdf5", "performance"], specifier = ">=2.2.2" },
