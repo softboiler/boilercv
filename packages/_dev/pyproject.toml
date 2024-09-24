@@ -13,7 +13,6 @@ dependencies = [
   "pydantic-settings>=2.5.2",
   "pydantic>=2.9.1",
   "python-dotenv>=1.0.1",
-  "toml>=0.10.2",
   # ? Docs
   "docutils>=0.21.2",
   "more-itertools>=10.4.0",

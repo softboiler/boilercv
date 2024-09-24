@@ -18,21 +18,30 @@ def main(params: Params):
         for filled, filled_slicers in zip(
             params.filled, params.filled_slicers, strict=True
         ):
+            _params = params.model_copy(deep=True)
+            time = get_time(filled)
             for field, value in {
                 "filled": filled,
                 "filled_slicers": filled_slicers,
                 "dfs": dfs / f"{dfs.name}_{get_time(filled)}.h5",
             }.items():
-                setattr(params, field, [value])
+                setattr(_params, field, [value])
             submit_nb_process(
-                executor=executor, nb=nb, params=params
+                executor=executor, nb=nb, params=_params
             ).add_done_callback(
                 partial(
                     callbacks,
                     callbacks=[
-                        lambda f: save_df(df=f.result().dfs.dst, path=one(params.dfs)),
-                        lambda f: save_plots(
-                            plots=f.result().plots, path=params.outs.plots
+                        partial(
+                            lambda f, p: save_df(df=f.result().dfs.dst, path=p),
+                            p=one(_params.dfs),
+                        ),
+                        partial(
+                            lambda f, p, s: save_plots(
+                                plots=f.result().plots, path=p, suffix=s
+                            ),
+                            p=_params.outs.plots,
+                            s=time,
                         ),
                     ],
                 )

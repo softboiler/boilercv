@@ -9,7 +9,7 @@ from dev.docs.intersphinx import get_ispx, get_rtd, get_url
 from dev.docs.models.paths import rooted_paths
 from dev.docs.patch_nbs import patch_nbs
 from dev.docs.types import IspxMappingValue
-from dev.tools.environment import init_shell
+from dev.tools.environment import sync_environment_variables
 from dev.tools.warnings import filter_boilercv_warnings
 from pydantic import BaseModel, Field
 from ruamel.yaml import YAML
@@ -21,7 +21,7 @@ from sphinx.application import Sphinx
 def init_docs_build() -> Path:
     """Initialize shell, ensure we are in `docs`, patch notebooks, return root."""
     filter_boilercv_warnings()
-    init_shell(rooted_paths.root)
+    sync_environment_variables(rooted_paths.root)
     patch_nbs()
     return rooted_paths.root
 
@@ -182,7 +182,7 @@ suppress_warnings = [
     "autodoc2.dup_item"  # "Duplicate items in boilercv_tests.test_morphs
 ]
 # * MARK: Theme
-html_title = const.ans.package
+html_title = project
 html_favicon = "_static/favicon.ico"
 html_logo = "_static/favicon.ico"
 html_static_path = dpaths(const.static)
@@ -228,7 +228,7 @@ myst_enable_extensions = [
 ]
 myst_heading_anchors = 6
 myst_substitutions = {
-    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{const.ans.user}/{const.ans.package}/{const.rev}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Fplot_tracks.ipynb)"
+    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{const.ans.user}/{project}/{const.rev}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Fplot_tracks.ipynb)"
 }
 # * MARK:  BibTeX
 bibtex_bibfiles = dpaths(const.bib_template, const.bib)
@@ -253,9 +253,9 @@ mermaid_d3_zoom = False
 # * MARK:  Autodoc2
 nitpicky = True
 autodoc2_packages = [
-    f"../src/{const.ans.package}",
+    f"../src/{project}",
     "../packages/_dev/dev",
-    f"../packages/pipeline/{const.ans.package}_pipeline",
+    f"../packages/pipeline/{project}_pipeline",
 ]
 autodoc2_render_plugin = "myst"
 # ? Autodoc2 does not currently obey `python_display_short_literal_types` or
@@ -265,7 +265,7 @@ autodoc2_render_plugin = "myst"
 maximum_signature_line_length = 1
 # ? Parse Numpy docstrings
 if not default.build.skip_autodoc_post_parse:
-    autodoc2_docstring_parser_regexes = [(".*", f"{const.ans.package}_docs.docstrings")]
+    autodoc2_docstring_parser_regexes = [(".*", "dev.docs.docstrings")]
 # * MARK:  Intersphinx
 intersphinx_mapping = {
     pkg: ispx for pkg, ispx in const.ispx_mapping.items() if pkg != "colorcet"
@@ -273,11 +273,11 @@ intersphinx_mapping = {
 nitpick_ignore = [
     ("py:class", "cv2.LineSegmentDetector"),
     ("py:class", "cappa.subcommand.Subcommands"),
-    ("py:class", f"{const.ans.package}.correlations.T"),
-    ("py:class", f"{const.ans.package}.data.sets.Stage"),
-    ("py:class", f"{const.ans.package}.experiments.e230920_subcool.NbProcess"),
-    ("py:class", f"{const.ans.package}.experiments.e230920_subcool.NbProcess"),
-    ("py:class", f"{const.ans.package}.morphs.contexts"),
+    ("py:class", f"{project}.correlations.T"),
+    ("py:class", f"{project}.data.sets.Stage"),
+    ("py:class", f"{project}.experiments.e230920_subcool.NbProcess"),
+    ("py:class", f"{project}.experiments.e230920_subcool.NbProcess"),
+    ("py:class", f"{project}.morphs.contexts"),
 ]
 nitpick_ignore_regex = [
     # ? Auto-generated, too hard to separate into own `types` module for ignoring
@@ -299,12 +299,11 @@ nitpick_ignore_regex = [
     ),  # ? https://github.com/pydantic/pydantic/issues/1339
     (r"py:.+", r"PySide6\..+"),  # ? https://bugreports.qt.io/browse/PYSIDE-2215
     # ? TypeAlias: https://github.com/sphinx-doc/sphinx/issues/10785
-    (r"py:class", rf"{const.ans.package}.*\.types\..+"),
+    (r"py:class", rf"{project}.*\.types\..+"),
     (r"py:class", r"boilercore.*\.types\..+"),
-    (r"py:class", rf"{const.ans.package}_pipeline\.captivate\.previews\..+"),
-    (r"py:.+", rf"{const.ans.package}_tests\.test_morphs\..+"),
+    (r"py:class", rf"{project}_pipeline\.captivate\.previews\..+"),
     # ? Annotated types unwieldy to move to own types paths
-    (r"py:obj", rf"{const.ans.package}_pipeline\.stages\..+\.__init__.py"),
+    (r"py:obj", rf"{project}_pipeline\.stages\..+\.__init__.py"),
 ]
 # * MARK:  Tippy
 # ? https://sphinx-tippy.readthedocs.io/en/latest/index.html#confval-tippy_anchor_parent_selector

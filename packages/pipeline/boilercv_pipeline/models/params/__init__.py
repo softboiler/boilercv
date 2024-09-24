@@ -160,13 +160,17 @@ class Params(Stage, Generic[Deps_T, Outs_T]):
         _fmt = self.floatfmt
         if cols:
             _fmt = tuple(c.fmt or self.floatfmt for c in cols)
-            _cols = [c() for c in cols] if cols else list(df.columns)
+            _cols = (
+                [c() for c in cols if c() in df.columns] if cols else list(df.columns)
+            )
         else:
             _fmt = self.floatfmt
             _cols = list(df.columns)
         _index: str = index or _cols.pop(0)  # pyright: ignore[reportAssignmentType]
         display_markdown(
-            df.pipe(f, *args, **kwds).set_index(_index)[_cols],
+            df.pipe(f, *args, **kwds)
+            .reset_index(drop=df.empty)
+            .set_index(_index)[_cols],
             floatfmt=_fmt,  # pyright: ignore[reportArgumentType]
         )
         return df

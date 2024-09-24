@@ -5,18 +5,25 @@ from json import dumps
 from pathlib import Path
 from re import finditer, sub
 from shlex import join, split
-from sys import version_info
+from tomllib import loads
 
 from cyclopts import App
+from pydantic import BaseModel
 
 from dev.tools import add_changes, environment
 from dev.tools.environment import escape, run
 from dev.tools.types import ChangeType
 
-if version_info >= (3, 11):  # noqa: UP036, RUF100
-    from tomllib import loads  # pyright: ignore[reportMissingImports]
-else:
-    from toml import loads  # pyright: ignore[reportMissingModuleSource]
+
+class Constants(BaseModel):
+    """Constants for {mod}`~dev.tools.environment`."""
+
+    pylance_version: str = Path(".pylance-version").read_text(encoding="utf-8").strip()
+    """Pylance version."""
+
+
+const = Constants()
+
 
 APP = App(help_format="markdown")
 """CLI."""
@@ -27,9 +34,9 @@ def main():  # noqa: D103
 
 
 @APP.command
-def init_shell():
+def sync_environment_variables(pylance_version: str = const.pylance_version):
     """Initialize shell."""
-    log(environment.init_shell())
+    log(environment.sync_environment_variables(pylance_version=pylance_version))
 
 
 @APP.command
@@ -103,12 +110,10 @@ def elevate_pyright_warnings():
 @APP.command()
 def build_docs():
     """Build docs."""
-    run([
-        "sphinx-autobuild",
-        "--show-traceback",
-        "docs _site",
+    run(
+        "sphinx-autobuild --show-traceback docs _site",
         *[f"--ignore **/{p}" for p in ["temp", "data", "apidocs", "*schema.json"]],
-    ])
+    )
 
 
 def log(obj):

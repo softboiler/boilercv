@@ -27,8 +27,8 @@ class Constants(BaseModel):
     day: str = "2024-07-18"
     time: str = "17-44-35"
 
-    nb_frame_count: int = 10
-    nb_frame_step: int = 100
+    nb_frame_count: int = 500
+    nb_frame_step: int = 1
 
     @property
     def nb_slicer_patterns(self) -> dict[str, Slicers]:

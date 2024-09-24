@@ -29,7 +29,7 @@ class Roots(BaseModel):
     """Docs."""
 
 
-ROOTED = Roots(data=const.data, docs=const.docs)
+ROOTED = Roots(data=const.root / const.data, docs=const.root / const.docs)
 """Paths rooted to their directories."""
 
 

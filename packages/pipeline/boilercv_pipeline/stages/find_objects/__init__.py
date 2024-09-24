@@ -11,13 +11,7 @@ from boilercv.data import FRAME, PX, XPX, YPX, X, Y
 from boilercv_pipeline.models import columns, data, stage
 from boilercv_pipeline.models.column import Col, ConstCol, Kind, LinkedCol
 from boilercv_pipeline.models.columns import get_cols
-from boilercv_pipeline.models.contexts import ROOTED
-from boilercv_pipeline.models.path import (
-    DataDir,
-    DirectoryPathSerPosix,
-    DocsFile,
-    get_boilercv_pipeline_config,
-)
+from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DfsPlotsOuts
 from boilercv_pipeline.models.subcool import (
@@ -26,8 +20,6 @@ from boilercv_pipeline.models.subcool import (
     validate_deps_paths,
 )
 from boilercv_pipeline.parser import PairedArg
-
-foo = get_boilercv_pipeline_config(ROOTED, kinds_from=paths)
 
 
 class Deps(FilledDeps):

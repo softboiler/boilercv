@@ -3,6 +3,7 @@
 from pathlib import Path
 
 from boilercv_pipeline.config import const as pipeline_const
+from boilercv_pipeline.config import get_root
 from pydantic import BaseModel
 
 from dev.tests.config import const as tests_const
@@ -17,17 +18,6 @@ class Constants(BaseModel):
 
 const = Constants()
 """Constants."""
-
-
-def get_root() -> Path:
-    """Look for project root directory starting from current working directory."""
-    path = Path().cwd()
-    while (path / "conf.py").exists() or not all(
-        (path / check).exists() for check in [const.pyproject, const.docs]
-    ):
-        if path == (path := path.parent):
-            raise RuntimeError("Project root directory not found.")
-    return path
 
 
 class RootedPaths(BaseModel):

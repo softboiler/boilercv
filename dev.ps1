@@ -41,7 +41,7 @@ function Install-Uv {
     Param([switch]$Update)
     $Env:PATH = "$HOME/.cargo/bin$([System.IO.Path]::PathSeparator)$Env:PATH"
     if ((Get-Command 'uv' -ErrorAction 'Ignore') -and $Update) {
-        try { uv self update }
+        try { return uv self update }
         catch [System.Management.Automation.NativeCommandExitException] {}
     }
     if ($IsWindows) {
@@ -120,41 +120,19 @@ function Invoke-Uv {
             }
             $Env:ENV_SYNCED = $True
 
-            # ? Track environment variables to update `.env` with later
-            $EnvVars = @{}
-            $EnvVars.Add('PYRIGHT_PYTHON_PYLANCE_VERSION', $PylanceVersion)
-            $EnvFile = $Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env"
-            if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
-
-            # ? Get environment variables from `pyproject.toml`
-            uv run --no-sync --python $PythonVersion dev init-shell |
-                Select-String -Pattern '^(.+)=(.+)$' |
-                ForEach-Object {
-                    $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
-                    if ($EnvVars -notcontains $Key) { $EnvVars.Add($Key, $Value) }
-                }
-
-            # ? Get environment variables to update in `.env`
-            $Keys = @()
-            $Lines = Get-Content $EnvFile | ForEach-Object {
-                $_ -Replace '^(?<Key>.+)=(?<Value>.+)$', {
-                    $Key = $_.Groups['Key'].Value
-                    if ($EnvVars.ContainsKey($Key)) {
-                        $Keys += $Key
-                        return "$Key=$($EnvVars[$Key])"
-                    }
-                    return $_
-                }
-            }
-            # ? Sync environment variables and those in `.env`
-            $NewLines = $EnvVars.GetEnumerator() | ForEach-Object {
-                $Key, $Value = $_.Key, $_.Value
+            # ? Sync `.env` and set environment variables from `pyproject.toml`
+            $EnvVars = uv run --no-sync --python $PythonVersion dev 'sync-environment-variables' --pylance-version $PylanceVersion
+            $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
+            $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
+                $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
                 Set-Item "Env:$Key" $Value
-                if ($Keys -notcontains $Key) { return "$Key=$Value" }
             }
-            @($Lines, $NewLines) | Set-Content $EnvFile
+
             # ? Environment-specific setup
-            if ($Devcontainer) {
+            if ($CI) {
+                uv run --no-sync --python $PythonVersion dev elevate-pyright-warnings
+            }
+            elseif ($Devcontainer) {
                 $Repo = Get-ChildItem '/workspaces'
                 $Packages = Get-ChildItem "$Repo/packages"
                 $SafeDirs = @($Repo) + $Packages
@@ -164,9 +142,7 @@ function Invoke-Uv {
                     }
                 }
             }
-            elseif ($CI) {
-                uv run --no-sync --python $PythonVersion dev elevate-pyright-warnings
-            }
+
             # ? Install pre-commit hooks
             else {
                 $Hooks = '.git/hooks'

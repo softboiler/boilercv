@@ -16,6 +16,9 @@ from boilercv_pipeline.models.contexts import ROOTED
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 from boilercv_pipeline.models.paths import Paths
 
+# TODO: Replace all uses of `ROOTED_PATHS` to eliminate side-effects like `data` folder
+# ..... being created in `docs/notebooks` on docs build
+# ..... softboiler/boilercv#251
 ROOTED_PATHS = Paths(context=get_boilercv_pipeline_context(ROOTED))
 """Paths rooted to their directories."""
 ALL_FRAMES = slice(None)
@@ -140,9 +143,40 @@ def get_dataset(
         })
 
 
-def get_dataset2(path: Path, slices: dict[str, slice] | None = None) -> DS:
+def get_selector(s: slice | range) -> slice | range:
+    """Get selector."""
+    if (
+        isinstance(s.start, int)
+        or isinstance(s.stop, int | None)
+        or isinstance(s.step, int)
+    ):
+        start = s.start or 0
+        stop = s.stop
+        step = s.step or 1
+        if (
+            not isinstance(start, int)
+            or not isinstance(stop, int | None)
+            or not isinstance(step, int)
+        ):
+            raise TypeError("All indices must be integers.")
+        return range(start, stop + step, step)
+    return s
+
+
+def get_dataset2(
+    path: Path,
+    slices: dict[str, slice] | None = None,
+    force_select_by_label: bool = True,
+) -> DS:
     """Load a video dataset."""
-    slices = slices or {}
+    selectors = (
+        {
+            dim: (get_selector(s) if force_select_by_label else s)
+            for dim, s in slices.items()
+        }
+        if slices
+        else {}
+    )
     cmp_source, unc_source = get_stage(path.stem, path.parent)
     source = unc_source if unc_source.exists() else cmp_source
     video = open_dataset(source)[VIDEO]
@@ -153,10 +187,10 @@ def get_dataset2(path: Path, slices: dict[str, slice] | None = None) -> DS:
     return Dataset({
         VIDEO: unpack(
             video.sel({
-                FRAME: slices.get("frame", slice(None)),
-                YPX: slices.get(YPX, slice(None)),
+                FRAME: selectors.get("frame", slice(None)),
+                YPX: selectors.get(YPX, slice(None)),
             })
-        ).sel({XPX: slices.get(XPX, slice(None))})
+        ).sel({XPX: selectors.get(XPX, slice(None))})
     })
 
 
