@@ -2,7 +2,7 @@ from itertools import chain
 from pathlib import Path
 
 from boilercv_pipeline.manual.flatten_data_dir import FlattenDataDir
-from cappa.base import invoke
+from boilercv_pipeline.parser import invoke
 
 
 def main(args: FlattenDataDir):

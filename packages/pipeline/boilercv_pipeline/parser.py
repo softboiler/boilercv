@@ -17,6 +17,7 @@ from context_models import CONTEXT, ContextStore
 from context_models.types import Context
 from more_itertools import first
 
+from boilercv_pipeline.models.contexts import BoilercvPipelineContexts
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 
 
@@ -49,7 +50,16 @@ def invoke(
         output=output,
         help_formatter=help_formatter,
     )
-    instance.context = get_first_innermost_context(instance)
+    from boilercv_pipeline.cli import BoilercvPipeline, Stage  # noqa: PLC0415
+
+    if isinstance(instance, ContextStore):
+        instance.context = get_first_innermost_context(instance)
+    elif isinstance(instance, BoilercvPipeline) and isinstance(
+        instance.commands, Stage
+    ):
+        instance.commands.commands.context = get_first_innermost_context(
+            instance.commands.commands
+        )
     resolved, global_deps = resolve_callable(
         command, parsed_command, instance, output=concrete_output, deps=deps
     )
@@ -61,13 +71,13 @@ def invoke(
         return value
 
 
-def get_first_innermost_context(model: ContextStore) -> Context:
+def get_first_innermost_context(model: ContextStore) -> BoilercvPipelineContexts:
     """Get the first innermost context."""
     context = model.context
     m = model.model_dump()
     while isinstance((m := first(v for k, v in m.items() if k != "context")), Mapping):
         context: Context = m.get(CONTEXT, get_boilercv_pipeline_context())
-    return context
+    return context  # pyright: ignore[reportReturnType]
 
 
 def PairedArg(name: str) -> Arg[Any]:  # noqa: N802

@@ -1,8 +1,7 @@
 """Command-line interface."""
 
-from cappa.base import invoke
-
 from boilercv_pipeline.cli import BoilercvPipeline
+from boilercv_pipeline.parser import invoke
 
 
 def main():
