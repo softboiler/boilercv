@@ -13,3 +13,6 @@
 [submodule "context_models"]
 	path = packages/context_models
 	url = https://github.com/softboiler/context_models.git
+[submodule "typings"]
+	path = typings
+	url = https://github.com/softboiler/python-type-stubs.git
