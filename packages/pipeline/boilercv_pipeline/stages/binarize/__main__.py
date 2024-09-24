@@ -1,4 +1,3 @@
-from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
 from xarray import open_dataset
@@ -8,6 +7,7 @@ from boilercv.data.packing import pack
 from boilercv.images import cv, scale_bool
 from boilercv.images.cv import apply_mask, close_and_erode, flood
 from boilercv.types import DA
+from boilercv_pipeline.parser import invoke
 from boilercv_pipeline.stages.binarize import Binarize
 
 

@@ -67,7 +67,11 @@ class GetMae(SubcoolParams[Deps, Outs, Data]):
     """Stage data."""
     cols: Ann[Cols, Arg(hidden=True)] = Field(default_factory=Cols)
     """Columns."""
-    tracks: Ann[list[Path], validate_deps_paths("tracks")] = Field(default_factory=list)
+    tracks: Ann[list[Path], Arg(hidden=True), validate_deps_paths("tracks")] = Field(
+        default_factory=list
+    )
     """Paths to tracks."""
-    dfs: Ann[list[Path], validate_outs_paths("dfs")] = Field(default_factory=list)
+    dfs: Ann[list[Path], Arg(hidden=True), validate_outs_paths("dfs")] = Field(
+        default_factory=list
+    )
     """Paths to data frame stage outputs."""

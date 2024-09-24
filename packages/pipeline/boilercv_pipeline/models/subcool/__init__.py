@@ -5,25 +5,20 @@ from pathlib import Path
 from typing import Annotated as Ann
 from typing import Generic
 
+from cappa.arg import Arg
 from pydantic import AfterValidator, BaseModel, Field, ValidationInfo
 
 from boilercv.data import FRAME
 from boilercv_pipeline.models.deps import DirSlicer, first_slicer, get_slicers
 from boilercv_pipeline.models.deps.types import Slicers
 from boilercv_pipeline.models.params import DataParams
-from boilercv_pipeline.models.params.types import (
-    BoolParam,
-    Data_T,
-    Deps_T,
-    IntParam,
-    Outs_T,
-    StrParam,
-)
+from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DataStage, Deps
 from boilercv_pipeline.models.stage.types import DfsPlotsOuts_T
 from boilercv_pipeline.models.subcool.types import FilledDeps_T
+from boilercv_pipeline.parser import PairedArg
 
 
 class Constants(BaseModel):
@@ -101,9 +96,9 @@ class SubcoolParams(
 ):
     """Stage parameters for the subcooled boiling study."""
 
-    sample: StrParam = const.sample
+    sample: str = const.sample
     """Sample to process."""
-    only_sample: BoolParam = False
+    only_sample: Ann[bool, PairedArg("only_sample")] = False
     """Only process the sample."""
     include_patterns: Ann[list[str], AfterValidator(get_include_patterns)] = (
         const.include_patterns
@@ -152,17 +147,21 @@ class FilledParams(
 ):
     """Stage parameters for subcooled boiling study including filled video dataset."""
 
-    dfs: Ann[list[Path], validate_outs_paths("dfs")] = Field(default_factory=list)
+    dfs: Ann[list[Path], Arg(hidden=True), validate_outs_paths("dfs")] = Field(
+        default_factory=list
+    )
     """Paths to data frame stage outputs."""
-    frame_count: IntParam = 0
+    frame_count: int = 0
     """Count of frames."""
-    frame_step: IntParam = 1
+    frame_step: int = 1
     """Step between frames."""
     slicer_patterns: dict[str, Slicers] = Field(default_factory=dict)
     """Slicer patterns."""
-    filled: Ann[list[Path], validate_deps_paths("filled")] = Field(default_factory=list)
-    """Paths to filled video datasets."""
-    filled_slicers: Ann[list[Slicers], validate_slicers("filled")] = Field(
+    filled: Ann[list[Path], Arg(hidden=True), validate_deps_paths("filled")] = Field(
         default_factory=list
+    )
+    """Paths to filled video datasets."""
+    filled_slicers: Ann[list[Slicers], Arg(hidden=True), validate_slicers("filled")] = (
+        Field(default_factory=list)
     )
     """Slicers for filled video datasets."""

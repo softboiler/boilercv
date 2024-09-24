@@ -11,7 +11,6 @@ from pydantic import Field
 from boilercv_pipeline.models import columns, data, stage
 from boilercv_pipeline.models.column import Col, IdentityCol, Kind, LinkedCol
 from boilercv_pipeline.models.deps import DirSlicer
-from boilercv_pipeline.models.params.types import BoolParam
 from boilercv_pipeline.models.path import (
     DataDir,
     DataFile,
@@ -20,6 +19,7 @@ from boilercv_pipeline.models.path import (
 )
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.subcool import SubcoolParams, const
+from boilercv_pipeline.parser import PairedArg
 
 
 class Deps(stage.Deps):
@@ -102,5 +102,5 @@ class GetThermalData(SubcoolParams[Deps, Outs, Data]):
     """Columns."""
     fit: Fit = Field(default_factory=Fit, exclude=True)
     """Model fit."""
-    load_src_from_outs: BoolParam = False
+    load_src_from_outs: Ann[bool, PairedArg("load_src_from_outs")] = False
     """Load source columns from outputs."""

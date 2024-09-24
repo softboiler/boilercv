@@ -35,7 +35,9 @@ def get_cat_colorbar(
     return palette.colors, data
 
 
-def save_plots(plots: BaseModel, path: Path):
+def save_plots(plots: BaseModel, path: Path, suffix: str = ""):
     """Save a DataFrame to HDF5 format."""
     for name, fig in plots.model_dump().items():
-        fig.savefig(path / f"{name}.png")  # pyright: ignore[reportArgumentType]
+        fig.savefig(
+            path / ("_".join([f"{name}", *([suffix] if suffix else [])]) + ".png")
+        )

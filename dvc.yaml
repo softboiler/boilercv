@@ -1,103 +1,128 @@
 stages:
   skip_cloud:
-    cmd: boilercv-pipeline stage skip-cloud --format ${scale}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage skip-cloud --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows}"
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
     outs:
       - data/cines:
           cache: false
           persist: true
           push: false
   convert:
-    cmd: boilercv-pipeline stage convert --format ${scale}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage convert --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows}"
     deps:
-      - pipeline/boilercv_pipeline/stages/convert
+      - packages/pipeline/boilercv_pipeline/stages/convert
       - data/cines
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
     outs:
       - data/large_sources:
           cache: false
           persist: true
           push: false
   binarize:
-    cmd: boilercv-pipeline stage binarize --format ${scale}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage binarize --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows}"
     deps:
-      - pipeline/boilercv_pipeline/stages/binarize
+      - packages/pipeline/boilercv_pipeline/stages/binarize
       - data/large_sources
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
     outs:
       - data/sources:
           persist: true
       - data/rois:
           persist: true
   preview_gray:
-    cmd: boilercv-pipeline stage preview-gray --format ${scale}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage preview-gray --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows}"
     deps:
-      - pipeline/boilercv_pipeline/stages/preview_gray
+      - packages/pipeline/boilercv_pipeline/stages/preview_gray
       - data/large_sources
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
     outs:
       - data/previews/gray_preview.nc:
           persist: true
   preview_binarized:
-    cmd: boilercv-pipeline stage preview-binarized --format ${scale}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage preview-binarized --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows}"
     deps:
-      - pipeline/boilercv_pipeline/stages/preview_binarized
+      - packages/pipeline/boilercv_pipeline/stages/preview_binarized
       - data/sources
       - data/rois
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
     outs:
       - data/previews/binarized_preview.nc:
           persist: true
   find_contours:
-    cmd: boilercv-pipeline stage find-contours --format ${scale}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage find-contours --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows}"
     deps:
-      - pipeline/boilercv_pipeline/stages/find_contours
+      - packages/pipeline/boilercv_pipeline/stages/find_contours
       - data/sources
       - data/rois
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
     outs:
       - data/contours:
           persist: true
   fill:
-    cmd: boilercv-pipeline stage fill --format ${scale}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage fill --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows}"
     deps:
-      - pipeline/boilercv_pipeline/stages/fill
+      - packages/pipeline/boilercv_pipeline/stages/fill
       - data/sources
       - data/rois
       - data/contours
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
     outs:
       - data/filled:
           persist: true
   preview_filled:
-    cmd: boilercv-pipeline stage preview-filled --format ${scale}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage preview-filled --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows}"
     deps:
-      - pipeline/boilercv_pipeline/stages/preview_filled
+      - packages/pipeline/boilercv_pipeline/stages/preview_filled
       - data/filled
       - data/rois
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
     outs:
       - data/previews/filled_preview.nc:
           persist: true
   get_thermal_data:
-    cmd:
-      boilercv-pipeline stage get-thermal-data --format ${scale} --sample ${sample}
-      --only-sample ${only_sample} --load-src-from-outs ${load_src_from_outs}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage get-thermal-data --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows} --sample ${sample} ${only_sample} ${load_src_from_outs}"
     deps:
-      - pipeline/boilercv_pipeline/stages/get_thermal_data
+      - packages/pipeline/boilercv_pipeline/stages/get_thermal_data
       - docs/notebooks/get_thermal_data.ipynb
       - data/thermal
       - data/models
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
       - sample
       - only_sample
       - load_src_from_outs
@@ -109,17 +134,17 @@ stages:
       - data/e230920/thermal_plots/subcool_superheat.png
       - data/e230920/thermal_plots/superheat.png
   find_objects:
-    cmd:
-      boilercv-pipeline stage find-objects --format ${scale} --sample ${sample}
-      --only-sample ${only_sample} --frame-count ${frame_count} --frame-step ${frame_step}
-      --compare-with-trackpy ${compare_with_trackpy} --guess-diameter ${guess_diameter}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage find-objects --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows} --sample ${sample} ${only_sample} --frame-count ${frame_count} --frame-step ${frame_step} ${compare_with_trackpy} --guess-diameter ${guess_diameter}"
     deps:
-      - pipeline/boilercv_pipeline/stages/find_objects
+      - packages/pipeline/boilercv_pipeline/stages/find_objects
       - docs/notebooks/find_objects.ipynb
       - data/filled
       - data/contours
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
       - sample
       - only_sample
       - frame_count
@@ -130,19 +155,35 @@ stages:
       - data/e230920/objects:
           persist: true
     plots:
-      - data/e230920/objects_plots/composite.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-07-13.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-14-14.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-19-12.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-28-16.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-33-19.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-37-25.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-44-35.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-50-30.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-04-05.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-08-58.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-15-26.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-21-28.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-31-44.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-36-37.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-40-58.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-49-55.png
   find_tracks:
-    cmd:
-      boilercv-pipeline stage find-tracks --format ${scale} --sample ${sample} --only-sample
-      ${only_sample} --frame-count ${frame_count} --frame-step ${frame_step}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage find-tracks --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows} --sample ${sample} ${only_sample} --frame-count ${frame_count} --frame-step ${frame_step}"
     deps:
-      - pipeline/boilercv_pipeline/stages/find_tracks
+      - packages/pipeline/boilercv_pipeline/stages/find_tracks
       - docs/notebooks/find_tracks.ipynb
       - data/filled
       - data/e230920/objects
       - data/e230920/thermal.h5
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
       - sample
       - only_sample
       - frame_count
@@ -154,16 +195,17 @@ stages:
       - data/e230920/tracks_plots/corr.png
       - data/e230920/tracks_plots/multi.png
   get_mae:
-    cmd:
-      boilercv-pipeline stage get-mae --format ${scale} --sample ${sample} --only-sample
-      ${only_sample}
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage get-mae --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows} --sample ${sample} ${only_sample}"
     deps:
-      - pipeline/boilercv_pipeline/stages/get_mae
+      - packages/pipeline/boilercv_pipeline/stages/get_mae
       - docs/notebooks/get_mae.ipynb
       - data/e230920/thermal.h5
       - data/e230920/tracks
     params:
       - scale
+      - marker_scale
+      - precision
+      - display_rows
       - sample
       - only_sample
     outs:

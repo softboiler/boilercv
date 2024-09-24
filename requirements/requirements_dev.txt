@@ -60,7 +60,7 @@ copykitten==1.1.1
 coverage==7.6.1
 cryptography==43.0.1
 cycler==0.12.1
-cyclopts==2.9.3
+cyclopts==2.9.9
 dask==2024.9.0
 dask-expr==1.1.14
 debuglater==1.4.4
@@ -76,7 +76,7 @@ distlib==0.3.8
 distributed==2024.9.0
 distro==1.9.0
 docopt==0.6.2
-docstring-parser==0.16
+docstring-parser==0.16 ; python_full_version < '4.0.0'
 docutils==0.21.2
 dpath==2.2.0
 dulwich==0.22.1

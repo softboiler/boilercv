@@ -20,6 +20,16 @@
       "id": "input3",
       "type": "promptString",
       "description": "3rd arg."
+    },
+    {
+      "id": "input4",
+      "type": "promptString",
+      "description": "4th arg."
+    },
+    {
+      "id": "input5",
+      "type": "promptString",
+      "description": "5th arg."
     }
   ],
   "configurations": [
@@ -106,6 +116,41 @@
       "request": "launch",
       "program": "${file}",
       "args": ["${input:input1}", "${input:input2}", "${input:input3}"],
+      "console": "internalConsole",
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
+      "name": "Python: Current file with 4 args",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "args": [
+        "${input:input1}",
+        "${input:input2}",
+        "${input:input3}",
+        "${input:input4}"
+      ],
+      "console": "internalConsole",
+      "env": {
+        "BOILERCV_DEBUG": "True",
+        "BOILERCV_PREVIEW": "True"
+      }
+    },
+    {
+      "name": "Python: Current file with 5 args",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${file}",
+      "args": [
+        "${input:input1}",
+        "${input:input2}",
+        "${input:input3}",
+        "${input:input4}",
+        "${input:input5}"
+      ],
       "console": "internalConsole",
       "env": {
         "BOILERCV_DEBUG": "True",

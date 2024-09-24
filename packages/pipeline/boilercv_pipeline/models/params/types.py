@@ -1,10 +1,7 @@
 """Types."""
 
-from enum import StrEnum, auto
 from typing import TYPE_CHECKING, ParamSpec, Protocol, TypeAlias, TypeVar
-from typing import Annotated as Ann
 
-from cappa.arg import Arg, ArgAction
 from pandas import DataFrame
 
 from boilercv_pipeline.models.data import Data, Dfs, Plots
@@ -29,24 +26,3 @@ class Preview(Protocol[Ps]):  # noqa: D101
     def __call__(  # noqa: D102
         self, df: DataFrame, /, *args: Ps.args, **kwds: Ps.kwargs
     ) -> DataFrame: ...
-
-
-class Param(StrEnum):
-    """Parameter."""
-
-    any: str = auto()
-
-
-BoolParam: TypeAlias = Ann[
-    bool,
-    Param.any,
-    Arg(
-        long=None,
-        action=ArgAction.set,
-        num_args=1,
-        parse=lambda v: v.casefold() != "false",
-    ),
-]
-FloatParam: TypeAlias = Ann[float, Param.any]
-IntParam: TypeAlias = Ann[int, Param.any]
-StrParam: TypeAlias = Ann[str, Param.any]

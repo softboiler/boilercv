@@ -1,5 +1,4 @@
-from cappa.base import invoke
-
+from boilercv_pipeline.parser import invoke
 from boilercv_pipeline.stages.skip_cloud import SkipCloud
 
 

@@ -1,8 +1,8 @@
-from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
 
 from boilercv.data import FRAME, ROI, VIDEO
+from boilercv_pipeline.parser import invoke
 from boilercv_pipeline.preview import new_videos_to_preview
 from boilercv_pipeline.sets import get_dataset
 from boilercv_pipeline.stages.preview_binarized import PreviewBinarized

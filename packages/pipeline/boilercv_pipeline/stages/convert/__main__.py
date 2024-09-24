@@ -3,11 +3,11 @@ from datetime import datetime
 from pathlib import Path
 from re import match
 
-from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
 
 from boilercv_pipeline.images import prepare_dataset
+from boilercv_pipeline.parser import invoke
 from boilercv_pipeline.stages.convert import Convert
 
 

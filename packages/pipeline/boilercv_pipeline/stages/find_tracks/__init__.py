@@ -136,7 +136,7 @@ class FindTracks(FilledParams[Deps, Outs, Data]):
     """Stage data."""
     cols: Ann[Cols, Arg(hidden=True)] = Field(default_factory=Cols)
     """Columns."""
-    objects: Ann[list[Path], validate_deps_paths("objects")] = Field(
+    objects: Ann[list[Path], Arg(hidden=True), validate_deps_paths("objects")] = Field(
         default_factory=list
     )
     """Paths to objects."""

@@ -1,35 +1,22 @@
 """Synchronize DVC config and parameters with the pipeline."""
 
-import dataclasses
 from collections.abc import Sized
-from dataclasses import dataclass
 from pathlib import Path
 from types import NoneType
-from typing import Any, ClassVar, get_args
+from typing import ClassVar, get_args
 
 from cappa.base import command
-from context_models import CONTEXT
 from more_itertools import one
 from pydantic import BaseModel, Field, create_model
 from yaml import safe_dump
 
 from boilercv_pipeline.cli.types import Model_T, RelativePath, Stages
 from boilercv_pipeline.models import dvc as _dvc
-from boilercv_pipeline.models.contexts import BOILERCV_PIPELINE, DVC, PARAMS, ROOTED
+from boilercv_pipeline.models.contexts import DVC, ROOTED, DvcContext
 from boilercv_pipeline.models.path import (
     BoilercvPipelineContextStore,
     get_boilercv_pipeline_config,
 )
-
-
-@dataclass
-class SyncedDvcModel:
-    """Synced DVC model."""
-
-    model: _dvc.DvcYamlModel = dataclasses.field(default_factory=_dvc.DvcYamlModel)
-    """DVC model."""
-    params: dict[str, Any] = dataclasses.field(default_factory=dict)
-    """Parameters."""
 
 
 @command(name="sync-dvc")
@@ -42,55 +29,54 @@ class SyncDVC(BaseModel):
     Currently, must be the current working directory as it is tied to the module
     constant {obj}`boilercv_pipeline.models.contexts.ROOTED`.
     """
-    yaml: RelativePath = Path("dvc.yaml")
-    """DVC's primary config YAML file."""
-    params: RelativePath = Path("dvc.yaml")
+    pipeline: RelativePath = Path("dvc.yaml")
+    """Primary config file describing the DVC pipeline."""
+    params: RelativePath = Path("params.yaml")
     """DVC's primary parameters YAML file."""
 
     def __call__(self):
         """Sync `dvc.yaml`."""
         synced = self.get_dvc_model()
-        (self.root / self.yaml).write_text(
+        (self.root / self.pipeline).write_text(
             encoding="utf-8",
             data=safe_dump(
                 sort_keys=False,
                 indent=2,
-                data=synced.model.model_dump(exclude_none=True),
+                data=self.clear_dvc_defaults(synced.model).model_dump(
+                    exclude_none=True
+                ),
+                width=float("inf"),
             ),
         )
         (self.root / self.params).write_text(
             encoding="utf-8",
-            data=safe_dump(sort_keys=True, indent=2, data=synced.params),
+            data=safe_dump(
+                sort_keys=False, indent=2, data=synced.params, width=float("inf")
+            ),
         )
 
     @classmethod
-    def get_dvc_model(cls) -> SyncedDvcModel:
+    def get_dvc_model(cls) -> DvcContext:
         """Get DVC model."""
         Model = BoilercvPipelineContextStore  # noqa: N806
         config = Model.model_config
+        stages = get_args(Stages)
         try:
             Model.model_config = get_boilercv_pipeline_config(ROOTED, dvc=True)
-            dvc = create_model(  # pyright: ignore[reportCallIssue]
+            model = create_model(  # pyright: ignore[reportCallIssue]
                 "_Stages",
                 __base__=Model,
                 **{  # pyright: ignore[reportArgumentType]
                     s.__module__.split(".")[-1]: (s, Field(default_factory=s))
-                    for s in get_args(Stages)
+                    for s in stages
                 },
-            )().model_dump()[CONTEXT][BOILERCV_PIPELINE][DVC]
-            (Path.cwd() / "params.yaml").write_text(
-                encoding="utf-8",
-                data=safe_dump(sort_keys=True, indent=2, data=dvc[PARAMS]),
             )
         finally:
             Model.model_config = config
-        return SyncedDvcModel(
-            model=cls.clear_defaults(_dvc.DvcYamlModel.model_validate(dvc[DVC])),
-            params=dvc["params"],
-        )
+        return model().context[DVC]
 
     @classmethod
-    def clear_dvc_defaults(cls, model: _dvc.DvcYamlModel):
+    def clear_dvc_defaults(cls, model: _dvc.DvcYamlModel) -> _dvc.DvcYamlModel:
         """Clear defaults in DVC model and its nested stages."""
         model = cls.clear_defaults(_dvc.DvcYamlModel.model_validate(model))
         for name, stage in model.stages.items():
@@ -102,6 +88,7 @@ class SyncDVC(BaseModel):
                             one(out.keys()): cls.clear_defaults(one(out.values()))
                         }
                 model.stages[name] = stage
+        return model
 
     @classmethod
     def clear_defaults(cls, model: Model_T) -> Model_T:

@@ -1,4 +1,3 @@
-from cappa.base import invoke
 from loguru import logger
 from tqdm import tqdm
 from xarray import zeros_like
@@ -8,6 +7,7 @@ from boilercv.data.packing import pack
 from boilercv.images import scale_bool
 from boilercv.images.cv import draw_contours
 from boilercv.types import ArrInt
+from boilercv_pipeline.parser import invoke
 from boilercv_pipeline.sets import get_contours_df, get_dataset, process_datasets
 from boilercv_pipeline.stages.fill import Fill
 

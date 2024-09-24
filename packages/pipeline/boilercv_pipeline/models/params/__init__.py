@@ -4,31 +4,19 @@ from __future__ import annotations
 
 from collections.abc import Iterable
 from contextlib import contextmanager
-from typing import Annotated as Ann
-from typing import Any, Generic
+from typing import Generic
 
 import matplotlib
-from cappa.arg import Arg
-from context_models.validators import context_field_validator, context_model_validator
 from IPython.display import Markdown, display
 from matplotlib.axes import Axes
 from numpy import set_printoptions
 from pandas import DataFrame, options
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from seaborn import move_legend, set_theme
 
-from boilercv_pipeline.models import dvc as _dvc
 from boilercv_pipeline.models.column import Col
 from boilercv_pipeline.models.column.types import Ps
-from boilercv_pipeline.models.contexts import DVC
-from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
-from boilercv_pipeline.models.params.types import (
-    Data_T,
-    Deps_T,
-    FloatParam,
-    Outs_T,
-    Preview,
-)
+from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T, Preview
 from boilercv_pipeline.models.stage import Stage
 
 
@@ -37,13 +25,17 @@ class Constants(BaseModel):
 
     scale: float = 1.3
     paper_scale: float = 1.0
+    precision: int = 3
+    display_rows: int = 12
 
 
 const = Constants()
 
 
 def set_display_options(
-    font_scale: float = const.scale, precision: int = 3, display_rows: int = 12
+    scale: float = const.scale,
+    precision: int = const.precision,
+    display_rows: int = const.display_rows,
 ):
     """Set display options."""
     float_spec = f"#.{precision}g"
@@ -58,7 +50,7 @@ def set_display_options(
         style="whitegrid",
         palette="deep",
         font="sans-serif",
-        font_scale=font_scale,
+        font_scale=scale,
     )
     matplotlib.rcParams |= {
         # * Figure
@@ -102,45 +94,23 @@ def get_floatfmt(precision: int = 3) -> str:
     return f"#.{precision}g"
 
 
-class StageParams(Stage):
+class Params(Stage, Generic[Deps_T, Outs_T]):
     """Stage parameters."""
 
-    @context_field_validator("*", mode="after")
-    @classmethod
-    def dvc_add_param(cls, value: bool, info: BoilercvPipelineValidationInfo) -> bool:
-        """Add param to `dvc.yaml`."""
-        if (
-            (dvc := info.context.get(DVC))
-            and (info.field_name not in dvc.stage.params)
-            and (
-                (ann := (param := cls.model_fields[info.field_name]).annotation)
-                in {bool, int, float, str}
-            )
-        ):
-            match ann:
-                case bool():
-                    dvc.cmd = " ".join([
-                        *(dvc.cmd if isinstance(dvc.cmd, list) else dvc.cmd.split(" ")),
-                        f"--{info.field_name.replace('_', '-')}",
-                        f"${{{info.field_name}}}",
-                    ])
-                case _:
-                    raise ValueError(f"Got unsupported parameter kind `{param}`")
-            dvc.stage.params.append(info.field_name)
-            dvc.params[info.field_name] = value
-        return value
+    deps: Deps_T
+    """Stage dependencies."""
+    outs: Outs_T
+    """Stage outputs."""
 
+    # ? Format parameters and properties
 
-class Format(StageParams):
-    """Plotting parameters."""
-
-    scale: FloatParam = const.scale
+    scale: float = const.scale
     """Plot scale."""
     marker_scale: float = 20
     """Marker scale."""
-    precision: int = 3
+    precision: int = const.precision
     """Number precision."""
-    display_rows: int = 12
+    display_rows: int = const.display_rows
     """Number of rows to display in data frames."""
 
     @property
@@ -158,9 +128,18 @@ class Format(StageParams):
         """Font scale."""
         return self.scale
 
-    def set_display_options(self):
+    def set_display_options(
+        self,
+        scale: float | None = None,
+        precision: int | None = None,
+        display_rows: int | None = None,
+    ):
         """Set display options."""
-        set_display_options(self.font_scale, self.precision, self.display_rows)
+        set_display_options(
+            scale or self.scale,
+            precision or self.precision,
+            display_rows or self.display_rows,
+        )
 
     def move_legend(
         self, ax: Axes, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=3
@@ -198,46 +177,18 @@ class Format(StageParams):
         display()
 
     @contextmanager
-    def display_options(self, other: Format):
+    def display_options(
+        self,
+        scale: float = const.scale,
+        precision: int = const.precision,
+        display_rows: int = const.display_rows,
+    ):
         """Display options."""
         try:
-            other.set_display_options()
+            self.set_display_options(scale, precision, display_rows)
             yield
         finally:
             self.set_display_options()
-
-
-def get_format(v) -> Format:
-    """Get format."""
-    return Format(scale=v)
-
-
-class Params(StageParams, Generic[Deps_T, Outs_T]):
-    """Stage parameters."""
-
-    @context_model_validator(mode="before")
-    @classmethod
-    def dvc_prepare_stage(
-        cls, data: dict[str, Any], info: BoilercvPipelineValidationInfo
-    ) -> dict[str, Any]:
-        """Validate param for `dvc.yaml`."""
-        if dvc := info.context.get(DVC):
-            name = cls.__module__.split(".")[-1]
-            stage = dvc.model.stages.get(name, dvc.stage)
-            if not isinstance(stage, _dvc.Stage):
-                raise TypeError(f"Expected stage `{name}` to be a {_dvc.Stage}.")
-            dvc.model.stages[name] = stage
-            dvc.cmd = (
-                f"./Invoke-Uv.ps1 boilercv-pipeline stage {name.replace('_', '-')}"
-            )
-        return data
-
-    deps: Deps_T
-    """Stage dependencies."""
-    outs: Outs_T
-    """Stage outputs."""
-    format: Ann[Format, Arg(parse=get_format)] = Field(default_factory=Format)
-    """Format parameters."""
 
 
 class DataParams(Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T, Data_T]):

@@ -1,4 +1,3 @@
-from cappa.base import invoke
 from cv2 import CHAIN_APPROX_SIMPLE, bitwise_not
 from loguru import logger
 from numpy import empty, insert, vstack
@@ -9,6 +8,7 @@ from boilercv.data import VIDEO
 from boilercv.images import scale_bool
 from boilercv.images.cv import find_contours
 from boilercv.types import DF, Vid
+from boilercv_pipeline.parser import invoke
 from boilercv_pipeline.sets import get_dataset, get_unprocessed_destinations
 from boilercv_pipeline.stages.find_contours import FindContours
 

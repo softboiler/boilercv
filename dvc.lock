@@ -33,7 +33,8 @@ stages:
       md5: 5598ee8b69f8591e2035194a9054f2c3
       size: 147879321
   preview_binarized:
-    cmd: boilercv-pipeline stage preview-binarized --format 1.3
+    cmd: pwsh -Command './Invoke-Uv.ps1 boilercv-pipeline stage preview-binarized
+      --scale 1.3 --marker-scale 20.0 --precision 3 --display-rows 12'
     deps:
     - path: data/rois
       hash: md5
@@ -45,13 +46,16 @@ stages:
       md5: c2ba0be71deda61b9c6beca3aa7725c3.dir
       size: 7512414707
       nfiles: 336
-    - path: pipeline/boilercv_pipeline/stages/preview_binarized
+    - path: packages/pipeline/boilercv_pipeline/stages/preview_binarized
       hash: md5
-      md5: 5f59775268396b1be41e3015b8d4c243.dir
-      size: 2192
+      md5: ae8fe0343f1bcd86aa473973875059a0.dir
+      size: 2187
       nfiles: 2
     params:
       params.yaml:
+        display_rows: 12
+        marker_scale: 20.0
+        precision: 3
         scale: 1.3
     outs:
     - path: data/previews/binarized_preview.nc
@@ -74,7 +78,8 @@ stages:
       size: 4279876062
       nfiles: 308
   fill:
-    cmd: boilercv-pipeline stage fill --format 1.3
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage fill --scale 1.3 --marker-scale
+      20.0 --precision 3 --display-rows 12"
     deps:
     - path: data/contours
       hash: md5
@@ -91,13 +96,16 @@ stages:
       md5: c2ba0be71deda61b9c6beca3aa7725c3.dir
       size: 7512414707
       nfiles: 336
-    - path: pipeline/boilercv_pipeline/stages/fill
+    - path: packages/pipeline/boilercv_pipeline/stages/fill
       hash: md5
-      md5: 77dcb7eaf429ce636eafe916b7ba0b8c.dir
-      size: 2645
+      md5: 69f7a48b8baa9168ae6dd6d4fc7e4814.dir
+      size: 2654
       nfiles: 2
     params:
       params.yaml:
+        display_rows: 12
+        marker_scale: 20.0
+        precision: 3
         scale: 1.3
     outs:
     - path: data/filled
@@ -240,7 +248,8 @@ stages:
       size: 0
       nfiles: 0
   find_contours:
-    cmd: boilercv-pipeline stage find-contours --format 1.3
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage find-contours --scale
+      1.3 --marker-scale 20.0 --precision 3 --display-rows 12"
     deps:
     - path: data/rois
       hash: md5
@@ -252,13 +261,16 @@ stages:
       md5: c2ba0be71deda61b9c6beca3aa7725c3.dir
       size: 7512414707
       nfiles: 336
-    - path: pipeline/boilercv_pipeline/stages/find_contours
+    - path: packages/pipeline/boilercv_pipeline/stages/find_contours
       hash: md5
-      md5: b291dca512e5accefda0dbf6b679683f.dir
-      size: 4333
+      md5: f4e417222bdd605d20c8aad7a59ba068.dir
+      size: 4342
       nfiles: 2
     params:
       params.yaml:
+        display_rows: 12
+        marker_scale: 20.0
+        precision: 3
         scale: 1.3
     outs:
     - path: data/contours
@@ -267,7 +279,8 @@ stages:
       size: 4427447588
       nfiles: 337
   preview_filled:
-    cmd: boilercv-pipeline stage preview-filled --format 1.3
+    cmd: pwsh -Command './Invoke-Uv.ps1 boilercv-pipeline stage preview-filled --scale
+      1.3 --marker-scale 20.0 --precision 3 --display-rows 12'
     deps:
     - path: data/filled
       hash: md5
@@ -279,13 +292,16 @@ stages:
       md5: e47325f1e13a630c356426538a3b8759.dir
       size: 205435895
       nfiles: 337
-    - path: pipeline/boilercv_pipeline/stages/preview_filled
+    - path: packages/pipeline/boilercv_pipeline/stages/preview_filled
       hash: md5
-      md5: 0ce2215702cf3c2943ef7c034962c5d1.dir
-      size: 2096
+      md5: 8aae2e0505e9d78ccaecd7eb95ccb358.dir
+      size: 2091
       nfiles: 2
     params:
       params.yaml:
+        display_rows: 12
+        marker_scale: 20.0
+        precision: 3
         scale: 1.3
     outs:
     - path: data/previews/filled_preview.nc
@@ -293,20 +309,24 @@ stages:
       md5: e43b9ddb4ad1ad6a3a1603996604e599
       size: 1693748
   preview_gray:
-    cmd: boilercv-pipeline stage preview-gray --format 1.3
+    cmd: pwsh -Command './Invoke-Uv.ps1 boilercv-pipeline stage preview-gray --scale
+      1.3 --marker-scale 20.0 --precision 3 --display-rows 12'
     deps:
     - path: data/large_sources
       hash: md5
       md5: 658d0528ed596161c3a269f67587f41f.dir
       size: 30563612808
       nfiles: 17
-    - path: pipeline/boilercv_pipeline/stages/preview_gray
+    - path: packages/pipeline/boilercv_pipeline/stages/preview_gray
       hash: md5
-      md5: ec3c8a1cb86d8ed7b32550ea8c29d83c.dir
-      size: 1904
+      md5: 6d233f9b8e3636afcb13581e8a8fd912.dir
+      size: 1899
       nfiles: 2
     params:
       params.yaml:
+        display_rows: 12
+        marker_scale: 20.0
+        precision: 3
         scale: 1.3
     outs:
     - path: data/previews/gray_preview.nc
@@ -432,20 +452,24 @@ stages:
       size: 10710
       nfiles: 7
   binarize:
-    cmd: boilercv-pipeline stage binarize --format 1.3
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage binarize --scale 1.3
+      --marker-scale 20.0 --precision 3 --display-rows 12"
     deps:
     - path: data/large_sources
       hash: md5
       md5: 658d0528ed596161c3a269f67587f41f.dir
       size: 30563612808
       nfiles: 17
-    - path: pipeline/boilercv_pipeline/stages/binarize
+    - path: packages/pipeline/boilercv_pipeline/stages/binarize
       hash: md5
-      md5: 33072159795162da893b233836617c6c.dir
-      size: 2394
+      md5: 64871657d69f0bb21d960035804a5864.dir
+      size: 2403
       nfiles: 2
     params:
       params.yaml:
+        display_rows: 12
+        marker_scale: 20.0
+        precision: 3
         scale: 1.3
     outs:
     - path: data/rois
@@ -459,20 +483,24 @@ stages:
       size: 7512414707
       nfiles: 336
   convert:
-    cmd: boilercv-pipeline stage convert --format 1.3
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage convert --scale 1.3
+      --marker-scale 20.0 --precision 3 --display-rows 12"
     deps:
     - path: data/cines
       hash: md5
       md5: e4d560c3ffae8d28dae3c8ddedbb3c18.dir
       size: 34034068416
       nfiles: 16
-    - path: pipeline/boilercv_pipeline/stages/convert
+    - path: packages/pipeline/boilercv_pipeline/stages/convert
       hash: md5
-      md5: 58a0e02f975ec51b2467b2768b76d841.dir
-      size: 2260
+      md5: 99214c98baf7a19f9b22fc664a568069.dir
+      size: 2269
       nfiles: 2
     params:
       params.yaml:
+        display_rows: 12
+        marker_scale: 20.0
+        precision: 3
         scale: 1.3
     outs:
     - path: data/large_sources
@@ -673,9 +701,13 @@ stages:
       md5: d41d8cd98f00b204e9800998ecf8427e
       size: 0
   skip_cloud:
-    cmd: boilercv-pipeline stage skip-cloud --format 1.3
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage skip-cloud --scale
+      1.3 --marker-scale 20.0 --precision 3 --display-rows 12"
     params:
       params.yaml:
+        display_rows: 12
+        marker_scale: 20.0
+        precision: 3
         scale: 1.3
     outs:
     - path: data/cines
@@ -684,7 +716,9 @@ stages:
       size: 34034068416
       nfiles: 16
   get_thermal_data:
-    cmd: boilercv-pipeline stage get-thermal-data
+    cmd: pwsh -Command './Invoke-Uv.ps1 boilercv-pipeline stage get-thermal-data --scale
+      1.3 --marker-scale 20.0 --precision 3 --display-rows 12 --sample 2024-07-18T17-44-35
+      --no-only-sample --no-load-src-from-outs'
     deps:
     - path: data/models
       hash: md5
@@ -698,32 +732,32 @@ stages:
       nfiles: 1
     - path: docs/notebooks/get_thermal_data.ipynb
       hash: md5
-      md5: 866634f482ce3c6a204774a67f126211
-      size: 9464
-    - path: pipeline/boilercv_pipeline/stages/get_thermal_data
+      md5: 6b1e8d5af8b8199737ec7093a13ccc7c
+      size: 9690
+    - path: packages/pipeline/boilercv_pipeline/stages/get_thermal_data
       hash: md5
-      md5: 1101feb970d7d934ef7dbee5a7b9d020.dir
-      size: 4189
+      md5: 7625521f4ac912e9d2379f107d366e7a.dir
+      size: 4141
       nfiles: 2
+    params:
+      params.yaml:
+        display_rows: 12
+        load_src_from_outs: --no-load-src-from-outs
+        marker_scale: 20.0
+        only_sample: --no-only-sample
+        precision: 3
+        sample: 2024-07-18T17-44-35
+        scale: 1.3
     outs:
     - path: data/e230920/thermal.h5
       hash: md5
       md5: 8cdad51ed780e66499be72ec5a89d743
       size: 402324
-    - path: data/e230920/thermal_plots/subcool.png
-      hash: md5
-      md5: 77eed207b1e4fb85662ffd7865d33f7f
-      size: 466134
-    - path: data/e230920/thermal_plots/subcool_superheat.png
-      hash: md5
-      md5: 7543872f184649978c1e5c3f3548f448
-      size: 330253
-    - path: data/e230920/thermal_plots/superheat.png
-      hash: md5
-      md5: facddf4259acd1c99fd6246cf904a673
-      size: 506031
   find_objects:
-    cmd: boilercv-pipeline stage find-objects --compare-with-trackpy false
+    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage find-objects --scale
+      1.3 --marker-scale 20.0 --precision 3 --display-rows 12 --sample 2024-07-18T17-44-35
+      --no-only-sample --frame-count 10 --frame-step 100 --no-compare-with-trackpy
+      --guess-diameter 21"
     deps:
     - path: data/contours
       hash: md5
@@ -737,26 +771,95 @@ stages:
       nfiles: 337
     - path: docs/notebooks/find_objects.ipynb
       hash: md5
-      md5: 32f2429cc796e74611bd224b78d676f6
-      size: 10643
-    - path: pipeline/boilercv_pipeline/stages/find_objects
+      md5: d083cb741cc7c71a58f36c7ad9476e87
+      size: 10835
+    - path: packages/pipeline/boilercv_pipeline/stages/find_objects
       hash: md5
-      md5: cb8ecf12842734df2043383c07b41bc8.dir
-      size: 5996
+      md5: ba29d3a7e5acd9a0f31d47a742d67f91.dir
+      size: 6331
       nfiles: 2
     params:
       params.yaml:
-        compare_with_trackpy: false
+        compare_with_trackpy: --no-compare-with-trackpy
+        display_rows: 12
+        frame_count: 10
+        frame_step: 100
+        guess_diameter: 21
+        marker_scale: 20.0
+        only_sample: --no-only-sample
+        precision: 3
+        sample: 2024-07-18T17-44-35
+        scale: 1.3
     outs:
     - path: data/e230920/objects
       hash: md5
-      md5: b60ab7f99bed8b7d316a17057135557e.dir
-      size: 2356628
-      nfiles: 1
-    - path: data/e230920/objects_plots/composite.png
+      md5: 3f5fa16e10ec3ad98467d1e79ebfd722.dir
+      size: 2749441
+      nfiles: 16
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-07-13.png
+      hash: md5
+      md5: 06bd088d8a60f4843c07b49e492d937a
+      size: 42121
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-14-14.png
+      hash: md5
+      md5: e9370f9e71733cb0892dcbb26585e334
+      size: 36911
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-19-12.png
+      hash: md5
+      md5: e46ca3e1633db1f9f9cdad81d1f6d129
+      size: 30255
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-28-16.png
+      hash: md5
+      md5: 7f9cde37b9e008269020a6093b931445
+      size: 30234
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-33-19.png
+      hash: md5
+      md5: a747d9123ccddf782c961a59aefa102c
+      size: 37209
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-37-25.png
+      hash: md5
+      md5: 55582c052b66b636eab8efe0b004e2a2
+      size: 40707
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-44-35.png
       hash: md5
       md5: e22dfc8223b69551d15cfc48e7c4cf91
       size: 43102
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-50-30.png
+      hash: md5
+      md5: d7ebdc163c9e3a0ebf381b5eb5af4c23
+      size: 48977
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-04-05.png
+      hash: md5
+      md5: c41190ef186507886cad72eb67b830cf
+      size: 76211
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-08-58.png
+      hash: md5
+      md5: 20e7b7dfed4d813dc7cda6dc3f536aed
+      size: 68868
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-15-26.png
+      hash: md5
+      md5: d69c9e965145b5989aab458b6624c7cb
+      size: 71076
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-21-28.png
+      hash: md5
+      md5: 784f0cf8f0f28576e5af6cbcbaed495f
+      size: 53858
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-31-44.png
+      hash: md5
+      md5: 5847ae53d14eae3290b1987fafd2bf32
+      size: 100519
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-36-37.png
+      hash: md5
+      md5: f502d60c89d7fdb5b0b8723e2957bc20
+      size: 86837
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-40-58.png
+      hash: md5
+      md5: 3fdb8775a52e79dbec4f9ee2a027db12
+      size: 80657
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-49-55.png
+      hash: md5
+      md5: 56a489d5b15601c121da29ddeab04144
+      size: 71870
   get_mae:
     cmd: boilercv-pipeline stage get-mae
     deps:
