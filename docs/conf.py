@@ -254,7 +254,7 @@ mermaid_d3_zoom = False
 nitpicky = True
 autodoc2_packages = [
     f"../src/{const.ans.package}",
-    f"../packages/_dev/dev",
+    "../packages/_dev/dev",
     f"../packages/pipeline/{const.ans.package}_pipeline",
 ]
 autodoc2_render_plugin = "myst"
