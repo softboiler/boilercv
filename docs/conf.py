@@ -254,10 +254,8 @@ mermaid_d3_zoom = False
 nitpicky = True
 autodoc2_packages = [
     f"../src/{const.ans.package}",
-    f"{const.ans.package}_docs",
-    f"../pipeline/{const.ans.package}_pipeline",
-    f"../tests/{const.ans.package}_tests",
-    f"../scripts/{const.ans.package}_tools",
+    f"../packages/_dev/dev",
+    f"../packages/pipeline/{const.ans.package}_pipeline",
 ]
 autodoc2_render_plugin = "myst"
 # ? Autodoc2 does not currently obey `python_display_short_literal_types` or
