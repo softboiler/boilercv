@@ -1,0 +1,5 @@
+[pip]
+annotation-style = "line"
+python-version = "3.11"
+resolution = "lowest-direct"
+universal = true

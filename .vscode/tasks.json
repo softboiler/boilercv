@@ -76,7 +76,7 @@
     {
       "label": "proj: Sync Binder requirements",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 && uv pip compile --universal --exclude-newer (Get-Date).ToUniversalTime().ToString('o') --python-version 3.11 --resolution lowest-direct requirements/binder.in > requirements.txt",
+      "command": "./Invoke-Uv.ps1 && uv pip compile --config-file requirements/binder_uv.toml --exclude-newer (Get-Date).ToUniversalTime().ToString('o') requirements/binder.in > requirements.txt",
       "icon": { "id": "git-commit" },
       "problemMatcher": []
     },
