@@ -7,7 +7,7 @@ from pathlib import Path
 from shlex import quote
 from sys import executable
 
-from dotenv.main import DotEnv
+from dotenv import dotenv_values, load_dotenv
 from pydantic import BaseModel, Field
 from pydantic_settings import (
     BaseSettings,
@@ -40,28 +40,23 @@ const = Constants()
 def sync_environment_variables(
     path: Path | None = None, pylance_version: str = "", setenv: bool = True
 ) -> str:
-    """Sync `.env` with `pyproject.toml`, optionally setting environmetn variables."""
+    """Sync `.env` with `pyproject.toml`, optionally setting environment variables."""
     path = Path(path) if path else Path.cwd() / ".env"
-    config_dotenv = DotEnv(
-        dotenv_path=None,
-        stream=StringIO("\n".join(f"{k}={v}" for k, v in Config().env.items())),
-    )
-    dotenv = DotEnv(dotenv_path=path)
-    if not dotenv._dict:  # noqa: SLF001
-        dotenv._dict = {}  # noqa: SLF001
+    config_env = Config().env
     if pylance_version:
-        dotenv._dict["PYRIGHT_PYTHON_PYLANCE_VERSION"] = pylance_version  # noqa: SLF001  # pyright: ignore[reportOptionalSubscript]
-    new: list[str] = []
-    for key in DotEnv(dotenv_path=path).dict():
-        if new_value := config_dotenv.get(key):
-            dotenv._dict[key] = new_value  # noqa: SLF001
-        else:
-            new.append(key)
-    for key in new:
-        dotenv._dict[key]  # noqa: SLF001
+        config_env["PYRIGHT_PYTHON_PYLANCE_VERSION"] = pylance_version
+    dotenv = dotenv_values(const.env)
+    keys_set: list[str] = []
+    for key in dotenv:
+        if override := config_env.get(key):
+            keys_set.append(key)
+            dotenv[key] = override
+    for k, v in config_env.items():
+        if k not in keys_set:
+            dotenv[k] = v
     if setenv:
-        dotenv.set_as_environment_variables()
-    return "\n".join(f"{k}={v}" for k, v in config_dotenv.dict().items())
+        load_dotenv(stream=StringIO("\n".join(f"{k}={v}" for k, v in dotenv.items())))
+    return "\n".join(f"{k}={v}" for k, v in dotenv.items())
 
 
 def run(*args: str):
