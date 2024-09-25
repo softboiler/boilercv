@@ -1,17 +1,19 @@
 """Datasets."""
 
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
+from more_itertools import first, last
+from numpy import iinfo, integer, isin, issubdtype, unique
 from pandas import read_hdf
 from xarray import Dataset, open_dataset
 
 from boilercv.correlations.types import Stage
-from boilercv.data import FRAME, HEADER, ROI, VIDEO, XPX, YPX
-from boilercv.data.packing import unpack
-from boilercv.types import DF, DS
+from boilercv.data import FRAME, HEADER, ROI, VIDEO, XPX, XPX_PACKED, YPX
+from boilercv.data.packing import pack, unpack
+from boilercv.types import DA, DF, DS
 from boilercv_pipeline.models.contexts import ROOTED
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 from boilercv_pipeline.models.paths import Paths
@@ -143,63 +145,65 @@ def get_dataset(
         })
 
 
-def get_selector(s: slice | range) -> slice | range:
-    """Get selector."""
-    if (
-        isinstance(s.start, int)
-        or isinstance(s.stop, int | None)
-        or isinstance(s.step, int)
-    ):
-        start = s.start or 0
-        stop = s.stop
-        step = s.step or 1
-        if (
-            not isinstance(start, int)
-            or not isinstance(stop, int | None)
-            or not isinstance(step, int)
-        ):
-            raise TypeError("All indices must be integers.")
-        return range(start, stop + step, step)
-    return s
+def get_selector(video: DA, dim: str, sel: slice | range | None) -> slice | range:
+    """Get selector, preferring label-based selection even given an integer slice."""
+    if not sel:
+        return slice(None)
+    if isinstance(sel, range):
+        return sel
+    if all((isinstance(s, int) or s is None) for s in (sel.start, sel.stop, sel.step)):
+        start = sel.start or first(video[dim].values)
+        stop = (sel.stop or last(video[dim].values)) + 1
+        step = sel.step or 1
+        return range(start, stop, step)
+    return sel
 
 
-def get_dataset2(
-    path: Path,
-    slices: dict[str, slice] | None = None,
-    force_select_by_label: bool = True,
-) -> DS:
-    """Load a video dataset."""
-    selectors = (
-        {
-            dim: (get_selector(s) if force_select_by_label else s)
-            for dim, s in slices.items()
-        }
-        if slices
-        else {}
-    )
+def load_video(path: Path, slices: Mapping[str, slice | range] | None = None) -> DA:
+    """Load video data array."""
+    slices = slices or {}
     cmp_source, unc_source = get_stage(path.stem, path.parent)
     source = unc_source if unc_source.exists() else cmp_source
-    video = open_dataset(source)[VIDEO]
-    if not unc_source.exists():
-        Dataset({VIDEO: video}).to_netcdf(
-            path=unc_source, encoding={VIDEO: {"zlib": False}}
+    with open_dataset(source) as src:
+        video = src[VIDEO]
+        if not unc_source.exists():
+            Dataset({VIDEO: video}).to_netcdf(
+                path=unc_source, encoding={VIDEO: {"zlib": False}}
+            )
+        selectors = {
+            FRAME: get_selector(video, FRAME, slices.get(FRAME)),
+            YPX: get_selector(video, YPX, slices.get(YPX)),
+        }
+        video = (
+            unpack(video.sel(selectors))
+            if XPX_PACKED in video.dims
+            else video.sel(selectors)
         )
-    return Dataset({
-        VIDEO: unpack(
-            video.sel({
-                FRAME: selectors.get("frame", slice(None)),
-                YPX: selectors.get(YPX, slice(None)),
-            })
-        ).sel({XPX: selectors.get(XPX, slice(None))})
-    })
+        video = video.sel({XPX: get_selector(video, XPX, slices.get(XPX))})
+    return video
+
+
+def save_video(da: DA, path: Path):
+    """Save video data array."""
+    cmp_dest, unc_source = get_stage(path.stem, path.parent)
+    if issubdtype(da.dtype, integer):
+        i = iinfo(da.dtype)
+        if (
+            len(uniq := unique(da)) == 2
+            and i.min == 0
+            and isin(uniq, [i.min, i.max]).all()
+        ):
+            da = pack(da)
+    Dataset({VIDEO: da}).to_netcdf(path=cmp_dest, encoding={VIDEO: {"zlib": True}})
+    if unc_source.exists():
+        unc_source.unlink()
 
 
 def get_stage(name: str, sources: Path) -> tuple[Path, Path]:
     """Get the paths associated with a particular video name and pipeline stage."""
     source = sources / f"{name}.nc"
-    (uncompressed := sources.with_name(f"uncompressed_{sources.name}")).mkdir(
-        parents=True, exist_ok=True
-    )
+    uncompressed = sources.with_name(f"uncompressed_{sources.name}")
+    uncompressed.mkdir(parents=True, exist_ok=True)
     return source, uncompressed / f"{name}.nc"
 
 

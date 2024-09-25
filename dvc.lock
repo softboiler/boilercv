@@ -730,7 +730,7 @@ stages:
   get_thermal_data:
     cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage get-thermal-data --scale
       1.3 --marker-scale 20.0 --precision 3 --display-rows 12 --sample 2024-07-18T17-44-35
-      --only-sample --no-load-src-from-outs"
+      --no-only-sample --no-load-src-from-outs"
     deps:
     - path: data/models
       hash: md5
@@ -756,14 +756,14 @@ stages:
         display_rows: 12
         load_src_from_outs: --no-load-src-from-outs
         marker_scale: 20.0
-        only_sample: --only-sample
+        only_sample: --no-only-sample
         precision: 3
         sample: 2024-07-18T17-44-35
         scale: 1.3
     outs:
     - path: data/e230920/thermal.h5
       hash: md5
-      md5: a5f495ed9c093438bff58a810f91a675
+      md5: e7762fa77a19c206320b82322a20c1c9
       size: 402343
     - path: data/e230920/thermal_plots/subcool.png
       hash: md5
@@ -780,8 +780,8 @@ stages:
   find_objects:
     cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage find-objects --scale
       1.3 --marker-scale 20.0 --precision 3 --display-rows 12 --sample 2024-07-18T17-44-35
-      --only-sample --frame-count 500 --frame-step 1 --compare-with-trackpy --guess-diameter
-      21"
+      --no-only-sample --frame-count 500 --frame-step 1 --no-compare-with-trackpy
+      --guess-diameter 21"
     deps:
     - path: data/contours
       hash: md5
@@ -795,8 +795,8 @@ stages:
       nfiles: 337
     - path: docs/notebooks/find_objects.ipynb
       hash: md5
-      md5: 784a55a4808927f6557b2240b3d06d1b
-      size: 10639
+      md5: ca70a5fded83c6f4fc8f44ca0290c46f
+      size: 11851
     - path: packages/pipeline/boilercv_pipeline/stages/find_objects
       hash: md5
       md5: d39d8969b6c6a5caec8de3edbafd8b01.dir
@@ -804,26 +804,86 @@ stages:
       nfiles: 2
     params:
       params.yaml:
-        compare_with_trackpy: --compare-with-trackpy
+        compare_with_trackpy: --no-compare-with-trackpy
         display_rows: 12
         frame_count: 500
         frame_step: 1
         guess_diameter: 21
         marker_scale: 20.0
-        only_sample: --only-sample
+        only_sample: --no-only-sample
         precision: 3
         sample: 2024-07-18T17-44-35
         scale: 1.3
     outs:
     - path: data/e230920/objects
       hash: md5
-      md5: 00dc43265ac7e6977d91416b48c5c4d2.dir
-      size: 2860076
+      md5: bbe015c1b6d83c13996a1f2acadc565e.dir
+      size: 5412903
       nfiles: 16
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-07-13.png
+      hash: md5
+      md5: 59d984f437ce089f9f4c5a950207c5c9
+      size: 31022
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-14-14.png
+      hash: md5
+      md5: 1878209f06ad2bbe63d4713ab6b5ee97
+      size: 26419
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-19-12.png
+      hash: md5
+      md5: b2ca00f6718f03975f740ec469a4f7a1
+      size: 23921
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-28-16.png
+      hash: md5
+      md5: c3ccd6ed8d3caa74072982168cb6fc97
+      size: 25098
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-33-19.png
+      hash: md5
+      md5: f2e8eb36fd116acdffa7f0150b1b6997
+      size: 30119
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-37-25.png
+      hash: md5
+      md5: a416cab774e3fc6c6b02b1e7d29b5528
+      size: 27826
     - path: data/e230920/objects_plots/composite_2024-07-18T17-44-35.png
       hash: md5
-      md5: 9888ac768c4d2316d8e57b18d2ea687e
-      size: 58345
+      md5: 5dfc222f942b76fa209d9ad65a11110d
+      size: 33248
+    - path: data/e230920/objects_plots/composite_2024-07-18T17-50-30.png
+      hash: md5
+      md5: d183b9d5964a06023bc14984da356504
+      size: 35023
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-04-05.png
+      hash: md5
+      md5: 9a667568761292670fe87755227e124d
+      size: 56350
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-08-58.png
+      hash: md5
+      md5: 61a41af55c343722f690b25aba329399
+      size: 45288
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-15-26.png
+      hash: md5
+      md5: d3c79dfa3a434f7f8a2d0ca9828eec2b
+      size: 48894
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-21-28.png
+      hash: md5
+      md5: c11e2e24c13d5228e304d662a8715325
+      size: 40291
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-31-44.png
+      hash: md5
+      md5: e41d194ef9a0bd316ef4beb46f1dfde1
+      size: 66738
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-36-37.png
+      hash: md5
+      md5: 46bb259fa01d95e9b265ed459fdc6c31
+      size: 63038
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-40-58.png
+      hash: md5
+      md5: 983811c09d5db2a592565cca0c49fbc3
+      size: 55412
+    - path: data/e230920/objects_plots/composite_2024-07-18T18-49-55.png
+      hash: md5
+      md5: 4a6ade95ac60e33615c3b1714d9dba60
+      size: 51788
   get_mae:
     cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage get-mae --scale 1.3
       --marker-scale 20.0 --precision 3 --display-rows 12 --sample 2024-07-18T17-44-35
