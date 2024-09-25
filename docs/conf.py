@@ -119,7 +119,7 @@ class Constants(BaseModel):
         if pkg not in ["python", "pandas", "matplotlib"]
     ]
     """Tippy ReadTheDocs-compatible URLs."""
-    rev: str = "4025524891c4b9a07c9624b6afa37085d4f73cb5"
+    rev: str = "e23191a87a8949c25412f41f863c298ea477abbc"
     """Binder revision."""
     html_thebe_common: dict[str, str] = {
         "repository_url": f"https://github.com/{ans.user}/{ans.repo}",
