@@ -12,10 +12,11 @@ class Build(BaseModel):
     mode: BuildMode = None
     """Force building documentation in a certain mode."""
     nb_execution_excludepatterns: NbExecutionExcludePatterns = [
-        "notebooks/e230920*.ipynb"
+        "notebooks/e230920*.ipynb",
+        "notebooks/get_mae.ipynb",
     ]
     """List of directories relative to `docs` to exclude executing notebooks in."""
-    nb_execution_mode: NbExecutionMode = "off"
+    nb_execution_mode: NbExecutionMode = "cache"
     """Notebook execution mode.
 
     https://myst-nb.readthedocs.io/en/stable/computation/execute.html#notebook-execution-modes
