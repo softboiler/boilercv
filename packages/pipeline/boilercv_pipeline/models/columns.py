@@ -15,15 +15,21 @@ D = DataStage()
 class Cols(BaseModel):
     """Columns."""
 
-    @property
-    def index(self) -> Col:
-        """Get the singular index column."""
-        return one(self.indices)
+    def get_indices(self, *stages: str) -> list[Col]:
+        """Get all index columns, optionally selecting by stage."""
+        cols = get_cols(self, Kind.idx)
+        if not stages:
+            return cols
+        return [
+            c
+            for c in cols
+            if c in chain.from_iterable(get_cols(self, stage) for stage in stages)
+        ]
 
     @property
-    def indices(self) -> list[Col]:
-        """All index columns."""
-        return get_cols(self, Kind.idx)
+    def index(self) -> Col:
+        """Singular index column in a set of columns with one index."""
+        return one(self.get_indices())
 
     @computed_field
     @property

@@ -3,7 +3,7 @@ from functools import partial
 
 from more_itertools import one
 
-from boilercv_pipeline.dfs import save_df
+from boilercv_pipeline.dfs import save_dfs
 from boilercv_pipeline.models.path import get_time
 from boilercv_pipeline.nbs import callbacks, submit_nb_process
 from boilercv_pipeline.parser import invoke
@@ -33,7 +33,9 @@ def main(params: Params):
                     callbacks,
                     callbacks=[
                         partial(
-                            lambda f, p: save_df(df=f.result().dfs.dst, path=p),
+                            lambda f, p: save_dfs(
+                                dfs=f.result().dfs.model_dump(), path=p
+                            ),
                             p=one(_params.dfs),
                         ),
                         partial(

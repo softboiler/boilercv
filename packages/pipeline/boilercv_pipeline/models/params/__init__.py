@@ -10,13 +10,19 @@ import matplotlib
 from IPython.display import Markdown, display
 from matplotlib.axes import Axes
 from numpy import set_printoptions
-from pandas import DataFrame, options
+from pandas import DataFrame, MultiIndex, RangeIndex, Series, options
 from pydantic import BaseModel
 from seaborn import move_legend, set_theme
 
 from boilercv_pipeline.models.column import Col
 from boilercv_pipeline.models.column.types import Ps
-from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T, Preview
+from boilercv_pipeline.models.params.types import (
+    Data_T,
+    Deps_T,
+    DfOrS_T,
+    Outs_T,
+    Preview,
+)
 from boilercv_pipeline.models.stage import Stage
 
 
@@ -149,28 +155,54 @@ class Params(Stage, Generic[Deps_T, Outs_T]):
 
     def preview(
         self,
-        df: DataFrame,
+        df: DfOrS_T,
         cols: Iterable[Col] | None = None,
         index: Col | None = None,
         f: Preview[Ps] = head,
+        ncol: int = 0,
         *args: Ps.args,
         **kwds: Ps.kwargs,
-    ) -> DataFrame:
+    ) -> DfOrS_T:
         """Preview a dataframe in the notebook."""
+        if df.empty:
+            display(df)
+            return df
         _fmt = self.floatfmt
+        if isinstance(df, Series):
+            display_markdown(
+                DataFrame(df[:ncol] if ncol else df)
+                .pipe(f, *args, **kwds)
+                .rename_axis("Parameter")
+                .rename(columns={0: "Value"})
+            )
+            return df
+
+        _df = df.pipe(f, *args, **kwds)
         if cols:
             _fmt = tuple(c.fmt or self.floatfmt for c in cols)
             _cols = (
-                [c() for c in cols if c() in df.columns] if cols else list(df.columns)
+                [c() for c in cols if c() in _df.columns] if cols else list(_df.columns)
             )
         else:
             _fmt = self.floatfmt
-            _cols = list(df.columns)
-        _index: str = index or _cols.pop(0)  # pyright: ignore[reportAssignmentType]
+            _cols = list(_df.columns)
+        _cols = _cols[:ncol] if ncol else _cols
+
+        if index:
+            display_markdown(
+                _df.reset_index(drop=_df.empty).set_index(index())[_cols],
+                floatfmt=_fmt,  # pyright: ignore[reportArgumentType]
+            )
+            return df
+        if isinstance(_df.index, MultiIndex):
+            display_markdown(_df[_cols], floatfmt=_fmt)  # pyright: ignore[reportArgumentType]
+            return df
+        if _df.index.name and not isinstance(_df.index, RangeIndex):
+            display_markdown(_df[_cols], floatfmt=_fmt)  # pyright: ignore[reportArgumentType]
+            return df
+        _index = _cols.pop(0)
         display_markdown(
-            df.pipe(f, *args, **kwds)
-            .reset_index(drop=df.empty)
-            .set_index(_index)[_cols],
+            _df.reset_index(drop=_df.empty).set_index(_index)[_cols],
             floatfmt=_fmt,  # pyright: ignore[reportArgumentType]
         )
         return df

@@ -12,7 +12,9 @@ class Dfs(BaseModel, arbitrary_types_allowed=True):
     """Data frames."""
 
     src: DataFrame = Field(default_factory=DataFrame)
+    """Source data for this stage."""
     dst: DataFrame = Field(default_factory=DataFrame)
+    """Destination data for this stage."""
 
 
 class Plots(BaseModel, arbitrary_types_allowed=True):

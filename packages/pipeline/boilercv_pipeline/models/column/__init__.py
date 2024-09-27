@@ -1,5 +1,7 @@
 """Data column model."""
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from functools import cached_property
 from re import search
@@ -49,7 +51,7 @@ def get_name(p: Parts) -> str:
 
 def get_latex(p: Parts) -> str:
     """Get LaTeX-wrapped name from parts."""
-    label = p.sym
+    label = p.sym.replace(" ", r"\ ")
     if p.sub:
         label = f"{label}_{{{p.sub}}}"
     if p.unit:
@@ -102,19 +104,27 @@ class Col:
         return get_name(Parts(self.sym, self.sub, self.unit))
 
     @property
-    def no_sub(self) -> "Col":
+    def no_sub(self) -> Col:
         """Canonical name without subscript."""
         return Col(sym=self.sym, unit=self.unit)
 
     @property
-    def no_unit(self) -> "Col":
+    def no_unit(self) -> Col:
         """Canonical name without unit."""
         return Col(sym=self.sym, sub=self.sub)
 
     @classmethod
-    def from_col(cls, col: "Col") -> "Col":
+    def from_col(cls, col: Col) -> Col:
         """Build a column from a column."""
         return cls(col.sym, col.sub, col.unit, col.raw)
+
+    @classmethod
+    def only_raw(cls, name: str) -> Col:
+        """Build a column without handling subscript and units."""
+        col = cls()
+        col.raw = col.sym = name
+        col()
+        return col
 
     def rename(self, df: DataFrame) -> DataFrame:
         """Rename this column."""

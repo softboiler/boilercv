@@ -32,6 +32,13 @@ def save_df(df: DataFrame, path: Path | str, key: str | None = None):
     df.to_hdf(path, key=key or path.stem, complib="zlib", complevel=9)
 
 
+def save_dfs(dfs: dict[str, DataFrame], path: Path | str, key: str | None = None):
+    """Save data frame to a compressed HDF5 file."""
+    path = Path(path)
+    for key, df in dfs.items():
+        save_df(df, path, key=key)
+
+
 def limit_group_size(df: DataFrame, by: str | list[str], n: int) -> DataFrame:
     """Filter out groups shorter than a certain length."""
     count = "__count"  # ? Dunder triggers forbidden control characters

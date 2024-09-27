@@ -126,9 +126,9 @@ beta ,
 latex = '\beta = \left( 1 - 0.135 \Re_\bo^{0.89} \Pr^{0.33} \Ja \Fo_\o \right) ^ {0.901}'
 sympy = 'Eq( beta , ( 1 - 0.135 * Re_b0**0.89 * Pr**0.33 * Ja * Fo_0 )**0.901 )'
 
-[tang_et_al_2016]
-latex = '''
-\beta =
-\left(1 - 12.29 \Re_\bo^{0.584} \Pr^{0.333} \Ja^{0.581} \Fo_\o \right) ^ {0.706}
-'''
-sympy = 'Eq( beta , (1 - 12.29* Re_b0**0.584 * Pr**0.333 * Ja**0.581 * Fo_0 )**0.706 )'
+# [tang_et_al_2016]
+# latex = '''
+# \beta =
+# \left(1 - 12.29 \Re_\bo^{0.584} \Pr^{0.333} \Ja^{0.581} \Fo_\o \right) ^ {0.706}
+# '''
+# sympy = 'Eq( beta , (1 - 12.29* Re_b0**0.584 * Pr**0.333 * Ja**0.581 * Fo_0 )**0.706 )'

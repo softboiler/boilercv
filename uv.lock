@@ -592,7 +592,6 @@ source = { editable = "packages/pipeline" }
 dependencies = [
     { name = "astroid" },
     { name = "cappa" },
-    { name = "cmasher" },
     { name = "colorcet" },
     { name = "copykitten" },
     { name = "cyclopts" },
@@ -632,7 +631,6 @@ cv = [
 requires-dist = [
     { name = "astroid", specifier = ">=3.3.1" },
     { name = "cappa", specifier = ">=0.22.4" },
-    { name = "cmasher", specifier = ">=1.7.2" },
     { name = "colorcet", specifier = ">=3.0.1" },
     { name = "copykitten", specifier = ">=1.1.1" },
     { name = "cyclopts", specifier = ">=2.6.1" },
@@ -967,20 +965,6 @@ wheels = [
 ]
 
 [[package]]
-name = "cmasher"
-version = "1.7.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "colorspacious" },
-    { name = "matplotlib" },
-    { name = "numpy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/7a/5d/f6b108426752112a6e5f8ba1ef520d61c750c92927852810bb038275e01d/cmasher-1.7.2.tar.gz", hash = "sha256:11853f90a894cbcf174b4707d9883b8c1af9ad2d01c56d039415b65ae021b426", size = 523413 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/f5/48/9b82fe261e79aac0cf2f2c7de6028b32654c6d2b1b238a65ba2795fc71a3/cmasher-1.7.2-py3-none-any.whl", hash = "sha256:8c87da3038bead3b14c5f8d8525474fe374db6f58518a28c5e4929b1070dad10", size = 531458 },
-]
-
-[[package]]
 name = "colorama"
 version = "0.4.6"
 source = { registry = "https://pypi.org/simple" }
@@ -999,18 +983,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/84/6c/4e486f6e4c838d9a9655fde812d0f138cde272c48f63e12ec311862875e9/colorcet-3.0.1.tar.gz", hash = "sha256:51455a20353d12fac91f953772d8409f2474e6a0db1af3fa4f7005f405a2480b", size = 3036207 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/6f/41/2973b97821330eee69fa6e5d226b36d9137f519a4b7b851a077edc3f01a0/colorcet-3.0.1-py2.py3-none-any.whl", hash = "sha256:8daff01824ee9935fdf762d15c444a67d3e361ad4f8b738ad59ac9bf38f30600", size = 1656427 },
-]
-
-[[package]]
-name = "colorspacious"
-version = "1.1.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "numpy" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/75/e4/aa41ae14c5c061205715006c8834496d86ec7500f1edda5981f0f0190cc6/colorspacious-1.1.2.tar.gz", hash = "sha256:5e9072e8cdca889dac445c35c9362a22ccf758e97b00b79ff0d5a7ba3e11b618", size = 688573 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ab/a1/318b9aeca7b9856410ededa4f52d6f82174d1a41e64bdd70d951e532675a/colorspacious-1.1.2-py2.py3-none-any.whl", hash = "sha256:c78befa603cea5dccb332464e7dd29e96469eebf6cd5133029153d1e69e3fd6f", size = 37735 },
 ]
 
 [[package]]

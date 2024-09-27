@@ -9,7 +9,6 @@ description = "Data pipeline"
 dependencies = [
   "astroid>=3.3.1",
   "cappa>=0.22.4",
-  "cmasher>=1.7.2",
   "colorcet>=3.0.1",
   "copykitten>=1.1.1",
   "cyclopts>=2.6.1",

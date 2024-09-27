@@ -91,12 +91,12 @@ class Cols(columns.Cols):
     @property
     def centroids(self) -> list[Col]:
         """All centroids columns."""
-        return [*self.indices, *get_cols(self, D.centroids)]  # pyright: ignore[reportReturnType]
+        return [*self.get_indices(), *get_cols(self, D.centroids)]  # pyright: ignore[reportReturnType]
 
     @property
     def geo(self) -> list[Col]:
         """All geometry columns."""
-        return [*self.indices, *get_cols(self, D.geo)]  # pyright: ignore[reportReturnType]
+        return [*self.get_indices(), *get_cols(self, D.geo)]  # pyright: ignore[reportReturnType]
 
 
 @command(

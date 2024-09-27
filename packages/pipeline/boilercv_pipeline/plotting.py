@@ -1,25 +1,17 @@
 """Plot operations."""
 
 from pathlib import Path
-from typing import Any
 
-from cmasher import get_sub_cmap
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
-from matplotlib.colors import Colormap, Normalize
+from matplotlib.colors import ListedColormap, Normalize
 from pandas import CategoricalDtype, DataFrame
 from pydantic import BaseModel
-
-
-def get_first_from_palette(palette: Any, n: int) -> Colormap:
-    """Get the first `n` colors from a palette."""
-    return get_sub_cmap(
-        palette, start=0, stop=n / (getattr(palette, "N", None) or len(palette)), N=n
-    )
+from seaborn import color_palette
 
 
 def get_cat_colorbar(
-    ax: Axes, col: str, palette: Any, data: DataFrame, alpha: float = 1.0
+    ax: Axes, col: str, palette: str, data: DataFrame, alpha: float = 1.0
 ) -> tuple[list[tuple[float, float, float]], DataFrame]:
     """Get categorical colorbar."""
     if isinstance(data[col].dtype, CategoricalDtype):
@@ -27,12 +19,12 @@ def get_cat_colorbar(
         num_colors = len(data[col].cat.categories)
     else:
         num_colors = data[col].nunique()
-    palette = get_first_from_palette(palette, num_colors)
-    mappable = ScalarMappable(cmap=palette, norm=Normalize(0, num_colors))
+    p = ListedColormap(color_palette(palette, num_colors))
+    mappable = ScalarMappable(cmap=p, norm=Normalize(0, num_colors))
     mappable.set_array([])
     colorbar = ax.figure.colorbar(ax=ax, mappable=mappable, label=col, alpha=alpha)  # pyright: ignore[reportAttributeAccessIssue, reportOptionalMemberAccess], CI
     colorbar.set_ticks([])
-    return palette.colors, data
+    return p.colors, data  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def save_plots(plots: BaseModel, path: Path, suffix: str = ""):

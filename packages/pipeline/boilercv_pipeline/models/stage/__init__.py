@@ -171,11 +171,15 @@ class DfsPlotsOuts(Outs):
     """Stage output paths including data frames and plots."""
 
     dfs: DataDir
+    """Output data directory for this stage."""
     plots: DataDir
+    """Output plots directory for this stage."""
 
 
 class DataStage(BaseModel):
     """Data stage in a pipeline stage."""
 
     src: str = "src"
+    """Source data for this stage."""
     dst: str = "dst"
+    """Destination data for this stage."""
