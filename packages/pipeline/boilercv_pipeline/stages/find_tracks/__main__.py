@@ -15,14 +15,15 @@ def main(params: Params):
     nb = params.deps.nb.read_text(encoding="utf-8")
     dfs = params.outs.dfs
     with ProcessPoolExecutor() as executor:
-        for filled, filled_slicers in zip(
-            params.filled, params.filled_slicers, strict=True
+        for filled, filled_slicers, objects in zip(
+            params.filled, params.filled_slicers, params.objects, strict=True
         ):
             _params = params.model_copy(deep=True)
             time = get_time(filled)
             for field, value in {
                 "filled": filled,
                 "filled_slicers": filled_slicers,
+                "objects": objects,
                 "dfs": dfs / f"{dfs.name}_{get_time(filled)}.h5",
             }.items():
                 setattr(_params, field, [value])

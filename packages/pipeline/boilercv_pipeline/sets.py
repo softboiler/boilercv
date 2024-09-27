@@ -159,17 +159,24 @@ def get_selector(video: DA, dim: str, sel: slice | range | None) -> slice | rang
     return sel
 
 
-def load_video(path: Path, slices: Mapping[str, slice | range] | None = None) -> DA:
-    """Load video data array."""
-    slices = slices or {}
+@contextmanager
+def inspect_video(path: Path) -> Iterator[DS]:
+    """Inspect video data array."""
     cmp_source, unc_source = get_stage(path.stem, path.parent)
     source = unc_source if unc_source.exists() else cmp_source
     with open_dataset(source) as src:
-        video = src[VIDEO]
         if not unc_source.exists():
-            Dataset({VIDEO: video}).to_netcdf(
+            Dataset({VIDEO: src[VIDEO]}).to_netcdf(
                 path=unc_source, encoding={VIDEO: {"zlib": False}}
             )
+        yield src
+
+
+def load_video(path: Path, slices: Mapping[str, slice | range] | None = None) -> DA:
+    """Load video data array."""
+    slices = slices or {}
+    with inspect_video(path) as src:
+        video = src[VIDEO]
         selectors = {
             FRAME: get_selector(video, FRAME, slices.get(FRAME)),
             YPX: get_selector(video, YPX, slices.get(YPX)),
