@@ -75,7 +75,9 @@ def get_first_innermost_context(model: ContextStore) -> BoilercvPipelineContexts
     """Get the first innermost context."""
     context = model.context
     m = model.model_dump()
-    while isinstance((m := first(v for k, v in m.items() if k != "context")), Mapping):
+    while isinstance(
+        (m := first((v for k, v in m.items() if k != "context"), default=None)), Mapping
+    ):
         context: Context = m.get(CONTEXT, get_boilercv_pipeline_context())
     return context  # pyright: ignore[reportReturnType]
 
