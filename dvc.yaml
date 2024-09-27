@@ -192,26 +192,6 @@ stages:
       - data/e230920/tracks:
           persist: true
     plots:
-      - data/e230920/tracks_plots/corr_2024-07-18T17-44-35.png
-      - data/e230920/tracks_plots/multi_2024-07-18T17-44-35.png
-  get_mae:
-    cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage get-mae --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows} --sample ${sample} ${only_sample}"
-    deps:
-      - packages/pipeline/boilercv_pipeline/stages/get_mae
-      - docs/notebooks/get_mae.ipynb
-      - data/e230920/thermal.h5
-      - data/e230920/tracks
-    params:
-      - scale
-      - marker_scale
-      - precision
-      - display_rows
-      - sample
-      - only_sample
-    outs:
-      - data/e230920/mae:
-          persist: true
-    plots:
       - data/e230920/tracks_plots/beta_err_2024-07-18T17-07-13.png
       - data/e230920/tracks_plots/beta_err_2024-07-18T17-14-14.png
       - data/e230920/tracks_plots/beta_err_2024-07-18T17-19-12.png
