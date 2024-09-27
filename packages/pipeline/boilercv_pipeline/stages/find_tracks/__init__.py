@@ -60,7 +60,9 @@ class Dfs(data.Dfs):
 
 
 class Plots(data.Plots):
+    bubbles: Figure = Field(default_factory=Figure)
     multi: Figure = Field(default_factory=Figure)
+    beta: Figure = Field(default_factory=Figure)
     beta_err: Figure = Field(default_factory=Figure)
     nusselt_err: Figure = Field(default_factory=Figure)
     mae: Figure = Field(default_factory=Figure)

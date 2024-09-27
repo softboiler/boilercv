@@ -145,22 +145,24 @@ def get_dataset(
         })
 
 
-def get_selector(video: DA, dim: str, sel: slice | range | None) -> slice | range:
+def get_selector(
+    video: DA, dim: str, sel: slice | range | Any | None
+) -> slice | range | Any:
     """Get selector, preferring label-based selection even given an integer slice."""
     if not sel:
         return slice(None)
-    if isinstance(sel, range):
-        return sel
-    if all((isinstance(s, int) or s is None) for s in (sel.start, sel.stop, sel.step)):
+    if isinstance(sel, slice) and all(
+        (isinstance(s, int) or s is None) for s in (sel.start, sel.stop, sel.step)
+    ):
         start = sel.start or first(video[dim].values)
         stop = (sel.stop or last(video[dim].values)) + 1
         step = sel.step or 1
         return range(start, stop, step)
-    return sel
+    return sel if isinstance(sel, slice | range) else list(sel)
 
 
 @contextmanager
-def inspect_video(path: Path) -> Iterator[DS]:
+def inspect_video(path: Path) -> Iterator[DA]:
     """Inspect video data array."""
     cmp_source, unc_source = get_stage(path.stem, path.parent)
     source = unc_source if unc_source.exists() else cmp_source
@@ -169,14 +171,15 @@ def inspect_video(path: Path) -> Iterator[DS]:
             Dataset({VIDEO: src[VIDEO]}).to_netcdf(
                 path=unc_source, encoding={VIDEO: {"zlib": False}}
             )
-        yield src
+        yield src[VIDEO]
 
 
-def load_video(path: Path, slices: Mapping[str, slice | range] | None = None) -> DA:
+def load_video(
+    path: Path, slices: Mapping[str, slice | range | Any] | None = None
+) -> DA:
     """Load video data array."""
     slices = slices or {}
-    with inspect_video(path) as src:
-        video = src[VIDEO]
+    with inspect_video(path) as video:
         selectors = {
             FRAME: get_selector(video, FRAME, slices.get(FRAME)),
             YPX: get_selector(video, YPX, slices.get(YPX)),

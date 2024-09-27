@@ -14,7 +14,7 @@ from boilercv_pipeline.stages.find_tracks import FindTracks as Params
 def main(params: Params):
     nb = params.deps.nb.read_text(encoding="utf-8")
     dfs = params.outs.dfs
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=4) as executor:
         for filled, filled_slicers, objects in zip(
             params.filled, params.filled_slicers, params.objects, strict=True
         ):
