@@ -146,6 +146,7 @@ Equation: TypeAlias = Literal[
     "lucic_mayinger_2010",
     "kim_park_2011",
     "al_issa_et_al_2014",
+    "tang_et_al_2016",  # Orders of magnitude higher MAE in Nusselt than all other corrs
 ]
 """Equation."""
 ExtraEquation: TypeAlias = Literal[
@@ -154,7 +155,6 @@ ExtraEquation: TypeAlias = Literal[
     "hughmark_1967",  # Requires numerical solution
     "hughmark_1967_2",  # Requires numerical solution
     "inaba_et_al_2013",  # Uses custom `epsilon` and void fraction
-    "tang_et_al_2016",  # Orders of magnitude higher MAE in Nusselt than all other corrs
 ]
 """Extended equation."""
 AnyEquation: TypeAlias = Equation | ExtraEquation
