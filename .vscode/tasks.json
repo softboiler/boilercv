@@ -209,7 +209,7 @@
     {
       "label": "dvc: dag",
       "type": "shell",
-      "command": ". ./Dev.ps1 && (iuv dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/_static/dag.md && iuv markdownlint-cli2 docs/_static/dag.md",
+      "command": ". ./Dev.ps1 && (iuv dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/_static/dag.md && markdownlint-cli2 docs/_static/dag.md",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },

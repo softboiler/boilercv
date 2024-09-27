@@ -1,28 +1,37 @@
 ```{mermaid}
 flowchart TD
- node1["Binarize"]
- node2["Convert CINEs"]
- node6["Fill contours"]
- node7["Find contours"]
- node8["Find bubbles"]
- node9["Link bubbles"]
- node10["Correlate"]
- node11["Process data"]
- node12["Check binarized"]
- node13["Check filled"]
- node14["Check gray"]
+ node1["binarize"]
+ node2["convert"]
+ node3["data\models\modelfun-3.11.dillpickle.dvc"]
+ node4["data\models\modelfun-3.12.dillpickle.dvc"]
+ node5["data\thermal.dvc"]
+ node6["fill"]
+ node7["find_contours"]
+ node8["find_objects"]
+ node9["find_tracks"]
+ node10["get_thermal_data"]
+ node11["preview_binarized"]
+ node12["preview_filled"]
+ node13["preview_gray"]
+ node14["skip_cloud"]
  node1-->node6
  node1-->node7
+ node1-->node11
  node1-->node12
- node1-->node13
  node2-->node1
- node2-->node14
+ node2-->node13
+ node3-->node10
+ node4-->node10
+ node5-->node10
  node6-->node8
  node6-->node9
+ node6-->node12
  node7-->node6
  node7-->node8
  node8-->node9
- node9-->node10
- node11-->node9
- node11-->node10
+ node10-->node9
+ node14-->node2
+ node15["data\examples.dvc"]
+ node16["data\notebooks.dvc"]
+ node17["data\samples.dvc"]
 ```
