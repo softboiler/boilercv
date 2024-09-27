@@ -780,8 +780,8 @@ stages:
   find_objects:
     cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage find-objects --scale
       1.3 --marker-scale 20.0 --precision 3 --display-rows 12 --sample 2024-07-18T17-44-35
-      --no-only-sample --frame-count 500 --frame-step 1 --no-compare-with-trackpy
-      --guess-diameter 21"
+      --no-only-sample --frame-count 0 --frame-step 1 --no-compare-with-trackpy --guess-diameter
+      21"
     deps:
     - path: data/contours
       hash: md5
@@ -795,18 +795,18 @@ stages:
       nfiles: 337
     - path: docs/notebooks/find_objects.ipynb
       hash: md5
-      md5: ca70a5fded83c6f4fc8f44ca0290c46f
-      size: 11851
+      md5: 742e98461a7792564815cb570b01179d
+      size: 11620
     - path: packages/pipeline/boilercv_pipeline/stages/find_objects
       hash: md5
-      md5: d39d8969b6c6a5caec8de3edbafd8b01.dir
-      size: 6157
+      md5: e4d2d332db08386ae2cfd424162831bc.dir
+      size: 6169
       nfiles: 2
     params:
       params.yaml:
         compare_with_trackpy: --no-compare-with-trackpy
         display_rows: 12
-        frame_count: 500
+        frame_count: 0
         frame_step: 1
         guess_diameter: 21
         marker_scale: 20.0
