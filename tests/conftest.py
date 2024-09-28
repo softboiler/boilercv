@@ -71,9 +71,9 @@ def stage(tmp_path, request):
     docs = boilercv_pipeline_const.docs
     module = f"boilercv_pipeline.stages.{request.param}"
     init = import_module(module)
-    Deps = init.Deps  # noqa: N806
-    Outs = init.Outs  # noqa: N806
     Params = getattr(init, f"{to_pascal(request.param)}")  # noqa: N806
+    Deps = Params.model_fields["deps"]. annotation # noqa: N806
+    Outs = Params.model_fields["outs"].annotation  # noqa: N806
     main = import_module(f"{module}.__main__").main
     return partial(
         main,
