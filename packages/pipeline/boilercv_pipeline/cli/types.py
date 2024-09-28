@@ -12,7 +12,6 @@ from boilercv_pipeline.stages.fill import Fill
 from boilercv_pipeline.stages.find_contours import FindContours
 from boilercv_pipeline.stages.find_objects import FindObjects
 from boilercv_pipeline.stages.find_tracks import FindTracks
-from boilercv_pipeline.stages.get_mae import GetMae
 from boilercv_pipeline.stages.get_thermal_data import GetThermalData
 from boilercv_pipeline.stages.preview_binarized import PreviewBinarized
 from boilercv_pipeline.stages.preview_filled import PreviewFilled
@@ -45,6 +44,5 @@ Stages: TypeAlias = (
     | GetThermalData
     | FindObjects
     | FindTracks
-    | GetMae
 )
 """Model stages."""

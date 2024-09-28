@@ -9,7 +9,6 @@ StageName: TypeAlias = Literal[
     "find_contours",
     "find_objects",
     "find_tracks",
-    "get_mae",
     "get_thermal_data",
     "preview_binarized",
     "preview_filled",
