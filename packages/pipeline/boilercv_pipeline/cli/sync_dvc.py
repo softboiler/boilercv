@@ -6,9 +6,10 @@ from types import NoneType
 from typing import ClassVar, get_args
 
 from cappa.base import command
+from context_models import CONTEXT
 from more_itertools import one
 from pydantic import BaseModel, Field, create_model
-from yaml import safe_dump
+from yaml import safe_dump, safe_load
 
 from boilercv_pipeline.cli.types import Model_T, RelativePath, Stages
 from boilercv_pipeline.models import dvc as _dvc
@@ -33,6 +34,8 @@ class SyncDVC(BaseModel):
     """Primary config file describing the DVC pipeline."""
     params: RelativePath = Path("params.yaml")
     """DVC's primary parameters YAML file."""
+    update_param_values: bool = Field(default=False)
+    """Update values of parameters in the parameters YAML file."""
 
     def __call__(self):
         """Sync `dvc.yaml`."""
@@ -51,29 +54,53 @@ class SyncDVC(BaseModel):
         (self.root / self.params).write_text(
             encoding="utf-8",
             data=safe_dump(
-                sort_keys=False, indent=2, data=synced.params, width=float("inf")
+                sort_keys=False,
+                indent=2,
+                data={
+                    **synced.params,
+                    **(
+                        {}
+                        if self.update_param_values
+                        else {
+                            k: v
+                            for k, v in safe_load(
+                                self.params.read_text(encoding="utf-8")
+                            ).items()
+                            if k in synced.params
+                        }
+                    ),
+                },
+                width=float("inf"),
             ),
         )
 
-    @classmethod
-    def get_dvc_model(cls) -> DvcContext:
+    def get_dvc_model(self) -> DvcContext:
         """Get DVC model."""
         Model = BoilercvPipelineContextStore  # noqa: N806
         config = Model.model_config
-        stages = get_args(Stages)
+        stages = {s.__module__.split(".")[-1]: s for s in get_args(Stages)}
         try:
             Model.model_config = get_boilercv_pipeline_config(ROOTED, dvc=True)
+            params = safe_load(self.params.read_text(encoding="utf-8"))
             model = create_model(  # pyright: ignore[reportCallIssue]
                 "_Stages",
                 __base__=Model,
                 **{  # pyright: ignore[reportArgumentType]
-                    s.__module__.split(".")[-1]: (s, Field(default_factory=s))
-                    for s in stages
+                    field: (stage, Field(default_factory=stage))
+                    for field, stage in stages.items()
                 },
-            )
+            )(**{
+                field: {
+                    k: (("--no" not in v) if isinstance(v, str) and "--" in v else v)
+                    for k, v in params.items()
+                    if k in stage.model_fields
+                }
+                for field, stage in stages.items()
+                if field != CONTEXT
+            })
         finally:
             Model.model_config = config
-        return model().context[DVC]
+        return model.context[DVC]
 
     @classmethod
     def clear_dvc_defaults(cls, model: _dvc.DvcYamlModel) -> _dvc.DvcYamlModel:

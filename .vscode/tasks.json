@@ -173,30 +173,12 @@
       "problemMatcher": []
     },
     {
-      "label": "dvc: repro (debug)",
-      "type": "shell",
-      "options": {
-        "env": { "BOILERCV_DEBUG": "True" }
-      },
-      "command": "./Invoke-Uv.ps1 dvc repro ${input:stage}",
-      "icon": { "id": "graph" },
-      "problemMatcher": []
-    },
-    {
-      "label": "dvc: repro force (debug)",
-      "type": "shell",
-      "options": {
-        "env": { "BOILERCV_DEBUG": "True" }
-      },
-      "command": "./Invoke-Uv.ps1 dvc repro --force ${input:stage}",
-      "icon": { "id": "graph" },
-      "problemMatcher": []
-    },
-    {
       "label": "dvc: repro",
       "type": "shell",
       "command": "./Invoke-Uv.ps1 dvc repro ${input:stage}",
       "icon": { "id": "graph" },
+      "dependsOn": ["dvc:sync"],
+      "dependsOrder": "sequence",
       "problemMatcher": []
     },
     {
@@ -204,6 +186,8 @@
       "type": "shell",
       "command": "./Invoke-Uv.ps1 dvc repro --force ${input:stage}",
       "icon": { "id": "graph" },
+      "dependsOn": ["dvc:sync"],
+      "dependsOrder": "sequence",
       "problemMatcher": []
     },
     {
@@ -211,12 +195,14 @@
       "type": "shell",
       "command": ". ./Dev.ps1 && (iuv dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/_static/dag.md && markdownlint-cli2 docs/_static/dag.md",
       "icon": { "id": "graph" },
+      "dependsOn": ["dvc:sync"],
+      "dependsOrder": "sequence",
       "problemMatcher": []
     },
     {
       "label": "dvc: sync",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 boilercv_pipeline sync-dvc",
+      "command": "./Dev.ps1 && iuv boilercv_pipeline sync-dvc && $(try { iuv pre-commit run --all-files prettier } catch [System.Management.Automation.NativeCommandExitException] {})",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },

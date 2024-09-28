@@ -90,6 +90,20 @@ def get_include_patterns(
     return include_patterns
 
 
+def dvc_validate_only_sample(
+    only_sample: bool, info: BoilercvPipelineValidationInfo
+) -> bool:
+    """Validate plots for `dvc.yaml` if `only_sample` is enabled."""
+    if (
+        info.field_name != CONTEXT
+        and (dvc := info.context.get(DVC))
+        and dvc.plot_dir
+        and only_sample
+    ):
+        dvc.plot_sample = info.data["sample"]
+    return only_sample
+
+
 class SubcoolParams(
     DataParams[Deps_T, Outs_T, Data_T], Generic[Deps_T, Outs_T, Data_T]
 ):
@@ -97,7 +111,9 @@ class SubcoolParams(
 
     sample: str = const.sample
     """Sample to process."""
-    only_sample: Ann[bool, PairedArg("only_sample")] = False
+    only_sample: Ann[
+        bool, PairedArg("only_sample"), ContextAfterValidator(dvc_validate_only_sample)
+    ] = False
     """Only process the sample."""
     include_patterns: Ann[list[str], AfterValidator(get_include_patterns)] = (
         const.include_patterns
@@ -149,7 +165,7 @@ def dvc_validate_times(
             sorted(
                 (dvc.plot_dir / ("_".join([f"{name}", time]) + ".png")).as_posix()
                 for name in dvc.plot_names
-                for time in times
+                for time in ([dvc.plot_sample] if dvc.plot_sample else times)
             )
         )
         dvc.plot_dir = None

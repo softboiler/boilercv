@@ -42,6 +42,8 @@ class DvcContext(BaseModel):
     """DVC `params.yaml` synchronized to `dvc.yaml`."""
     stage: Stage = Field(default_factory=lambda: Stage(cmd=""))
     """Current stage."""
+    plot_sample: str = ""
+    """Whether to plot only the sample."""
     plot_dir: Path | None = None
     """Current plotting directory."""
     plot_names: list[str] = Field(default_factory=list)
