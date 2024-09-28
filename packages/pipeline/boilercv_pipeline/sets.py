@@ -149,7 +149,7 @@ def get_selector(
     video: DA, dim: str, sel: slice | range | Any | None
 ) -> slice | range | Any:
     """Get selector, preferring label-based selection even given an integer slice."""
-    if not sel:
+    if sel is None:
         return slice(None)
     if isinstance(sel, slice) and all(
         (isinstance(s, int) or s is None) for s in (sel.start, sel.stop, sel.step)
