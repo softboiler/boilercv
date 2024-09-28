@@ -63,13 +63,6 @@ class Paths(BoilercvPipelineContextStore):
     objects_plots: DataDir = e230920 / Path("objects_plots")
     tracks: DataDir = e230920 / Path("tracks")
     tracks_plots: DataDir = e230920 / Path("tracks_plots")
-    mae: DataDir = e230920 / Path("mae")
-    mae_plots: DataDir = e230920 / Path("mae_plots")
-
-    e230920_processed_tracks: DataDir = e230920 / Path("processed_tracks")
-    e230920_merged_tracks: DataFile = e230920 / Path("merged_tracks.h5")
-
-    e230920_merged_mae: DataFile = e230920 / Path("merged_mae.h5")
 
     # ! Previews
     previews: DataDir = Path("previews")

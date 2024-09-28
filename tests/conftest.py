@@ -68,13 +68,6 @@ def _get_ns_attrs(request):
 @pytest.fixture(params=boilercv_pipeline_const.stages)
 def stage(tmp_path, request):
     """Set project directory."""
-    if request.param in [
-        "skip_cloud",
-        "get_mae",
-        "e230920_merge_mae",
-        "e230920_merge_tracks",
-    ]:
-        pytest.skip("Deps not yet sourced")
     docs = boilercv_pipeline_const.docs
     module = f"boilercv_pipeline.stages.{request.param}"
     init = import_module(module)

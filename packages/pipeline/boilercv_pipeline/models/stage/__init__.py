@@ -135,28 +135,25 @@ class StagePaths(BoilercvPipelineContextStore):
 
     @context_field_validator("*", mode="after")
     @classmethod
-    def dvc_validate_out(
-        cls, value: Path, info: BoilercvPipelineValidationInfo
-    ) -> Path:
+    def dvc_validate_out(cls, path: Path, info: BoilercvPipelineValidationInfo) -> Path:
         """Serialize path for `dvc.yaml`."""
         if info.field_name != CONTEXT and (dvc := info.context.get(DVC)):
-            path = Path(value).resolve().relative_to(Path.cwd())
+            path = Path(path).resolve().relative_to(Path.cwd())
             if info.field_name == "plots":
-                if plots := [p.as_posix() for p in path.iterdir()]:
-                    dvc.stage.plots.extend(plots)
-                return value
-            path = path.as_posix()
+                dvc.plot_dir = path
+                return path
+            p = path.as_posix()
             kind = "deps" if issubclass(cls, Deps) else "outs"
             getattr(dvc.stage, kind).append(
-                path
+                p
                 if kind == "deps"
                 else (
-                    {path: const.dvc_out_skip_cloud_config}
-                    if path in const.skip_cloud
-                    else {path: const.dvc_out_config}
+                    {p: const.dvc_out_skip_cloud_config}
+                    if p in const.skip_cloud
+                    else {p: const.dvc_out_config}
                 )
             )
-        return value
+        return path
 
 
 class Deps(StagePaths):

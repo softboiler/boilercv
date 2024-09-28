@@ -1,3 +1,4 @@
+from functools import partial
 from pathlib import Path
 from tomllib import loads
 from typing import Annotated as Ann
@@ -7,7 +8,7 @@ from cappa.arg import Arg
 from cappa.base import command
 from matplotlib.figure import Figure
 from pandas import DataFrame
-from pydantic import Field
+from pydantic import AfterValidator, Field
 
 from boilercv.correlations import META_TOML
 from boilercv.correlations.models import Metadata
@@ -24,11 +25,7 @@ from boilercv_pipeline.models.path import (
 )
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DfsPlotsOuts
-from boilercv_pipeline.models.subcool import (
-    FilledDeps,
-    FilledParams,
-    validate_deps_paths,
-)
+from boilercv_pipeline.models.subcool import FilledDeps, FilledParams, validate_paths
 from boilercv_pipeline.stages import find_objects
 
 
@@ -204,7 +201,9 @@ class FindTracks(FilledParams[Deps, Outs, Data]):
     """Stage data."""
     cols: Ann[Cols, Arg(hidden=True)] = Field(default_factory=Cols)
     """Columns."""
-    objects: Ann[list[Path], Arg(hidden=True), validate_deps_paths("objects")] = Field(
-        default_factory=list
-    )
+    objects: Ann[
+        list[Path],
+        Arg(hidden=True),
+        AfterValidator(partial(validate_paths, deps=True, field="objects")),
+    ] = Field(default_factory=list)
     """Paths to objects."""

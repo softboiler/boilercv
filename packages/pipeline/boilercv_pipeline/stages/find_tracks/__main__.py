@@ -13,10 +13,13 @@ from boilercv_pipeline.stages.find_tracks import FindTracks as Params
 
 def main(params: Params):
     nb = params.deps.nb.read_text(encoding="utf-8")
-    dfs = params.outs.dfs
     with ProcessPoolExecutor(max_workers=4) as executor:
-        for filled, filled_slicers, objects in zip(
-            params.filled, params.filled_slicers, params.objects, strict=True
+        for filled, filled_slicers, objects, dfs in zip(
+            params.filled,
+            params.filled_slicers,
+            params.objects,
+            params.dfs,
+            strict=True,
         ):
             _params = params.model_copy(deep=True)
             time = get_time(filled)
@@ -24,7 +27,7 @@ def main(params: Params):
                 "filled": filled,
                 "filled_slicers": filled_slicers,
                 "objects": objects,
-                "dfs": dfs / f"{dfs.name}_{get_time(filled)}.h5",
+                "dfs": dfs,
             }.items():
                 setattr(_params, field, [value])
             submit_nb_process(

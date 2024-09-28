@@ -3,17 +3,26 @@
 from functools import partial
 from pathlib import Path
 from typing import Annotated as Ann
-from typing import Generic
+from typing import Generic, Self
 
 from cappa.arg import Arg
+from context_models import CONTEXT
+from context_models.validators import ContextAfterValidator, context_model_validator
 from pydantic import AfterValidator, BaseModel, Field, ValidationInfo
 
 from boilercv.data import FRAME
+from boilercv_pipeline.models.contexts import DVC
+from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
 from boilercv_pipeline.models.deps import DirSlicer, first_slicer, get_slicers
 from boilercv_pipeline.models.deps.types import Slicers
 from boilercv_pipeline.models.params import DataParams
 from boilercv_pipeline.models.params.types import Data_T, Deps_T, Outs_T
-from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
+from boilercv_pipeline.models.path import (
+    DataDir,
+    DirectoryPathSerPosix,
+    DocsFile,
+    get_time,
+)
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DataStage, Deps
 from boilercv_pipeline.models.stage.types import DfsPlotsOuts_T
@@ -59,8 +68,8 @@ class Constants(BaseModel):
 const = Constants()
 
 
-def _get_paths(
-    deps: bool, field: str, paths: list[Path] | None, info: ValidationInfo
+def validate_paths(
+    paths: list[Path] | None, info: ValidationInfo, deps: bool, field: str
 ) -> list[Path]:
     """Get paths for a given paths field in dependencies."""
     return (
@@ -70,16 +79,6 @@ def _get_paths(
             include_patterns=info.data["include_patterns"],
         ).paths
     )
-
-
-def validate_deps_paths(field: str) -> AfterValidator:
-    """Validate paths for a given paths field in dependencies."""
-    return AfterValidator(partial(_get_paths, True, field))
-
-
-def validate_outs_paths(field: str) -> AfterValidator:
-    """Validate paths for a given paths field in dependencies."""
-    return AfterValidator(partial(_get_paths, False, field))
 
 
 def get_include_patterns(
@@ -114,8 +113,13 @@ class FilledDeps(Deps):
     filled: DataDir = paths.filled
 
 
-def _get_slicers(
-    paths: str, slicers: list[Slicers] | None, info: ValidationInfo
+def validate_times(times: list[str], info: ValidationInfo, field: str) -> list[str]:
+    """Validate times."""
+    return times or [get_time(path) for path in info.data.get(field, [])]
+
+
+def validate_slicers(
+    slicers: list[Slicers] | None, info: ValidationInfo, field: str
 ) -> list[Slicers]:
     """Get slicers for a given paths field in parameters."""
     return slicers or [
@@ -132,13 +136,25 @@ def _get_slicers(
                 }
             ),
         )
-        for path in info.data.get(paths, [])
+        for path in info.data.get(field, [])
     ]
 
 
-def validate_slicers(paths: str) -> AfterValidator:
-    """Validate slicers for a given paths field in parameters."""
-    return AfterValidator(partial(_get_slicers, paths))
+def dvc_validate_times(
+    times: list[str], info: BoilercvPipelineValidationInfo
+) -> list[str]:
+    """Validate plot timestamp suffixes for `dvc.yaml`."""
+    if info.field_name != CONTEXT and (dvc := info.context.get(DVC)) and dvc.plot_dir:
+        dvc.stage.plots.extend(
+            sorted(
+                (dvc.plot_dir / ("_".join([f"{name}", time]) + ".png")).as_posix()
+                for name in dvc.plot_names
+                for time in times
+            )
+        )
+        dvc.plot_dir = None
+        dvc.plot_names.clear()
+    return times
 
 
 class FilledParams(
@@ -147,21 +163,51 @@ class FilledParams(
 ):
     """Stage parameters for subcooled boiling study including filled video dataset."""
 
-    dfs: Ann[list[Path], Arg(hidden=True), validate_outs_paths("dfs")] = Field(
-        default_factory=list
-    )
-    """Paths to data frame stage outputs."""
+    @context_model_validator(mode="after")
+    def dvc_validate_params(self, info: BoilercvPipelineValidationInfo) -> Self:
+        """Extend stage plots in `dvc.yaml`."""
+        if (
+            info.field_name != CONTEXT
+            and (dvc := info.context.get(DVC))
+            and dvc.plot_dir
+            and not dvc.stage.plots
+        ):
+            dvc.stage.plots.extend(
+                sorted(
+                    (dvc.plot_dir / f"{name}.png").as_posix() for name in dvc.plot_names
+                )
+            )
+            dvc.plot_dir = None
+            dvc.plot_names.clear()
+        return self
+
     frame_count: int = 0
     """Count of frames."""
     frame_step: int = 1
     """Step between frames."""
+    dfs: Ann[
+        list[Path],
+        Arg(hidden=True),
+        AfterValidator(partial(validate_paths, deps=False, field="dfs")),
+    ] = Field(default_factory=list)
+    """Paths to data frame stage outputs."""
     slicer_patterns: dict[str, Slicers] = Field(default_factory=dict)
     """Slicer patterns."""
-    filled: Ann[list[Path], Arg(hidden=True), validate_deps_paths("filled")] = Field(
-        default_factory=list
-    )
+    filled: Ann[
+        list[Path],
+        Arg(hidden=True),
+        AfterValidator(partial(validate_paths, deps=True, field="filled")),
+    ] = Field(default_factory=list)
     """Paths to filled video datasets."""
-    filled_slicers: Ann[list[Slicers], Arg(hidden=True), validate_slicers("filled")] = (
-        Field(default_factory=list)
-    )
+    filled_slicers: Ann[
+        list[Slicers],
+        Arg(hidden=True),
+        AfterValidator(partial(validate_slicers, field="filled")),
+    ] = Field(default_factory=list)
     """Slicers for filled video datasets."""
+    times: Ann[
+        list[str],
+        Arg(hidden=True),
+        AfterValidator(partial(validate_times, field="filled")),
+        ContextAfterValidator(dvc_validate_times),
+    ] = Field(default_factory=list)

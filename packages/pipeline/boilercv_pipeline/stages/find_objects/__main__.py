@@ -4,7 +4,6 @@ from functools import partial
 from more_itertools import one
 
 from boilercv_pipeline.dfs import save_df
-from boilercv_pipeline.models.path import get_time
 from boilercv_pipeline.nbs import callbacks, submit_nb_process
 from boilercv_pipeline.parser import invoke
 from boilercv_pipeline.plotting import save_plots
@@ -13,18 +12,21 @@ from boilercv_pipeline.stages.find_objects import FindObjects as Params
 
 def main(params: Params):
     nb = params.deps.nb.read_text(encoding="utf-8")
-    dfs = params.outs.dfs
     with ProcessPoolExecutor() as executor:
-        for contours, filled, filled_slicers in zip(
-            params.contours, params.filled, params.filled_slicers, strict=True
+        for time, filled, filled_slicers, contours, dfs in zip(
+            params.times,
+            params.filled,
+            params.filled_slicers,
+            params.contours,
+            params.dfs,
+            strict=True,
         ):
             _params = params.model_copy(deep=True)
-            time = get_time(contours)
             for field, value in {
                 "contours": contours,
                 "filled": filled,
                 "filled_slicers": filled_slicers,
-                "dfs": dfs / f"{dfs.name}_{time}.h5",
+                "dfs": dfs,
             }.items():
                 setattr(_params, field, [value])
             submit_nb_process(

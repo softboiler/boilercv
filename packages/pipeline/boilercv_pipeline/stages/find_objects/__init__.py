@@ -1,3 +1,4 @@
+from functools import partial
 from pathlib import Path
 from typing import Annotated as Ann
 
@@ -5,7 +6,7 @@ from cappa.arg import Arg
 from cappa.base import command
 from matplotlib.figure import Figure
 from pandas import DataFrame
-from pydantic import Field
+from pydantic import AfterValidator, Field
 
 from boilercv.data import FRAME, PX, XPX, YPX, X, Y
 from boilercv_pipeline.models import columns, data, stage
@@ -14,11 +15,7 @@ from boilercv_pipeline.models.columns import get_cols
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DfsPlotsOuts
-from boilercv_pipeline.models.subcool import (
-    FilledDeps,
-    FilledParams,
-    validate_deps_paths,
-)
+from boilercv_pipeline.models.subcool import FilledDeps, FilledParams, validate_paths
 from boilercv_pipeline.parser import PairedArg
 
 
@@ -117,7 +114,9 @@ class FindObjects(FilledParams[Deps, Outs, Data]):
     """Whether to get objects using the Trackpy approach."""
     guess_diameter: int = 21
     """Guess diameter for the Trackpy approach. (px)"""
-    contours: Ann[list[Path], Arg(hidden=True), validate_deps_paths("contours")] = (
-        Field(default_factory=list)
-    )
+    contours: Ann[
+        list[Path],
+        Arg(hidden=True),
+        AfterValidator(partial(validate_paths, deps=True, field="contours")),
+    ] = Field(default_factory=list)
     """Paths to contours."""

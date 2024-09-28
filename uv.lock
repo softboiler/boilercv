@@ -1302,7 +1302,6 @@ name = "dev"
 version = "0.0.0"
 source = { editable = "packages/_dev" }
 dependencies = [
-    { name = "colorcet" },
     { name = "cyclopts" },
     { name = "devtools" },
     { name = "docutils" },
@@ -1311,7 +1310,6 @@ dependencies = [
     { name = "ipykernel" },
     { name = "matplotlib" },
     { name = "more-itertools" },
-    { name = "myst-nb" },
     { name = "myst-parser" },
     { name = "nbformat" },
     { name = "numpy" },
@@ -1332,7 +1330,6 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "colorcet", specifier = ">=3.0.1" },
     { name = "cyclopts", specifier = ">=2.9.3" },
     { name = "devtools", specifier = ">=0.12.2" },
     { name = "docutils", specifier = ">=0.21.2" },
@@ -1341,7 +1338,6 @@ requires-dist = [
     { name = "ipykernel", specifier = ">=6.29.4" },
     { name = "matplotlib", specifier = ">=3.7.2" },
     { name = "more-itertools", specifier = ">=10.4.0" },
-    { name = "myst-nb", specifier = ">=1.1.1" },
     { name = "myst-parser", specifier = ">=3.0.1" },
     { name = "nbformat", specifier = ">=5.10.4" },
     { name = "numpy", specifier = ">=1.24.4" },
