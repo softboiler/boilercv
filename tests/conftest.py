@@ -10,7 +10,7 @@ from logging import warning
 from os import environ, getpid
 from pathlib import Path
 from re import fullmatch
-from shutil import rmtree
+from shutil import copytree, rmtree
 from types import SimpleNamespace
 
 import pytest
@@ -68,6 +68,7 @@ def _get_ns_attrs(request):
 @pytest.fixture(params=boilercv_pipeline_const.stages)
 def stage(tmp_path, request):
     """Set project directory."""
+    copytree("docs/data", const.data)
     docs = boilercv_pipeline_const.docs
     module = f"boilercv_pipeline.stages.{request.param}"
     init = import_module(module)
