@@ -77,7 +77,7 @@ def stage(tmp_path, request):
     fields = Params.model_fields
     return partial(
         import_module(f"{module}.__main__").main,
-        getattr(import_module(module), f"{to_pascal(request.param)}")(**{
+        Params(**{
             **({"only_sample": True} if "only_sample" in fields else {}),
             **({"load_src_from_outs": True} if "load_src_from_outs" in fields else {}),
             CONTEXT: get_boilercv_pipeline_context(Roots(data=const.data, docs=docs)),
