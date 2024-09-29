@@ -15,7 +15,11 @@ from boilercv_pipeline.models.columns import get_cols
 from boilercv_pipeline.models.path import DataDir, DirectoryPathSerPosix, DocsFile
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DfsPlotsOuts
-from boilercv_pipeline.models.subcool import FilledDeps, FilledParams, validate_paths
+from boilercv_pipeline.models.subcool import (
+    FilledDeps,
+    FilledParams,
+    validate_time_suffixed_paths,
+)
 from boilercv_pipeline.parser import PairedArg
 
 
@@ -117,6 +121,13 @@ class FindObjects(FilledParams[Deps, Outs, Data]):
     contours: Ann[
         list[Path],
         Arg(hidden=True),
-        AfterValidator(partial(validate_paths, deps=True, field="contours")),
+        AfterValidator(
+            partial(
+                validate_time_suffixed_paths,
+                times_field="times",
+                paths_field="deps",
+                paths_subfield="contours",
+            )
+        ),
     ] = Field(default_factory=list)
     """Paths to contours."""

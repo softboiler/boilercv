@@ -2,6 +2,7 @@
 
 from pathlib import Path
 
+from context_models import CONTEXT
 from matplotlib.axes import Axes
 from matplotlib.cm import ScalarMappable
 from matplotlib.colors import ListedColormap, Normalize
@@ -30,6 +31,8 @@ def get_cat_colorbar(
 def save_plots(plots: BaseModel, path: Path, suffix: str = ""):
     """Save a DataFrame to HDF5 format."""
     for name, fig in plots.model_dump().items():
+        if name == CONTEXT:
+            continue
         fig.savefig(
             path / ("_".join([f"{name}", *([suffix] if suffix else [])]) + ".png")
         )

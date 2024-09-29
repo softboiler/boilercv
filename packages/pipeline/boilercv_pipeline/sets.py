@@ -1,7 +1,7 @@
 """Datasets."""
 
 from collections.abc import Iterator, Mapping
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from pathlib import Path
 from typing import Any
 
@@ -133,15 +133,18 @@ def get_dataset(
         )
     source = unc_source if unc_source.exists() else cmp_source
     roi = rois / f"{name}.nc"
-    with open_dataset(source) as ds, open_dataset(roi) as roi_ds:
+    with (
+        open_dataset(source) as ds,
+        open_dataset(roi) if roi.exists() else nullcontext() as roi_ds,
+    ):
         if not unc_source.exists():
-            Dataset({VIDEO: ds[VIDEO], HEADER: ds[HEADER]}).to_netcdf(
+            Dataset({VIDEO: ds[VIDEO]}).to_netcdf(
                 path=unc_source, encoding={VIDEO: {"zlib": False}}
             )
+        video = ds[VIDEO].sel(frame=frame)
         return Dataset({
-            VIDEO: unpack(ds[VIDEO].sel(frame=frame)),
-            ROI: roi_ds[ROI],
-            HEADER: ds[HEADER],
+            VIDEO: unpack(video) if XPX_PACKED in ds.dims else video,
+            **({ROI: roi_ds[ROI]} if roi_ds else {}),
         })
 
 

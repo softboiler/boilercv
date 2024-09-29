@@ -10,7 +10,7 @@ from logging import warning
 from os import environ, getpid
 from pathlib import Path
 from re import fullmatch
-from shutil import copytree, rmtree
+from shutil import rmtree
 from types import SimpleNamespace
 
 import pytest
@@ -20,6 +20,7 @@ from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
 from boilercv_pipeline.config import const as boilercv_pipeline_const
 from boilercv_pipeline.models.contexts import Roots
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
+from context_models import CONTEXT
 from dev.tests import Case, get_cached_nb_ns, normalize_cases
 from dev.tests.config import const
 from dev.tests.types import FixtureStore
@@ -68,24 +69,22 @@ def _get_ns_attrs(request):
 @pytest.fixture(params=boilercv_pipeline_const.stages)
 def stage(tmp_path, request):
     """Set project directory."""
-    copytree("docs/data", const.data, dirs_exist_ok=True)
+    for path in const.data.glob("uncompressed_*"):
+        rmtree(path)
     docs = boilercv_pipeline_const.docs
     module = f"boilercv_pipeline.stages.{request.param}"
-    init = import_module(module)
-    Params = getattr(init, f"{to_pascal(request.param)}")  # noqa: N806
-    Deps = Params.model_fields["deps"].annotation  # noqa: N806
-    Outs = Params.model_fields["outs"].annotation  # noqa: N806
-    main = import_module(f"{module}.__main__").main
+    Params = getattr(import_module(module), f"{to_pascal(request.param)}")  # noqa: N806
+    fields = Params.model_fields
     return partial(
-        main,
-        Params(
-            deps=Deps(
-                context=get_boilercv_pipeline_context(Roots(data=const.data, docs=docs))
-            ),
-            outs=Outs(
-                context=get_boilercv_pipeline_context(Roots(data=tmp_path, docs=docs))
-            ),
-        ),
+        import_module(f"{module}.__main__").main,
+        getattr(import_module(module), f"{to_pascal(request.param)}")(**{
+            **({"only_sample": True} if "only_sample" in fields else {}),
+            **({"load_src_from_outs": True} if "load_src_from_outs" in fields else {}),
+            CONTEXT: get_boilercv_pipeline_context(Roots(data=const.data, docs=docs)),
+            "outs": {
+                CONTEXT: get_boilercv_pipeline_context(Roots(data=tmp_path, docs=docs))
+            },
+        }),
     )
 
 

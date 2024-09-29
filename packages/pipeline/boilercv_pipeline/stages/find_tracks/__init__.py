@@ -25,7 +25,11 @@ from boilercv_pipeline.models.path import (
 )
 from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.models.stage import DfsPlotsOuts
-from boilercv_pipeline.models.subcool import FilledDeps, FilledParams, validate_paths
+from boilercv_pipeline.models.subcool import (
+    FilledDeps,
+    FilledParams,
+    validate_time_suffixed_paths,
+)
 from boilercv_pipeline.stages import find_objects
 
 
@@ -204,6 +208,13 @@ class FindTracks(FilledParams[Deps, Outs, Data]):
     objects: Ann[
         list[Path],
         Arg(hidden=True),
-        AfterValidator(partial(validate_paths, deps=True, field="objects")),
+        AfterValidator(
+            partial(
+                validate_time_suffixed_paths,
+                times_field="times",
+                paths_field="deps",
+                paths_subfield="objects",
+            )
+        ),
     ] = Field(default_factory=list)
     """Paths to objects."""

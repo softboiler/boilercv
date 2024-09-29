@@ -16,7 +16,7 @@ from dev import tests
 class Constants(BaseModel):
     """Constants."""
 
-    data: Path = Path("tests") / "data"
+    data: Path = Path("docs") / "data"
 
 
 const = Constants()
