@@ -123,6 +123,7 @@ def validate_time_suffixed_paths(
     times_field: str,
     paths_field: str,
     paths_subfield: str,
+    prefix: str = "",
     subfield_prefix: bool = True,
     ext: str = "h5",
 ) -> list[Path]:
@@ -131,7 +132,7 @@ def validate_time_suffixed_paths(
         (
             Path(getattr(info.data[paths_field], paths_subfield))
             / (
-                f"{paths_subfield}_{time}.{ext}"
+                f"{prefix or paths_subfield}_{time}.{ext}"
                 if subfield_prefix
                 else Path(f"{time}.{ext}")
             )
@@ -239,16 +240,5 @@ class FilledParams(
         ),
         ContextAfterValidator(dvc_validate_times),
     ] = Field(default_factory=list)
-    dfs: Ann[
-        list[Path],
-        Arg(hidden=True),
-        AfterValidator(
-            partial(
-                validate_time_suffixed_paths,
-                times_field="times",
-                paths_field="outs",
-                paths_subfield="dfs",
-            )
-        ),
-    ] = Field(default_factory=list)
+    dfs: list[Path]
     """Paths to data frame stage outputs."""

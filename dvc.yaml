@@ -155,7 +155,22 @@ stages:
       - data/e230920/objects:
           persist: true
     plots:
+      - data/e230920/objects_plots/composite_2024-07-18T17-07-13.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-14-14.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-19-12.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-28-16.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-33-19.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-37-25.png
       - data/e230920/objects_plots/composite_2024-07-18T17-44-35.png
+      - data/e230920/objects_plots/composite_2024-07-18T17-50-30.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-04-05.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-08-58.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-15-26.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-21-28.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-31-44.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-36-37.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-40-58.png
+      - data/e230920/objects_plots/composite_2024-07-18T18-49-55.png
   find_tracks:
     cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage find-tracks --scale ${scale} --marker-scale ${marker_scale} --precision ${precision} --display-rows ${display_rows} --sample ${sample} ${only_sample} --frame-count ${frame_count} --frame-step ${frame_step}"
     deps:
@@ -177,9 +192,99 @@ stages:
       - data/e230920/tracks:
           persist: true
     plots:
+      - data/e230920/tracks_plots/beta_2024-07-18T17-07-13.png
+      - data/e230920/tracks_plots/beta_2024-07-18T17-14-14.png
+      - data/e230920/tracks_plots/beta_2024-07-18T17-19-12.png
+      - data/e230920/tracks_plots/beta_2024-07-18T17-28-16.png
+      - data/e230920/tracks_plots/beta_2024-07-18T17-33-19.png
+      - data/e230920/tracks_plots/beta_2024-07-18T17-37-25.png
       - data/e230920/tracks_plots/beta_2024-07-18T17-44-35.png
+      - data/e230920/tracks_plots/beta_2024-07-18T17-50-30.png
+      - data/e230920/tracks_plots/beta_2024-07-18T18-04-05.png
+      - data/e230920/tracks_plots/beta_2024-07-18T18-08-58.png
+      - data/e230920/tracks_plots/beta_2024-07-18T18-15-26.png
+      - data/e230920/tracks_plots/beta_2024-07-18T18-21-28.png
+      - data/e230920/tracks_plots/beta_2024-07-18T18-31-44.png
+      - data/e230920/tracks_plots/beta_2024-07-18T18-36-37.png
+      - data/e230920/tracks_plots/beta_2024-07-18T18-40-58.png
+      - data/e230920/tracks_plots/beta_2024-07-18T18-49-55.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T17-07-13.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T17-14-14.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T17-19-12.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T17-28-16.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T17-33-19.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T17-37-25.png
       - data/e230920/tracks_plots/beta_err_2024-07-18T17-44-35.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T17-50-30.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T18-04-05.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T18-08-58.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T18-15-26.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T18-21-28.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T18-31-44.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T18-36-37.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T18-40-58.png
+      - data/e230920/tracks_plots/beta_err_2024-07-18T18-49-55.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T17-07-13.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T17-14-14.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T17-19-12.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T17-28-16.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T17-33-19.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T17-37-25.png
       - data/e230920/tracks_plots/bubbles_2024-07-18T17-44-35.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T17-50-30.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T18-04-05.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T18-08-58.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T18-15-26.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T18-21-28.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T18-31-44.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T18-36-37.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T18-40-58.png
+      - data/e230920/tracks_plots/bubbles_2024-07-18T18-49-55.png
+      - data/e230920/tracks_plots/mae_2024-07-18T17-07-13.png
+      - data/e230920/tracks_plots/mae_2024-07-18T17-14-14.png
+      - data/e230920/tracks_plots/mae_2024-07-18T17-19-12.png
+      - data/e230920/tracks_plots/mae_2024-07-18T17-28-16.png
+      - data/e230920/tracks_plots/mae_2024-07-18T17-33-19.png
+      - data/e230920/tracks_plots/mae_2024-07-18T17-37-25.png
       - data/e230920/tracks_plots/mae_2024-07-18T17-44-35.png
+      - data/e230920/tracks_plots/mae_2024-07-18T17-50-30.png
+      - data/e230920/tracks_plots/mae_2024-07-18T18-04-05.png
+      - data/e230920/tracks_plots/mae_2024-07-18T18-08-58.png
+      - data/e230920/tracks_plots/mae_2024-07-18T18-15-26.png
+      - data/e230920/tracks_plots/mae_2024-07-18T18-21-28.png
+      - data/e230920/tracks_plots/mae_2024-07-18T18-31-44.png
+      - data/e230920/tracks_plots/mae_2024-07-18T18-36-37.png
+      - data/e230920/tracks_plots/mae_2024-07-18T18-40-58.png
+      - data/e230920/tracks_plots/mae_2024-07-18T18-49-55.png
+      - data/e230920/tracks_plots/multi_2024-07-18T17-07-13.png
+      - data/e230920/tracks_plots/multi_2024-07-18T17-14-14.png
+      - data/e230920/tracks_plots/multi_2024-07-18T17-19-12.png
+      - data/e230920/tracks_plots/multi_2024-07-18T17-28-16.png
+      - data/e230920/tracks_plots/multi_2024-07-18T17-33-19.png
+      - data/e230920/tracks_plots/multi_2024-07-18T17-37-25.png
       - data/e230920/tracks_plots/multi_2024-07-18T17-44-35.png
+      - data/e230920/tracks_plots/multi_2024-07-18T17-50-30.png
+      - data/e230920/tracks_plots/multi_2024-07-18T18-04-05.png
+      - data/e230920/tracks_plots/multi_2024-07-18T18-08-58.png
+      - data/e230920/tracks_plots/multi_2024-07-18T18-15-26.png
+      - data/e230920/tracks_plots/multi_2024-07-18T18-21-28.png
+      - data/e230920/tracks_plots/multi_2024-07-18T18-31-44.png
+      - data/e230920/tracks_plots/multi_2024-07-18T18-36-37.png
+      - data/e230920/tracks_plots/multi_2024-07-18T18-40-58.png
+      - data/e230920/tracks_plots/multi_2024-07-18T18-49-55.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T17-07-13.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T17-14-14.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T17-19-12.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T17-28-16.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T17-33-19.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T17-37-25.png
       - data/e230920/tracks_plots/nusselt_err_2024-07-18T17-44-35.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T17-50-30.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T18-04-05.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T18-08-58.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T18-15-26.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T18-21-28.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T18-31-44.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T18-36-37.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T18-40-58.png
+      - data/e230920/tracks_plots/nusselt_err_2024-07-18T18-49-55.png

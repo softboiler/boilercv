@@ -218,3 +218,16 @@ class FindTracks(FilledParams[Deps, Outs, Data]):
         ),
     ] = Field(default_factory=list)
     """Paths to objects."""
+    dfs: Ann[
+        list[Path],
+        Arg(hidden=True),
+        AfterValidator(
+            partial(
+                validate_time_suffixed_paths,
+                times_field="times",
+                paths_field="outs",
+                paths_subfield="dfs",
+                prefix="tracks",
+            )
+        ),
+    ] = Field(default_factory=list)

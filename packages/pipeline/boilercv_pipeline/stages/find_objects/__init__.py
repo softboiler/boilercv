@@ -132,3 +132,16 @@ class FindObjects(FilledParams[Deps, Outs, Data]):
         ),
     ] = Field(default_factory=list)
     """Paths to contours."""
+    dfs: Ann[
+        list[Path],
+        Arg(hidden=True),
+        AfterValidator(
+            partial(
+                validate_time_suffixed_paths,
+                times_field="times",
+                paths_field="outs",
+                paths_subfield="dfs",
+                prefix="objects",
+            )
+        ),
+    ] = Field(default_factory=list)
