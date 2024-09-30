@@ -18,6 +18,7 @@ classifiers = [
   # "Programming Language :: Python :: 3.14",  # ? Not yet beta (https://peps.python.org/pep-0745)
 ]
 dependencies = [
+  # TODO
   "context-models>=0.0.1",
   "matplotlib>=3.7.2",
   "numpy>=1.24.4",
@@ -45,6 +46,7 @@ name = "Blake Naccarato, Kwang Jin Kim"
 email = "blake.naccarato@gmail.com"
 
 [tool.uv]
+override-dependencies = ["cachier @ ${PROJECT_ROOT}/packages/cachier"]
 constraint-dependencies = [
   # ? Security
   "fiona>=1.10.1",
@@ -143,7 +145,7 @@ addopts = """
     --color=yes
     -p no:legacypaths
     -r a
-    -n 0
+    -n auto
     --dist=loadfile
     --plots=tests/plots
 """ # ? `-n 0` because test suite is currently faster in series

@@ -1,9 +1,11 @@
 """Data frame model."""
 
-from typing import TypedDict
+from __future__ import annotations
+
+from typing import Any, TypedDict
 
 from pandas import DataFrame, NamedAgg
-from pandas.api.typing import DataFrameGroupBy  # pyright: ignore[reportMissingImports]
+from pandas.core.groupby.generic import DataFrameGroupBy
 
 
 class GroupByCommon(TypedDict):
@@ -35,6 +37,6 @@ def gbc(
 WIDTH = 10
 
 
-def agg(dfgb: DataFrameGroupBy, cols: dict[str, NamedAgg]) -> DataFrame:
+def agg(dfgb: DataFrameGroupBy[Any], cols: dict[str, NamedAgg]) -> DataFrame:
     """Pandas group aggregator for correct types."""
-    return dfgb.agg(**cols)
+    return dfgb.agg(**cols)  # pyright: ignore[reportArgumentType, reportCallIssue]

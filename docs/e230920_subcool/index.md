@@ -9,5 +9,4 @@ equations
 /notebooks/get_thermal_data
 /notebooks/find_objects
 /notebooks/find_tracks
-/notebooks/get_mae
 :::

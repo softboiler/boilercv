@@ -5,6 +5,7 @@ from boilercore.settings_models import (
     get_settings_paths,
     sync_settings_schema,
 )
+from pydantic import Field
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
 from dev import docs
@@ -33,7 +34,7 @@ class PluginModelConfig(BaseSettings, use_attribute_docstrings=True):
 class Settings(BaseSettings, use_attribute_docstrings=True):
     """Package settings."""
 
-    build: Build = Build()
+    build: Build = Field(default_factory=Build)
 
     @classmethod
     def settings_customise_sources(

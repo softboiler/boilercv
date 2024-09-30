@@ -2,7 +2,7 @@
 
 from pydantic import BaseModel
 
-from dev.docs.models.types.runtime import NbExecutionExcludePatterns, SkipAutodoc
+from dev.docs.models.types import NbExecutionExcludePatterns, SkipAutodoc
 from dev.docs.types import BuildMode, NbExecutionMode
 
 

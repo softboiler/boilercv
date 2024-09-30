@@ -10,7 +10,7 @@ from logging import warning
 from os import environ, getpid
 from pathlib import Path
 from re import fullmatch
-from shutil import rmtree
+from shutil import copy, rmtree
 from types import SimpleNamespace
 
 import pytest
@@ -21,7 +21,7 @@ from boilercv_pipeline.config import const as boilercv_pipeline_const
 from boilercv_pipeline.models.contexts import Roots
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 from context_models import CONTEXT
-from dev.tests import Case, get_cached_nb_ns, normalize_cases
+from dev.tests import Case, get_cached_nb_ns
 from dev.tests.config import const
 from dev.tests.types import FixtureStore
 from dev.tools.warnings import filter_boilercv_warnings
@@ -56,8 +56,7 @@ def _get_ns_attrs(request):
     )
     for case, test in zip(cases, notebook_namespace_tests, strict=True):
         name = getattr(module, test.originalname)
-        case.results |= dict.fromkeys(get_ns_attrs(name))
-    normalize_cases(*cases)
+        case.results = sorted(set(case.results) | set(get_ns_attrs(name)))
     yield
     for nb in [c.clean_path for c in cases if c.clean_path]:
         nb.unlink(missing_ok=True)
@@ -66,39 +65,56 @@ def _get_ns_attrs(request):
 # * MARK: Notebook namespaces
 
 
-@pytest.fixture(params=boilercv_pipeline_const.stages)
-def stage(tmp_path, request):
-    """Set project directory."""
+def get_params(stage: str, tmp: Path, **kwds):
+    """Get stage parameters."""
     for path in const.data.glob("uncompressed_*"):
         rmtree(path)
-    docs = boilercv_pipeline_const.docs
-    module = f"boilercv_pipeline.stages.{request.param}"
-    Params = getattr(import_module(module), f"{to_pascal(request.param)}")  # noqa: N806
+    (tmp_e230920 := tmp / "e230920").mkdir(parents=True, exist_ok=True)
+    copy(const.data / "e230920" / "thermal.h5", tmp_e230920)
+    module = f"boilercv_pipeline.stages.{stage}"
+    Params = getattr(import_module(module), f"{to_pascal(stage)}")  # noqa: N806
     fields = Params.model_fields
+    return Params(**{
+        CONTEXT: get_boilercv_pipeline_context(
+            Roots(data=const.data, docs=boilercv_pipeline_const.docs)
+        ),
+        "outs": {
+            CONTEXT: get_boilercv_pipeline_context(
+                Roots(data=tmp, docs=boilercv_pipeline_const.docs)
+            )
+        },
+        **({"only_sample": True} if "only_sample" in fields else {}),
+        **({"load_src_from_outs": True} if "load_src_from_outs" in fields else {}),
+        **kwds,
+    })
+
+
+@pytest.fixture(params=boilercv_pipeline_const.stages)
+def stage(tmp_path, request):
+    """Pipeline stage."""
+    stage: str = request.param
+    module = f"boilercv_pipeline.stages.{stage}"
     return partial(
-        import_module(f"{module}.__main__").main,
-        Params(**{
-            **({"only_sample": True} if "only_sample" in fields else {}),
-            **({"load_src_from_outs": True} if "load_src_from_outs" in fields else {}),
-            CONTEXT: get_boilercv_pipeline_context(Roots(data=const.data, docs=docs)),
-            "outs": {
-                CONTEXT: get_boilercv_pipeline_context(Roots(data=tmp_path, docs=docs))
-            },
-        }),
+        import_module(f"{module}.__main__").main, get_params(stage, tmp_path)
     )
 
 
 @pytest.fixture
 @pytest_harvest.saved_fixture
-def ns(request, fixture_stores) -> Iterator[SimpleNamespace]:
-    """Namespace."""
+def ns(tmp_path, request, fixture_stores) -> Iterator[SimpleNamespace]:
+    """Notebook stage namespace."""
     case: Case = request.param
+    params = {
+        "PARAMS": (
+            get_params(case.stage, tmp_path, **case.params) if case.params else None
+        ),
+        "MODE": "docs",
+    }
+    attributes = ["params", "data", *case.results]
     if environ.get("CI"):
-        yield get_nb_ns(nb=case.nb, params=case.params, attributes=case.results.keys())
+        yield get_nb_ns(nb=case.nb, params=params, attributes=attributes)
         return
-    yield get_cached_nb_ns(
-        nb=case.clean_nb(), params=case.params, attributes=case.results.keys()
-    )
+    yield get_cached_nb_ns(nb=case.clean_nb(), params=params, attributes=attributes)
     update_fixture_stores(
         fixture_stores,
         request.fixturename,
@@ -125,9 +141,7 @@ def update_fixture_stores(
 ):
     """Update nested fixture store with the new namespace."""
     module = fixture_stores.nested[fixturename][
-        path.relative_to(Path("tests/boilercv_tests").resolve())
-        .with_suffix("")
-        .as_posix()
+        path.relative_to(Path("tests").resolve()).with_suffix("").as_posix()
     ]
     # Pattern for e.g. `test[case]`
     if match := fullmatch(pattern=r"(?P<node>[^\[]+)\[(?P<case>[^\]]+)\]", string=test):

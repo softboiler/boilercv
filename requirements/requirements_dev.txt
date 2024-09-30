@@ -4,9 +4,9 @@
 -e ./packages/_dev
 -e ./packages/boilercine
 -e ./packages/boilercore
--e ./packages/cachier
 -e ./packages/context_models
 -e ./packages/pipeline
+./packages/cachier
 accessible-pygments==0.0.5
 aiohappyeyeballs==2.4.0
 aiohttp==3.10.5

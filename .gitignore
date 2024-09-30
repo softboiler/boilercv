@@ -1,5 +1,6 @@
 # Ignore schema, which have absolute paths that will vary by system
 *schema.json
+docs.yaml
 settings*.yaml
 # Don't commit local DVC plots
 dvc_plots

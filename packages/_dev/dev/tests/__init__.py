@@ -2,10 +2,9 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable, Iterator, Sequence
+from collections.abc import Iterator, Sequence
 from dataclasses import dataclass, field
 from functools import partial
-from itertools import chain
 from pathlib import Path
 from shlex import join, quote, split
 from shutil import copy
@@ -37,11 +36,6 @@ def init():
 init()
 
 
-def get_nb(exp: Path, name: str) -> Path:
-    """Get notebook path for experiment and name."""
-    return (exp / name).with_suffix(".ipynb")
-
-
 @cachier(hash_func=partial(hash_args, get_nb_ns), separate_files=True)
 def get_cached_nb_ns(
     nb: str, params: Params | None = None, attributes: Attributes | None = None
@@ -55,24 +49,28 @@ class Case:
     """Notebook test case.
 
     Args:
-        path: Path to the notebook.
+        stage: Notebook stage.
         suffix: Test ID suffix.
         params: Parameters to pass to the notebook.
-        results: Variable names to retrieve and optional expectations on their values.
     """
 
-    path: Path
-    """Path to the notebook."""
-    clean_path: Path | None = field(default=None, init=False)
-    """Path to the cleaned notebook."""
+    stage: str
+    """Notebook stage."""
     id: str = "_"
     """Test ID suffix."""
     params: dict[str, Any] = field(default_factory=dict)
     """Parameters to pass to the notebook."""
-    results: dict[str, Any] = field(default_factory=dict)
-    """Variable names to retrieve and optional expectations on their values."""
+    results: list[str] = field(default_factory=list)
+    """Additional results to get from the notebook."""
     marks: Sequence[pytest.Mark] = field(default_factory=list)
     """Pytest marks."""
+    clean_path: Path | None = field(default=None, init=False)
+    """Path to the cleaned notebook."""
+
+    @property
+    def path(self) -> Path:
+        """Notebook path."""
+        return Path("docs") / "notebooks" / f"{self.stage}.ipynb"
 
     @property
     def nb(self) -> str:
@@ -81,53 +79,11 @@ class Case:
 
     def clean_nb(self) -> str:
         """Clean notebook contents."""
-        (test_temp_nbs := Path("docs/temp")).mkdir(exist_ok=True, parents=True)
+        (test_temp_nbs := Path("docs") / "temp").mkdir(exist_ok=True, parents=True)
         self.clean_path = (test_temp_nbs / next(NAMER)).with_suffix(".ipynb")
         copy(self.path, self.clean_path)
         clean_notebooks(self.clean_path)
         return self.clean_path.read_text(encoding="utf-8")
-
-    def get_ns(self) -> SimpleNamespace:
-        """Get notebook namespace for this check."""
-        return get_nb_ns(nb=self.nb, params=self.params, attributes=self.results)
-
-
-def normalize_cases(*cases: Case) -> Iterable[Case]:
-    """Normalize cases to minimize number of caches.
-
-    Assign the same results to cases with the same path and parameters, preserving
-    expectations. Sort parameters and results.
-
-    Parameters
-    ----------
-    *cases
-        Cases to normalize.
-
-    Returns
-    -------
-    Normalized cases.
-    """
-    seen: dict[Path, dict[str, Any]] = {}
-    all_cases: list[list[Case]] = []
-    # Find cases with the same path and parameters and sort parameters
-    for c in cases:
-        for i, (path, params) in enumerate(seen.items()):
-            if c.path == path and c.params == params:
-                all_cases[i].append(c)
-                break
-        else:
-            # If the loop doesn't break, no match was found
-            seen[c.path] = c.params
-            all_cases.append([c])
-        c.params = dict(sorted(c.params.items()))
-    # Assign the same results to common casees and sort results
-    for cs in all_cases:
-        all_results: set[str] = set()
-        all_results.update(chain.from_iterable(c.results.keys() for c in cs))
-        for c in cs:
-            c.results |= {r: None for r in all_results if r not in c.results}
-            c.results = dict(sorted(c.results.items()))
-    return cases
 
 
 def parametrize_by_cases(*cases: Case):
@@ -146,18 +102,20 @@ class Caser:
 
     def __call__(
         self,
-        name: str,
+        stage: str,
         id: str = "_",  # noqa: A002
         params: dict[str, Any] | None = None,
-        results: dict[str, Any] | Iterable[Any] | None = None,
+        results: list[str] | None = None,
         marks: Sequence[pytest.Mark] | None = None,
     ) -> Case:
         """Add case to experiment."""
-        if results:
-            results = results if isinstance(results, dict) else dict.fromkeys(results)
-        else:
-            results = {}
-        case = Case(get_nb(self.exp, name), id, params or {}, results, marks or [])
+        case = Case(
+            stage=stage,
+            id=id,
+            params=params or {},
+            results=results or [],
+            marks=marks or [],
+        )
         self.cases.append(case)
         return case
 

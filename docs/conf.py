@@ -95,6 +95,7 @@ class Constants(BaseModel):
                 "myst_parser",
                 "nbformat",
                 "numpydoc",
+                "pint",
                 "tomlkit",
                 "typing_extensions",
             ]
@@ -111,6 +112,7 @@ class Constants(BaseModel):
         "python": get_ispx("docs.python.org/3"),
         "scipy": get_ispx("docs.scipy.org/doc/scipy"),
         "boilercore": IspxMappingValue("https://softboiler.org/boilercore"),
+        "context_models": IspxMappingValue("https://softboiler.org/context_models"),
     }
     """Intersphinx mapping."""
     tippy_rtd_urls: list[str] = [
@@ -273,6 +275,7 @@ intersphinx_mapping = {
 nitpick_ignore = [
     ("py:class", "cv2.LineSegmentDetector"),
     ("py:class", "cappa.subcommand.Subcommands"),
+    ("py:class", "pandas.core.groupby.generic.DataFrameGroupBy"),
     ("py:class", f"{project}.correlations.T"),
     ("py:class", f"{project}.data.sets.Stage"),
     ("py:class", f"{project}.experiments.e230920_subcool.NbProcess"),
@@ -301,9 +304,10 @@ nitpick_ignore_regex = [
     # ? TypeAlias: https://github.com/sphinx-doc/sphinx/issues/10785
     (r"py:class", rf"{project}.*\.types\..+"),
     (r"py:class", r"boilercore.*\.types\..+"),
+    (r"py:class", r"context_models.*\.types\..+"),
     (r"py:class", rf"{project}_pipeline\.captivate\.previews\..+"),
     # ? Annotated types unwieldy to move to own types paths
-    (r"py:obj", rf"{project}_pipeline\.stages\..+\.__init__.py"),
+    (r"py:.+", rf"{project}_pipeline\.stages\..+"),
 ]
 # * MARK:  Tippy
 # ? https://sphinx-tippy.readthedocs.io/en/latest/index.html#confval-tippy_anchor_parent_selector

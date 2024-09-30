@@ -10,6 +10,7 @@ from typing import Any, Self
 
 from context_models.types import Context
 
+from boilercv.pipelines.contexts.types import PipelineContextLike
 from boilercv.pipelines.pipes import ContextValue
 from boilercv.pipelines.pipes.types import CV, AnyPipe
 
@@ -76,7 +77,7 @@ def get_context_value(value_type: type[CV], context: PipelineCtx | None) -> CV |
 # * MARK: Contexts
 
 
-class PipelineCtx(UserDict[str, PipelineContext | ContextValue]):
+class PipelineCtx(UserDict[str, PipelineContextLike]):
     """Morphs."""
 
     @property

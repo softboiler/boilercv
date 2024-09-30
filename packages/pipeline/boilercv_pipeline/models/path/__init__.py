@@ -10,7 +10,6 @@ from typing import Annotated as Ann
 from typing import ClassVar, Self, TypeAlias
 
 from boilercore.paths import ISOLIKE, dt_fromisolike
-from cappa.arg import Arg
 from context_models import ContextStore
 from context_models.serializers import ContextWrapSerializer
 from context_models.types import Context, ContextPluginSettings, Data, PluginConfigDict
@@ -37,7 +36,7 @@ from boilercv_pipeline.models.contexts.types import (
     BoilercvPipelineValidationInfo,
     Kind,
 )
-from boilercv_pipeline.models.path.types import Key
+from boilercv_pipeline.models.path.types import HiddenContext, Key
 
 
 def get_times(directory: Path, pattern: str) -> list[str]:
@@ -96,10 +95,6 @@ def get_boilercv_pipeline_config(
     )
 
 
-HiddenContext = Ann[BoilercvPipelineContexts, Arg(hidden=True)]
-"""Pipeline context as a hidden argument."""
-
-
 class BoilercvPipelineContextStore(ContextStore):
     """Context model for {mod}`~boilercv_pipeline`."""
 
@@ -138,7 +133,7 @@ make_path_args: dict[tuple[Key, bool], Kind] = {
     ("docs", False): "DocsDir",
     ("docs", True): "DocsFile",
 }
-"""{func}`~boilercv_pipeline.models.types.runtime.make_path` args and their kinds."""
+"""{func}`~boilercv_pipeline.models.path.make_path` args and their kinds."""
 
 
 def make_path(

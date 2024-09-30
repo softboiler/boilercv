@@ -1,6 +1,6 @@
 """Types."""
 
-from typing import TypeAlias
+from typing import TYPE_CHECKING, TypeAlias
 
 from context_models.types import (
     ContextPluginSettings,
@@ -9,8 +9,14 @@ from context_models.types import (
     ValidationInfo,
 )
 
-from boilercv.pipelines.contexts import PipelineCtxDict
+if TYPE_CHECKING:
+    from boilercv.pipelines.contexts import PipelineContext, PipelineCtxDict
 
-PipelineConfigDict: TypeAlias = PluginConfigDict[ContextPluginSettings[PipelineCtxDict]]
-PipelineValidationInfo: TypeAlias = ValidationInfo[PipelineCtxDict]
-PipelineSerializationInfo: TypeAlias = SerializationInfo[PipelineCtxDict]
+from boilercv.pipelines.pipes import ContextValue
+
+PipelineConfigDict: TypeAlias = PluginConfigDict[
+    "ContextPluginSettings[PipelineCtxDict]"
+]
+PipelineValidationInfo: TypeAlias = "ValidationInfo[PipelineCtxDict]"
+PipelineSerializationInfo: TypeAlias = "SerializationInfo[PipelineCtxDict]"
+PipelineContextLike: TypeAlias = "PipelineContext | ContextValue"

@@ -20,7 +20,6 @@ class Constants(BaseModel):
 
 
 const = Constants()
-
 paths = get_settings_paths(tests)
 
 
