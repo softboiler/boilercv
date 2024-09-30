@@ -127,6 +127,7 @@ class FindObjects(FilledParams[Deps, Outs, Data]):
                 times_field="times",
                 paths_field="deps",
                 paths_subfield="contours",
+                subfield_prefix=False,
             )
         ),
     ] = Field(default_factory=list)

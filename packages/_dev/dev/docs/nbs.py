@@ -16,22 +16,26 @@ from dev.docs.types import BuildMode
 from dev.tools.warnings import filter_boilercv_warnings
 
 
-def init(force_mode: BuildMode = default.build.mode) -> BoilercvPipelineContexts:
+def init(mode: BuildMode | None = None) -> BoilercvPipelineContexts:
     """Initialize a documentation notebook."""
     # sourcery skip: extract-method, remove-pass-elif
     filter_boilercv_warnings()
-    at_root = Path().cwd() == rooted_paths.root
+    mode = mode or default.build.force_mode or get_mode()
     if _in_binder := environ.get("BINDER_LAUNCH_HOST"):
         copytree(rooted_paths.docs_data, rooted_paths.pipeline_data, dirs_exist_ok=True)
-    if force_mode == "docs" or (
-        force_mode != "dev"
-        and ((_in_docs := not at_root) or (_in_ci := environ.get("CI")))
-    ):
+    if mode == "docs" or (_in_ci := environ.get("CI")):
         return get_boilercv_pipeline_context(
             roots=Roots(data=rooted_paths.docs_data, docs=rooted_paths.docs)
         )
     return get_boilercv_pipeline_context(
         roots=Roots(data=rooted_paths.pipeline_data, docs=rooted_paths.docs)
+    )
+
+
+def get_mode() -> BuildMode:
+    """Get notebook mode."""
+    return default.build.force_mode or (
+        "dev" if (Path().cwd() == rooted_paths.root) else "docs"
     )
 
 

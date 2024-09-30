@@ -123,10 +123,19 @@ def validate_time_suffixed_paths(
     times_field: str,
     paths_field: str,
     paths_subfield: str,
+    subfield_prefix: bool = True,
+    ext: str = "h5",
 ) -> list[Path]:
     """Validate time-suffixed paths."""
     return paths or [
-        Path(getattr(info.data[paths_field], paths_subfield)) / f"_{time}.h5"
+        (
+            Path(getattr(info.data[paths_field], paths_subfield))
+            / (
+                f"{paths_subfield}_{time}.{ext}"
+                if subfield_prefix
+                else Path(f"{time}.{ext}")
+            )
+        )
         for time in info.data[times_field]
     ]
 

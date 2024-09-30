@@ -9,7 +9,7 @@ from dev.docs.types import BuildMode, NbExecutionMode
 class Build(BaseModel):
     """Docs."""
 
-    mode: BuildMode = None
+    force_mode: BuildMode | None = None
     """Force building documentation in a certain mode."""
     nb_execution_excludepatterns: NbExecutionExcludePatterns = [
         "notebooks/e230920*.ipynb",

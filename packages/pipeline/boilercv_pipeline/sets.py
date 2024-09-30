@@ -177,9 +177,10 @@ def inspect_video(path: Path) -> Iterator[DA]:
         yield src[VIDEO]
 
 
+@contextmanager
 def load_video(
     path: Path, slices: Mapping[str, slice | range | Any] | None = None
-) -> DA:
+) -> Iterator[DA]:
     """Load video data array."""
     slices = slices or {}
     with inspect_video(path) as video:
@@ -192,8 +193,7 @@ def load_video(
             if XPX_PACKED in video.dims
             else video.sel(selectors)
         )
-        video = video.sel({XPX: get_selector(video, XPX, slices.get(XPX))})
-    return video
+        yield video.sel({XPX: get_selector(video, XPX, slices.get(XPX))})
 
 
 def save_video(da: DA, path: Path):

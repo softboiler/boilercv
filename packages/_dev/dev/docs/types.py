@@ -8,7 +8,7 @@ DfOrS: TypeAlias = DataFrame | Series  # pyright: ignore[reportMissingTypeArgume
 
 # * MARK: settings
 
-BuildMode: TypeAlias = Literal["dev", "docs"] | None
+BuildMode: TypeAlias = Literal["dev", "docs"]
 NbExecutionMode: TypeAlias = Literal["off", "force", "auto", "cache", "inline"]
 
 # * MARK: intersphinx
