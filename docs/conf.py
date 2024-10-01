@@ -273,8 +273,8 @@ intersphinx_mapping = {
     pkg: ispx for pkg, ispx in const.ispx_mapping.items() if pkg != "colorcet"
 }
 nitpick_ignore = [
+    ("py:obj", "typing.Annotated"),
     ("py:class", "cv2.LineSegmentDetector"),
-    ("py:class", "cappa.subcommand.Subcommands"),
     ("py:class", "pandas.core.groupby.generic.DataFrameGroupBy"),
     ("py:class", f"{project}.correlations.T"),
     ("py:class", f"{project}.data.sets.Stage"),
@@ -283,9 +283,13 @@ nitpick_ignore = [
     ("py:class", f"{project}.morphs.contexts"),
 ]
 nitpick_ignore_regex = [
-    # ? Auto-generated, too hard to separate into own `types` module for ignoring
-    (r"py:.+", r"boilercv_pipeline\.models\.dvc\..+"),
+    # ? Auto-generated or otherwise too hard to separate into own `types` modules
+    (r"py:.+", rf"{project}_pipeline\.models\.dvc\..+"),
+    (r"py:.+", rf"{project}_pipeline\.models\.path\..+"),
+    (r"py:.+", rf"{project}_pipeline\.models\.column\..+"),
+    (r"py:.+", rf"{project}_pipeline\.stages\..+"),
     # ? Missing inventory
+    (r"py:.+", r"cappa\..+"),
     (r"py:.+", r"docutils\..+"),
     (r"py:.+", r"numpydoc\.docscrape\..+"),
     (r"py:.+", r"_pytest\..+"),
@@ -302,12 +306,11 @@ nitpick_ignore_regex = [
     ),  # ? https://github.com/pydantic/pydantic/issues/1339
     (r"py:.+", r"PySide6\..+"),  # ? https://bugreports.qt.io/browse/PYSIDE-2215
     # ? TypeAlias: https://github.com/sphinx-doc/sphinx/issues/10785
-    (r"py:class", rf"{project}.*\.types\..+"),
-    (r"py:class", r"boilercore.*\.types\..+"),
-    (r"py:class", r"context_models.*\.types\..+"),
-    (r"py:class", rf"{project}_pipeline\.captivate\.previews\..+"),
-    # ? Annotated types unwieldy to move to own types paths
-    (r"py:.+", rf"{project}_pipeline\.stages\..+"),
+    (r"py:.+", r"dev.*\.types\..+"),
+    (r"py:.+", rf"{project}.*\.types\..+"),
+    (r"py:.+", r"boilercore.*\.types\..+"),
+    (r"py:.+", r"context_models.*\.types\..+"),
+    (r"py:.+", rf"{project}_pipeline\.captivate\.previews\..+"),
 ]
 # * MARK:  Tippy
 # ? https://sphinx-tippy.readthedocs.io/en/latest/index.html#confval-tippy_anchor_parent_selector

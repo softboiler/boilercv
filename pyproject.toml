@@ -187,9 +187,15 @@ exclude = [
   "packages/boilercine",
   "packages/boilercore",
   "packages/cachier",
+]
+ignore = [
+  "**/node_modules",
+  "**/__pycache__",
+  "**/.*",
+  ".cache",
+  "typings",
   "packages/context_models",
 ]
-ignore = ["**/node_modules", "**/__pycache__", "**/.*", ".cache", "typings"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true
