@@ -1,3 +1,8 @@
+# [naccarato_kim_2024.Nu_c]
+# # solutions = ["4*Ja*beta/(pi*(1 - beta))"]
+# solutions = ["1.0723069*Re_b**0.61*Pr**0.33*Ja**0.88951964"]
+# warnings = []
+
 [florschuetz_chao_1965.Nu_c]
 solutions = ["4*Ja*beta/(pi*(1 - beta))"]
 warnings = []

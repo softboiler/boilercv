@@ -82,6 +82,7 @@ SYMBOL_LABELS = {
 GROUPS = {
     k: f"Group {v}"
     for k, v in {
+        # "naccarato_kim_2024": 5,
         "florschuetz_chao_1965": 1,
         "isenberg_sideman_1970": 2,
         "akiyama_1973": 2,

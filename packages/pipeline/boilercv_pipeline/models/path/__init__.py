@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from collections.abc import Mapping
+from datetime import datetime
 from functools import partial
 from pathlib import Path
-from re import search
 from typing import Annotated as Ann
 from typing import ClassVar, Self, TypeAlias
 
@@ -39,13 +39,12 @@ from boilercv_pipeline.models.contexts.types import (
 from boilercv_pipeline.models.path.types import HiddenContext, Key
 
 
-def get_times(directory: Path, pattern: str) -> list[str]:
-    """Get timestamps from a pattern-filtered directory."""
-    return [
-        dt_fromisolike(match).isoformat()
-        for path in directory.iterdir()
-        if (match := ISOLIKE.search(path.stem)) and search(pattern, path.stem)
-    ]
+def get_datetime(string: str) -> datetime:
+    """Get datetimes."""
+    if match := ISOLIKE.search(string):
+        return dt_fromisolike(match)
+    else:
+        raise ValueError("String does not appear to be similar to ISO 8601.")
 
 
 def get_time(path: Path) -> str:

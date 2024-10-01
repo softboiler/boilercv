@@ -4,6 +4,7 @@ from collections.abc import Callable
 from os import environ
 from typing import Any
 
+from dev.tools.warnings import filter_boilercv_warnings
 from loguru import logger
 from pandas import set_option
 
@@ -26,6 +27,7 @@ def init():
     """Initialize {mod}`~boilercv_pipeline`."""
     if DEBUG:
         logger.add(sink="boilercv.log")
+    filter_boilercv_warnings()
     set_option("mode.copy_on_write", True)
     set_option("mode.chained_assignment", "raise")
     set_option("mode.string_storage", "pyarrow")

@@ -16,6 +16,7 @@ from cappa.output import Output
 from context_models import CONTEXT, ContextStore
 from context_models.types import Context
 from more_itertools import first
+from pydantic import BaseModel
 
 from boilercv_pipeline.models.contexts import BoilercvPipelineContexts
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
@@ -74,11 +75,12 @@ def invoke(
 def get_first_innermost_context(model: ContextStore) -> BoilercvPipelineContexts:
     """Get the first innermost context."""
     context = model.context
-    m = model.model_dump()
+    m = model
     while isinstance(
-        (m := first((v for k, v in m.items() if k != "context"), default=None)), Mapping
+        (m := first((v for k, v in dict(m).items() if k != "context"), default=None)),
+        BaseModel,
     ):
-        context: Context = m.get(CONTEXT, get_boilercv_pipeline_context())
+        context: Context = dict(m).get(CONTEXT, get_boilercv_pipeline_context())
     return context  # pyright: ignore[reportReturnType]
 
 

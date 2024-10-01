@@ -1,3 +1,8 @@
+# [naccarato_kim_2024.beta]
+# # solutions = ["1 - 4*Ja*(Fo_0/pi)**0.44"]
+# solutions = ["1 - 2.14461381*Re_b0**0.61*Pr**0.33*Ja**1.889519643*Fo_0"]
+# warnings = []
+
 # [ranz_marshall_1952.beta]
 # solutions = []
 # warnings = ["Unable to find solution within 5 seconds."]
