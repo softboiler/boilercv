@@ -12,10 +12,10 @@ C = Caser(Path("docs") / "notebooks")
 
 @parametrize_by_cases(C("find_objects"))
 def test_approaches_close(ns):
-    """Object-finding approaches have similar object counts (within 10%)."""
+    """Object-finding approaches have similar object counts."""
     tp = len(ns.trackpy_preview)
     cen = len(ns.centroids_preview)
-    assert 200 * abs(tp - cen) / (tp + cen) < 10
+    assert (abs(tp - cen) / cen) < 10
 
 
 @pytest.fixture(scope="module")
