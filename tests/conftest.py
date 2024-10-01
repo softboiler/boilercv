@@ -67,7 +67,7 @@ def _get_ns_attrs(request):
 
 def get_params(stage: str, tmp: Path, **kwds):
     """Get stage parameters."""
-    if environ.get("CI"):
+    if not environ.get("CI"):
         for path in const.data.glob("uncompressed_*"):
             rmtree(path)
     (tmp_e230920 := tmp / "e230920").mkdir(parents=True, exist_ok=True)
