@@ -67,8 +67,9 @@ def _get_ns_attrs(request):
 
 def get_params(stage: str, tmp: Path, **kwds):
     """Get stage parameters."""
-    for path in const.data.glob("uncompressed_*"):
-        rmtree(path)
+    if environ.get("CI"):
+        for path in const.data.glob("uncompressed_*"):
+            rmtree(path)
     (tmp_e230920 := tmp / "e230920").mkdir(parents=True, exist_ok=True)
     copy(const.data / "e230920" / "thermal.h5", tmp_e230920)
     module = f"boilercv_pipeline.stages.{stage}"
