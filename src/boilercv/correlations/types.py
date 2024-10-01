@@ -135,7 +135,7 @@ Param: TypeAlias = Literal[
 ]
 """Parameter."""
 Equation: TypeAlias = Literal[
-    # "naccarato_kim_2024",
+    "naccarato_kim_2024",
     "florschuetz_chao_1965",  # Depends on beta
     "isenberg_sideman_1970",
     "akiyama_1973",
