@@ -59,12 +59,12 @@ def sync_environment_variables(
     return "\n".join(f"{k}={v}" for k, v in dotenv.items())
 
 
-def run(*args: str):
+def run(*args: str, check: bool = True):
     """Run command."""
     sep = " "
     with nullcontext() if Path(const.uv_run_wrapper).exists() else chdir(".."):
         subprocess.run(
-            check=True, args=[*const.shell, sep.join([const.uv_run_wrapper, *args])]
+            check=check, args=[*const.shell, sep.join([const.uv_run_wrapper, *args])]
         )
 
 

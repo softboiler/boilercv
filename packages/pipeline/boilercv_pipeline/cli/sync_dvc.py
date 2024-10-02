@@ -45,10 +45,10 @@ class SyncDVC(BaseModel):
             data=safe_dump(
                 sort_keys=False,
                 indent=2,
+                width=float("inf"),
                 data=self.clear_dvc_defaults(synced.model).model_dump(
                     exclude_none=True
                 ),
-                width=float("inf"),
             ),
         )
         (self.root / self.params).write_text(
@@ -56,6 +56,7 @@ class SyncDVC(BaseModel):
             data=safe_dump(
                 sort_keys=False,
                 indent=2,
+                width=float("inf"),
                 data={
                     **synced.params,
                     **(
@@ -70,7 +71,6 @@ class SyncDVC(BaseModel):
                         }
                     ),
                 },
-                width=float("inf"),
             ),
         )
 
