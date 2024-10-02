@@ -2,5 +2,7 @@
     remote = origin
 [hydra]
     enabled = True
+[exp]
+    auto_push = true
 ['remote "origin"']
     url = gs://boilercv
