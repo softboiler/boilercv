@@ -12,7 +12,6 @@ dependencies = [
   "colorcet>=3.0.1",
   "copykitten>=1.1.1",
   "cyclopts>=2.6.1",
-  "dvclive>=3.48.0",
   "imageio[pyav]>=2.34.1",
   "ipykernel>=6.29.4",
   "loguru>=0.7.0",

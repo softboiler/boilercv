@@ -86,7 +86,6 @@ dvc-objects==5.1.0
 dvc-render==1.0.2
 dvc-studio-client==0.21.0
 dvc-task==0.4.0
-dvclive==3.48.0
 entrypoints==0.4
 execnet==2.1.1
 executing==2.1.0
@@ -237,7 +236,6 @@ pydot==3.0.1
 pygit2==1.15.1
 pygments==2.18.0
 pygtrie==2.5.0
-pynvml==11.5.3
 pyparsing==3.0.9
 pyproj==3.6.1
 pyqtgraph==0.13.3

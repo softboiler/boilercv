@@ -701,7 +701,6 @@ dependencies = [
     { name = "colorcet" },
     { name = "copykitten" },
     { name = "cyclopts" },
-    { name = "dvclive" },
     { name = "imageio", extra = ["pyav"] },
     { name = "ipykernel" },
     { name = "loguru" },
@@ -741,7 +740,6 @@ requires-dist = [
     { name = "colorcet", specifier = ">=3.0.1" },
     { name = "copykitten", specifier = ">=1.1.1" },
     { name = "cyclopts", specifier = ">=2.6.1" },
-    { name = "dvclive", specifier = ">=3.48.0" },
     { name = "imageio", extras = ["pyav"], specifier = ">=2.34.1" },
     { name = "ipykernel", specifier = ">=6.29.4" },
     { name = "loguru", specifier = ">=0.7.0" },
@@ -1759,26 +1757,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/67/18/245fc0f1f47fc0a46a793af5359eaa4507bf375746d65fc3db6ad8b3b7b4/dvc-task-0.4.0.tar.gz", hash = "sha256:c0166626af9c0e932ba18194fbc57df38f22860fcc0fbd450dee14ef9615cd3c", size = 35986 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9d/c5/f56893f455486db875a6c74fbf68047fafe581313fb975da1315421117c2/dvc_task-0.4.0-py3-none-any.whl", hash = "sha256:ed047e4bb5031fcf640357ae4638a2a89e34f556560ed9d1fbf6646ed4e8cca6", size = 21383 },
-]
-
-[[package]]
-name = "dvclive"
-version = "3.48.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "dvc" },
-    { name = "dvc-render" },
-    { name = "dvc-studio-client" },
-    { name = "funcy" },
-    { name = "gto" },
-    { name = "psutil" },
-    { name = "pynvml" },
-    { name = "ruamel-yaml" },
-    { name = "scmrepo" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e3/91/d6cf2ccceaa063b988809ab4fa33846e6ee811ef146b573dadc1c9fb0a0f/dvclive-3.48.0.tar.gz", hash = "sha256:42434660f16b88c8931e625da010c9cdabf2b0d8d11173b81ed1d976c4b7fb0a", size = 2041796 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/86/96f6a2383e94b90b97b7920c4a1831a8858a5bfd1a08ac3bd8e2626e7bd1/dvclive-3.48.0-py3-none-any.whl", hash = "sha256:6625b9eac49322165877a95696db8934d190d89fadf53294c471d2584b322879", size = 43481 },
 ]
 
 [[package]]
@@ -4100,15 +4078,6 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b9/13/55deec25bf09383216fa7f1dfcdbfca40a04aa00b6d15a5cbf25af8fce5f/pygtrie-2.5.0.tar.gz", hash = "sha256:203514ad826eb403dab1d2e2ddd034e0d1534bbe4dbe0213bb0593f66beba4e2", size = 39266 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/cd/bd196b2cf014afb1009de8b0f05ecd54011d881944e62763f3c1b1e8ef37/pygtrie-2.5.0-py3-none-any.whl", hash = "sha256:8795cda8105493d5ae159a5bef313ff13156c5d4d72feddefacaad59f8c8ce16", size = 25099 },
-]
-
-[[package]]
-name = "pynvml"
-version = "11.5.3"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/e4/e9/9931792cb776716363fc7c3039b477d11278173d71ddc230eb9b5f4ce93f/pynvml-11.5.3.tar.gz", hash = "sha256:183d223ae487e5f00402d8da06c68c978ef8a9295793ee75559839c6ade7b229", size = 73685 }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/54/5b/16e50abf152be7f18120f11dfff495014a9eaff7b764626e1656f04ad262/pynvml-11.5.3-py3-none-any.whl", hash = "sha256:a5fba3ab14febda50d19dbda012ef62ae0aed45b7ccc07af0bc5be79223e450c", size = 53135 },
 ]
 
 [[package]]

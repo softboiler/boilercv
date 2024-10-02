@@ -1,11 +1,12 @@
 """Run DVC experiments."""
 
 from pathlib import Path
+from shlex import split
+from subprocess import run
 
 from cappa import invoke
 from cappa.base import command
-from dev.tools.environment import run
-from dvclive import Live
+from dev.tools import environment
 from pydantic import BaseModel
 from yaml import safe_dump, safe_load
 
@@ -16,42 +17,31 @@ class Trackpy(BaseModel):
 
     def __call__(self):
         """Run TrackPy object finding experiment."""
-        dvc_yaml = Path("dvc.yaml")
-        dvc_yaml.write_text(
-            encoding="utf-8",
-            data=safe_dump(
-                sort_keys=False,
-                indent=2,
-                width=float("inf"),
-                data={
-                    "stages": {
-                        stage: value
-                        for stage, value in safe_load(
-                            dvc_yaml.read_text(encoding="utf-8")
-                        )["stages"].items()
-                        if stage == "find_objects"
-                    }
-                },
-            ),
-        )
+        run(args=split("git checkout trackpy"), check=False)
         params_yaml = Path("params.yaml")
         params_yaml.write_text(
             encoding="utf-8",
             data=safe_dump(
-                sort_keys=False,
                 indent=2,
+                sort_keys=False,
                 width=float("inf"),
                 data={
                     **safe_load(params_yaml.read_text(encoding="utf-8")),
                     "compare_with_trackpy": "--compare-with-trackpy",
                     "frame_count": 500,
-                    "only_sample": "--only-sample",
                 },
             ),
         )
-        run("pre-commit run --all-files prettier", check=False)
-        with Live(".", resume=True):
-            pass
+        environment.run("pre-commit run --all-files prettier", check=False)
+        for cmd in ["git add .", "git commit -m 'prepare for trackpy experiment'"]:
+            run(args=split(cmd), check=False)
+        environment.run("dvc repro find_objects", check=False)
+        for cmd in [
+            "git add .",
+            "git commit -m 'repro trackpy experiment'",
+            "git push",
+        ]:
+            run(args=split(cmd), check=False)
 
 
 if __name__ == "__main__":
