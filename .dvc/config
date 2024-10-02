@@ -1,4 +1,6 @@
 [core]
     remote = origin
+[hydra]
+    enabled = True
 ['remote "origin"']
     url = gs://boilercv
