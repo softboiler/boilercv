@@ -12,7 +12,7 @@ from boilercv_pipeline.stages.find_objects import FindObjects as Params
 
 def main(params: Params):
     nb = params.deps.nb.read_text(encoding="utf-8")
-    with ProcessPoolExecutor() as executor:
+    with ProcessPoolExecutor(max_workers=4) as executor:
         for time, filled, filled_slicers, contours, dfs in zip(
             params.times,
             params.filled,
