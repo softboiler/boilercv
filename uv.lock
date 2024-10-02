@@ -658,7 +658,7 @@ dev = [
     { name = "context-models", editable = "packages/context_models" },
     { name = "debugpy", specifier = ">=1.8.2" },
     { name = "dev", editable = "packages/_dev" },
-    { name = "dvc", extras = ["gs"], specifier = ">=3.51.2" },
+    { name = "dvc", extras = ["gs"], specifier = ">=3.55.2" },
     { name = "fawltydeps", specifier = ">=0.16.0" },
     { name = "ipython", specifier = ">=8.26.0" },
     { name = "linkify-it-py", specifier = ">=2.0.3" },
@@ -701,6 +701,7 @@ dependencies = [
     { name = "colorcet" },
     { name = "copykitten" },
     { name = "cyclopts" },
+    { name = "dvclive" },
     { name = "imageio", extra = ["pyav"] },
     { name = "ipykernel" },
     { name = "loguru" },
@@ -740,6 +741,7 @@ requires-dist = [
     { name = "colorcet", specifier = ">=3.0.1" },
     { name = "copykitten", specifier = ">=1.1.1" },
     { name = "cyclopts", specifier = ">=2.6.1" },
+    { name = "dvclive", specifier = ">=3.48.0" },
     { name = "imageio", extras = ["pyav"], specifier = ">=2.34.1" },
     { name = "ipykernel", specifier = ">=6.29.4" },
     { name = "loguru", specifier = ">=0.7.0" },
@@ -1604,7 +1606,7 @@ wheels = [
 
 [[package]]
 name = "dvc"
-version = "3.51.2"
+version = "3.55.2"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -1650,9 +1652,9 @@ dependencies = [
     { name = "voluptuous" },
     { name = "zc-lockfile" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/55/4f/4bf3dabe2929073ca50f9318fa678b1413816f3d1c2ca36f9d9bd67a87a3/dvc-3.51.2.tar.gz", hash = "sha256:bc714b727e02f4702e79346933fbed8a6409da6ec1bef7b51416af741fc6aa13", size = 591698 }
+sdist = { url = "https://files.pythonhosted.org/packages/ce/fe/30d8a9733f1edddd356766f0ec167e950e26a4717ec6f0c397da25f9510f/dvc-3.55.2.tar.gz", hash = "sha256:2fbb38385753d51b25967c80e672cf9dea046bdac182c159a2c1d1f246d15ce0", size = 647480 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/22/ea/e2969794a37ea2958471fad368e918daf740e3f6e375d19ed04f691e0cab/dvc-3.51.2-py3-none-any.whl", hash = "sha256:2af4592932dff2413b8fce78e1889fec3fff3e1543cce3921c17ae10d8f17830", size = 452556 },
+    { url = "https://files.pythonhosted.org/packages/a2/fd/6f6095b001c1f265938eee4be8830e1d4da07d4bd9d15538d25793b5fe81/dvc-3.55.2-py3-none-any.whl", hash = "sha256:1324e4a5471618a4300dd0a7c33ac877d5e057fbe48940812116494865d0e4e2", size = 455068 },
 ]
 
 [package.optional-dependencies]
@@ -1662,7 +1664,7 @@ gs = [
 
 [[package]]
 name = "dvc-data"
-version = "3.15.2"
+version = "3.16.6"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -1671,13 +1673,14 @@ dependencies = [
     { name = "dvc-objects" },
     { name = "fsspec" },
     { name = "funcy", marker = "python_full_version < '3.12'" },
+    { name = "orjson", marker = "implementation_name == 'cpython'" },
     { name = "pygtrie" },
     { name = "sqltrie" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1e/9d/5600b6a2f3a139a6d36994579e4fdd01c068a54e3391257b5ea962eb5bce/dvc_data-3.15.2.tar.gz", hash = "sha256:1b9652c864011791b94b69d1bf5b24511ac8b94dcadfbde7aaf4677198715885", size = 72555 }
+sdist = { url = "https://files.pythonhosted.org/packages/97/3d/7c160b6b0ceddbf930ee2f05f3e4aa456f7926c9b92339ba010fbad6995a/dvc_data-3.16.6.tar.gz", hash = "sha256:598c10e5ded098f5145ede5535f2b5b964af42dc900486bc9bb739191f8189fd", size = 81829 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/bc/51/ddf83d67d3c6fa4b33c64e62fed423be40422d0460cff9ac1d8d86a4a722/dvc_data-3.15.2-py3-none-any.whl", hash = "sha256:95c9eeda536a76d47883b5b7a77d4e28ce1151b13b3c529a29851d9b1358c386", size = 71631 },
+    { url = "https://files.pythonhosted.org/packages/43/ea/337cf52730955f81c09f653b7966bc042613511847b2d96518b587e032cd/dvc_data-3.16.6-py3-none-any.whl", hash = "sha256:ffba21e2d0e420c427257a984213c94ba51db2fb76f2227ab23d9cb978613684", size = 77960 },
 ]
 
 [[package]]
@@ -1756,6 +1759,26 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/67/18/245fc0f1f47fc0a46a793af5359eaa4507bf375746d65fc3db6ad8b3b7b4/dvc-task-0.4.0.tar.gz", hash = "sha256:c0166626af9c0e932ba18194fbc57df38f22860fcc0fbd450dee14ef9615cd3c", size = 35986 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/9d/c5/f56893f455486db875a6c74fbf68047fafe581313fb975da1315421117c2/dvc_task-0.4.0-py3-none-any.whl", hash = "sha256:ed047e4bb5031fcf640357ae4638a2a89e34f556560ed9d1fbf6646ed4e8cca6", size = 21383 },
+]
+
+[[package]]
+name = "dvclive"
+version = "3.48.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "dvc" },
+    { name = "dvc-render" },
+    { name = "dvc-studio-client" },
+    { name = "funcy" },
+    { name = "gto" },
+    { name = "psutil" },
+    { name = "pynvml" },
+    { name = "ruamel-yaml" },
+    { name = "scmrepo" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/e3/91/d6cf2ccceaa063b988809ab4fa33846e6ee811ef146b573dadc1c9fb0a0f/dvclive-3.48.0.tar.gz", hash = "sha256:42434660f16b88c8931e625da010c9cdabf2b0d8d11173b81ed1d976c4b7fb0a", size = 2041796 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/86/96f6a2383e94b90b97b7920c4a1831a8858a5bfd1a08ac3bd8e2626e7bd1/dvclive-3.48.0-py3-none-any.whl", hash = "sha256:6625b9eac49322165877a95696db8934d190d89fadf53294c471d2584b322879", size = 43481 },
 ]
 
 [[package]]
@@ -1910,15 +1933,15 @@ wheels = [
 
 [[package]]
 name = "flufl-lock"
-version = "7.1.1"
+version = "8.1.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "atpublic" },
     { name = "psutil" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/35/33/d3baecd2545b9ae842f4df356aaa4a1816191eff737264542e9d27c5ec3b/flufl.lock-7.1.1.tar.gz", hash = "sha256:af14172b35bbc58687bd06b70d1693fd8d48cbf0ffde7e51a618c148ae24042d", size = 33017 }
+sdist = { url = "https://files.pythonhosted.org/packages/a9/fa/885c58f9716063e2ac099f773d0420f20bb834b19538066a2e0d5b848ba4/flufl_lock-8.1.0.tar.gz", hash = "sha256:d88302005692a63d98b60080158faf089be5ecae6969f706409da8276fdce7cb", size = 32884 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3c/4d/506c1dc1162f2f94f6b3146bda4a9cea6f7dfa213f7969fa885c193c9648/flufl.lock-7.1.1-py3-none-any.whl", hash = "sha256:96d2c0448ba9fd8fc65d5d681ed7217c8e1625149c1c880bba50559bb680a615", size = 11167 },
+    { url = "https://files.pythonhosted.org/packages/20/36/e6b26dc9ace9f4fa30f46b3f69182b6f25c07746e0b71caf3cc3c4d78ed2/flufl_lock-8.1.0-py3-none-any.whl", hash = "sha256:a01b2153d1b0cc170a26b1413037debbe94af6a1cd23164b3b2b229f766b164f", size = 11143 },
 ]
 
 [[package]]
@@ -4077,6 +4100,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/b9/13/55deec25bf09383216fa7f1dfcdbfca40a04aa00b6d15a5cbf25af8fce5f/pygtrie-2.5.0.tar.gz", hash = "sha256:203514ad826eb403dab1d2e2ddd034e0d1534bbe4dbe0213bb0593f66beba4e2", size = 39266 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ec/cd/bd196b2cf014afb1009de8b0f05ecd54011d881944e62763f3c1b1e8ef37/pygtrie-2.5.0-py3-none-any.whl", hash = "sha256:8795cda8105493d5ae159a5bef313ff13156c5d4d72feddefacaad59f8c8ce16", size = 25099 },
+]
+
+[[package]]
+name = "pynvml"
+version = "11.5.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/e4/e9/9931792cb776716363fc7c3039b477d11278173d71ddc230eb9b5f4ce93f/pynvml-11.5.3.tar.gz", hash = "sha256:183d223ae487e5f00402d8da06c68c978ef8a9295793ee75559839c6ade7b229", size = 73685 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/54/5b/16e50abf152be7f18120f11dfff495014a9eaff7b764626e1656f04ad262/pynvml-11.5.3-py3-none-any.whl", hash = "sha256:a5fba3ab14febda50d19dbda012ef62ae0aed45b7ccc07af0bc5be79223e450c", size = 53135 },
 ]
 
 [[package]]

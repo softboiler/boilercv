@@ -6,19 +6,27 @@ from dataclasses import dataclass
 
 from cappa.subcommand import Subcommands
 
+from boilercv_pipeline.cli.experiments import Trackpy
 from boilercv_pipeline.cli.sync_dvc import SyncDVC
 from boilercv_pipeline.cli.types import Stages
 
 
 @dataclass
 class Stage:
-    """Pipeline stage."""
+    """Run a pipeline stage."""
 
     commands: Subcommands[Stages]
 
 
 @dataclass
-class BoilercvPipeline:
-    """Pipeline."""
+class Exp:
+    """Run a pipeline experiment."""
 
-    commands: Subcommands[SyncDVC | Stage]
+    commands: Subcommands[Trackpy]
+
+
+@dataclass
+class BoilercvPipeline:
+    """Run the research data pipeline."""
+
+    commands: Subcommands[SyncDVC | Stage | Exp]

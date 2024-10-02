@@ -12,6 +12,7 @@ dependencies = [
   "colorcet>=3.0.1",
   "copykitten>=1.1.1",
   "cyclopts>=2.6.1",
+  "dvclive>=3.48.0",
   "imageio[pyav]>=2.34.1",
   "ipykernel>=6.29.4",
   "loguru>=0.7.0",
@@ -25,6 +26,7 @@ dependencies = [
   "pydantic>=2.9.1",
   "pyqtgraph>=0.13.3",
   "pyside6>=6.7.2",
+  "pyyaml>=6.0.2",
   "ruamel.yaml>=0.17.32",
   "scikit-image>=0.23.1",
   "scipy>=1.11.1",
@@ -36,7 +38,6 @@ dependencies = [
   "tqdm>=4.66.3",
   "watchfiles>=0.22.0",
   "xarray[accel,io,parallel]>=2023.7.0",
-  "pyyaml>=6.0.2",
 ]
 [project.optional-dependencies]
 # * Minimal CV flavor needed, but allow `boilercv_pipeline` to coexist with different flavors
