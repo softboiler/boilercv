@@ -3,10 +3,10 @@ stage:
   marker_scale: 20.0
   precision: 3
   display_rows: 12
-  sample: "2024-07-18T17-44-35"
-  only_sample: "--no-only-sample"
-  load_src_from_outs: "--no-load-src-from-outs"
-  frame_count: 0
+  sample: 2024-07-18T17-44-35
+  only_sample: --no-only-sample
+  load_src_from_outs: --no-load-src-from-outs
+  frame_count: 500
   frame_step: 1
-  compare_with_trackpy: "--no-compare-with-trackpy"
+  compare_with_trackpy: --compare-with-trackpy
   guess_diameter: 21
