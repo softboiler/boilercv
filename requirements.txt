@@ -176,7 +176,7 @@ numpy-groupies==0.11.2    # via flox
 numpydantic==1.0.0        # via boilercv
 numpydoc==1.7.0           # via dev
 omegaconf==2.3.0          # via hydra-core
-opencv-python==4.10.0.84  # via boilercv, boilercv-pipeline
+opencv-python-headless==4.10.0.84  # via boilercv, boilercv-pipeline
 orjson==3.10.7 ; implementation_name == 'cpython'  # via sqltrie
 overrides==7.7.0          # via jupyter-server
 packaging==24.1           # via bokeh, dask, distributed, dvc, dvc-objects, flox, geopandas, h5netcdf, hydra-core, ipykernel, jupyter-server, jupyterlab, jupyterlab-server, lazy-loader, matplotlib, nbconvert, pooch, pytest, pytest-harvest, scikit-image, sphinx, tables, xarray
