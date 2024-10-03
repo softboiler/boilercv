@@ -16,7 +16,7 @@ class SyncDvc(BaseModel):
     """Primary config file describing the DVC pipeline."""
     params: Path = Path("params.yaml")
     """DVC's primary parameters YAML file."""
-    update_param_values: bool = Field(default=False)
-    """Update values of parameters in the parameters YAML file."""
     stages: str = "boilercv_pipeline.stages"
     """Dotted module path to the package containing stages."""
+    update_param_values: bool = Field(default=False)
+    """Update values of parameters in the parameters YAML file."""

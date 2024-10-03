@@ -6,6 +6,7 @@ from inspect import getmembers, ismodule
 from types import NoneType
 from typing import get_args
 
+from cappa.base import invoke
 from context_models import CONTEXT, PLUGIN_SETTINGS, ContextStore
 from dev.tools.environment import run
 from more_itertools import first, one
@@ -13,7 +14,6 @@ from pydantic import create_model
 from pydantic.alias_generators import to_pascal
 from yaml import safe_dump, safe_load
 
-from boilercv_pipeline.parser import invoke
 from boilercv_pipeline.sync_dvc import SyncDvc
 from boilercv_pipeline.sync_dvc.contexts import DVC, DvcContext, DvcContexts
 from boilercv_pipeline.sync_dvc.dvc import DvcYamlModel, Stage
