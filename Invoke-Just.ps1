@@ -1,5 +1,5 @@
 <#.SYNOPSIS
-Invoke `uv`.#>
+Invoke `just`.#>
 [CmdletBinding(PositionalBinding = $False)]
 Param(
     [switch]$Sync,
@@ -33,4 +33,4 @@ Begin {
         PylanceVersion = $PylanceVersion
     }
 }
-Process { Invoke-Uv @InvokeUvArgs @Run }
+Process { Invoke-Just @InvokeUvArgs @Run }

@@ -74,101 +74,72 @@
   ],
   "tasks": [
     {
-      "label": "proj: Sync Binder requirements",
+      "label": "just: generate correlations",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 && uv pip compile --config-file requirements/binder_uv.toml --constraint requirements/binder_constraints.in --override requirements/binder_overrides.txt --exclude-newer (Get-Date).ToUniversalTime().ToString('o') requirements/binder.in > requirements.txt",
+      "command": "./Invoke-Just.ps1 generate-correlations ${file} ${input:correlations}",
+      "icon": { "id": "file-code" },
+      "problemMatcher": []
+    },
+    {
+      "label": "just: generate correlation docs",
+      "type": "shell",
+      "command": "./Invoke-Just.ps1 generate-correlation-docs",
+      "icon": { "id": "file-code" },
+      "problemMatcher": []
+    },
+    {
+      "label": "just: update binder",
+      "type": "shell",
+      "command": "./Invoke-Just.ps1 update-binder",
       "icon": { "id": "git-commit" },
       "problemMatcher": []
     },
     {
-      "label": "proj: Generate correlation",
+      "label": "just: sync local dev configs",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 ${file} ${input:correlations}",
+      "command": "./Invoke-Just.ps1 sync-local-dev-configs",
       "icon": { "id": "file-code" },
       "problemMatcher": []
     },
     {
-      "label": "proj: Generate correlation docs",
+      "label": "just: remove empty data folders",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 -m boilercv_pipeline.equations.make_docs",
-      "icon": { "id": "file-code" },
-      "problemMatcher": []
-    },
-    {
-      "label": "proj: Sync local dev configs",
-      "type": "shell",
-      "command": "./Invoke-Uv.ps1 dev sync-local-dev-configs",
-      "icon": { "id": "file-code" },
-      "problemMatcher": []
-    },
-    {
-      "label": "proj: Remove empty data folders",
-      "type": "shell",
-      "command": "./Invoke-Uv.ps1 && Get-ChildItem -Path ./data -Recurse -Directory | Where-Object { (Get-ChildItem -Path $_ -Recurse -File | Measure-Object).Count -eq 0 } | Remove-Item -Recurse -Force",
+      "command": "./Invoke-Just.ps1 remove-empty-data-folders",
       "icon": { "id": "terminal-powershell" },
       "problemMatcher": []
     },
     {
-      "label": "proj: Hide notebook inputs",
+      "label": "just: hide notebook inputs",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 -m dev.docs.patch_nbs",
+      "command": "./Invoke-Just.ps1 hide-notebook-inputs",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
     {
-      "label": "proj: Run file PREVIEW/WRITE",
+      "label": "just: boilercv preview write",
       "type": "shell",
-      "options": {
-        "env": {
-          "BOILERCV_PREVIEW": "True",
-          "BOILERCV_WRITE": "True"
-        }
-      },
-      "command": "./Invoke-Uv.ps1 ${file}",
+      "command": "./Invoke-Just.ps1 boilercv-preview-write ${file}",
       "icon": { "id": "repo" },
       "problemMatcher": []
     },
     {
-      "label": "proj: Run file DEBUG/PREVIEW/WRITE",
+      "label": "just: boilercv debug preview write",
       "type": "shell",
-      "options": {
-        "env": {
-          "BOILERCV_DEBUG": "True",
-          "BOILERCV_PREVIEW": "True",
-          "BOILERCV_WRITE": "True"
-        }
-      },
-      "command": "./Invoke-Uv.ps1 ${file}",
+      "command": "./Invoke-Just.ps1 boilercv-debug-preview-write ${file}",
       "icon": { "id": "repo" },
       "problemMatcher": []
     },
     {
-      "label": "proj: Run file PREVIEW",
+      "label": "just: boilercv write",
       "type": "shell",
-      "options": {
-        "env": { "BOILERCV_PREVIEW": "True" }
-      },
-      "command": "./Invoke-Uv.ps1 ${file}",
+      "command": "./Invoke-Just.ps1 boilercv-write ${file}",
       "icon": { "id": "repo" },
       "problemMatcher": []
     },
     {
-      "label": "proj: Run file WRITE",
+      "label": "just: boilercv preview",
       "type": "shell",
-      "options": {
-        "env": { "BOILERCV_WRITE": "True" }
-      },
-      "command": "./Invoke-Uv.ps1 ${file}",
-      "icon": { "id": "repo" },
-      "problemMatcher": []
-    },
-    {
-      "label": "proj: preview",
-      "type": "shell",
-      "options": {
-        "env": { "BOILERCV_PREVIEW": "True" }
-      },
-      "command": "./Invoke-Uv.ps1 -m boilercv_pipeline.previews.${input:preview}",
+      "command": "./Invoke-Just.ps1 boilercv-preview ${input:preview}",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -187,16 +158,16 @@
       "problemMatcher": []
     },
     {
-      "label": "dvc: dag",
+      "label": "just: dvc dag",
       "type": "shell",
-      "command": ". ./Dev.ps1 && (iuv dvc dag --md) -Replace 'mermaid', '{mermaid}' > docs/_static/dag.md && markdownlint-cli2 docs/_static/dag.md",
+      "command": "./Invoke-Just.ps1 dvc-dag",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
     {
-      "label": "dvc: sync",
+      "label": "just: sync dvc",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 boilercv_pipeline sync-dvc",
+      "command": "./Invoke-Just.ps1 pipeline-sync-dvc",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -239,9 +210,9 @@
       "problemMatcher": []
     },
     {
-      "label": "setup: Sync contributor environment",
+      "label": "setup: just: sync contrib",
       "type": "shell",
-      "command": "if (!$Env:DEVCONTAINER) {./Invoke-Uv.ps1 -Sync -Update}",
+      "command": "if (!$Env:DEVCONTAINER) {./Invoke-Just.ps1 sync-contrib}",
       "icon": { "id": "file-symlink-directory" },
       "problemMatcher": [],
       "runOptions": {

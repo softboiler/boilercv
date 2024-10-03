@@ -71,113 +71,153 @@ function Invoke-Uv {
         [switch]$Devcontainer = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER)),
         [string]$PythonVersion = (Get-Content '.python-version'),
         [string]$PylanceVersion = (Get-Content '.pylance-version'),
-        [Parameter(ValueFromRemainingArguments = $True)][string[]]$Run
+        [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
     )
-    if ($CI -or $Sync) {
-        if (!$CI) {
-            Install-Uv -Update:$Update
-            # ? Sync submodules
-            Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 |
-                Remove-Item
-            git submodule update --init --merge
-        }
-        # ? Sync the environment
-        if (!(Test-Path 'requirements')) {
-            New-Item 'requirements' -ItemType 'Directory'
-        }
-        $LockedArg = $Locked ? '--locked' : $null
-        $FrozenArg = $Locked ? $null : '--frozen'
-        if ($Low) {
-            uv sync $LockedArg --resolution lowest-direct --python $PythonVersion
-            uv export $LockedArg $FrozenArg --resolution lowest-direct --no-hashes --python $PythonVersion |
-                Set-Content "$PWD/requirements/requirements_dev_low.txt"
-            $Env:ENV_SYNCED = $null
-        }
-        elseif ($High) {
-            uv sync $LockedArg --upgrade --python $PythonVersion
-            uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
-                Set-Content "$PWD/requirements/requirements_dev_high.txt"
-            $Env:ENV_SYNCED = $null
-        }
-        elseif ($Build) {
-            $LockedArg = $null
-            $FrozenArg = '--frozen'
-            uv sync $LockedArg --no-sources --no-dev --python $PythonVersion
-            uv export $LockedArg $FrozenArg --no-dev --no-hashes --python $PythonVersion |
-                Set-Content "$PWD/requirements/requirements_prod.txt"
-            uv build --python $PythonVersion
-            $Env:ENV_SYNCED = $null
-        }
-        elseif ($CI -or $Force -or !$Env:ENV_SYNCED) {
+    Begin {
+        if ($CI -or $Sync) {
+            if (!$CI) {
+                Install-Uv -Update:$Update
+                # ? Sync submodules
+                Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 |
+                    Remove-Item
+                git submodule update --init --merge
+            }
             # ? Sync the environment
-            uv sync $LockedArg --python $PythonVersion
-            uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
-                Set-Content "$PWD/requirements/requirements_dev.txt"
-            if ($CI) {
-                Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts")
+            if (!(Test-Path 'requirements')) {
+                New-Item 'requirements' -ItemType 'Directory'
             }
-            $Env:ENV_SYNCED = $True
+            $LockedArg = $Locked ? '--locked' : $null
+            $FrozenArg = $Locked ? $null : '--frozen'
+            if ($Low) {
+                uv sync $LockedArg --resolution lowest-direct --python $PythonVersion
+                uv export $LockedArg $FrozenArg --resolution lowest-direct --no-hashes --python $PythonVersion |
+                    Set-Content "$PWD/requirements/requirements_dev_low.txt"
+                $Env:ENV_SYNCED = $null
+            }
+            elseif ($High) {
+                uv sync $LockedArg --upgrade --python $PythonVersion
+                uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
+                    Set-Content "$PWD/requirements/requirements_dev_high.txt"
+                $Env:ENV_SYNCED = $null
+            }
+            elseif ($Build) {
+                $LockedArg = $null
+                $FrozenArg = '--frozen'
+                uv sync $LockedArg --no-sources --no-dev --python $PythonVersion
+                uv export $LockedArg $FrozenArg --no-dev --no-hashes --python $PythonVersion |
+                    Set-Content "$PWD/requirements/requirements_prod.txt"
+                uv build --python $PythonVersion
+                $Env:ENV_SYNCED = $null
+            }
+            elseif ($CI -or $Force -or !$Env:ENV_SYNCED) {
+                # ? Sync the environment
+                uv sync $LockedArg --python $PythonVersion
+                uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
+                    Set-Content "$PWD/requirements/requirements_dev.txt"
+                if ($CI) {
+                    Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts")
+                }
+                $Env:ENV_SYNCED = $True
 
-            # ? Sync `.env` and set environment variables from `pyproject.toml`
-            $EnvVars = uv run --no-sync --python $PythonVersion dev 'sync-environment-variables' --pylance-version $PylanceVersion
-            $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
-            $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
-                $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
-                Set-Item "Env:$Key" $Value
-            }
+                # ? Sync `.env` and set environment variables from `pyproject.toml`
+                $EnvVars = uv run --no-sync --python $PythonVersion dev 'sync-environment-variables' --pylance-version $PylanceVersion
+                $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
+                $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
+                    $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
+                    Set-Item "Env:$Key" $Value
+                }
 
-            # ? Environment-specific setup
-            if ($CI) {
-                uv run --no-sync --python $PythonVersion dev elevate-pyright-warnings
-            }
-            elseif ($Devcontainer) {
-                $Repo = Get-ChildItem '/workspaces'
-                $Packages = Get-ChildItem "$Repo/packages"
-                $SafeDirs = @($Repo) + $Packages
-                foreach ($Dir in $SafeDirs) {
-                    if (!($SafeDirs -contains $Dir)) {
-                        git config --global --add safe.directory $Dir
+                # ? Environment-specific setup
+                if ($CI) {
+                    uv run --no-sync --python $PythonVersion dev elevate-pyright-warnings
+                }
+                elseif ($Devcontainer) {
+                    $Repo = Get-ChildItem '/workspaces'
+                    $Packages = Get-ChildItem "$Repo/packages"
+                    $SafeDirs = @($Repo) + $Packages
+                    foreach ($Dir in $SafeDirs) {
+                        if (!($SafeDirs -contains $Dir)) {
+                            git config --global --add safe.directory $Dir
+                        }
                     }
                 }
-            }
 
-            # ? Install pre-commit hooks
-            else {
-                $Hooks = '.git/hooks'
-                if (
-                    !(Test-Path "$Hooks/pre-commit") -or
-                    !(Test-Path "$Hooks/post-checkout")
-                ) { uv run --no-sync --python $PythonVersion pre-commit install --install-hooks }
-                if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
-                    $LocalExtensions = '.vscode/extensions'
-                    $Pylance = 'ms-python.vscode-pylance'
-                    if (!(Test-Path "$LocalExtensions/$Pylance-$PylanceVersion")) {
-                        $Install = @(
-                            "--extensions-dir=$LocalExtensions",
-                            "--install-extension=$Pylance@$PylanceVersion"
-                        )
-                        code @Install
-                        if (Test-Path $LocalExtensions) {
-                            $PylanceExtension = (
-                                Get-ChildItem -Path $LocalExtensions -Filter "$Pylance-*"
+                # ? Install pre-commit hooks
+                else {
+                    $Hooks = '.git/hooks'
+                    if (
+                        !(Test-Path "$Hooks/pre-commit") -or
+                        !(Test-Path "$Hooks/post-checkout")
+                    ) { uv run --no-sync --python $PythonVersion pre-commit install --install-hooks }
+                    if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
+                        $LocalExtensions = '.vscode/extensions'
+                        $Pylance = 'ms-python.vscode-pylance'
+                        if (!(Test-Path "$LocalExtensions/$Pylance-$PylanceVersion")) {
+                            $Install = @(
+                                "--extensions-dir=$LocalExtensions",
+                                "--install-extension=$Pylance@$PylanceVersion"
                             )
-                            # ? Remove other files
-                            Get-ChildItem -Path $LocalExtensions |
-                                Where-Object { Compare-Object $_ $PylanceExtension } |
-                                Remove-Item -Recurse
-                            # ? Remove local Pylance bundled stubs
-                            $PylanceExtension | ForEach-Object {
-                                Get-ChildItem "$_/dist/bundled" -Filter '*stubs'
-                            } | Remove-Item -Recurse
+                            code @Install
+                            if (Test-Path $LocalExtensions) {
+                                $PylanceExtension = (
+                                    Get-ChildItem -Path $LocalExtensions -Filter "$Pylance-*"
+                                )
+                                # ? Remove other files
+                                Get-ChildItem -Path $LocalExtensions |
+                                    Where-Object { Compare-Object $_ $PylanceExtension } |
+                                    Remove-Item -Recurse
+                                # ? Remove local Pylance bundled stubs
+                                $PylanceExtension | ForEach-Object {
+                                    Get-ChildItem "$_/dist/bundled" -Filter '*stubs'
+                                } | Remove-Item -Recurse
+                            }
                         }
                     }
                 }
             }
         }
     }
-    if ($Run) { uv run --no-sync --python $PythonVersion $Run }
+    Process { if ($Run) { uv run --no-sync --python $PythonVersion $Run } }
 }
 Set-Alias -Name 'iuv' -Value 'Invoke-Uv'
+
+function Invoke-Just {
+    <#.SYNOPSIS
+    Invoke `just`.#>
+    [CmdletBinding(PositionalBinding = $False)]
+    Param(
+        [switch]$Sync,
+        [switch]$Update,
+        [switch]$Low,
+        [switch]$High,
+        [switch]$Build,
+        [switch]$Force,
+        [switch]$CI,
+        [switch]$Locked,
+        [switch]$Devcontainer,
+        [string]$PythonVersion = (Get-Content '.python-version'),
+        [string]$PylanceVersion = (Get-Content '.pylance-version'),
+        [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
+    )
+    Begin {
+        $CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI))
+        $InvokeUvArgs = @{
+            Sync           = $Sync
+            Update         = $Update
+            Low            = $Low
+            High           = $High
+            Build          = $Build
+            Force          = $Force
+            CI             = $CI
+            Locked         = $CI
+            Devcontainer   = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER))
+            PythonVersion  = $PythonVersion
+            PylanceVersion = $PylanceVersion
+        }
+    }
+    Process { if ($Run) { Invoke-Uv @InvokeUvArgs -- just @Run } else { Invoke-Uv @InvokeUvArgs -- just } }
+}
+Set-Alias -Name 'ij' -Value 'Invoke-Just'
 
 function Sync-Template {
     <#.SYNOPSIS

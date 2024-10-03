@@ -248,6 +248,8 @@
     "editor.wordWrap": "off"
   },
   "yaml.format.printWidth": 88,
+  //* Justfile (JUST)
+  "[just]": { "editor.tabSize": 2, "editor.wordWrap": "off" },
   //* ruff (PY, IPYNB)
   "ruff.importStrategy": "fromEnvironment",
   "ruff.lint.args": ["--config", "pyproject.toml"],

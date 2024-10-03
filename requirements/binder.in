@@ -1,7 +1,10 @@
 --editable boilercv[cv] @ .
 --editable dev @ packages/_dev
---editable boilercv_pipeline[cv] @ packages/pipeline
+--editable boilercine @ packages/boilercine
 --editable boilercore @ packages/boilercore
+--editable cachier @ packages/cachier
+--editable context_models @ packages/context_models
+--editable boilercv_pipeline[cv] @ packages/pipeline
 # Binder's implicit additional requirements via JupyterHub as of 2024/07/02
 notebook==7.2.2
 jupyter-resource-usage==1.0.2
