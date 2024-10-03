@@ -7,6 +7,16 @@ from pydantic import BaseModel
 
 
 @command
+class Sample(BaseModel):
+    """Run TrackPy object finding experiment."""
+
+    def __call__(self):
+        """Run experiment with just the sample video."""
+        run("boilercv_pipeline sync-dvc")
+        run("dvc exp run --single-item --set-param stage=sample")
+
+
+@command
 class Trackpy(BaseModel):
     """Run TrackPy object finding experiment."""
 
@@ -16,4 +26,4 @@ class Trackpy(BaseModel):
 
 
 if __name__ == "__main__":
-    invoke(Trackpy)
+    invoke(Sample)
