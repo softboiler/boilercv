@@ -1,44 +1,69 @@
 """Run DVC experiments."""
 
+from collections.abc import Iterable
 from pathlib import Path
 
-from cappa import invoke
-from cappa.base import command
+from cappa.base import command, invoke
 from dev.tools.environment import run
 from dvc.utils.hydra import compose_and_dump
 from pydantic import BaseModel
 
+from boilercv_pipeline.sync_dvc import SyncDvc
+
+
+class Forceable(BaseModel):
+    """Forceable model."""
+
+    force: bool = False
+
 
 @command
-class Sample(BaseModel):
+class Sample(Forceable):
     """Run sample experiment."""
 
     def __call__(self):
         """Run experiment with just the sample video."""
-        compose_and_dump(
-            output_file=Path("params.yaml"),
-            config_dir=Path("conf").resolve().as_posix(),
-            config_module=None,
-            config_name="config",
-            plugins_path="hydra_plugins",
-            overrides=["stage=sample"],
+        run_experiment(
+            exp="sample", stages=("find_objects", "find_tracks"), force=self.force
         )
-        run("boilercv_pipeline sync-dvc", check=False)
-        run("dvc exp remove sample", check=False)
-        run("dvc exp run --name sample --set-param stage=sample", check=False)
 
 
 @command
-class Trackpy(BaseModel):
+class Trackpy(Forceable):
     """Run TrackPy object finding experiment."""
 
     def __call__(self):
         """Run TrackPy object finding experiment."""
-        run(
-            "dvc exp run --single-item --set-param stage=trackpy find_objects",
-            check=False,
-        )
+        run_experiment(exp="trackpy", stages="find_objects", force=self.force)
+
+
+def run_experiment(
+    exp: str = "",
+    stages: Iterable[str] | None = None,
+    params: Path = Path("params.yaml"),
+    force: bool = False,
+):
+    """Run experiment."""
+    compose_and_dump(
+        output_file=Path(params),
+        config_dir=Path("conf").resolve().as_posix(),
+        config_module=None,
+        config_name="config",
+        plugins_path="hydra_plugins",
+        overrides=[f"stage={exp}"] if exp else [],
+    )
+    sep = " "
+    invoke(SyncDvc)
+    if exp and force:
+        run(f"dvc exp remove {exp}", check=False, capture_output=True)
+    run(
+        sep.join([
+            "dvc exp run",
+            *([f"--name {exp} --set-param stage={exp}"] if exp else []),
+            *([f"--single-item {sep.join(tuple(stages))}"] if stages else []),
+        ])
+    )
 
 
 if __name__ == "__main__":
-    invoke(Sample)
+    invoke(Sample, argv=["--force"])

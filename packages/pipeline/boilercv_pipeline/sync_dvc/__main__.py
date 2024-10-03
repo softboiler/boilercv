@@ -2,7 +2,8 @@
 
 from collections.abc import Sized
 from importlib import import_module
-from inspect import getmembers, ismodule
+from inspect import getfile, getmembers
+from pathlib import Path
 from types import NoneType
 from typing import Any, get_args
 
@@ -65,9 +66,9 @@ def main(params: SyncDvc):
 def get_dvc_context(params: dict[str, Any], stages: str) -> DvcContext:
     """Get DVC context for pipeline model and stages."""
     stage_models = {
-        k: dict(getmembers(v))[to_pascal(k)]
-        for k, v in getmembers(import_module(stages))
-        if ismodule(v)
+        p.stem: dict(getmembers(import_module(f"{stages}.{p.stem}")))[to_pascal(p.stem)]
+        for p in Path(getfile(import_module(stages))).parent.iterdir()
+        if not p.stem.startswith("_")
     }
     stage = first(stage_models.values())
 
