@@ -10,13 +10,13 @@ from pydantic import BaseModel
 from pydantic.functional_validators import ModelWrapValidatorHandler
 
 from boilercv_pipeline.models.contexts import ROOTED
-from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
 from boilercv_pipeline.models.path import (
     BoilercvPipelineContextStore,
     DataDir,
     get_boilercv_pipeline_config,
 )
 from boilercv_pipeline.models.paths import paths
+from boilercv_pipeline.sync_dvc.types import DvcValidationInfo
 from boilercv_pipeline.sync_dvc.validators import (
     dvc_add_param,
     dvc_prepare_stage,
@@ -35,14 +35,14 @@ class Stage(BoilercvPipelineContextStore):
         cls,
         data: dict[str, Any],
         handler: ModelWrapValidatorHandler[Self],
-        info: BoilercvPipelineValidationInfo,
+        info: DvcValidationInfo,
     ) -> Self:
         """Prepare a pipeline stage for `dvc.yaml`."""
         return dvc_prepare_stage(data, handler, info, model=cls)
 
     @context_field_validator("*", mode="after")
     @classmethod
-    def dvc_add_param(cls, value: Any, info: BoilercvPipelineValidationInfo) -> Any:
+    def dvc_add_param(cls, value: Any, info: DvcValidationInfo) -> Any:
         """Add param to global parameters and stage command for `dvc.yaml`."""
         return dvc_add_param(value, info, fields=cls.model_fields)
 
@@ -54,9 +54,7 @@ class StagePaths(BoilercvPipelineContextStore):
 
     @context_field_validator("*", mode="after")
     @classmethod
-    def dvc_set_stage_path(
-        cls, path: Path, info: BoilercvPipelineValidationInfo
-    ) -> Path:
+    def dvc_set_stage_path(cls, path: Path, info: DvcValidationInfo) -> Path:
         """Set stage path as a stage dep, plot, or out for `dvc.yaml`."""
         return dvc_set_stage_path(
             path, info, kind="deps" if issubclass(cls, Deps) else "outs"

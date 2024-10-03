@@ -7,12 +7,12 @@ from matplotlib.figure import Figure
 from pandas import DataFrame
 from pydantic import BaseModel, Field
 
-from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
 from boilercv_pipeline.models.data.types import Dfs_T, Plots_T
 from boilercv_pipeline.models.path import (
     BoilercvPipelineContextStore,
     get_boilercv_pipeline_config,
 )
+from boilercv_pipeline.sync_dvc.types import DvcValidationInfo
 from boilercv_pipeline.sync_dvc.validators import dvc_append_plot_name
 
 
@@ -32,9 +32,7 @@ class Plots(BoilercvPipelineContextStore, arbitrary_types_allowed=True):
 
     @context_field_validator("*", mode="after")
     @classmethod
-    def dvc_validate_plot(
-        cls, figure: Figure, info: BoilercvPipelineValidationInfo
-    ) -> Figure:
+    def dvc_validate_plot(cls, figure: Figure, info: DvcValidationInfo) -> Figure:
         """Append plot name for `dvc.yaml`."""
         return dvc_append_plot_name(figure, info)
 

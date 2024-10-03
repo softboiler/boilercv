@@ -1,5 +1,8 @@
 [core]
+    analytics = false
     remote = origin
+[exp]
+    auto_push = True
 [hydra]
     enabled = True
 ['remote "origin"']

@@ -17,7 +17,6 @@ from seaborn import move_legend, set_theme
 
 from boilercv_pipeline.models.column import Col
 from boilercv_pipeline.models.column.types import Ps
-from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
 from boilercv_pipeline.models.params.types import (
     Data_T,
     Deps_T,
@@ -27,6 +26,7 @@ from boilercv_pipeline.models.params.types import (
 )
 from boilercv_pipeline.models.path import get_boilercv_pipeline_config
 from boilercv_pipeline.models.stage import Stage
+from boilercv_pipeline.sync_dvc.types import DvcValidationInfo
 from boilercv_pipeline.sync_dvc.validators import dvc_extend_with_named_plots_if_missing
 
 
@@ -237,7 +237,7 @@ class DataParams(Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T, Data_T]):
     model_config = get_boilercv_pipeline_config()
 
     @context_model_validator(mode="after")
-    def dvc_validate_params(self, info: BoilercvPipelineValidationInfo) -> Self:
+    def dvc_validate_params(self, info: DvcValidationInfo) -> Self:
         """Extend stage plots for `dvc.yaml` with named plots if plots haven't been set."""
         return dvc_extend_with_named_plots_if_missing(self, info)
 
