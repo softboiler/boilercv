@@ -82,7 +82,7 @@ dvc==3.55.2
 dvc-data==3.16.6
 dvc-gs==3.0.1
 dvc-http==2.32.0
-dvc-objects==5.1.0
+dvc-objects==4.0.1
 dvc-render==1.0.2
 dvc-studio-client==0.21.0
 dvc-task==0.4.0
@@ -268,7 +268,7 @@ ruamel-yaml-clib==0.2.8 ; python_full_version < '3.13' and platform_python_imple
 ruff==0.5.1
 scikit-image==0.23.1
 scipy==1.11.2
-scmrepo==3.3.7
+scmrepo==3.3.8
 seaborn==0.13.2
 semver==3.0.2
 setproctitle==1.3.3

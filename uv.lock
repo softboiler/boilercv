@@ -1709,15 +1709,15 @@ wheels = [
 
 [[package]]
 name = "dvc-objects"
-version = "5.1.0"
+version = "4.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fsspec" },
     { name = "funcy", marker = "python_full_version < '3.12'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f0/18/22e1b3440ad2b1b6de864b10ef25e6e0069342524d2b592de40f0cb17e13/dvc-objects-5.1.0.tar.gz", hash = "sha256:22e919620f9ecf428a0d295efca8073d1c0e87206dd8e1f52b1d9520fa25b814", size = 43049 }
+sdist = { url = "https://files.pythonhosted.org/packages/6f/00/3d47944fe96c1a4ec5168fa84ef635f0a2172b9d996bc977ecf5811fe222/dvc-objects-4.0.1.tar.gz", hash = "sha256:4db17463f3f43e0d3a4149afbd863697a0ef98d482d512929f882d5b896f5d1c", size = 45318 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/52/64/c7d7980b96cf4706f68b858cb2a6d54ab4538f4dc568b2a60cea29c8846a/dvc_objects-5.1.0-py3-none-any.whl", hash = "sha256:c29b28f372674f53eca13323832d7b61c14bc29d516c39f6e87c5eba871a00ba", size = 33530 },
+    { url = "https://files.pythonhosted.org/packages/4b/98/d1b79460a653109af6da750de102d35c0f9f384a12f73ad49227bdc55222/dvc_objects-4.0.1-py3-none-any.whl", hash = "sha256:8a3f8c3f5ef775d54380e48bc6ba3e4340b6397bd6f4de7fb7ab5335423d159d", size = 36140 },
 ]
 
 [[package]]
@@ -4656,7 +4656,7 @@ wheels = [
 
 [[package]]
 name = "scmrepo"
-version = "3.3.7"
+version = "3.3.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp-retry" },
@@ -4670,9 +4670,9 @@ dependencies = [
     { name = "pygtrie" },
     { name = "tqdm" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/1f/8b/cecf019d43f6cc54737835c8c4eb9146f19b9c5e56a19f59a773a7f72deb/scmrepo-3.3.7.tar.gz", hash = "sha256:8ca01563c27cf0f8b07fb51fe757c7d975d61aa9f2f2ed13a29e5e308c891c07", size = 94060 }
+sdist = { url = "https://files.pythonhosted.org/packages/d6/19/82a0dac4531c486f079c304397acf48bafae80d92ad05161ac9fa1c787fd/scmrepo-3.3.8.tar.gz", hash = "sha256:e0d71cef4725dbee2cefab0cfff0a3a65d8cc213a53b468d4e3fa61ba2ec66f4", size = 94645 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/fb/e8/2b8189a8d6574ddcc05fce31db8859dce7795808df87589377ecdf7023f6/scmrepo-3.3.7-py3-none-any.whl", hash = "sha256:5758177ac765b535edd00c9aaa1a5026172a86c349ef130f6f352b69c3fec8b0", size = 73555 },
+    { url = "https://files.pythonhosted.org/packages/72/44/a83109a4a30c1086c0f8a2ac7f67c173aea31d6f99687324dca85fd03e4a/scmrepo-3.3.8-py3-none-any.whl", hash = "sha256:fd841811d17b46579ba96e4a142da33a117d368dc5cdd60047dc772fd427c9b4", size = 73595 },
 ]
 
 [[package]]

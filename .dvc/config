@@ -2,7 +2,7 @@
     analytics = false
     remote = origin
 [exp]
-    auto_push = True
+    auto_push = False
 [hydra]
     enabled = True
 ['remote "origin"']
