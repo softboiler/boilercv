@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from datetime import datetime
 from functools import partial
 from pathlib import Path
@@ -12,7 +11,7 @@ from typing import ClassVar, Self, TypeAlias
 from boilercore.paths import ISOLIKE, dt_fromisolike
 from context_models import ContextStore
 from context_models.serializers import ContextWrapSerializer
-from context_models.types import Context, ContextPluginSettings, Data, PluginConfigDict
+from context_models.types import ContextPluginSettings, PluginConfigDict
 from context_models.validators import ContextAfterValidator
 from pydantic import (
     DirectoryPath,
@@ -24,10 +23,8 @@ from pydantic import (
 
 from boilercv_pipeline.models.contexts import (
     BOILERCV_PIPELINE,
-    DVC,
     BoilercvPipelineContext,
     BoilercvPipelineContexts,
-    DvcContext,
     Roots,
 )
 from boilercv_pipeline.models.contexts.types import (
@@ -56,7 +53,6 @@ def get_boilercv_pipeline_context(
     roots: Roots | None = None,
     kinds_from: BoilercvPipelineContextStore | None = None,
     track_kinds: bool = False,
-    sync_dvc: bool = False,
 ) -> BoilercvPipelineContexts:
     """Context for {mod}`~boilercv_pipeline`."""
     ctx_from: BoilercvPipelineContexts = getattr(
@@ -69,8 +65,7 @@ def get_boilercv_pipeline_context(
             roots=roots or Roots(),
             kinds=ctx_from[BOILERCV_PIPELINE].kinds,
             track_kinds=track_kinds,
-        ),
-        **({DVC: DvcContext()} if sync_dvc else {}),
+        )
     )
 
 
@@ -78,17 +73,13 @@ def get_boilercv_pipeline_config(
     roots: Roots | None = None,
     kinds_from: BoilercvPipelineContextStore | None = None,
     track_kinds: bool = False,
-    dvc: bool = False,
 ) -> BoilercvPipelineConfigDict:
     """Model config for {mod}`~boilercv_pipeline`."""
     return PluginConfigDict(
         validate_default=True,
         plugin_settings=ContextPluginSettings(
             context=get_boilercv_pipeline_context(
-                roots=roots,
-                kinds_from=kinds_from,
-                track_kinds=track_kinds,
-                sync_dvc=dvc,
+                roots=roots, kinds_from=kinds_from, track_kinds=track_kinds
             )
         ),
     )
@@ -101,23 +92,6 @@ class BoilercvPipelineContextStore(ContextStore):
     context: HiddenContext = BoilercvPipelineContexts(  # pyright: ignore[reportIncompatibleVariableOverride]
         boilercv_pipeline=BoilercvPipelineContext()
     )
-
-    @classmethod
-    def context_get(
-        cls,
-        data: Data,
-        context: Context | None = None,
-        context_base: Context | None = None,
-    ) -> Context:
-        """Get context from data."""
-        return BoilercvPipelineContexts({  # pyright: ignore[reportArgumentType]
-            k: (
-                {BOILERCV_PIPELINE: BoilercvPipelineContext}[k].model_validate(v)
-                if isinstance(v, Mapping)
-                else v
-            )
-            for k, v in super().context_get(data, context, context_base).items()
-        })
 
     @model_validator(mode="after")
     def unset_kinds(self) -> Self:

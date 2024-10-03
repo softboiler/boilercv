@@ -843,16 +843,16 @@ requires-dist = [
 
 [[package]]
 name = "cappa"
-version = "0.22.4"
+version = "0.22.5"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "rich" },
     { name = "typing-extensions" },
     { name = "typing-inspect" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/2c/98/b07f7c87a1194f90fc103e8b65e4ea19b3c036a91c9575d44a977f51d251/cappa-0.22.4.tar.gz", hash = "sha256:ee34c734592cc3bd7531ed3db4e18a0916b779f3649b5aebc921f60af4569c58", size = 49456 }
+sdist = { url = "https://files.pythonhosted.org/packages/a5/0d/c3e916d987980c81a72c40b0e8ca09ae732fcee4ff67ae8d17b405ae0652/cappa-0.22.5.tar.gz", hash = "sha256:959f43a6080f209b5b1a0fadecc8cd7eba5c8bcf38c95abaf099cc9c941fa0e0", size = 198927 }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/9d/d4/5ab39a4e84125615cde999c6b6b27dbddb640e5ca24db13fec0a059b8f2c/cappa-0.22.4-py3-none-any.whl", hash = "sha256:7e4379c84a60f8409ef223da4f362a98e4ee3818769e2fe71ba2f82b2e01aa12", size = 58460 },
+    { url = "https://files.pythonhosted.org/packages/26/81/04d4b5f50ad55601acb6f299aed321ffd915b7b9827d1844b9957997f9d4/cappa-0.22.5-py3-none-any.whl", hash = "sha256:8df14b4845c72d52e0aa30276e000761f5f7feb8598ea9e95f6a03d41ce10e01", size = 56719 },
 ]
 
 [[package]]

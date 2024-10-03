@@ -3,16 +3,13 @@
 from functools import partial
 from pathlib import Path
 from typing import Annotated as Ann
-from typing import Any, Generic, Self
+from typing import Generic
 
 from cappa.arg import Arg
-from context_models import CONTEXT
-from context_models.validators import ContextAfterValidator, context_model_validator
+from context_models.validators import ContextAfterValidator
 from pydantic import AfterValidator, BaseModel, Field, ValidationInfo
 
 from boilercv.data import FRAME
-from boilercv_pipeline.models.contexts import DVC
-from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
 from boilercv_pipeline.models.deps import DirSlicer, first_slicer, get_slicers
 from boilercv_pipeline.models.deps.types import Slicers
 from boilercv_pipeline.models.params import DataParams
@@ -28,6 +25,10 @@ from boilercv_pipeline.models.stage import DataStage, Deps
 from boilercv_pipeline.models.stage.types import DfsPlotsOuts_T
 from boilercv_pipeline.models.subcool.types import FilledDeps_T
 from boilercv_pipeline.parser import PairedArg
+from boilercv_pipeline.sync_dvc.validators import (
+    dvc_extend_with_timestamp_suffixed_plots,
+    dvc_set_only_sample,
+)
 
 
 class Constants(BaseModel):
@@ -70,53 +71,6 @@ class Constants(BaseModel):
 const = Constants()
 
 
-def dvc_validate_params(model, info: BoilercvPipelineValidationInfo) -> Any:
-    """Extend stage plots in `dvc.yaml`."""
-    if (
-        info.field_name != CONTEXT
-        and (dvc := info.context.get(DVC))
-        and dvc.plot_dir
-        and not dvc.stage.plots
-    ):
-        dvc.stage.plots.extend(
-            sorted((dvc.plot_dir / f"{name}.png").as_posix() for name in dvc.plot_names)
-        )
-        dvc.plot_dir = None
-        dvc.plot_names.clear()
-    return model
-
-
-def dvc_validate_only_sample(
-    only_sample: bool, info: BoilercvPipelineValidationInfo, sample_field: str
-) -> bool:
-    """Validate plots for `dvc.yaml` if `only_sample` is enabled."""
-    if (
-        info.field_name != CONTEXT
-        and (dvc := info.context.get(DVC))
-        and dvc.plot_dir
-        and only_sample
-    ):
-        dvc.plot_sample = info.data[sample_field]
-    return only_sample
-
-
-def dvc_validate_times(
-    times: list[str], info: BoilercvPipelineValidationInfo
-) -> list[str]:
-    """Validate plot timestamp suffixes for `dvc.yaml`."""
-    if info.field_name != CONTEXT and (dvc := info.context.get(DVC)) and dvc.plot_dir:
-        dvc.stage.plots.extend(
-            sorted(
-                (dvc.plot_dir / ("_".join([f"{name}", time]) + ".png")).as_posix()
-                for name in dvc.plot_names
-                for time in ([dvc.plot_sample] if dvc.plot_sample else times)
-            )
-        )
-        dvc.plot_dir = None
-        dvc.plot_names.clear()
-    return times
-
-
 def validate_time_suffixed_paths(
     paths: list[Path],
     info: ValidationInfo,
@@ -151,7 +105,7 @@ class SubcoolParams(
     only_sample: Ann[
         bool,
         PairedArg("only_sample"),
-        ContextAfterValidator(partial(dvc_validate_only_sample, sample_field="sample")),
+        ContextAfterValidator(partial(dvc_set_only_sample, sample_field="sample")),
     ] = False
     """Only process the sample."""
     include_patterns: Ann[
@@ -180,11 +134,6 @@ class FilledParams(
     Generic[FilledDeps_T, DfsPlotsOuts_T, Data_T],
 ):
     """Stage parameters for subcooled boiling study including filled video dataset."""
-
-    @context_model_validator(mode="after")
-    def _dvc_validate_params(self, info: BoilercvPipelineValidationInfo) -> Self:
-        """Extend stage plots in `dvc.yaml`."""
-        return dvc_validate_params(self, info)
 
     frame_count: int = 0
     """Count of frames."""
@@ -238,7 +187,7 @@ class FilledParams(
             lambda times, info: times
             or [get_time(path) for path in info.data["filled"]]
         ),
-        ContextAfterValidator(dvc_validate_times),
+        ContextAfterValidator(dvc_extend_with_timestamp_suffixed_plots),
     ] = Field(default_factory=list)
     dfs: list[Path]
     """Paths to data frame stage outputs."""

@@ -390,7 +390,7 @@ convention = "numpy"
   "S603", # Allow shell expressions here
   "S607", # Allow shell expressions here
 ]
-"packages/pipeline/boilercv_pipeline/models/dvc.py" = [
+"packages/pipeline/boilercv_pipeline/sync_dvc/dvc.py" = [
   "D1", # Don't require docstrings
 ]
 "packages/pipeline/boilercv_pipeline/models/generated/types/**/*.py" = [

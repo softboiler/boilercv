@@ -19,9 +19,6 @@ BoilercvPipelineValidationInfo: TypeAlias = ContextValidationInfo[
 BoilercvPipelineSerializationInfo: TypeAlias = ContextSerializationInfo[
     "BoilercvPipelineContexts"
 ]
-BoilercvPipelineFieldSerializationInfo: TypeAlias = ContextSerializationInfo[
-    "BoilercvPipelineContexts"
-]
 Kind: TypeAlias = Literal["DataDir", "DataFile", "DocsDir", "DocsFile"]
 """File or directory kind."""
 Kinds: TypeAlias = dict[Path, Kind]

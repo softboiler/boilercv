@@ -2,23 +2,14 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
-from datetime import datetime
-from itertools import chain
 from pathlib import Path
 from typing import Any, Self
 
-from cappa.arg import Arg
-from context_models import CONTEXT
 from context_models.validators import context_field_validator, context_model_validator
-from more_itertools import first
 from pydantic import BaseModel
 from pydantic.functional_validators import ModelWrapValidatorHandler
 
-import boilercv_pipeline
-from boilercv_pipeline.models import dvc
-from boilercv_pipeline.models import dvc as _dvc
-from boilercv_pipeline.models.contexts import DVC, ROOTED
+from boilercv_pipeline.models.contexts import ROOTED
 from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
 from boilercv_pipeline.models.path import (
     BoilercvPipelineContextStore,
@@ -26,22 +17,11 @@ from boilercv_pipeline.models.path import (
     get_boilercv_pipeline_config,
 )
 from boilercv_pipeline.models.paths import paths
-
-
-class Constants(BaseModel):
-    """Constants."""
-
-    dvc_out_config: dvc.OutFlags = dvc.OutFlags(persist=True)
-    """Default `dvc.yaml` configuration for `outs`."""
-    skip_cloud: list[str] = ["data/cines", "data/large_sources"]
-    """These paths are too large and unwieldy to cache or push to cloud storage."""
-    dvc_out_skip_cloud_config: dvc.OutFlags = dvc.OutFlags(
-        cache=False, persist=True, push=False
-    )
-    """Default `dvc.yaml` configuration for `outs` that skip the cloud."""
-
-
-const = Constants()
+from boilercv_pipeline.sync_dvc.validators import (
+    dvc_add_param,
+    dvc_prepare_stage,
+    dvc_set_stage_path,
+)
 
 
 class Stage(BoilercvPipelineContextStore):
@@ -57,75 +37,14 @@ class Stage(BoilercvPipelineContextStore):
         handler: ModelWrapValidatorHandler[Self],
         info: BoilercvPipelineValidationInfo,
     ) -> Self:
-        """Validate param for `dvc.yaml`."""
-        if not (dvc := info.context.get(DVC)):
-            return handler(data)
-        name = cls.__module__.split(".")[-1]
-        if dvc.model.stages.get(name):
-            return handler(data)
-        dvc.stage = _dvc.Stage(cmd="")
-        dvc.model.stages[name] = dvc.stage
-        sep = " "
-        dvc.stage.cmd = sep.join([
-            f"./Invoke-Uv.ps1 {boilercv_pipeline.__name__.replace('_', '-')}",
-            f"stage {name.replace('_', '-')}",
-        ])
-        self = handler(data)
-        dvc.stage.cmd = f'pwsh -Command "{dvc.stage.cmd}"'
-        return self
+        """Prepare a pipeline stage for `dvc.yaml`."""
+        return dvc_prepare_stage(data, handler, info, model=cls)
 
     @context_field_validator("*", mode="after")
     @classmethod
     def dvc_add_param(cls, value: Any, info: BoilercvPipelineValidationInfo) -> Any:
-        # sourcery skip: low-code-quality
-        """Add param to `dvc.yaml`."""
-        if (
-            (dvc := info.context.get(DVC))
-            and not first(
-                (
-                    m
-                    for m in cls.model_fields[info.field_name].metadata
-                    if isinstance(m, Arg)
-                ),
-                default=Arg,
-            ).hidden
-            and (info.field_name not in dvc.stage.params)
-        ) and isinstance(value, Sequence | bool | int | float | complex | datetime):
-            sep = " "
-            name = info.field_name
-            arg = name.replace("_", "-")
-            if not dvc.params.get(name):
-                if isinstance(value, bool):
-                    dvc.params[name] = f"--{arg}" if value else f"--no-{arg}"
-                elif not isinstance(value, str) and isinstance(value, Sequence):
-                    values = []
-                    for v in value:
-                        if isinstance(v, Path):
-                            v = v.as_posix()
-                        elif not isinstance(v, bool | int | float | complex | datetime):
-                            return value
-                        values.append(v)
-                    dvc.params[name] = sep.join(
-                        chain.from_iterable((arg, v) for v in values)
-                    )
-                else:
-                    dvc.params[name] = value
-            if isinstance(value, bool) or (
-                not isinstance(value, str) and isinstance(value, Sequence)
-            ):
-                args = [f"${{{name}}}"]
-            else:
-                args = [f"--{arg}", f"${{{name}}}"]
-            dvc.stage.cmd = sep.join([
-                *(
-                    dvc.stage.cmd
-                    if isinstance(dvc.stage.cmd, list)
-                    else dvc.stage.cmd.split(sep)
-                ),
-                *args,
-            ])
-            dvc.stage.params.append(name)
-        return value
+        """Add param to global parameters and stage command for `dvc.yaml`."""
+        return dvc_add_param(value, info, fields=cls.model_fields)
 
 
 class StagePaths(BoilercvPipelineContextStore):
@@ -135,25 +54,13 @@ class StagePaths(BoilercvPipelineContextStore):
 
     @context_field_validator("*", mode="after")
     @classmethod
-    def dvc_validate_out(cls, path: Path, info: BoilercvPipelineValidationInfo) -> Path:
-        """Serialize path for `dvc.yaml`."""
-        if info.field_name != CONTEXT and (dvc := info.context.get(DVC)):
-            path = Path(path).resolve().relative_to(Path.cwd())
-            if info.field_name == "plots":
-                dvc.plot_dir = path
-                return path
-            p = path.as_posix()
-            kind = "deps" if issubclass(cls, Deps) else "outs"
-            getattr(dvc.stage, kind).append(
-                p
-                if kind == "deps"
-                else (
-                    {p: const.dvc_out_skip_cloud_config}
-                    if p in const.skip_cloud
-                    else {p: const.dvc_out_config}
-                )
-            )
-        return path
+    def dvc_set_stage_path(
+        cls, path: Path, info: BoilercvPipelineValidationInfo
+    ) -> Path:
+        """Set stage path as a stage dep, plot, or out for `dvc.yaml`."""
+        return dvc_set_stage_path(
+            path, info, kind="deps" if issubclass(cls, Deps) else "outs"
+        )
 
 
 class Deps(StagePaths):

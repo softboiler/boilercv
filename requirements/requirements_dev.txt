@@ -36,7 +36,7 @@ blosc2==2.7.1
 bokeh==3.5.2
 bottleneck==1.4.0
 cachetools==5.5.0
-cappa==0.22.4
+cappa==0.22.5
 celery==5.4.0
 certifi==2024.8.30
 cffi==1.17.1

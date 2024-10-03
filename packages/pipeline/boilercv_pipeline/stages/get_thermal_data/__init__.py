@@ -102,5 +102,5 @@ class GetThermalData(SubcoolParams[Deps, Outs, Data]):
     """Columns."""
     fit: Fit = Field(default_factory=Fit, exclude=True)
     """Model fit."""
-    load_src_from_outs: Ann[bool, PairedArg("load_src_from_outs")] = True
+    load_src_from_outs: Ann[bool, PairedArg("load_src_from_outs")] = False
     """Load source columns from outputs."""

@@ -7,7 +7,6 @@ from contextlib import contextmanager
 from typing import Generic, Self
 
 import matplotlib
-from context_models import CONTEXT
 from context_models.validators import context_model_validator
 from IPython.display import Markdown, display
 from matplotlib.axes import Axes
@@ -18,7 +17,6 @@ from seaborn import move_legend, set_theme
 
 from boilercv_pipeline.models.column import Col
 from boilercv_pipeline.models.column.types import Ps
-from boilercv_pipeline.models.contexts import DVC
 from boilercv_pipeline.models.contexts.types import BoilercvPipelineValidationInfo
 from boilercv_pipeline.models.params.types import (
     Data_T,
@@ -29,6 +27,7 @@ from boilercv_pipeline.models.params.types import (
 )
 from boilercv_pipeline.models.path import get_boilercv_pipeline_config
 from boilercv_pipeline.models.stage import Stage
+from boilercv_pipeline.sync_dvc.validators import dvc_extend_with_named_plots_if_missing
 
 
 class Constants(BaseModel):
@@ -238,22 +237,9 @@ class DataParams(Params[Deps_T, Outs_T], Generic[Deps_T, Outs_T, Data_T]):
     model_config = get_boilercv_pipeline_config()
 
     @context_model_validator(mode="after")
-    def dvc_validate_data(self, info: BoilercvPipelineValidationInfo) -> Self:
-        """Extend stage plots in `dvc.yaml`."""
-        if (
-            info.field_name != CONTEXT
-            and (dvc := info.context.get(DVC))
-            and dvc.plot_dir
-            and not dvc.stage.plots
-        ):
-            dvc.stage.plots.extend(
-                sorted(
-                    (dvc.plot_dir / f"{name}.png").as_posix() for name in dvc.plot_names
-                )
-            )
-            dvc.plot_dir = None
-            dvc.plot_names.clear()
-        return self
+    def dvc_validate_params(self, info: BoilercvPipelineValidationInfo) -> Self:
+        """Extend stage plots for `dvc.yaml` with named plots if plots haven't been set."""
+        return dvc_extend_with_named_plots_if_missing(self, info)
 
     data: Data_T
     """Stage data."""

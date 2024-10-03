@@ -1,2 +1,2 @@
 defaults:
-  - stage: "defaults.yaml"
+  - stage: "_defaults.yaml"
