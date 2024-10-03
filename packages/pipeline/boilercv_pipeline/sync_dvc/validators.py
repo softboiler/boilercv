@@ -15,6 +15,7 @@ from pydantic.fields import FieldInfo
 from pydantic.functional_validators import ModelWrapValidatorHandler
 
 import boilercv_pipeline
+from boilercv_pipeline import sync_dvc
 from boilercv_pipeline.sync_dvc.contexts import DVC
 from boilercv_pipeline.sync_dvc.dvc import OutFlags, Stage
 from boilercv_pipeline.sync_dvc.types import DvcValidationInfo, Model
@@ -23,7 +24,7 @@ from boilercv_pipeline.sync_dvc.types import DvcValidationInfo, Model
 class Constants(BaseModel):
     """Constants."""
 
-    table_key: str = "stage"
+    table_key: str = sync_dvc.const.table_key
     """Key for the global parameters table."""
     out_config: OutFlags = OutFlags(persist=True)
     """Default `dvc.yaml` configuration for `outs`."""

@@ -4,7 +4,7 @@ from collections.abc import Sized
 from importlib import import_module
 from inspect import getmembers, ismodule
 from types import NoneType
-from typing import get_args
+from typing import Any, get_args
 
 from cappa.base import invoke
 from context_models import CONTEXT, PLUGIN_SETTINGS, ContextStore
@@ -14,7 +14,7 @@ from pydantic import create_model
 from pydantic.alias_generators import to_pascal
 from yaml import safe_dump, safe_load
 
-from boilercv_pipeline.sync_dvc import SyncDvc
+from boilercv_pipeline.sync_dvc import SyncDvc, const
 from boilercv_pipeline.sync_dvc.contexts import DVC, DvcContext, DvcContexts
 from boilercv_pipeline.sync_dvc.dvc import DvcYamlModel, Stage
 from boilercv_pipeline.sync_dvc.types import Model
@@ -62,7 +62,7 @@ def main(params: SyncDvc):
     run("pre-commit run --all-files prettier", check=False, capture_output=True)
 
 
-def get_dvc_context(params, stages: str) -> DvcContext:
+def get_dvc_context(params: dict[str, Any], stages: str) -> DvcContext:
     """Get DVC context for pipeline model and stages."""
     stage_models = {
         k: dict(getmembers(v))[to_pascal(k)]
@@ -85,7 +85,7 @@ def get_dvc_context(params, stages: str) -> DvcContext:
         **{
             field: {
                 k: (("--no" not in v) if isinstance(v, str) and "--" in v else v)
-                for k, v in params.items()
+                for k, v in params[const.table_key].items()
                 if k in stage.model_fields
             }
             for field, stage in stage_models.items()

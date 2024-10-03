@@ -6,6 +6,16 @@ from cappa.base import command
 from pydantic import BaseModel, Field
 
 
+class Constants(BaseModel):
+    """Constants."""
+
+    table_key: str = "stage"
+    """Key for the global parameters table."""
+
+
+const = Constants()
+
+
 @command(default_long=True, invoke="boilercv_pipeline.sync_dvc.__main__.main")
 class SyncDvc(BaseModel):
     """Sync `dvc.yaml` and `params.yaml` with pipeline specification."""
