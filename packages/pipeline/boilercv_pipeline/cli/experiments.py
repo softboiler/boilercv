@@ -10,6 +10,9 @@ from pydantic import BaseModel
 
 from boilercv_pipeline.sync_dvc import SyncDvc
 
+# TODO: Implement sweeps
+# dvc.utils.hydra.get_hydra_sweeps({"params.yaml": {"stage.scale=choice(1.0, 1.3)"}})
+
 
 class Forceable(BaseModel):
     """Forceable model."""
