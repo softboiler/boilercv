@@ -230,7 +230,7 @@ myst_enable_extensions = [
 ]
 myst_heading_anchors = 6
 myst_substitutions = {
-    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{const.ans.user}/{project}/{const.rev}?labpath=docs%2Fexperiments%2Fe230920_subcool%2Fplot_tracks.ipynb)"
+    "binder": f"[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/{const.ans.user}/{project}/{const.rev}?labpath=docs%2Fnotebooks%2Ffind_objects.ipynb)"
 }
 # * MARK:  BibTeX
 bibtex_bibfiles = dpaths(const.bib_template, const.bib)
