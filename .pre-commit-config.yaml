@@ -96,19 +96,19 @@ repos:
             docs/.*\.ipynb
           )$
   - repo: "https://github.com/pre-commit/pre-commit-hooks"
-    rev: "v4.6.0"
+    rev: "v5.0.0"
     hooks:
       - id: "end-of-file-fixer"
       - id: "trailing-whitespace"
   - repo: "https://github.com/iterative/dvc"
-    rev: "3.51.2"
+    rev: "3.55.2"
     hooks:
       - id: "dvc-post-checkout"
         additional_dependencies: ["dvc[gs]"]
       - id: "dvc-pre-push"
         additional_dependencies: ["dvc[gs]"]
   - repo: "https://github.com/DavidAnson/markdownlint-cli2"
-    rev: "v0.13.0"
+    rev: "v0.14.0"
     hooks:
       - id: "markdownlint-cli2"
   - repo: "https://github.com/srstevenson/nb-clean"
