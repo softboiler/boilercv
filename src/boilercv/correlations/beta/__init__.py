@@ -133,7 +133,7 @@ def kalman_mori_2002(
 def yuan_et_al_2009(
     bubble_fourier, bubble_initial_reynolds, liquid_prandtl, bubble_jakob
 ):
-    """Bubble history correlation for condensation of a stagnant bubble {cite}`yuandewenCondensationHeatTransfer2009,tangReviewDirectContact2022`."""
+    """Bubble history correlation for condensation of a stagnant bubble {cite}`yuanCondensationHeatTransfer2009,tangReviewDirectContact2022`."""
     return (
         1
         - 1.8

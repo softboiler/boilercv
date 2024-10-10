@@ -17,12 +17,12 @@ $$ (eq_beta_florschuetz_chao_1965)
 ### Isenberg and Sideman (1970) {cite}`isenbergDirectContactHeat1970,tangReviewDirectContact2022`
 
 $$
-\Nu_c = \left(1/\sqrt{\pi}\right) \Re_b^{1/2} Pr^{1/3}
+\Nu_c = \left(1/\sqrt{\pi}\right) \Re_b^{1/2} \Pr^{1/3}
 $$ (eq_nusselt_isenberg_sideman_1970)
 
 $$
 \beta =
-\left( 1 - \left( 3/\sqrt{\pi} \right) \Re_\bo^{1/2} \Pr^{1/3} Ja \Fo_\o \right) ^ {2/3}
+\left( 1 - \left( 3/\sqrt{\pi} \right) \Re_\bo^{1/2} \Pr^{1/3} \Ja \Fo_\o \right) ^ {2/3}
 
 $$ (eq_beta_isenberg_sideman_1970)
 
@@ -148,7 +148,7 @@ $$
 20 < \Re_b < 700 ,\ 12 < \Ja < 100 ,\ 1.8 < \Pr < 2.9
 $$ (eq_range_warrier_et_al_2002)
 
-### Yuan et al. (2009) {cite}`yuandewenCondensationHeatTransfer2009,tangReviewDirectContact2022`
+### Yuan et al. (2009) {cite}`yuanCondensationHeatTransfer2009,tangReviewDirectContact2022`
 
 $$
 \Nu_c = 0.6 \Re_b^{1/2} \Pr^{1/3} (1 - \Ja^{0.1} \Fo_\o )
