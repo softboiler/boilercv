@@ -8,10 +8,10 @@ from boilercv.images import cv, scale_bool
 from boilercv.images.cv import apply_mask, close_and_erode, flood
 from boilercv.types import DA
 from boilercv_pipeline.parser import invoke
-from boilercv_pipeline.stages.binarize import Binarize
+from boilercv_pipeline.stages.binarize import Binarize as Params
 
 
-def main(params: Binarize):
+def main(params: Params):
     logger.info("start binarize")
     for source in tqdm(sorted(params.deps.large_sources.iterdir())):
         destination = params.outs.sources / source.name
@@ -35,4 +35,4 @@ def main(params: Binarize):
 
 
 if __name__ == "__main__":
-    invoke(Binarize)
+    invoke(Params)

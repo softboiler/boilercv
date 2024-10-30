@@ -21,6 +21,8 @@ stages:
           cache: false
           persist: true
           push: false
+      - data/headers:
+          persist: true
     params:
       - stage
   fill:

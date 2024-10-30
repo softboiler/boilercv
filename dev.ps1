@@ -41,7 +41,7 @@ function Install-Uv {
     Param([switch]$Update)
     $Env:PATH = "$HOME/.cargo/bin$([System.IO.Path]::PathSeparator)$Env:PATH"
     if ($Update) {
-        if ((Get-Command 'uv' -ErrorAction 'Ignore') -and $Update) {
+        if (Get-Command 'uv' -ErrorAction 'Ignore') {
             try { return uv self update }
             catch [System.Management.Automation.NativeCommandExitException] {}
         }
@@ -74,14 +74,16 @@ function Invoke-Uv {
         [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
     )
     Begin {
+        if (!$CI) {
+            # ? Install or update `uv`
+            if ($Update -or !(Get-Command 'uv' -ErrorAction 'Ignore')) { Install-Uv -Update }
+            else { Install-Uv }
+            # ? Sync submodules
+            Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 |
+                Remove-Item
+            git submodule update --init --merge
+        }
         if ($CI -or $Sync) {
-            if (!$CI) {
-                Install-Uv -Update:$Update
-                # ? Sync submodules
-                Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 |
-                    Remove-Item
-                git submodule update --init --merge
-            }
             # ? Sync the environment
             if (!(Test-Path 'requirements')) {
                 New-Item 'requirements' -ItemType 'Directory'

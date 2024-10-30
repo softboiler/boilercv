@@ -4,14 +4,15 @@ from pathlib import Path
 from re import match
 
 from loguru import logger
+from tomlkit import dumps
 from tqdm import tqdm
 
 from boilercv_pipeline.images import prepare_dataset
 from boilercv_pipeline.parser import invoke
-from boilercv_pipeline.stages.convert import Convert
+from boilercv_pipeline.stages.convert import Convert as Params
 
 
-def main(params: Convert):
+def main(params: Params):
     logger.info("start convert")
     for source in tqdm(sorted(params.deps.cines.iterdir())):
         if dt := get_datetime_from_cine(source):
@@ -25,8 +26,11 @@ def main(params: Convert):
         for pattern, crop in {}.items():  # TODO: Reimplement crop property
             if match(pattern, source.stem):
                 matched_crop = crop
-        dataset = prepare_dataset(source, crop=matched_crop)
+        header, dataset = prepare_dataset(source, crop=matched_crop)
         dataset.to_netcdf(path=destination)
+        Path(params.outs.headers / source.name).write_text(
+            encoding="utf-8", data=dumps(header.model_dump(mode="json"))
+        )
     logger.info("finish convert")
 
 
@@ -38,4 +42,4 @@ def get_datetime_from_cine(path: Path) -> datetime | None:
 
 
 if __name__ == "__main__":
-    invoke(Convert)
+    invoke(Params)

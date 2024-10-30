@@ -11,11 +11,9 @@ from matplotlib.axes import Axes
 from matplotlib.pyplot import subplots
 from numpy import where
 from scipy.spatial.distance import euclidean
-from xarray import DataArray
 
 from boilercv.data import (
     FRAME,
-    HEADER,
     LENGTH,
     SAMPLE_DIAMETER_UM,
     TIME,
@@ -31,6 +29,7 @@ from boilercv.data.models import Dimension
 from boilercv.images import scale_bool
 from boilercv.images.cv import Op, Transform, transform
 from boilercv.types import DA, DS, ArrInt, Img
+from boilercv_pipeline.models.header import CineHeader
 from boilercv_pipeline.types import Slicer2D
 
 
@@ -39,13 +38,13 @@ def prepare_dataset(
     num_frames: int | None = None,
     start_frame: int = 0,
     crop: Slicer2D | None = None,
-) -> DS:
+) -> tuple[CineHeader, DS]:
     """Prepare a dataset from a CINE."""
     # Header
     header, utc_arr = get_cine_attributes(
         cine_source, TIMEZONE, num_frames, start_frame
     )
-    header_da = DataArray(name=HEADER, attrs=asdict(header))
+    header = CineHeader(**asdict(header))
 
     # Dimensions
     frame_dim = Dimension(dim=FRAME, long_name="Frame number")
@@ -78,8 +77,9 @@ def prepare_dataset(
         if crop
         else list(images),
     )
-    ds[header_da.name] = header_da
-    return ds
+
+    # Return header and dataset
+    return header, ds
 
 
 # * -------------------------------------------------------------------------------- * #

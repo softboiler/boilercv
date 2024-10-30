@@ -48,12 +48,12 @@ LiteralKeys: TypeAlias = _LiteralGenericAlias
 Stage: TypeAlias = Literal["large_sources", "sources", "filled"]
 """Stage."""
 # ? `numpy` array shapes
-AnyShape: TypeAlias = Shape["*"]  # noqa: F722
-"""Any shape."""
-Vector: TypeAlias = Shape["*"]  # noqa: F722
+VectorShape: TypeAlias = Shape["*"]  # noqa: F722  # pyright: ignore[reportInvalidTypeArguments]
 """Vector shape."""
+Vector: TypeAlias = NDArray[VectorShape, int | float]  # pyright: ignore[reportInvalidTypeArguments]
+"""Vector."""
 # ? Equations
-Expectation: TypeAlias = float | NDArray[Vector, float]  # pyright: ignore[reportInvalidTypeArguments]
+Expectation: TypeAlias = int | float | Vector
 """Expectation."""
 
 # * MARK: Type variables

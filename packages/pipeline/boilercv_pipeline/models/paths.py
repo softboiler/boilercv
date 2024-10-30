@@ -40,6 +40,7 @@ class Paths(BoilercvPipelineContextStore):
     modelfunctions: DataDir = Path("models")
 
     # * DVC-tracked inputs
+    headers: DataDir = Path("headers")
     notebooks: dict[str | StageName, DocsFile] = {  # noqa: RUF012
         stage_name: Path("notebooks") / f"{stage_name}.ipynb"
         for stage_name in get_args(StageName)
