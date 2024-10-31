@@ -43,20 +43,28 @@ stages:
       nfiles: 337
     - path: data/sources
       hash: md5
-      md5: c2ba0be71deda61b9c6beca3aa7725c3.dir
-      size: 7512414707
+      md5: 3e979d24a00d1a10bbc6123e12cfe4e4.dir
+      size: 7444398568
       nfiles: 336
     - path: packages/pipeline/boilercv_pipeline/stages/preview_binarized
       hash: md5
-      md5: bf8616c0294ceaf7081defe8347ffb7b.dir
-      size: 2201
+      md5: bb9d27c1e81ba17e9ca088079fbd750f.dir
+      size: 2137
       nfiles: 2
     params:
       params.yaml:
-        display_rows: 12
-        marker_scale: 20.0
-        precision: 3
-        scale: 1.3
+        stage:
+          compare_with_trackpy: --no-compare-with-trackpy
+          display_rows: 12
+          frame_count: 0
+          frame_step: 1
+          guess_diameter: 21
+          load_src_from_outs: --no-load-src-from-outs
+          marker_scale: 20.0
+          only_sample: --no-only-sample
+          precision: 3
+          sample: 2024-07-18T17-44-35
+          scale: 1.3
     outs:
     - path: data/previews/binarized_preview.nc
       hash: md5
@@ -93,8 +101,8 @@ stages:
       nfiles: 337
     - path: data/sources
       hash: md5
-      md5: c2ba0be71deda61b9c6beca3aa7725c3.dir
-      size: 7512414707
+      md5: 3e979d24a00d1a10bbc6123e12cfe4e4.dir
+      size: 7444398568
       nfiles: 336
     - path: packages/pipeline/boilercv_pipeline/stages/fill
       hash: md5
@@ -266,8 +274,8 @@ stages:
       nfiles: 337
     - path: data/sources
       hash: md5
-      md5: c2ba0be71deda61b9c6beca3aa7725c3.dir
-      size: 7512414707
+      md5: 3e979d24a00d1a10bbc6123e12cfe4e4.dir
+      size: 7444398568
       nfiles: 336
     - path: packages/pipeline/boilercv_pipeline/stages/find_contours
       hash: md5
@@ -310,15 +318,23 @@ stages:
       nfiles: 337
     - path: packages/pipeline/boilercv_pipeline/stages/preview_filled
       hash: md5
-      md5: a8d3eea1c40332bfc0e3a940a0afb35f.dir
-      size: 2105
+      md5: d173f961dc88ece9efb8948a76fdbeba.dir
+      size: 2042
       nfiles: 2
     params:
       params.yaml:
-        display_rows: 12
-        marker_scale: 20.0
-        precision: 3
-        scale: 1.3
+        stage:
+          compare_with_trackpy: --no-compare-with-trackpy
+          display_rows: 12
+          frame_count: 0
+          frame_step: 1
+          guess_diameter: 21
+          load_src_from_outs: --no-load-src-from-outs
+          marker_scale: 20.0
+          only_sample: --no-only-sample
+          precision: 3
+          sample: 2024-07-18T17-44-35
+          scale: 1.3
     outs:
     - path: data/previews/filled_preview.nc
       hash: md5
@@ -335,15 +351,23 @@ stages:
       nfiles: 17
     - path: packages/pipeline/boilercv_pipeline/stages/preview_gray
       hash: md5
-      md5: 67638cee89d7a023ecafe53d50cad10c.dir
-      size: 1913
+      md5: c70b2b2b46d6359bc6374767eb85d61a.dir
+      size: 1856
       nfiles: 2
     params:
       params.yaml:
-        display_rows: 12
-        marker_scale: 20.0
-        precision: 3
-        scale: 1.3
+        stage:
+          compare_with_trackpy: --no-compare-with-trackpy
+          display_rows: 12
+          frame_count: 0
+          frame_step: 1
+          guess_diameter: 21
+          load_src_from_outs: --no-load-src-from-outs
+          marker_scale: 20.0
+          only_sample: --no-only-sample
+          precision: 3
+          sample: 2024-07-18T17-44-35
+          scale: 1.3
     outs:
     - path: data/previews/gray_preview.nc
       hash: md5
@@ -374,8 +398,8 @@ stages:
     deps:
     - path: data/e230920/objects
       hash: md5
-      md5: 2c43c3dbaa45407e67dfec30a3f2e8f2.dir
-      size: 92853221
+      md5: 65122fbd719dcbc2e5276988fb4e6e18.dir
+      size: 92859509
       nfiles: 16
     - path: data/e230920/thermal.h5
       hash: md5
@@ -388,8 +412,8 @@ stages:
       nfiles: 337
     - path: docs/notebooks/find_tracks.ipynb
       hash: md5
-      md5: a085e9d98e45347fa56b3cfd1f05f2fe
-      size: 32727
+      md5: 2b230ad00254833a56150d5beb3ba30c
+      size: 31887
     - path: packages/pipeline/boilercv_pipeline/stages/find_tracks
       hash: md5
       md5: a9e78f1299ce20dba7779fba0b4bd81f.dir
@@ -412,8 +436,8 @@ stages:
     outs:
     - path: data/e230920/tracks
       hash: md5
-      md5: 28c0e1faeb6199ad6d7f748f4bbb28a8.dir
-      size: 1145891900
+      md5: a9dfcbb5596616c99e57168f736677c1.dir
+      size: 1155351802
       nfiles: 16
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-07-13.png
       hash: md5
@@ -441,12 +465,12 @@ stages:
       size: 446821
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-44-35.png
       hash: md5
-      md5: a6047124819fcff893f08eeeefa69ab9
-      size: 475241
+      md5: 2575442816cd34d20dfc233f61db1bc9
+      size: 475200
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-50-30.png
       hash: md5
-      md5: c6f0748fddd781f7c481687f9f235014
-      size: 488371
+      md5: 4ee5645a5d80042cd3a10529f9ca0845
+      size: 488088
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-04-05.png
       hash: md5
       md5: f47473793e914908fad6ae3b6d61f68e
@@ -505,12 +529,12 @@ stages:
       size: 176845
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-44-35.png
       hash: md5
-      md5: c14bb99d8b75c1a69a00c1d3b7a90be2
-      size: 174701
+      md5: d21693bda06bcb70667bfcb4adeb2427
+      size: 174706
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-50-30.png
       hash: md5
-      md5: 791a56b76b70ef4620fe21a32ed17cd5
-      size: 187987
+      md5: c1eac5ff23f4bfa9cce3a332eef2babe
+      size: 187905
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-04-05.png
       hash: md5
       md5: 44daee088a34f1118328b288b55998ec
@@ -569,12 +593,12 @@ stages:
       size: 163512
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-44-35.png
       hash: md5
-      md5: 301fba6c8d3ad2060c13237a486ddacf
-      size: 166134
+      md5: 36631b38b7aa7e405498004e089db5f6
+      size: 166122
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-50-30.png
       hash: md5
-      md5: cc38e82087fb9349f5eb2d51d1d6b891
-      size: 161200
+      md5: d1779d55e8a7118ccef69b1b5f2a9cf2
+      size: 161359
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-04-05.png
       hash: md5
       md5: 5b11ff72d04afb0100f8dd85c6a93e92
@@ -633,12 +657,12 @@ stages:
       size: 158218
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-44-35.png
       hash: md5
-      md5: 295bdbd20868b48f148752a5d5fcea4c
-      size: 183088
+      md5: 89e2bcb4fcd330e14223fd7b3eb04b6f
+      size: 183027
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-50-30.png
       hash: md5
-      md5: 3f7f08b639776a7dc905c3a8e85abb40
-      size: 193706
+      md5: cd04030595a289f407c9b5aaf9506a35
+      size: 193734
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-04-05.png
       hash: md5
       md5: 86e311064ac481661473920977fe659f
@@ -697,12 +721,12 @@ stages:
       size: 290977
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-44-35.png
       hash: md5
-      md5: 99b1e23aa99dda3f2653e3079ba39af3
-      size: 298315
+      md5: 8bc44ae10b4467ce6374e6dc4048668d
+      size: 298203
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-50-30.png
       hash: md5
-      md5: c84ad3afff229d985216317ac198d272
-      size: 325927
+      md5: 73812f008860fb468ce636a2dd4aa29e
+      size: 326470
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-04-05.png
       hash: md5
       md5: 50ea1982e7ac0aeeb9d865f506f6d3f0
@@ -761,12 +785,12 @@ stages:
       size: 177725
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-44-35.png
       hash: md5
-      md5: a5fcfa166964f06eafa0cec9ee203d59
-      size: 189128
+      md5: c27acd2c3810f5642ae55f3d8128282a
+      size: 189101
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-50-30.png
       hash: md5
-      md5: 1dead794a564e917bcb5e179c5e9553d
-      size: 193561
+      md5: 643283e4dbe0b56423ead0627c888a57
+      size: 193518
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-04-05.png
       hash: md5
       md5: c061e76d97d9cd97427602a5ebd1aaea
@@ -870,8 +894,8 @@ stages:
       nfiles: 17
     - path: packages/pipeline/boilercv_pipeline/stages/binarize
       hash: md5
-      md5: fba47d289e69db10dbaf0658a094ad4e.dir
-      size: 2336
+      md5: 009a7cc151eb77769c4b80f83e1edf9a.dir
+      size: 2342
       nfiles: 2
     params:
       params.yaml:
@@ -895,8 +919,8 @@ stages:
       nfiles: 337
     - path: data/sources
       hash: md5
-      md5: c2ba0be71deda61b9c6beca3aa7725c3.dir
-      size: 7512414707
+      md5: 3e979d24a00d1a10bbc6123e12cfe4e4.dir
+      size: 7444398568
       nfiles: 336
   convert:
     cmd: pwsh -Command "./Invoke-Uv.ps1 boilercv-pipeline stage convert --scale 1.3
@@ -909,8 +933,8 @@ stages:
       nfiles: 16
     - path: packages/pipeline/boilercv_pipeline/stages/convert
       hash: md5
-      md5: 3d6ee1c1ec0747411eb0998581d44b61.dir
-      size: 2200
+      md5: 61d7e10c10cfb086a0ca748ec665f310.dir
+      size: 2447
       nfiles: 2
     params:
       params.yaml:
@@ -927,6 +951,11 @@ stages:
           sample: 2024-07-18T17-44-35
           scale: 1.3
     outs:
+    - path: data/headers
+      hash: md5
+      md5: f1de24e095c017140acb57f141cb45ce.dir
+      size: 1265736
+      nfiles: 336
     - path: data/large_sources
       hash: md5
       md5: 658d0528ed596161c3a269f67587f41f.dir
@@ -1220,8 +1249,8 @@ stages:
       nfiles: 337
     - path: docs/notebooks/find_objects.ipynb
       hash: md5
-      md5: 7b283a0bd46ec277bf66179ec0c3ab4e
-      size: 12620
+      md5: f791fb3393adc63b854cee4656050af9
+      size: 12241
     - path: packages/pipeline/boilercv_pipeline/stages/find_objects
       hash: md5
       md5: ed0b89cee8cc94d872a1d15872f035eb.dir
@@ -1244,8 +1273,8 @@ stages:
     outs:
     - path: data/e230920/objects
       hash: md5
-      md5: 2c43c3dbaa45407e67dfec30a3f2e8f2.dir
-      size: 92853221
+      md5: 65122fbd719dcbc2e5276988fb4e6e18.dir
+      size: 92859509
       nfiles: 16
     - path: data/e230920/objects_plots/composite_2024-07-18T17-07-13.png
       hash: md5

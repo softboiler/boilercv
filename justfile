@@ -7,19 +7,12 @@ devpy := 'dev'
 dev:
   . ./dev.ps1
 
-_env-boilercv-debug:
-  $Env:BOILERCV_DEBUG = $True
-_env-boilercv-preview:
-  $Env:BOILERCV_PREVIEW = $True
-_env-boilercv-write:
-  $Env:BOILERCV_WRITE = $True
-
-boilercv-preview-write file: _env-boilercv-preview _env-boilercv-write
+boilercv-preview-write file $BOILERCV_PREVIEW='true' $BOILERCV_WRITE='true':
   iuv python {{file}}
-boilercv-debug-preview-write file: _env-boilercv-debug _env-boilercv-preview _env-boilercv-write
+boilercv-debug-preview-write file $BOILERCV_DEBUG='true' $BOILERCV_PREVIEW='true' $BOILERCV_WRITE='true':
   iuv python {{file}}
-boilercv-preview preview: _env-boilercv-preview
-  iuv -m {{pipeline}}.previews.{{preview}}
+boilercv-preview preview $BOILERCV_PREVIEW='true':
+  python -m {{pipeline}}.previews.{{preview}}
 
 update-binder:
   (uv pip compile --config-file requirements/binder_uv.toml \

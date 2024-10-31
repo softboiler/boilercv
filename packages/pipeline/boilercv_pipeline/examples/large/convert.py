@@ -7,7 +7,7 @@ from boilercv_pipeline.models.paths import paths
 
 def main():  # noqa: D103
     destination = paths.large_examples / f"{paths.large_example_cine.stem}.nc"
-    ds = prepare_dataset(paths.large_example_cine, num_frames=EXAMPLE_NUM_FRAMES)
+    _, ds = prepare_dataset(paths.large_example_cine, num_frames=EXAMPLE_NUM_FRAMES)
     ds.to_netcdf(path=destination)
 
 
