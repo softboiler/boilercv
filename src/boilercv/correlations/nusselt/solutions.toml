@@ -1,11 +1,11 @@
-[naccarato_kim_2024.Nu_c]
-# solutions = ["4*Ja*beta/(pi*(1 - beta))"]
-# solutions = ["1.0723069*Re_b**0.61*Pr**0.33*Ja**0.88951964"]
-# solutions = ["4.368190643536664*Re_b**0.02465124538381548*Pr**4.9489420330064915"]
-solutions = ["2.0049926468433052*Re_b**0.61*Pr**0.33*Ja**0.2776466639672906"]
-# solutions = ["0.014177513802698752*Re_b**0.89*Pr**0.33*Ja**1.5372439626062409"]
-# solutions = ["0.5702486668918026*Re_b**0.61*Pr**0.33*Ja**0.5724307226555843"]
+[florschuetz_chao_fitted_1965.Nu_c]
+solutions = ["4*Ja*beta/(pi*(1 - beta))"]
 warnings = []
+
+# [chen_mayinger_fitted_1992.Nu_c]
+# solutions = ["0.2235890366422012*Re_b**0.7*Pr**0.5*Ja**0.6043200139830518"]
+# # solutions = ["0.5703792679515443*Re_b**0.61*Pr**0.33*Ja**0.5689279965470183"]
+# warnings = []
 
 [florschuetz_chao_1965.Nu_c]
 solutions = ["4*Ja*beta/(pi*(1 - beta))"]

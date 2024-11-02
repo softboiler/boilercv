@@ -412,8 +412,8 @@ stages:
       nfiles: 337
     - path: docs/notebooks/find_tracks.ipynb
       hash: md5
-      md5: 2b230ad00254833a56150d5beb3ba30c
-      size: 31887
+      md5: b358895a5f50e13c4cb99e442aba6d95
+      size: 32023
     - path: packages/pipeline/boilercv_pipeline/stages/find_tracks
       hash: md5
       md5: a9e78f1299ce20dba7779fba0b4bd81f.dir
@@ -436,393 +436,393 @@ stages:
     outs:
     - path: data/e230920/tracks
       hash: md5
-      md5: a9dfcbb5596616c99e57168f736677c1.dir
-      size: 1155351802
+      md5: 169325f22fa0b1a1b83809d6a5ea8b14.dir
+      size: 1226589809
       nfiles: 16
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-07-13.png
       hash: md5
-      md5: fec3cd9f18ea0040a21f944248a7f7bb
-      size: 444127
+      md5: b88610791b0ed2bdc6a3f3bbbfa0430f
+      size: 360953
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-14-14.png
       hash: md5
-      md5: 70cba864d6516993a7b67b81ed7ddcb5
-      size: 423465
+      md5: 7d175edd5545903281bcb03c0e11d095
+      size: 328671
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-19-12.png
       hash: md5
-      md5: 3b0bb2c82f8798b9e08b41be00431963
-      size: 403479
+      md5: 50ed1f764fe1fbae87563e7d787130e1
+      size: 296722
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-28-16.png
       hash: md5
-      md5: 475a08c4847699fcc07a35d5d060a9c4
-      size: 429025
+      md5: 09c05cda595fe5a8a72fcaa773a686ec
+      size: 307193
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-33-19.png
       hash: md5
-      md5: da84307539ba5af58cc268cbff74302a
-      size: 422546
+      md5: 80a5f887b4e0c4fa9291ab48dea87762
+      size: 318158
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-37-25.png
       hash: md5
-      md5: de1e3c65a96378d33ac9826a91a89e4a
-      size: 446821
+      md5: d1e6fce8bb4bcfa0f4024aa66d4777de
+      size: 312629
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-44-35.png
       hash: md5
-      md5: 2575442816cd34d20dfc233f61db1bc9
-      size: 475200
+      md5: df8fb905ea50d921c30dcc57cc4f6451
+      size: 353402
     - path: data/e230920/tracks_plots/beta_2024-07-18T17-50-30.png
       hash: md5
-      md5: 4ee5645a5d80042cd3a10529f9ca0845
-      size: 488088
+      md5: dc70d8245481f8e617f04d65c41fe728
+      size: 373800
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-04-05.png
       hash: md5
-      md5: f47473793e914908fad6ae3b6d61f68e
-      size: 465444
+      md5: dd693c7a60cb0bb79082485bc866468a
+      size: 443162
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-08-58.png
       hash: md5
-      md5: 486b2910ddc00e782c2d243ac9460674
-      size: 465579
+      md5: 6d17f56bc543ce29c6698d2396aacda1
+      size: 419316
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-15-26.png
       hash: md5
-      md5: cbd53499dfdbaf9afabe3cecbf7df3a1
-      size: 417948
+      md5: 18c4479ba6dccc2900e974e6116b0af3
+      size: 378058
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-21-28.png
       hash: md5
-      md5: 8988730ba740da712bc893f9b799470c
-      size: 430583
+      md5: bebcfa6ea8660fe9a0bcaaa65f613674
+      size: 387387
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-31-44.png
       hash: md5
-      md5: 2ef61a13d063af0bfee70b824f7b28ff
-      size: 311110
+      md5: f555c89c3e0d3fb097d469eb1eaa24f1
+      size: 307353
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-36-37.png
       hash: md5
-      md5: c9dc15798763b9d4424a873d93b6dca3
-      size: 300921
+      md5: 92bbe83daf98467850a6181b1dc6c404
+      size: 295461
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-40-58.png
       hash: md5
-      md5: 8b8cb6afb08a50468f90fec753baffdf
-      size: 304728
+      md5: 1bc782d38288f436512cfeaabb26f968
+      size: 302536
     - path: data/e230920/tracks_plots/beta_2024-07-18T18-49-55.png
       hash: md5
-      md5: a39eb79c5b228aa70fef1ebc8e673ed6
-      size: 240052
+      md5: 14888186ecf104c0f19f9d509392765c
+      size: 239026
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-07-13.png
       hash: md5
-      md5: 50a9890be28dbb35b1c018615a28bad1
-      size: 198910
+      md5: d344241b59d9bf8215e8427602201f43
+      size: 181824
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-14-14.png
       hash: md5
-      md5: 678df1f37bac5e323c87e667cdee48de
-      size: 206739
+      md5: f83c483639e7c74d4acb93dc21a294be
+      size: 197489
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-19-12.png
       hash: md5
-      md5: 981dff1f2e831e92be973715a4082b5e
-      size: 197303
+      md5: 19fcb01700e0372ce3325004f2940bc8
+      size: 184548
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-28-16.png
       hash: md5
-      md5: 4f3fcda4b23387598de2036d64018881
-      size: 192809
+      md5: 7ccfb55dfc7e49e28250f7b781f94389
+      size: 198664
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-33-19.png
       hash: md5
-      md5: 7aa0d8912c5ed697bed930328dfea73c
-      size: 208145
+      md5: 22dc2cf6b1450af0dce31be0e7c9308b
+      size: 198638
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-37-25.png
       hash: md5
-      md5: 87135cb8237bf433e1e3bbcbb5d5e38b
-      size: 176845
+      md5: d4f26940c8ef1941304dce2c78b018f1
+      size: 178829
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-44-35.png
       hash: md5
-      md5: d21693bda06bcb70667bfcb4adeb2427
-      size: 174706
+      md5: 33fbf2a8068d9c330b26ae417ec7f07d
+      size: 193746
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T17-50-30.png
       hash: md5
-      md5: c1eac5ff23f4bfa9cce3a332eef2babe
-      size: 187905
+      md5: 42e97cbad09ac6f22907cc209e103b29
+      size: 187081
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-04-05.png
       hash: md5
-      md5: 44daee088a34f1118328b288b55998ec
-      size: 195322
+      md5: 0e8a6c42d75bb3383414f8b9633e2b1b
+      size: 181614
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-08-58.png
       hash: md5
-      md5: d4af751c569cc34fb87cb5e6ac253758
-      size: 213212
+      md5: a1b5ce5d091b4ddcce70a0f61590b3f4
+      size: 201799
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-15-26.png
       hash: md5
-      md5: 19f9e44f29ad5ecf7a82388f329902da
-      size: 179161
+      md5: d2f546f872a078f6d5c164d22e025146
+      size: 166931
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-21-28.png
       hash: md5
-      md5: 4cb418da79e2748a13e6b1b5c2c4f811
-      size: 193630
+      md5: c4190481f6ed3d622525ece2fdfb7115
+      size: 188537
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-31-44.png
       hash: md5
-      md5: 08cc08eac9bd76e224c8d6113e1e6ce5
-      size: 196363
+      md5: bbba0a1c495f1b4f8e20cc88783ce09e
+      size: 176469
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-36-37.png
       hash: md5
-      md5: 13c44c25beb650c410ec16d92f0921a1
-      size: 173551
+      md5: 07d734d3271d0a93c8a62033c3c448f9
+      size: 184127
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-40-58.png
       hash: md5
-      md5: 7d7bf089c4e231a7a72bbe843af5f703
-      size: 200274
+      md5: b5bff79a848d6b2daa3452fd8a8b8928
+      size: 200494
     - path: data/e230920/tracks_plots/beta_err_2024-07-18T18-49-55.png
       hash: md5
-      md5: d13bce28f93b10a2687871832913ce51
-      size: 182971
+      md5: d295739374ccb2da3cd3c1e8d409894b
+      size: 180186
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-07-13.png
       hash: md5
-      md5: ff80b5bce58d1a62fc1b47764fa9e7ba
-      size: 165407
+      md5: d84aba06c184f9df81907af95251d795
+      size: 160575
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-14-14.png
       hash: md5
-      md5: 82c3fea690cd3510233e1429e5a3f08f
-      size: 148398
+      md5: d583178f3d8f95cf9788b76e6d4986fb
+      size: 143076
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-19-12.png
       hash: md5
-      md5: e201e1d7b6abc93a18895f3729b52b38
-      size: 138882
+      md5: 61575bfa4a099faaf0ffa9b36bfeed9e
+      size: 131694
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-28-16.png
       hash: md5
-      md5: 68d1d3ae824241ccb152f27cb8cefa0f
-      size: 123832
+      md5: 64adbb0470d67cd0f3369529d390947e
+      size: 117947
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-33-19.png
       hash: md5
-      md5: a9cc4dd43acf792e67da62224b32a04a
-      size: 148133
+      md5: 5fd63ab9adccd70d3bdceac92c677076
+      size: 138052
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-37-25.png
       hash: md5
-      md5: 55d4a15ff0d43cf8c038091349b23634
-      size: 163512
+      md5: a6f82edd48b89532c0d4064f55bab8df
+      size: 151531
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-44-35.png
       hash: md5
-      md5: 36631b38b7aa7e405498004e089db5f6
-      size: 166122
+      md5: 8f2a037656d97601c5ea7a45d2eb7144
+      size: 159557
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T17-50-30.png
       hash: md5
-      md5: d1779d55e8a7118ccef69b1b5f2a9cf2
-      size: 161359
+      md5: 6ada7181ab1c04b11d25c3a89c9e4168
+      size: 153651
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-04-05.png
       hash: md5
-      md5: 5b11ff72d04afb0100f8dd85c6a93e92
-      size: 204139
+      md5: d824fa167b64e3381146fd9f4b894ada
+      size: 199029
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-08-58.png
       hash: md5
-      md5: 25e1c25b83f36641ae5bf5812685e9d2
-      size: 198663
+      md5: e045427f1bc0fd61a616ef508d2cab46
+      size: 196445
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-15-26.png
       hash: md5
-      md5: deb0c039270b75524b4a5a67413a5803
-      size: 205690
+      md5: 6e145b136736e17fa8e0c6a6c5b8f7a5
+      size: 201380
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-21-28.png
       hash: md5
-      md5: 59bd1637c7f978f29143f71d7339c713
-      size: 198096
+      md5: 5b0e52cf3c140dcb0487d43263adfc9d
+      size: 192518
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-31-44.png
       hash: md5
-      md5: 24974854f5b2e77189e2878395fc1793
-      size: 222382
+      md5: 98e531d9f13baee4ee4d9cc92c0504ee
+      size: 219183
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-36-37.png
       hash: md5
-      md5: 50305be18797f5ccd375b48a00cad2ae
-      size: 203972
+      md5: cdd97260c1203d5beba52a1ca6f010a3
+      size: 204176
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-40-58.png
       hash: md5
-      md5: 208c6f93344e903c7cf8857820291897
-      size: 220456
+      md5: 34079c06b280291276fa73b31c186dd5
+      size: 217892
     - path: data/e230920/tracks_plots/bubbles_2024-07-18T18-49-55.png
       hash: md5
-      md5: 050ee6dc54d37fb9bc107dfffb40033a
-      size: 223872
+      md5: 8cf41d11aba30d7f9aed82352184d93b
+      size: 220151
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-07-13.png
       hash: md5
-      md5: 606b565677b623246a975ec344b14284
-      size: 150977
+      md5: be5b72eddf246c59f7a7e1492d4c247d
+      size: 90868
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-14-14.png
       hash: md5
-      md5: 2d092cc249f9ae037075a3f901f9036d
-      size: 102475
+      md5: acdb725ebb4702114c1945bab75679bf
+      size: 70183
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-19-12.png
       hash: md5
-      md5: a1983558ef4512c4f46ff8832030ce12
-      size: 117582
+      md5: 771d978c36c68d709ec726885787479a
+      size: 68403
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-28-16.png
       hash: md5
-      md5: 4fdf12b6cfc4c5978d45293b3bbda565
-      size: 139144
+      md5: 242fbfcc8c35651bc7e7431794c58a5b
+      size: 77539
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-33-19.png
       hash: md5
-      md5: 51a4c3317ee4344ca5e2ae53cb93bbcd
-      size: 112534
+      md5: fc9ba20f32879736779bf4d4941de109
+      size: 58355
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-37-25.png
       hash: md5
-      md5: 98c5925604503486263b0cd4a073a864
-      size: 158218
+      md5: 86b71f8ae3975e4898994673992fe941
+      size: 72327
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-44-35.png
       hash: md5
-      md5: 89e2bcb4fcd330e14223fd7b3eb04b6f
-      size: 183027
+      md5: c8724e2116b713beece27c2f83c2f984
+      size: 94413
     - path: data/e230920/tracks_plots/mae_2024-07-18T17-50-30.png
       hash: md5
-      md5: cd04030595a289f407c9b5aaf9506a35
-      size: 193734
+      md5: c98fbf4e6dbe215aa13ec01e2b1d059e
+      size: 107092
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-04-05.png
       hash: md5
-      md5: 86e311064ac481661473920977fe659f
-      size: 214407
+      md5: f464b07a12a5b44034cd48910a42f600
+      size: 135805
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-08-58.png
       hash: md5
-      md5: 6f46cf7e91ed3bac817038b8fc143183
-      size: 215810
+      md5: 4bb0a1e6ee42d5b352cc069941978fa8
+      size: 118529
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-15-26.png
       hash: md5
-      md5: 9bd139e165acb3936eeb7e8dccf0a35e
-      size: 198452
+      md5: 7a1433e5b5b4ab5c97add06024108273
+      size: 103837
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-21-28.png
       hash: md5
-      md5: a33f2ea619c3541ac4928c55138dddb8
-      size: 169794
+      md5: a6327e748abda4a79082797266d3231c
+      size: 89707
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-31-44.png
       hash: md5
-      md5: a42c71c30c0f9e1354675423ccdf156e
-      size: 152230
+      md5: aa38f2c9a99ee519c60dc90e63ebd810
+      size: 82762
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-36-37.png
       hash: md5
-      md5: acacee8c15002353bf43f42ff1437fd2
-      size: 118981
+      md5: 1e385d487d89bc9851f7802945821c59
+      size: 71552
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-40-58.png
       hash: md5
-      md5: 911283e8a0da689a73d249963989c334
-      size: 128340
+      md5: 3cb574fa7ccc64fb3188b9ba7b9877eb
+      size: 76222
     - path: data/e230920/tracks_plots/mae_2024-07-18T18-49-55.png
       hash: md5
-      md5: a5acaf0fc8e40b9cfdd5f73aec164f47
-      size: 79771
+      md5: 0b17ffd21c676babc045efb1cbaf09ec
+      size: 47313
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-07-13.png
       hash: md5
-      md5: 91dacb49c3152d7664a4450e94eec7c5
-      size: 282986
+      md5: d4fb0fad5884225b98c13bad689a4d48
+      size: 269509
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-14-14.png
       hash: md5
-      md5: f660f78e8fb8993bae50fb538f508bf5
-      size: 272343
+      md5: 71fb494d4df0d9e34a030094207d06b1
+      size: 261403
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-19-12.png
       hash: md5
-      md5: e6871b042d49e68705b62ae0dc2a921f
-      size: 299729
+      md5: 7b094442f7a99704746296b3f147f931
+      size: 297873
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-28-16.png
       hash: md5
-      md5: 194c2b7c6a1c124ac9e0f01461f108ae
-      size: 277359
+      md5: 8bbea403d1bf142774b4f27ec6b49c19
+      size: 259865
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-33-19.png
       hash: md5
-      md5: 09855ff3463dd8ccfa2703d6ce5ab78f
-      size: 318492
+      md5: 36688e13e5b62751d5f4abdf663eb971
+      size: 314619
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-37-25.png
       hash: md5
-      md5: 6ec254aa8a055d3ec55bf5bbcc14a4fd
-      size: 290977
+      md5: a6b50953e0140c208ec119feba717083
+      size: 273333
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-44-35.png
       hash: md5
-      md5: 8bc44ae10b4467ce6374e6dc4048668d
-      size: 298203
+      md5: 9f4def238db6c61c81a6ea99fe2c838b
+      size: 280424
     - path: data/e230920/tracks_plots/multi_2024-07-18T17-50-30.png
       hash: md5
-      md5: 73812f008860fb468ce636a2dd4aa29e
-      size: 326470
+      md5: 0fbc1fb896e8325adc1c9881fc5de3bc
+      size: 297395
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-04-05.png
       hash: md5
-      md5: 50ea1982e7ac0aeeb9d865f506f6d3f0
-      size: 314201
+      md5: c4c073e1f330f026cb49fe73ff2ce795
+      size: 299203
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-08-58.png
       hash: md5
-      md5: d60f00d482322045e08960c731c048d4
-      size: 376841
+      md5: c55d0da3467e40edd723e16bb95fce8f
+      size: 372549
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-15-26.png
       hash: md5
-      md5: 42e7b2e03ad6daebb933738f2e8ce150
-      size: 350099
+      md5: 993d2dc896ae85549cb0ac7da8d3bb79
+      size: 333456
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-21-28.png
       hash: md5
-      md5: ae24e2aa890cf9e9cc12875a661963bd
-      size: 320199
+      md5: 0c0dde4ccea84125af8152f56b74758a
+      size: 300958
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-31-44.png
       hash: md5
-      md5: 091aaba35ea0e1b82df5a6da1f9a32f9
-      size: 427051
+      md5: 963ce10afa9d12dd268ce4060d274350
+      size: 407695
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-36-37.png
       hash: md5
-      md5: 3d402b1eac0e758e19e37de25990e5da
-      size: 402981
+      md5: f251ba7d80f9fd71bc33f7dc7052f4cd
+      size: 362082
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-40-58.png
       hash: md5
-      md5: a06aac1c5a026190f559f5a5873cc0cc
-      size: 425485
+      md5: aceaae3e718769b8d1d063d074f12b91
+      size: 412497
     - path: data/e230920/tracks_plots/multi_2024-07-18T18-49-55.png
       hash: md5
-      md5: b795dfd851df4004c0258ff1750119cb
-      size: 427689
+      md5: 7bc765d0707b1dc95004e394e9a0f11b
+      size: 399129
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-07-13.png
       hash: md5
-      md5: 2a2c05a8c153f0bb3d0168719fb0e70c
-      size: 176093
+      md5: e274640c79339f6f03f175e2572b05e7
+      size: 151817
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-14-14.png
       hash: md5
-      md5: 0175ea976d4d7b688d32f67f1db956b4
-      size: 162760
+      md5: 6009babd106612edfb76568170623e0f
+      size: 157102
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-19-12.png
       hash: md5
-      md5: e87cff5fc075a025b9ba771b1427c16a
-      size: 170009
+      md5: 2b148e998fafb08518e5a929428b7f69
+      size: 159200
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-28-16.png
       hash: md5
-      md5: 3f9d1210901faee9518b54e0cb212d65
-      size: 167077
+      md5: 86df1bfa8cc4f18a9370e392f24a7481
+      size: 151418
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-33-19.png
       hash: md5
-      md5: 6511eae09dd1d7cdeb2fb80d1a7b1e8a
-      size: 169492
+      md5: 06d95040957fb89767c5400dc39010c1
+      size: 153620
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-37-25.png
       hash: md5
-      md5: a8cfc0e66334dd2245fa872c665564c1
-      size: 177725
+      md5: c3c3b333456f4ce844f755a4063c51fd
+      size: 151476
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-44-35.png
       hash: md5
-      md5: c27acd2c3810f5642ae55f3d8128282a
-      size: 189101
+      md5: e7e0a8258324b7c568584fbbc36ce572
+      size: 162190
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T17-50-30.png
       hash: md5
-      md5: 643283e4dbe0b56423ead0627c888a57
-      size: 193518
+      md5: bfe0d4aac1e04266d3ee269cf1628d1e
+      size: 166170
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-04-05.png
       hash: md5
-      md5: c061e76d97d9cd97427602a5ebd1aaea
-      size: 208077
+      md5: 6b60785513f434e5d789d37cb9bb1023
+      size: 174015
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-08-58.png
       hash: md5
-      md5: 664a441b6c7935e3b49abcc99f957b65
-      size: 201631
+      md5: c0ca8ce734353d8e706087b11f2d4b87
+      size: 165808
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-15-26.png
       hash: md5
-      md5: 1f5b00f4244c2b62b8fcfd0853d4ce06
-      size: 201473
+      md5: 83513814a54cec201f49156c4a6745d3
+      size: 163699
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-21-28.png
       hash: md5
-      md5: b6443771cc1f22c68fd3f4c75ec2ad3f
-      size: 184935
+      md5: 75a6de3f383822326326337484bc8ece
+      size: 162240
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-31-44.png
       hash: md5
-      md5: 3ee2d791f1f684ec795c1f50f0dff452
-      size: 196367
+      md5: 67bddeb431fd9c97c87a1ebbd728f52b
+      size: 161749
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-36-37.png
       hash: md5
-      md5: e7e7a69041f75e3537d3e2bdbd3d891b
-      size: 178001
+      md5: 7ec4b3e57377b894b003d0b670e8e36a
+      size: 167649
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-40-58.png
       hash: md5
-      md5: 2e3d9fee17aadbd12677baaf37825323
-      size: 191474
+      md5: 1dcc4e961bac451fd2db382e31a2379d
+      size: 163733
     - path: data/e230920/tracks_plots/nusselt_err_2024-07-18T18-49-55.png
       hash: md5
-      md5: 0ffc718398016fee800ad7117a3c31a5
-      size: 196114
+      md5: 25d03b0def5f4b457d33605885003ea1
+      size: 264383
   compare_theory:
     cmd: python pipeline/boilercv_pipeline/stages/compare_theory.py
     deps:
