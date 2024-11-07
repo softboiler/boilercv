@@ -84,6 +84,7 @@ class Cols(columns.Cols):
     flux: Ann[LinkedCol, D.dst] = LinkedCol("q''", "W/cm^2", source=Col("q''", "W/m^2"))
     boiling: Ann[Col, D.dst] = Col("T_sat (C)")
     video: Ann[Col, D.dst] = Col("Video")
+    highlight: Ann[Col, D.dst] = Col("Highlight")
 
 
 @command(
