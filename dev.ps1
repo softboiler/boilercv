@@ -38,11 +38,14 @@ function Find-Pattern {
 function Install-Uv {
     <#.SYNOPSIS
     Install `uv`.#>
-    Param([switch]$Update)
+    Param(
+        [switch]$Update,
+        [string]$UvVersion = (Get-Content '.uv-version')
+    )
     $Env:PATH = "$HOME/.cargo/bin$([System.IO.Path]::PathSeparator)$Env:PATH"
     if ($Update) {
         if (Get-Command 'uv' -ErrorAction 'Ignore') {
-            try { return uv self update }
+            try { return uv self update $UvVersion }
             catch [System.Management.Automation.NativeCommandExitException] {}
         }
         if ($IsWindows) { Invoke-RestMethod 'https://astral.sh/uv/install.ps1' | Invoke-Expression }
