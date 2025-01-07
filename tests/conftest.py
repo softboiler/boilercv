@@ -256,7 +256,7 @@ def pytest_harvest_xdist_worker_dump(worker_id, session_items, fixture_store):
             pickle.dump((session_items, fixture_store), f)
         except Exception as e:  # noqa: BLE001
             warning(  # noqa: PLE1206
-                "Error while pickling worker %s's harvested results: " "[%s] %s",
+                "Error while pickling worker %s's harvested results: [%s] %s",
                 (worker_id, e.__class__, e),
             )
     return True
