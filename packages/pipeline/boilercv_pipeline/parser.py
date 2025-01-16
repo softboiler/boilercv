@@ -39,7 +39,7 @@ def invoke(
     help_formatter: HelpFormatable | None = None,
 ):
     """Modified Cappa CLI parser that surfaces the first innermost context."""  # noqa: D401
-    command, parsed_command, instance, concrete_output = parse_command(
+    command, parsed_command, instance, concrete_output, state = parse_command(
         obj=obj,
         argv=argv,
         backend=backend,
@@ -62,13 +62,18 @@ def invoke(
             instance.commands.commands
         )
     resolved, global_deps = resolve_callable(
-        command, parsed_command, instance, output=concrete_output, deps=deps
+        command,
+        parsed_command,
+        instance,
+        output=concrete_output,
+        state=state,
+        deps=deps,
     )
     for dep in global_deps:
         with dep.get(concrete_output):
             pass
 
-    with resolved.get(concrete_output) as value:
+    with resolved.get(output=concrete_output) as value:
         return value
 
 

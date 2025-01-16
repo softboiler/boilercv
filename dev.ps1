@@ -219,6 +219,7 @@ function Invoke-Just {
             PythonVersion  = $PythonVersion
             PylanceVersion = $PylanceVersion
         }
+        if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Update -Force }
     }
     Process { if ($Run) { Invoke-Uv @InvokeUvArgs -- just @Run } else { Invoke-Uv @InvokeUvArgs -- just } }
 }

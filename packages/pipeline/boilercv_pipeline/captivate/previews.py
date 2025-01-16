@@ -225,7 +225,7 @@ def set_images(
             viewable = scale_bool(viewable)
         image_view.setImage(viewable.squeeze())
         if isinstance(title, str):
-            image_view.addItem(TextItem(title, fill=mkBrush("black")))
+            image_view.view.addItem(TextItem(title, fill=mkBrush("black")))
     return dict(zip(images.keys(), image_views, strict=False))
 
 
@@ -314,7 +314,7 @@ def edit_roi(
             button = QPushButton("Save ROI")
             button.clicked.connect(save_roi_)
             button_layout.addWidget(button)
-            image_views[0].addItem(roi)
+            image_views[0].view.addItem(roi)
 
         def keyPressEvent(ev: QKeyEvent):  # noqa: N802
             """Save ROI or quit on key presses."""
