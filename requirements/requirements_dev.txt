@@ -4,9 +4,9 @@
 -e ./packages/_dev
 -e ./packages/boilercine
 -e ./packages/boilercore
+-e ./packages/cachier
 -e ./packages/context_models
 -e ./packages/pipeline
-./packages/cachier
 accessible-pygments==0.0.5
 aiohappyeyeballs==2.4.0
 aiohttp==3.10.5
@@ -18,7 +18,7 @@ annotated-types==0.7.0
 antlr4-python3-runtime==4.9.3
 anyio==4.5.0
 appdirs==1.4.4
-appnope==0.1.4 ; platform_system == 'Darwin'
+appnope==0.1.4 ; sys_platform == 'darwin'
 argcomplete==3.5.0
 asciitree==0.3.3
 astroid==3.3.1
@@ -26,17 +26,17 @@ asttokens==2.4.1
 asyncssh==2.17.0
 atpublic==5.0
 attrs==24.2.0
-av==13.0.0
+av==14.0.1
 babel==2.16.0
 backoff==2.2.1
 beautifulsoup4==4.12.3
 billiard==4.2.0
-bleach==6.1.0
+bleach==6.2.0
 blosc2==2.7.1
 bokeh==3.5.2
 bottleneck==1.4.0
 cachetools==5.5.0
-cappa==0.22.5
+cappa==0.26.3
 celery==5.4.0
 certifi==2024.8.30
 cffi==1.17.1
@@ -47,18 +47,17 @@ click==8.1.7
 click-didyoumean==0.3.1
 click-plugins==1.1.1
 click-repl==0.3.0
-cligj==0.7.2
 cloudpickle==3.0.0
 colorama==0.4.6
-colorcet==3.0.1
+colorcet==3.1.0
 comm==0.2.2
 configobj==5.0.8
 contourpy==1.3.0
-copykitten==1.1.1
+copykitten==1.2.2
 coverage==7.6.1
 cryptography==43.0.1
 cycler==0.12.1
-cyclopts==2.9.9
+cyclopts==3.2.1
 dask==2024.9.0
 dask-expr==1.1.14
 debuglater==1.4.4
@@ -74,7 +73,7 @@ distlib==0.3.8
 distributed==2024.9.0
 distro==1.9.0
 docopt==0.6.2
-docstring-parser==0.16 ; python_full_version < '4.0.0'
+docstring-parser==0.16 ; python_full_version < '4.0'
 docutils==0.21.2
 dpath==2.2.0
 dulwich==0.22.1
@@ -93,22 +92,20 @@ fasteners==0.19 ; sys_platform != 'emscripten'
 fastjsonschema==2.20.0
 fawltydeps==0.16.0
 filelock==3.16.1
-fiona==1.10.1
 flatten-dict==0.4.2
 flexcache==0.3
-flexparser==0.3.1
+flexparser==0.4
 flox==0.9.12
 flufl-lock==8.1.0
 fonttools==4.53.1
 frozenlist==1.4.1
 fsspec==2024.9.0
 funcy==2.0
-future==1.0.0
 gcsfs==2024.9.0.post1
-geopandas==0.14.3
+geopandas==1.0.1
 gitdb==4.0.11
 gitpython==3.1.43
-gmpy2==2.2.0rc1
+gmpy2==2.2.1
 google-api-core==2.20.0
 google-auth==2.35.0
 google-auth-oauthlib==1.2.1
@@ -126,7 +123,7 @@ h5py==3.11.0
 hydra-core==1.3.2
 identify==2.6.1
 idna==3.10
-imageio==2.34.1
+imageio==2.36.1
 imagesize==1.4.1
 importlib-metadata==8.5.0
 incremental==24.7.2
@@ -150,27 +147,26 @@ lazy-loader==0.4
 linkify-it-py==2.0.3
 llvmlite==0.43.0
 locket==1.0.0
-loguru==0.7.0
+loguru==0.7.3
 looseversion==1.3.0
 lz4==4.3.3
-makefun==1.15.4
+makefun==1.15.6
 markdown-it-py==3.0.0
 markupsafe==2.1.5
 matplotlib==3.7.2
 matplotlib-inline==0.1.7
 mdit-py-plugins==0.4.2
 mdurl==0.1.2
-mistune==3.0.2
+mistune==3.1.0
 monotonic==1.6
-more-itertools==10.4.0
+more-itertools==10.6.0
 mpmath==1.3.0
 msgpack==1.1.0
 multidict==6.1.0
-mypy-extensions==1.0.0
 myst-nb==1.1.1
 myst-parser==3.0.1
 nbclient==0.10.0
-nbconvert==7.7.3
+nbconvert==7.16.5
 nbformat==5.10.4
 ndindex==1.8
 nest-asyncio==1.6.0
@@ -184,7 +180,7 @@ numexpr==2.10.1
 numpy==1.26.0
 numpy-groupies==0.11.2
 numpydantic==1.6.4
-numpydoc==1.7.0
+numpydoc==1.8.0
 oauthlib==3.2.2
 omegaconf==2.3.0
 opencv-python==4.10.0.84
@@ -193,25 +189,25 @@ packaging==24.1
 pandas==2.2.2
 pandas-stubs==2.2.2.240514
 pandocfilters==1.5.1
-param==2.1.1
 parso==0.8.4
 partd==1.4.2
 pathspec==0.12.1
 pexpect==4.9.0 ; sys_platform != 'emscripten' and sys_platform != 'win32'
 pillow==10.3.0
-pint==0.24.3
+pint==0.24.4
 pip==24.2
 pip-requirements-parser==32.0.1
 pipdeptree==2.23.0
 pipx==1.6.0
 platformdirs==3.11.0
-ploomber-core==0.2.25
-ploomber-engine==0.0.30
+ploomber-core==0.2.26
+ploomber-engine==0.0.33
+ploomber-extension==0.1.1
 pluggy==1.5.0
 pooch==1.8.2
 portalocker==2.3.2
-posthog==3.6.6
-pre-commit==3.7.1
+posthog==3.8.3
+pre-commit==4.0.1
 prompt-toolkit==3.0.47
 proto-plus==1.24.0
 protobuf==5.28.2
@@ -226,22 +222,22 @@ pybtex==0.24.0
 pybtex-docutils==1.0.3
 pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca
 pycparser==2.22
-pyct==0.5.0
 pydantic==2.9.1
 pydantic-core==2.23.3
-pydantic-settings==2.5.2
+pydantic-settings==2.7.1
 pydata-sphinx-theme==0.15.4
 pydot==3.0.1
 pygit2==1.15.1
 pygments==2.18.0
 pygtrie==2.5.0
+pyogrio==0.10.0
 pyparsing==3.0.9
-pyproj==3.6.1
-pyqtgraph==0.13.3
+pyproj==3.7.0
+pyqtgraph==0.13.7
 pyright==1.1.371
-pyside6==6.7.2
-pyside6-addons==6.7.2
-pyside6-essentials==6.7.2
+pyside6==6.8.1.1
+pyside6-addons==6.8.1.1
+pyside6-essentials==6.8.1.1
 pytest==8.2.2
 pytest-cov==5.0.0
 pytest-custom-exit-code==0.3.0
@@ -252,7 +248,7 @@ pytest-xdist==3.6.1
 python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 pytz==2023.3
-pywin32==306 ; sys_platform == 'win32' or platform_system == 'Windows'
+pywin32==306 ; sys_platform == 'win32'
 pyyaml==6.0.2
 pyzmq==26.2.0
 referencing==0.35.1
@@ -266,16 +262,16 @@ ruamel-yaml==0.18.6
 ruamel-yaml-clib==0.2.8 ; python_full_version < '3.13' and platform_python_implementation == 'CPython'
 ruff==0.5.1
 rust-just==1.36.0
-scikit-image==0.23.1
+scikit-image==0.25.0
 scipy==1.11.2
 scmrepo==3.3.8
 seaborn==0.13.2
 semver==3.0.2
 setproctitle==1.3.3
 setuptools==70.0.0
-shapely==2.0.3
+shapely==2.0.6
 shellingham==1.5.4
-shiboken6==6.7.2
+shiboken6==6.8.1.1
 shortuuid==1.0.13
 shtab==1.7.1
 six==1.16.0
@@ -286,7 +282,7 @@ snowballstemmer==2.2.0
 sortedcontainers==2.4.0
 soupsieve==2.6
 sourcery==1.21.0
-sparklines==0.4.2
+sparklines==0.5.0
 sphinx==7.3.7
 sphinx-autobuild==2024.4.16
 sphinx-autodoc2==0.5.0
@@ -313,24 +309,24 @@ sympy==1.12
 tables==3.10.1
 tabulate==0.9.0
 tblib==3.0.0
-tifffile==2024.8.30
+tifffile==2025.1.10
 timecode==1.4.0
-tinycss2==1.3.0
+tinycss2==1.4.0
 tomli==2.0.1 ; python_full_version <= '3.11'
 tomlkit==0.12.4
 toolz==0.12.1
 tornado==6.4.1
 towncrier==23.11.0
 tqdm==4.66.3
-trackpy==0.6.2
+trackpy==0.6.4
 traitlets==5.14.3
+type-lens==0.2.3
 typer==0.12.5
 types-pytz==2024.2.0.20240913
 typing-extensions==4.12.2
-typing-inspect==0.9.0
 tzdata==2024.1
 uc-micro-py==1.0.3
-uncertainties==3.1.7
+uncertainties==3.2.2
 urllib3==2.2.2
 userpath==1.9.2
 uvicorn==0.30.6
@@ -343,7 +339,7 @@ wcwidth==0.2.13
 webencodings==0.5.1
 websockets==13.0.1
 wheel==0.44.0
-win32-setctime==1.1.0 ; sys_platform == 'win32'
+win32-setctime==1.2.0 ; sys_platform == 'win32'
 xarray==2023.7.0
 xyzservices==2024.9.0
 yarl==1.11.1

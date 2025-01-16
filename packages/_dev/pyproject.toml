@@ -7,55 +7,49 @@ name = "dev"
 version = "0.0.0"
 description = "Dev"
 dependencies = [
-  # ? Dev
   "cyclopts>=2.9.3",
   "dulwich>=0.22.1",
   "pydantic-settings>=2.5.2",
   "pydantic>=2.9.1",
   "python-dotenv>=1.0.1",
-  # ? Docs
-  "docutils>=0.21.2",
-  "more-itertools>=10.4.0",
-  "myst-parser>=3.0.1",
-  "nbformat>=5.10.4",
-  "numpydoc>=1.7.0",
-  "ruamel-yaml>=0.18.6",
-  "sphinx>=7.3.7",
-  # ? Other docs
-  "devtools>=0.12.2",
-  "geopandas>=0.14.3",
-  "ipykernel>=6.29.4",
-  "matplotlib>=3.7.2",
-  "numpy>=1.24.4",
-  "pandas[hdf5,performance]>=2.2.2",
-  "seaborn>=0.13.2",
-  "shapely>=2.0.3",
-  "sympy>=1.12",
-  "trackpy>=0.6.2",
-  # ? Tests
-  "pytest-harvest>=1.10.5",
-  "pytest>=8.2.2",
 ]
 [project.scripts]
 "dev" = "dev.tools.__main__:main"
+[project.optional-dependencies]
+docs = [
+  "devtools>=0.12.2",
+  "docutils>=0.21.2",
+  "geopandas>=0.14.3",
+  "ipython>=8.26.0",
+  "matplotlib>=3.7.2",
+  "more-itertools>=10.4.0",
+  "myst-parser>=3.0.1",
+  "nbformat>=5.10.4",
+  "numpy>=1.24.4",
+  "numpydoc>=1.7.0",
+  "pandas[hdf5,performance]>=2.2.2",
+  "ruamel-yaml>=0.18.6",
+  "seaborn>=0.13.2",
+  "shapely>=2.0.3",
+  "sphinx>=7.3.7",
+  "sympy>=1.12",
+  "trackpy>=0.6.2",
+]
+tests = ["pytest-harvest>=1.10.5", "pytest>=8.2.2"]
 
 [tool.fawltydeps]
 deps = ["packages/_dev/pyproject.toml"]
 code = ["packages/_dev", "docs", "tests"]
 ignore_undeclared = [
-  # ? This project
-  "boilercv",
   # TODO
   "pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca",
-  # ? Workspaces
-  "dev",
-  "boilercv_pipeline",
+  "boilercv",
   "boilercine",
   "boilercore",
-  "context_models",
-  # ? Path-sourced deps
+  "boilercv_pipeline",
   "cachier",
+  "context_models",
+  "dev",
 ]
 [tool.fawltydeps.custom_mapping]
-ipykernel = ["IPython"]
 ruamel-yaml = ["ruamel"]

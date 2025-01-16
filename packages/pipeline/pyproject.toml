@@ -14,7 +14,7 @@ dependencies = [
   "cyclopts>=2.6.1",
   "dvc>=3.55.2",
   "imageio[pyav]>=2.34.1",
-  "ipykernel>=6.29.4",
+  "ipython>=8.26.0",
   "loguru>=0.7.0",
   "matplotlib>=3.7.2",
   "more-itertools>=10.4.0",
@@ -51,21 +51,16 @@ cv = ["opencv-python>=4.10.0.84"]
 deps = ["packages/pipeline/pyproject.toml"]
 code = ["packages/pipeline/boilercv_pipeline"]
 ignore_undeclared = [
-  # ? This project
-  "boilercv",
   # TODO
   "pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca",
-  # ? Workspaces
-  "dev",
-  "boilercv_pipeline",
+  "boilercv",
   "boilercine",
   "boilercore",
-  "context_models",
-  # ? Path-sourced deps
+  "boilercv_pipeline",
   "cachier",
+  "context_models",
+  "dev",
 ]
 ignore_unused = [
   "pyarrow", # Used in `boilercv_pipeline.__init__`
 ]
-[tool.fawltydeps.custom_mapping]
-ipykernel = ["IPython"]
