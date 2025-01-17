@@ -45,4 +45,4 @@ remove-empty-data-folders:
     } | Remove-Item -Recurse -Force
 
 sync-local-dev-configs:
-  {{dev}} {{devpy}} sync-local-dev-configs
+  {{devpy}} sync-local-dev-configs
