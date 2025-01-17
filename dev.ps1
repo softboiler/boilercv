@@ -143,7 +143,8 @@ function Invoke-Uv {
                 Enter-Venv
 
                 # ? Sync `.env` and set environment variables from `pyproject.toml`
-                # $EnvVars = boilercv-dev 'sync-environment-variables'
+                $EnvVars = dev 'sync-environment-variables'
+                Write-Output $EnvVars
                 $EnvVars = @"
 COVERAGE_CORE=sysmon
 JUPYTER_PLATFORM_DIRS=1
@@ -161,7 +162,7 @@ PYRIGHT_PYTHON_PYLANCE_VERSION=2024.6.1
                 }
 
                 # ? Environment-specific setup
-                if ($CI) { boilercv-dev 'elevate-pyright-warnings' }
+                if ($CI) { dev 'elevate-pyright-warnings' }
                 elseif ($Devcontainer) {
                     $Repo = Get-ChildItem '/workspaces'
                     $Packages = Get-ChildItem "$Repo/packages"
