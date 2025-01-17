@@ -3,6 +3,7 @@
 import subprocess
 from contextlib import chdir, nullcontext
 from io import StringIO
+from os import environ
 from pathlib import Path
 
 from dotenv import dotenv_values, load_dotenv
@@ -14,7 +15,6 @@ from pydantic_settings import (
 )
 
 import boilercv_dev
-from boilercv_dev import log
 from boilercv_dev.docs.models.paths import rooted_paths
 from boilercv_dev.modules import get_module_name
 
@@ -67,7 +67,14 @@ def sync_environment_variables(
 
 def _sync_environment_variables(pylance_version: str = const.pylance_version):
     """Sync `.env` with `pyproject.toml`."""
-    log(sync_environment_variables(pylance_version=pylance_version))
+    if environ.get("GITHUB_ENV"):
+        env = Path(environ["GITHUB_ENV"])
+    else:
+        env = Path.cwd() / ".env"
+    env.write_text(
+        encoding="utf-8",
+        data=sync_environment_variables(pylance_version=pylance_version),
+    )
 
 
 def run(*args: str, check: bool = True, **kwds):

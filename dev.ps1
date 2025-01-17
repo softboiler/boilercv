@@ -143,13 +143,13 @@ function Invoke-Uv {
                 Enter-Venv
 
                 # ? Sync `.env` and set environment variables from `pyproject.toml`
-                $EnvVars = dev 'sync-environment-variables'
-                Write-Output $EnvVars -replace "`n", " "
-                $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
-                $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
-                    $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
-                    Set-Item "Env:$Key" $Value
-                }
+                dev 'sync-environment-variables'
+                Get-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env") |
+                    Select-String -Pattern '^(.+?)=(.+)$' |
+                    ForEach-Object {
+                        $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
+                        Set-Item "Env:$Key" $Value
+                    }
 
                 # ? Environment-specific setup
                 if ($CI) { dev 'elevate-pyright-warnings' }
