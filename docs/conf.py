@@ -21,7 +21,7 @@ from sphinx.application import Sphinx
 def init_docs_build() -> Path:
     """Initialize shell, ensure we are in `docs`, patch notebooks, return root."""
     filter_boilercv_warnings()
-    sync_environment_variables(rooted_paths.root)
+    sync_environment_variables()
     patch_notebooks()
     return rooted_paths.root
 

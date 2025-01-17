@@ -46,12 +46,9 @@ const = Constants()
 
 
 def sync_environment_variables(
-    path: Path | None = None,
-    pylance_version: str = const.pylance_version,
-    setenv: bool = True,
+    pylance_version: str = const.pylance_version, setenv: bool = True
 ):
     """Sync `.env` with `pyproject.toml`, optionally setting environment variables."""
-    path = Path(path) if path else Path.cwd() / ".env"
     config_env = Config().env
     if pylance_version:
         config_env["PYRIGHT_PYTHON_PYLANCE_VERSION"] = pylance_version
