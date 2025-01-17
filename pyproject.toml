@@ -55,7 +55,7 @@ packages = [
   "boilercine",
   "boilercore",
   "boilercv-pipeline",
-  "dev[docs,tests]",
+  "boilercv-dev[docs,tests]",
   "cachier",
   "context-models",
 ]
@@ -64,7 +64,7 @@ dev = [
   "pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca",
   "debugpy>=1.8.2",
   "dvc[gs]>=3.55.2",
-  "fawltydeps>=0.16.0",
+  "fawltydeps>=0.18.0",
   "ipykernel>=6.29.4",
   "pandas-stubs~=2.2.2",
   "pipdeptree>=2.23.0",
@@ -111,11 +111,10 @@ constraint-dependencies = [
 ]
 override-dependencies = ["cachier @ ${PROJECT_ROOT}/packages/cachier"]
 [tool.uv.pip]
-python-version = "3.11"
 all-extras = true
 [tool.uv.sources]
 boilercine = { path = "packages/boilercine", editable = true }
-dev = { path = "packages/_dev", editable = true }
+boilercv-dev = { path = "packages/_dev", editable = true }
 boilercore = { path = "packages/boilercore", editable = true }
 boilercv-pipeline = { path = "packages/pipeline", editable = true }
 cachier = { path = "packages/cachier", editable = true }
@@ -123,7 +122,7 @@ context-models = { path = "packages/context_models", editable = true }
 
 [tool.coverage.run]
 branch = true
-source = ["dev", "boilercv-pipeline", "boilercv", "tests"]
+source = ["boilercv_dev", "boilercv_pipeline", "boilercv", "tests"]
 
 [tool.dev.env]
 COVERAGE_CORE = "sysmon"
@@ -392,7 +391,7 @@ convention = "numpy"
 "docs/**.ipynb" = [
   "E402", # Need to allow imports below patches in docs notebooks
 ]
-"packages/_dev/dev/tools/add_changes.py" = [
+"packages/_dev/boilercv_dev/tools/add_changes.py" = [
   "S603", # Allow shell expressions here
   "S607", # Allow shell expressions here
 ]

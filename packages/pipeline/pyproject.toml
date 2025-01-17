@@ -11,18 +11,18 @@ dependencies = [
   "cappa>=0.22.4",
   "colorcet>=3.0.1",
   "copykitten>=1.1.1",
-  "cyclopts>=2.6.1",
+  "cyclopts>=2.9.3",
   "dvc>=3.55.2",
   "imageio[pyav]>=2.34.1",
   "ipython>=8.26.0",
-  "loguru>=0.7.0",
+  "loguru>=0.7.3",
   "matplotlib>=3.7.2",
   "more-itertools>=10.4.0",
   "numpy>=1.24.4",
   "numpydantic>=1.6.4",
   "pandas[hdf5,performance]>=2.2.2",
   "pillow>=10.3.0",
-  "pint>=0.24.3",
+  "pint>=0.24.4",
   "pyarrow>=14.0.1",
   "pydantic>=2.9.1",
   "pyqtgraph>=0.13.3",
@@ -53,13 +53,13 @@ code = ["packages/pipeline/boilercv_pipeline"]
 ignore_undeclared = [
   # TODO
   "pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca",
-  "boilercv",
   "boilercine",
   "boilercore",
+  "boilercv_dev",
   "boilercv_pipeline",
+  "boilercv",
   "cachier",
   "context_models",
-  "dev",
 ]
 ignore_unused = [
   "pyarrow", # Used in `boilercv_pipeline.__init__`

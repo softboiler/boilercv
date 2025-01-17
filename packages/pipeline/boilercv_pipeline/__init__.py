@@ -4,7 +4,7 @@ from collections.abc import Callable
 from os import environ
 from typing import Any
 
-from dev.tools.warnings import filter_boilercv_warnings
+from boilercv_dev.tools.warnings import filter_boilercv_warnings
 from loguru import logger
 from pandas import set_option
 

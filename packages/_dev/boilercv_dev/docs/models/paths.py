@@ -6,7 +6,7 @@ from boilercv_pipeline.config import const as pipeline_const
 from boilercv_pipeline.config import get_root
 from pydantic import BaseModel
 
-from dev.tests.config import const as tests_const
+from boilercv_dev.tests.config import const as tests_const
 
 
 class Constants(BaseModel):

@@ -4,7 +4,7 @@ from os import environ
 from pathlib import Path
 
 import pytest
-from dev.tests import Caser, parametrize_by_cases
+from boilercv_dev.tests import Caser, parametrize_by_cases
 
 pytestmark = pytest.mark.slow
 C = Caser(Path("docs") / "notebooks")

@@ -4,13 +4,13 @@ from datetime import date
 from hashlib import sha256
 from pathlib import Path
 
-from dev.docs.config import default
-from dev.docs.intersphinx import get_ispx, get_rtd, get_url
-from dev.docs.models.paths import rooted_paths
-from dev.docs.patch_nbs import patch_nbs
-from dev.docs.types import IspxMappingValue
-from dev.tools.environment import sync_environment_variables
-from dev.tools.warnings import filter_boilercv_warnings
+from boilercv_dev.docs.config import default
+from boilercv_dev.docs.intersphinx import get_ispx, get_rtd, get_url
+from boilercv_dev.docs.models.paths import rooted_paths
+from boilercv_dev.docs.patch_notebooks import patch_notebooks
+from boilercv_dev.docs.types import IspxMappingValue
+from boilercv_dev.tools.environment import sync_environment_variables
+from boilercv_dev.tools.warnings import filter_boilercv_warnings
 from pydantic import BaseModel, Field
 from ruamel.yaml import YAML
 from sphinx.application import Sphinx
@@ -22,7 +22,7 @@ def init_docs_build() -> Path:
     """Initialize shell, ensure we are in `docs`, patch notebooks, return root."""
     filter_boilercv_warnings()
     sync_environment_variables(rooted_paths.root)
-    patch_nbs()
+    patch_notebooks()
     return rooted_paths.root
 
 

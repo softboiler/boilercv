@@ -1,6 +1,6 @@
 """Intersphinx URL handlers."""
 
-from dev.docs.types import IspxMappingValue
+from boilercv_dev.docs.types import IspxMappingValue
 
 
 def get_url(url: str, latest: bool = False):

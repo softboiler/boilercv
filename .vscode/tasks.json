@@ -109,9 +109,9 @@
       "problemMatcher": []
     },
     {
-      "label": "just: hide notebook inputs",
+      "label": "just: patch notebooks",
       "type": "shell",
-      "command": "./Invoke-Just.ps1 hide-notebook-inputs",
+      "command": "./Invoke-Just.ps1 patch-notebooks",
       "icon": { "id": "graph" },
       "problemMatcher": []
     },
@@ -284,7 +284,7 @@
     {
       "label": "task: pre-commit (clean and format notebooks)",
       "type": "shell",
-      "command": "./Dev.ps1 && iuv pre-commit run --all-files patch-nbs --verbose && iuv pre-commit run --all-files nb-clean --verbose && iuv pre-commit run --all-files ruff --verbose && iuv pre-commit run --all-files ruff-format --verbose",
+      "command": "./Dev.ps1 && iuv pre-commit run --all-files patch-notebooks --verbose && iuv pre-commit run --all-files nb-clean --verbose && iuv pre-commit run --all-files ruff --verbose && iuv pre-commit run --all-files ruff-format --verbose",
       "icon": { "id": "git-commit" },
       "problemMatcher": []
     },

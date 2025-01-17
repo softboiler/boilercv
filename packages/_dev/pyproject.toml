@@ -3,18 +3,19 @@ requires = ["flit_core==3.9.0"]
 build-backend = "flit_core.buildapi"
 
 [project]
-name = "dev"
+name = "boilercv-dev"
 version = "0.0.0"
 description = "Dev"
 dependencies = [
-  "cyclopts>=2.9.3",
+  "cappa>=0.22.4",
   "dulwich>=0.22.1",
   "pydantic-settings>=2.5.2",
   "pydantic>=2.9.1",
   "python-dotenv>=1.0.1",
 ]
 [project.scripts]
-"dev" = "dev.tools.__main__:main"
+"boilercv-dev" = "boilercv_dev.__main__:main"
+"boilercv_dev" = "boilercv_dev.__main__:main"
 [project.optional-dependencies]
 docs = [
   "devtools>=0.12.2",
@@ -30,7 +31,7 @@ docs = [
   "pandas[hdf5,performance]>=2.2.2",
   "ruamel-yaml>=0.18.6",
   "seaborn>=0.13.2",
-  "shapely>=2.0.3",
+  "shapely>=2.0.6",
   "sphinx>=7.3.7",
   "sympy>=1.12",
   "trackpy>=0.6.2",
@@ -43,13 +44,13 @@ code = ["packages/_dev", "docs", "tests"]
 ignore_undeclared = [
   # TODO
   "pycine @ git+https://github.com/ottomatic-io/pycine@815cfca06cafc50745a43b2cd0168982225c6dca",
-  "boilercv",
   "boilercine",
   "boilercore",
+  "boilercv_dev",
   "boilercv_pipeline",
+  "boilercv",
   "cachier",
   "context_models",
-  "dev",
 ]
 [tool.fawltydeps.custom_mapping]
 ruamel-yaml = ["ruamel"]

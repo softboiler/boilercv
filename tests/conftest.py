@@ -17,14 +17,14 @@ import pytest
 import pytest_harvest
 from _pytest.python import Function
 from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
+from boilercv_dev.tests import Case, get_cached_nb_ns
+from boilercv_dev.tests.config import const
+from boilercv_dev.tests.types import FixtureStore
+from boilercv_dev.tools.warnings import filter_boilercv_warnings
 from boilercv_pipeline.config import const as boilercv_pipeline_const
 from boilercv_pipeline.models.contexts import Roots
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 from context_models import CONTEXT
-from dev.tests import Case, get_cached_nb_ns
-from dev.tests.config import const
-from dev.tests.types import FixtureStore
-from dev.tools.warnings import filter_boilercv_warnings
 from matplotlib.axis import Axis
 from matplotlib.figure import Figure
 from pydantic.alias_generators import to_pascal

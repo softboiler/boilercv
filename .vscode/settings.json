@@ -6,11 +6,11 @@
     "src/boilercv/settings_schema.json": "src/boilercv/settings.yaml",
     "src/boilercv/settings_plugin_schema.json": "src/boilercv/settings_plugin.yaml",
     // ? `dev.docs`
-    "packages/_dev/dev/docs/settings_schema.json": "packages/_dev/dev/docs/settings.yaml",
-    "packages/_dev/dev/docs/settings_plugin_schema.json": "packages/_dev/dev/docs/settings_plugin.yaml",
+    "packages/_dev/boilercv_dev/docs/settings_schema.json": "packages/_dev/boilercv_dev/docs/settings.yaml",
+    "packages/_dev/boilercv_dev/docs/settings_plugin_schema.json": "packages/_dev/boilercv_dev/docs/settings_plugin.yaml",
     // ? `dev.tests`
-    "packages/_dev/dev/tests/settings_schema.json": "packages/_dev/dev/tests/settings.yaml",
-    "packages/_dev/dev/tests/settings_plugin_schema.json": "packages/_dev/dev/tests/settings_plugin.yaml",
+    "packages/_dev/boilercv_dev/tests/settings_schema.json": "packages/_dev/boilercv_dev/tests/settings.yaml",
+    "packages/_dev/boilercv_dev/tests/settings_plugin_schema.json": "packages/_dev/boilercv_dev/tests/settings_plugin.yaml",
     // ? `boilercv_pipeline`
     "pipeline/boilercv_pipeline/settings_schema.json": "packages/pipeline/boilercv_pipeline/settings.yaml",
     "pipeline/boilercv_pipeline/settings_plugin_schema.json": "packages/pipeline/boilercv_pipeline/settings_plugin.yaml"

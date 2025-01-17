@@ -21,7 +21,7 @@ from boilercv_pipeline.models.params import set_display_options
 from cachier import cachier  # pyright: ignore[reportMissingImports]
 from seaborn import set_theme
 
-from dev.tests.types import Attributes, Params
+from boilercv_dev.tests.types import Attributes, Params
 
 NAMER: Iterator[str] = _RandomNameSequence()
 """Random name sequence for case files."""

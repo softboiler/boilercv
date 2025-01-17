@@ -14,11 +14,17 @@ if ($IsWindows) {
     [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 }
 
+function Enter-Venv {
+    <#.SYNOPSIS
+    Enter a local Python virtual environment.#>
+    if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+}
+
 function Initialize-Shell {
     <#.SYNOPSIS
     Initialize shell.#>
     if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Update -Force }
-    if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+    Enter-Venv
 }
 
 function Find-Pattern {
@@ -98,12 +104,14 @@ function Invoke-Uv {
                 uv export $LockedArg $FrozenArg --resolution lowest-direct --no-hashes --python $PythonVersion |
                     Set-Content "$PWD/requirements/requirements_dev_low.txt"
                 $Env:ENV_SYNCED = $null
+                Enter-Venv
             }
             elseif ($High) {
                 uv sync $LockedArg --upgrade --python $PythonVersion
                 uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
                     Set-Content "$PWD/requirements/requirements_dev_high.txt"
                 $Env:ENV_SYNCED = $null
+                Enter-Venv
             }
             elseif ($Build) {
                 $LockedArg = $null
@@ -113,6 +121,7 @@ function Invoke-Uv {
                     Set-Content "$PWD/requirements/requirements_prod.txt"
                 uv build --python $PythonVersion
                 $Env:ENV_SYNCED = $null
+                Enter-Venv
             }
             elseif ($CI -or $Force -or !$Env:ENV_SYNCED) {
                 # ? Sync the environment
@@ -123,9 +132,10 @@ function Invoke-Uv {
                     Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts")
                 }
                 $Env:ENV_SYNCED = $True
+                Enter-Venv
 
                 # ? Sync `.env` and set environment variables from `pyproject.toml`
-                $EnvVars = uv run --no-sync --python $PythonVersion dev 'sync-environment-variables' --pylance-version $PylanceVersion
+                $EnvVars = boilercv-dev 'sync-environment-variables'
                 $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
                 $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
                     $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
@@ -133,9 +143,7 @@ function Invoke-Uv {
                 }
 
                 # ? Environment-specific setup
-                if ($CI) {
-                    uv run --no-sync --python $PythonVersion dev elevate-pyright-warnings
-                }
+                if ($CI) { boilercv-dev 'elevate-pyright-warnings' }
                 elseif ($Devcontainer) {
                     $Repo = Get-ChildItem '/workspaces'
                     $Packages = Get-ChildItem "$Repo/packages"
@@ -185,6 +193,7 @@ function Invoke-Uv {
     Process { if ($Run) { uv run --no-sync --python $PythonVersion $Run } }
 }
 Set-Alias -Name 'iuv' -Value 'Invoke-Uv'
+Set-Alias -Name 'dev' -Value 'boilercv-dev'
 
 function Invoke-Just {
     <#.SYNOPSIS
@@ -219,7 +228,7 @@ function Invoke-Just {
             PythonVersion  = $PythonVersion
             PylanceVersion = $PylanceVersion
         }
-        if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Update -Force }
+        if (!(Get-Command 'just' -ErrorAction 'Ignore')) { Initialize-Shell }
     }
     Process { if ($Run) { Invoke-Uv @InvokeUvArgs -- just @Run } else { Invoke-Uv @InvokeUvArgs -- just } }
 }
@@ -268,7 +277,7 @@ function Initialize-Repo {
     try { git commit --no-verify -m 'Add template and type stub submodules' }
     catch [System.Management.Automation.NativeCommandExitException] {}
 
-    Invoke-Uv -Sync -Update
+    Initialize-Shell
 
     git add .
     try { git commit --no-verify -m 'Lock' }

@@ -5,7 +5,7 @@ from textwrap import dedent
 
 from nbformat import NO_CONVERT, NotebookNode, read, write
 
-from dev.docs.models.paths import rooted_paths
+from boilercv_dev.docs.models.paths import rooted_paths
 
 EXCLUDE_THEBE = ["find_tracks", "find_tracks_trackpy"]
 """Resourcse-intensive notebooks to exclude adding Thebe buttons to."""
@@ -17,7 +17,7 @@ MD = "markdown"
 """Markdown cell type."""
 
 
-def patch_nbs():
+def patch_notebooks():
     """Patch notebooks.
 
     Patch Thebe buttons in. Insert `parameters` and `thebe-init` tags to the first code
@@ -90,7 +90,3 @@ def patch(src: str, content: str, end: str = "\n\n") -> str:
     """
     content = dedent(content).strip()
     return src if src.startswith(content) else f"{content}{end}{src}"
-
-
-if __name__ == "__main__":
-    patch_nbs()

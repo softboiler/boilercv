@@ -1,4 +1,4 @@
-"""CLI for tools."""
+"""Tools."""
 
 from collections.abc import Collection
 from json import dumps
@@ -7,12 +7,11 @@ from re import finditer, sub
 from shlex import join, split
 from tomllib import loads
 
-from cyclopts import App
 from pydantic import BaseModel
 
-from dev.tools import add_changes, environment
-from dev.tools.environment import escape, run
-from dev.tools.types import ChangeType
+from boilercv_dev.tools import add_changes, environment
+from boilercv_dev.tools.environment import escape, run
+from boilercv_dev.tools.types import ChangeType
 
 
 class Constants(BaseModel):
@@ -25,27 +24,16 @@ class Constants(BaseModel):
 const = Constants()
 
 
-APP = App(help_format="markdown")
-"""CLI."""
-
-
-def main():  # noqa: D103
-    APP()
-
-
-@APP.command
 def sync_environment_variables(pylance_version: str = const.pylance_version):
     """Initialize shell."""
     log(environment.sync_environment_variables(pylance_version=pylance_version))
 
 
-@APP.command
 def add_change(change: ChangeType = "change"):
     """Add change."""
     add_changes.add_change(change)
 
 
-@APP.command
 def get_actions():
     """Get actions used by this repository.
 
@@ -70,7 +58,6 @@ def get_actions():
     log(sorted(set(actions)))
 
 
-@APP.command
 def sync_local_dev_configs():
     """Synchronize local dev configs to shadow `pyproject.toml`, with some changes.
 
@@ -94,7 +81,6 @@ def disable_concurrent_tests(addopts: str) -> str:
     return sub(pattern=r"-n\s[^\s]+", repl="-n 0", string=join(split(addopts)))
 
 
-@APP.command
 def elevate_pyright_warnings():
     """Elevate Pyright warnings to errors."""
     config = loads(Path("pyproject.toml").read_text("utf-8"))
@@ -107,7 +93,6 @@ def elevate_pyright_warnings():
     )
 
 
-@APP.command()
 def build_docs():
     """Build docs."""
     run(
@@ -128,7 +113,3 @@ def log(obj):
             log(escape(obj))
         case _:
             print(obj)  # noqa: T201
-
-
-if __name__ == "__main__":
-    main()

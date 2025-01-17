@@ -8,7 +8,7 @@ from typing import TypeAlias
 
 from pydantic import AfterValidator
 
-from dev.docs.models.paths import rooted_paths
+from boilercv_dev.docs.models.paths import rooted_paths
 
 NbExecutionExcludePatterns: TypeAlias = Ann[
     list[str],

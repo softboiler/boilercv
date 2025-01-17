@@ -10,10 +10,10 @@ from boilercv_pipeline.models.contexts import BoilercvPipelineContexts, Roots
 from boilercv_pipeline.models.path import get_boilercv_pipeline_context
 from IPython.utils.capture import capture_output
 
-from dev.docs.config import default
-from dev.docs.models.paths import rooted_paths
-from dev.docs.types import BuildMode
-from dev.tools.warnings import filter_boilercv_warnings
+from boilercv_dev.docs.config import default
+from boilercv_dev.docs.models.paths import rooted_paths
+from boilercv_dev.docs.types import BuildMode
+from boilercv_dev.tools.warnings import filter_boilercv_warnings
 
 
 def init(mode: BuildMode | None = None) -> BoilercvPipelineContexts:

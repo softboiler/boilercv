@@ -1,26 +1,17 @@
-"""Settings."""
-
-from pathlib import Path
+"""Configuration."""
 
 from boilercore.settings_models import (
     customise_sources,
     get_settings_paths,
     sync_settings_schema,
 )
-from pydantic import BaseModel
+from pydantic import Field
 from pydantic_settings import BaseSettings, PydanticBaseSettingsSource
 
-from dev import tests
+from boilercv_dev import docs
+from boilercv_dev.docs.models import Build
 
-
-class Constants(BaseModel):
-    """Constants."""
-
-    data: Path = Path("docs") / "data"
-
-
-const = Constants()
-paths = get_settings_paths(tests)
+settings_paths = get_settings_paths(docs)
 
 
 class PluginModelConfig(BaseSettings, use_attribute_docstrings=True):
@@ -35,11 +26,15 @@ class PluginModelConfig(BaseSettings, use_attribute_docstrings=True):
         **_kwds: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Source settings from init and TOML."""
-        return customise_sources(settings_cls, init_settings, paths.plugin_settings)
+        return customise_sources(
+            settings_cls, init_settings, settings_paths.plugin_settings
+        )
 
 
 class Settings(BaseSettings, use_attribute_docstrings=True):
     """Package settings."""
+
+    build: Build = Field(default_factory=Build)
 
     @classmethod
     def settings_customise_sources(
@@ -50,11 +45,13 @@ class Settings(BaseSettings, use_attribute_docstrings=True):
         **_kwds: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
         """Source  settings from init and TOML."""
-        return customise_sources(settings_cls, init_settings, paths.settings)
+        return customise_sources(settings_cls, init_settings, settings_paths.settings)
 
 
 for path, model in zip(
-    paths.all_dev_settings if paths.in_dev else paths.all_cwd_settings,
+    settings_paths.all_dev_settings
+    if settings_paths.in_dev
+    else settings_paths.all_cwd_settings,
     (PluginModelConfig, Settings),
     strict=True,
 ):

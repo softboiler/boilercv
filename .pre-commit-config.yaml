@@ -13,7 +13,7 @@ ci:
     - "pytest-fast-only"
     - "dvc-post-checkout"
     - "dvc-pre-push"
-    - "patch-nbs"
+    - "patch-notebooks"
   autoupdate_schedule: "quarterly"
 default_install_hook_types:
   - "pre-commit"
@@ -86,12 +86,12 @@ repos:
             |src/.*
             |tests/.*
           )$
-      - id: "patch-nbs"
-        name: "patch-nbs"
+      - id: "patch-notebooks"
+        name: "patch-notebooks"
         pass_filenames: false
         language: "system"
         entry: |
-          pwsh -Command "./Invoke-Uv.ps1 python -m dev.docs.patch_nbs"
+          pwsh -Command "./Invoke-Just.ps1 patch-notebooks"
         files: |
           (?x)^(
             docs/.*\.ipynb

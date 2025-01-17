@@ -3,8 +3,8 @@
 from collections.abc import Iterable
 from pathlib import Path
 
+from boilercv_dev.tools.environment import run
 from cappa.base import command, invoke
-from dev.tools.environment import run
 from dvc.utils.hydra import compose_and_dump
 from pydantic import BaseModel
 
