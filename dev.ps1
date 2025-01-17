@@ -14,6 +14,14 @@ if ($IsWindows) {
     [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
 }
 
+# ? Set aliases
+@{
+    'iuv' = 'Invoke-Uv'
+    'ij' = 'Invoke-Just'
+    'dev' = 'boilercv-dev'
+    'pipeline' = 'boilercv-pipeline'
+}.GetEnumerator() | ForEach-Object { Set-Alias -Name $_.Key -Value $_.Value }
+
 function Enter-Venv {
     <#.SYNOPSIS
     Enter a local Python virtual environment.#>
@@ -192,8 +200,6 @@ function Invoke-Uv {
     }
     Process { if ($Run) { uv run --no-sync --python $PythonVersion $Run } }
 }
-Set-Alias -Name 'iuv' -Value 'Invoke-Uv'
-Set-Alias -Name 'dev' -Value 'boilercv-dev'
 
 function Invoke-Just {
     <#.SYNOPSIS
@@ -232,7 +238,6 @@ function Invoke-Just {
     }
     Process { if ($Run) { Invoke-Uv @InvokeUvArgs -- just @Run } else { Invoke-Uv @InvokeUvArgs -- just } }
 }
-Set-Alias -Name 'ij' -Value 'Invoke-Just'
 
 function Sync-Template {
     <#.SYNOPSIS

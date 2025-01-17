@@ -4,6 +4,9 @@ set dotenv-load
 dev := '. ./dev.ps1; Initialize-Shell; '
 devpy := dev + 'dev'
 
+sync-contrib:
+  {{dev}} iuv -Sync -Update
+
 boilercv-preview-write file $BOILERCV_PREVIEW='true' $BOILERCV_WRITE='true':
   {{dev}} iuv python {{file}}
 boilercv-debug-preview-write file $BOILERCV_DEBUG='true' $BOILERCV_PREVIEW='true' $BOILERCV_WRITE='true':
@@ -15,9 +18,9 @@ update-binder:
   (uv pip compile --config-file requirements/binder_uv.toml \
     --constraint requirements/binder_constraints.in \
     --override requirements/binder_overrides.txt \
-    --exclude-newer (Get-Date).ToUniversalTime().ToString(o) \
+    --exclude-newer (Get-Date).ToUniversalTime().ToString('o') \
     requirements/binder.in \
-  ) -Replace opencv-python, opencv-python-headless | Set-Content requirements.txt
+  ) -Replace 'opencv-python', 'opencv-python-headless' | Set-Content requirements.txt
 
 dvc-dag:
   {{dev}} (iuv dvc dag --md) -Replace (mermaid, '{mermaid}') | \
@@ -40,9 +43,6 @@ remove-empty-data-folders:
     Where-Object { \
       ( Get-ChildItem -Path $_ -Recurse -File | Measure-Object ).Count -eq 0 \
     } | Remove-Item -Recurse -Force
-
-sync-contrib:
-  {{dev}} iuv -Sync -Update
 
 sync-local-dev-configs:
   {{dev}} {{devpy}} sync-local-dev-configs
