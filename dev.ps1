@@ -143,8 +143,8 @@ function Invoke-Uv {
                 Enter-Venv
 
                 # ? Sync `.env` and set environment variables from `pyproject.toml`
-                $EnvVars = (dev sync-environment-variables) | Out-String
-                Write-Output $EnvVars
+                $EnvVars = dev 'sync-environment-variables'
+                Write-Output $EnvVars -replace "`n", " "
                 $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
                 $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
                     $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
