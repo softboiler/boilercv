@@ -143,7 +143,7 @@ function Invoke-Uv {
                 Enter-Venv
 
                 # ? Sync `.env` and set environment variables from `pyproject.toml`
-                $EnvVars = dev 'sync-environment-variables'
+                $EnvVars = (dev 'sync-environment-variables')
                 Write-Output $EnvVars
                 $EnvVars = @"
 COVERAGE_CORE=sysmon
