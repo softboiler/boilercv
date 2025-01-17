@@ -4,8 +4,6 @@ import subprocess
 from contextlib import chdir, nullcontext
 from io import StringIO
 from pathlib import Path
-from shlex import quote
-from sys import executable
 
 from dotenv import dotenv_values, load_dotenv
 from pydantic import BaseModel, Field
@@ -16,6 +14,8 @@ from pydantic_settings import (
 )
 
 import boilercv_dev
+from boilercv_dev import log
+from boilercv_dev.docs.models.paths import rooted_paths
 from boilercv_dev.modules import get_module_name
 
 
@@ -32,13 +32,19 @@ class Constants(BaseModel):
     """Wrapper of `uv run` with extra setup."""
     env: str = ".env"
     """Name of environment file."""
+    pylance_version: str = (
+        (rooted_paths.root / ".pylance-version").read_text(encoding="utf-8").strip()
+    )
+    """Pylance version."""
 
 
 const = Constants()
 
 
 def sync_environment_variables(
-    path: Path | None = None, pylance_version: str = "", setenv: bool = True
+    path: Path | None = None,
+    pylance_version: str = const.pylance_version,
+    setenv: bool = True,
 ) -> str:
     """Sync `.env` with `pyproject.toml`, optionally setting environment variables."""
     path = Path(path) if path else Path.cwd() / ".env"
@@ -59,6 +65,11 @@ def sync_environment_variables(
     return "\n".join(f"{k}={v}" for k, v in dotenv.items())
 
 
+def _sync_environment_variables(pylance_version: str = const.pylance_version):
+    """Sync `.env` with `pyproject.toml`."""
+    log(sync_environment_variables(pylance_version=pylance_version))
+
+
 def run(*args: str, check: bool = True, **kwds):
     """Run command."""
     sep = " "
@@ -68,16 +79,6 @@ def run(*args: str, check: bool = True, **kwds):
             args=[*const.shell, sep.join([const.uv_run_wrapper, *args])],
             **kwds,
         )
-
-
-def run_dev(*args: str):
-    """Run command from `dev` CLI."""
-    run(f"& {quote(executable)} -m", *args)
-
-
-def escape(path: str | Path) -> str:
-    """Escape a path, suitable for passing to e.g. {func}`~subprocess.run`."""
-    return quote(Path(path).as_posix())
 
 
 class Config(BaseSettings):

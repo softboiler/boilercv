@@ -326,7 +326,7 @@
     {
       "label": "task: Build docs",
       "type": "shell",
-      "command": "./Invoke-Uv.ps1 dev build-docs",
+      "command": "./Invoke-Just.ps1 build-docs",
       "icon": { "id": "book" },
       "problemMatcher": []
     },

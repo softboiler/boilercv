@@ -256,7 +256,7 @@ mermaid_d3_zoom = False
 nitpicky = True
 autodoc2_packages = [
     f"../src/{project}",
-    "../packages/_dev/dev",
+    "../packages/_dev/boilercv_dev",
     f"../packages/pipeline/{project}_pipeline",
 ]
 autodoc2_render_plugin = "myst"
@@ -267,7 +267,7 @@ autodoc2_render_plugin = "myst"
 maximum_signature_line_length = 1
 # ? Parse Numpy docstrings
 if not default.build.skip_autodoc_post_parse:
-    autodoc2_docstring_parser_regexes = [(".*", "dev.docs.docstrings")]
+    autodoc2_docstring_parser_regexes = [(".*", "boilercv_dev.docs.docstrings")]
 # * MARK:  Intersphinx
 intersphinx_mapping = {
     pkg: ispx for pkg, ispx in const.ispx_mapping.items() if pkg != "colorcet"

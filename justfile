@@ -6,6 +6,8 @@ devpy := dev + 'dev'
 
 sync-contrib:
   {{dev}} iuv -Sync -Update
+build-docs:
+  {{dev}} Build-Docs
 
 boilercv-preview-write file $BOILERCV_PREVIEW='true' $BOILERCV_WRITE='true':
   {{dev}} iuv python {{file}}

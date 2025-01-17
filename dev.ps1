@@ -16,9 +16,9 @@ if ($IsWindows) {
 
 # ? Set aliases
 @{
-    'iuv' = 'Invoke-Uv'
-    'ij' = 'Invoke-Just'
-    'dev' = 'boilercv-dev'
+    'iuv'      = 'Invoke-Uv'
+    'ij'       = 'Invoke-Just'
+    'dev'      = 'boilercv-dev'
     'pipeline' = 'boilercv-pipeline'
 }.GetEnumerator() | ForEach-Object { Set-Alias -Name $_.Key -Value $_.Value }
 
@@ -261,6 +261,15 @@ function Sync-Template {
     }
     if ($Prompt) { return uvx $Copier update --vcs-ref=$Ref }
     return uvx $Copier update --defaults --vcs-ref=$Ref
+}
+
+function Build-Docs {
+    <#.SYNOPSIS
+    Build documentation.#>
+    Initialize-Shell
+    $Ignore = @('temp', 'data', 'apidocs', '*schema.json') |
+        ForEach-Object { @('--ignore', "**/$_") }
+    sphinx-autobuild '--show-traceback' 'docs' '_site' @Ignore
 }
 
 function Initialize-Repo {

@@ -1,32 +1,14 @@
 """Tools."""
 
-from collections.abc import Collection
 from json import dumps
 from pathlib import Path
 from re import finditer, sub
 from shlex import join, split
 from tomllib import loads
 
-from pydantic import BaseModel
-
-from boilercv_dev.tools import add_changes, environment
-from boilercv_dev.tools.environment import escape, run
+from boilercv_dev import log
+from boilercv_dev.tools import add_changes
 from boilercv_dev.tools.types import ChangeType
-
-
-class Constants(BaseModel):
-    """Constants for {mod}`~dev.tools.environment`."""
-
-    pylance_version: str = Path(".pylance-version").read_text(encoding="utf-8").strip()
-    """Pylance version."""
-
-
-const = Constants()
-
-
-def sync_environment_variables(pylance_version: str = const.pylance_version):
-    """Initialize shell."""
-    log(environment.sync_environment_variables(pylance_version=pylance_version))
 
 
 def add_change(change: ChangeType = "change"):
@@ -91,25 +73,3 @@ def elevate_pyright_warnings():
     Path("pyrightconfig.json").write_text(
         encoding="utf-8", data=dumps(pyright, indent=2)
     )
-
-
-def build_docs():
-    """Build docs."""
-    run(
-        "sphinx-autobuild --show-traceback docs _site",
-        *[f"--ignore **/{p}" for p in ["temp", "data", "apidocs", "*schema.json"]],
-    )
-
-
-def log(obj):
-    """Send object to `stdout`."""
-    match obj:
-        case str():
-            print(obj)  # noqa: T201
-        case Collection():
-            for o in obj:
-                log(o)
-        case Path():
-            log(escape(obj))
-        case _:
-            print(obj)  # noqa: T201
