@@ -66,7 +66,7 @@ def invoke(
         parsed_command,
         instance,
         output=concrete_output,
-        state=state,
+        state=state,  # pyright: ignore[reportCallIssue]
         deps=deps,
     )
     for dep in global_deps:

@@ -30,8 +30,12 @@ class Constants(BaseModel):
     """Shell invocation for running arbitrary commands."""
     uv_run_wrapper: str = "./Invoke-Uv.ps1"
     """Wrapper of `uv run` with extra setup."""
-    env: str = ".env"
-    """Name of environment file."""
+    env: Path = (
+        Path(environ["GITHUB_ENV"])
+        if environ.get("GITHUB_ENV")
+        else rooted_paths.root / ".env"
+    )
+    """Environment file path."""
     pylance_version: str = (
         (rooted_paths.root / ".pylance-version").read_text(encoding="utf-8").strip()
     )
@@ -45,7 +49,7 @@ def sync_environment_variables(
     path: Path | None = None,
     pylance_version: str = const.pylance_version,
     setenv: bool = True,
-) -> str:
+):
     """Sync `.env` with `pyproject.toml`, optionally setting environment variables."""
     path = Path(path) if path else Path.cwd() / ".env"
     config_env = Config().env
@@ -62,18 +66,8 @@ def sync_environment_variables(
             dotenv[k] = v
     if setenv:
         load_dotenv(stream=StringIO("\n".join(f"{k}={v}" for k, v in dotenv.items())))
-    return "\n".join(f"{k}={v}" for k, v in dotenv.items())
-
-
-def _sync_environment_variables(pylance_version: str = const.pylance_version):
-    """Sync `.env` with `pyproject.toml`."""
-    if environ.get("GITHUB_ENV"):
-        env = Path(environ["GITHUB_ENV"])
-    else:
-        env = Path.cwd() / ".env"
-    env.write_text(
-        encoding="utf-8",
-        data=sync_environment_variables(pylance_version=pylance_version),
+    const.env.write_text(
+        encoding="utf-8", data="\n".join(f"{k}={v}" for k, v in dotenv.items())
     )
 
 
