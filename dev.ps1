@@ -143,12 +143,12 @@ function Invoke-Uv {
                 Enter-Venv
 
                 # ? Set up CI and contributor environments
-                if ($CI) { Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts") }
+                if ($_CI) { Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts") }
                 else {
                     # ? Install pre-commit hooks
                     $Hooks = '.git/hooks'
                     if ( !(Test-Path "$Hooks/pre-commit") -or !(Test-Path "$Hooks/post-checkout") ) {
-                        Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'install' '--install-hooks'
+                        Invoke-Uv 'pre-commit' 'install' '--install-hooks'
                     }
                     # ? Install Pylance extension
                     if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
@@ -216,7 +216,7 @@ function Invoke-Uv {
             }
         }
     }
-    Process { if ($Run) { uv run --no-sync --python $PythonVersion $Run } }
+    Process { if ($Run) { uv run --no-sync $Run } }
 }
 
 function Invoke-Just {
@@ -337,13 +337,6 @@ function Initialize-Machine {
     Finish machine initialization (cross-platform).#>
 
     Param([switch]$Force)
-
-    # ? Hook into user profile if it doesn't exist already
-    if ($Force -or !(Test-Path $PROFILE)) {
-        if (!(Test-Path $PROFILE)) { New-Item $PROFILE }
-        'if (Test-Path ''dev.ps1'') { . ./dev.ps1 && Initialize-Shell }' |
-            Add-Content $PROFILE
-    }
 
     # ? Set Git username if missing
     try { $Name = git config 'user.name' }
