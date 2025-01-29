@@ -25,7 +25,7 @@ if ($IsWindows) {
 function Enter-Venv {
     <#.SYNOPSIS
     Enter a local Python virtual environment.#>
-    if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+    if ($IsWindows) { .venv/scripts/activate } else { .venv/bin/activate }
 }
 
 function Initialize-Shell {
@@ -216,7 +216,7 @@ function Invoke-Uv {
             }
         }
     }
-    Process { if ($Run) { uv run --no-sync $Run } }
+    Process { if ($Run) { uv run --no-sync --python $PythonVersion @Run } }
 }
 
 function Invoke-Just {

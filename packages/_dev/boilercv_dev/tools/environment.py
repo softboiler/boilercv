@@ -29,7 +29,7 @@ class Constants(BaseModel):
     """Path to Pylance version file."""
     shell: list[str] = ["pwsh", "-Command"]
     """Shell invocation for running arbitrary commands."""
-    uv_run_wrapper: str = "./Invoke-Uv.ps1"
+    uv_run_wrapper: str = "./Invoke-Uv"
     """Wrapper of `uv run` with extra setup."""
     env: Path = (
         Path(environ["GITHUB_ENV"])

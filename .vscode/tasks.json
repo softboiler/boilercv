@@ -74,72 +74,72 @@
   "tasks": [
     {
       "label": "just: generate correlations",
-      "command": "./Invoke-Just.ps1 generate-correlations ${file} ${input:correlations}",
+      "command": "./Invoke-Just generate-correlations ${file} ${input:correlations}",
       "icon": { "id": "file-code" }
     },
     {
       "label": "just: generate correlation docs",
-      "command": "./Invoke-Just.ps1 generate-correlation-docs",
+      "command": "./Invoke-Just generate-correlation-docs",
       "icon": { "id": "file-code" }
     },
     {
       "label": "just: update binder",
-      "command": "./Invoke-Just.ps1 update-binder",
+      "command": "./Invoke-Just update-binder",
       "icon": { "id": "git-commit" }
     },
     {
       "label": "just: sync local dev configs",
-      "command": "./Invoke-Just.ps1 sync-local-dev-configs",
+      "command": "./Invoke-Just sync-local-dev-configs",
       "icon": { "id": "file-code" }
     },
     {
       "label": "just: remove empty data folders",
-      "command": "./Invoke-Just.ps1 remove-empty-data-folders",
+      "command": "./Invoke-Just remove-empty-data-folders",
       "icon": { "id": "terminal-powershell" }
     },
     {
       "label": "just: patch notebooks",
-      "command": "./Invoke-Just.ps1 patch-notebooks",
+      "command": "./Invoke-Just patch-notebooks",
       "icon": { "id": "graph" }
     },
     {
       "label": "just: boilercv preview write",
-      "command": "./Invoke-Just.ps1 boilercv-preview-write ${file}",
+      "command": "./Invoke-Just boilercv-preview-write ${file}",
       "icon": { "id": "repo" }
     },
     {
       "label": "just: boilercv debug preview write",
-      "command": "./Invoke-Just.ps1 boilercv-debug-preview-write ${file}",
+      "command": "./Invoke-Just boilercv-debug-preview-write ${file}",
       "icon": { "id": "repo" }
     },
     {
       "label": "just: boilercv write",
-      "command": "./Invoke-Just.ps1 boilercv-write ${file}",
+      "command": "./Invoke-Just boilercv-write ${file}",
       "icon": { "id": "repo" }
     },
     {
       "label": "just: boilercv preview",
-      "command": "./Invoke-Just.ps1 boilercv-preview ${input:preview}",
+      "command": "./Invoke-Just boilercv-preview ${input:preview}",
       "icon": { "id": "graph" }
     },
     {
       "label": "dvc: repro",
-      "command": "./Invoke-Uv.ps1 dvc repro ${input:stage}",
+      "command": "./Invoke-Uv dvc repro ${input:stage}",
       "icon": { "id": "graph" }
     },
     {
       "label": "dvc: repro force",
-      "command": "./Invoke-Uv.ps1 dvc repro --force ${input:stage}",
+      "command": "./Invoke-Uv dvc repro --force ${input:stage}",
       "icon": { "id": "graph" }
     },
     {
       "label": "just: dvc dag",
-      "command": "./Invoke-Just.ps1 dvc-dag",
+      "command": "./Invoke-Just dvc-dag",
       "icon": { "id": "graph" }
     },
     {
       "label": "just: sync dvc",
-      "command": "./Invoke-Just.ps1 pipeline-sync-dvc",
+      "command": "./Invoke-Just pipeline-sync-dvc",
       "icon": { "id": "graph" }
     },
 
@@ -148,7 +148,7 @@
 
     {
       "label": "wsl: Copy PID of Python Debugger",
-      "command": "./Invoke-Uv.ps1 && ps aux | grep python | grep --max-count 1 -- --adapter-access-token | grep --only-matching --perl-regexp 'user\\s+\\d+' | grep --only-matching --perl-regexp '\\d+' | clip.exe",
+      "command": "./Invoke-Uv && ps aux | grep python | grep --max-count 1 -- --adapter-access-token | grep --only-matching --perl-regexp 'user\\s+\\d+' | grep --only-matching --perl-regexp '\\d+' | clip.exe",
       "icon": { "id": "terminal-linux" },
       "group": {
         "kind": "test",
@@ -166,17 +166,17 @@
 
     {
       "label": "setup: Sync with template",
-      "command": ". ./dev.ps1 && Sync-Template ${input:templateOptions}",
+      "command": ". ./dev && Sync-Template ${input:templateOptions}",
       "icon": { "id": "file-symlink-directory" }
     },
     {
       "label": "setup: Sync with specific template ref",
-      "command": ". ./dev.ps1 && Sync-Template ${input:ref} ${input:templateOptions}",
+      "command": ". ./dev && Sync-Template ${input:ref} ${input:templateOptions}",
       "icon": { "id": "file-symlink-directory" }
     },
     {
       "label": "setup: just: sync contrib",
-      "command": "if (!$Env:DEVCONTAINER) {./Invoke-Just.ps1 sync-contrib}",
+      "command": "if (!$Env:DEVCONTAINER) {./Invoke-Just sync-contrib}",
       "icon": { "id": "file-symlink-directory" },
       "problemMatcher": [],
       "runOptions": {
@@ -185,7 +185,7 @@
     },
     {
       "label": "setup: Initialize repository",
-      "command": ". ./dev.ps1 && Initialize-Repo",
+      "command": ". ./dev && Initialize-Repo",
       "icon": { "id": "file-symlink-directory" }
     },
     {
@@ -196,7 +196,7 @@
     {
       "label": "setup: Initialize Windows machine",
       "options": { "shell": { "executable": "powershell" } },
-      "command": ". ./dev.ps1 && Initialize-Windows",
+      "command": ". ./dev && Initialize-Windows",
       "icon": { "id": "file-symlink-directory" }
     },
     {
@@ -207,7 +207,7 @@
     },
     {
       "label": "setup: Finish initializing machine (cross-platform)",
-      "command": ". ./dev.ps1 && Initialize-Machine",
+      "command": ". ./dev && Initialize-Machine",
       "icon": { "id": "file-symlink-directory" }
     },
 
@@ -216,22 +216,22 @@
 
     {
       "label": "task: pre-commit",
-      "command": "./Invoke-Uv.ps1 pre-commit run --verbose",
+      "command": "./Invoke-Uv pre-commit run --verbose",
       "icon": { "id": "git-commit" }
     },
     {
       "label": "task: pre-commit (all)",
-      "command": "./Invoke-Uv.ps1 pre-commit run --all-files --verbose",
+      "command": "./Invoke-Uv pre-commit run --all-files --verbose",
       "icon": { "id": "git-commit" }
     },
     {
       "label": "task: pre-commit (clean notebooks)",
-      "command": "./Invoke-Uv.ps1 pre-commit run --all-files nb-clean --verbose",
+      "command": "./Invoke-Uv pre-commit run --all-files nb-clean --verbose",
       "icon": { "id": "git-commit" }
     },
     {
       "label": "task: pre-commit (clean and format notebooks)",
-      "command": "./Dev.ps1 && iuv pre-commit run --all-files patch-notebooks --verbose && iuv pre-commit run --all-files nb-clean --verbose && iuv pre-commit run --all-files ruff --verbose && iuv pre-commit run --all-files ruff-format --verbose",
+      "command": "./dev && iuv pre-commit run --all-files patch-notebooks --verbose && iuv pre-commit run --all-files nb-clean --verbose && iuv pre-commit run --all-files ruff --verbose && iuv pre-commit run --all-files ruff-format --verbose",
       "icon": { "id": "git-commit" }
     },
     {
@@ -241,57 +241,57 @@
     },
     {
       "label": "task: Show tree of packages requesting a dependency",
-      "command": "./Invoke-Uv.ps1 pipdeptree --reverse --packages ${input:dependency}",
+      "command": "./Invoke-Uv pipdeptree --reverse --packages ${input:dependency}",
       "icon": { "id": "versions" }
     },
     {
       "label": "task: Run pytest with coverage",
-      "command": "./Invoke-Uv.ps1 pytest --cov  --cov-config pyproject.toml --cov-report xml",
+      "command": "./Invoke-Uv pytest --cov  --cov-config pyproject.toml --cov-report xml",
       "icon": { "id": "check" }
     },
     {
       "label": "task: Run ruff",
-      "command": ". ./dev.ps1 && iuv ruff check . && iuv ruff format .",
+      "command": ". ./dev && iuv ruff check . && iuv ruff format .",
       "icon": { "id": "check" }
     },
     {
       "label": "task: Run pyright",
-      "command": "./Invoke-Uv.ps1 pyright",
+      "command": "./Invoke-Uv pyright",
       "icon": { "id": "check" }
     },
     {
       "label": "task: Build docs",
-      "command": "./Invoke-Just.ps1 build-docs",
+      "command": "./Invoke-Just build-docs",
       "icon": { "id": "book" }
     },
     {
       "label": "task: Profile this file",
-      "command": "./Invoke-Uv.ps1 cProfile -o .prof ${file}",
+      "command": "./Invoke-Uv cProfile -o .prof ${file}",
       "icon": { "id": "graph-line" }
     },
     {
       "label": "task: View profile results with snakeviz",
-      "command": "./Invoke-Uv.ps1 snakeviz .prof",
+      "command": "./Invoke-Uv snakeviz .prof",
       "icon": { "id": "graph-line" }
     },
     {
       "label": "task: Bump version",
-      "command": ". ./dev.ps1 && uvx copier@9.2.0 update --vcs-ref=HEAD --defaults --data project_version='${input:version}' && iuv towncrier build --yes --version '${input:version}' && git add . && git commit -m '${input:version}'",
+      "command": ". ./dev && uvx copier@9.2.0 update --vcs-ref=HEAD --defaults --data project_version='${input:version}' && iuv towncrier build --yes --version '${input:version}' && git add . && git commit -m '${input:version}'",
       "icon": { "id": "tag" }
     },
     {
       "label": "task: Release version",
-      "command": ". ./dev.ps1 && Invoke-Uv && ($Version = (Get-Content '.copier-answers.yml' | Find-Pattern '^project_version:\\s(.+)$')) && git tag --sign -m $Version $Version && git push",
+      "command": ". ./dev && Invoke-Uv && ($Version = (Get-Content '.copier-answers.yml' | Find-Pattern '^project_version:\\s(.+)$')) && git tag --sign -m $Version $Version && git push",
       "icon": { "id": "tag" }
     },
     {
       "label": "task: Update changelog",
-      "command": "./Invoke-Uv.ps1 -m dev add-change ${input:changeType}",
+      "command": "./Invoke-Uv -m dev add-change ${input:changeType}",
       "icon": { "id": "tag" }
     },
     {
       "label": "task: Update changelog with the latest commit's message",
-      "command": "./Invoke-Uv.ps1 towncrier create +$((Get-Date).ToUniversalTime().ToString('o').Replace(':','-')).change.md --content $($(git log -1 --format='%s') + ' ([' + $(git rev-parse --short HEAD) + '](https://github.com/softboiler/boilercv/commit/' + $(git rev-parse HEAD) + '))\n')",
+      "command": "./Invoke-Uv towncrier create +$((Get-Date).ToUniversalTime().ToString('o').Replace(':','-')).change.md --content $($(git log -1 --format='%s') + ' ([' + $(git rev-parse --short HEAD) + '](https://github.com/softboiler/boilercv/commit/' + $(git rev-parse HEAD) + '))\n')",
       "icon": { "id": "tag" }
     }
   ]

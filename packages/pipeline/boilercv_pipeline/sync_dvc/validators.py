@@ -56,7 +56,7 @@ def dvc_prepare_stage(
     dvc.model.stages[name] = dvc.stage
     sep = " "
     dvc.stage.cmd = sep.join([
-        f"./Invoke-Uv.ps1 {boilercv_pipeline.__name__.replace('_', '-')}",
+        f"./Invoke-Uv {boilercv_pipeline.__name__.replace('_', '-')}",
         f"stage {name.replace('_', '-')}",
     ])
     self = handler(data)

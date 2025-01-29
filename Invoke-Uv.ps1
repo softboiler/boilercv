@@ -16,7 +16,7 @@ Param(
     [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
 )
 Begin {
-    . ./dev.ps1
+    . ./dev
 
     $_CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI))
     $InvokeUvArgs = @{
