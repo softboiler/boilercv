@@ -9,7 +9,6 @@ from boilercv_dev.docs.intersphinx import get_ispx, get_rtd, get_url
 from boilercv_dev.docs.models.paths import rooted_paths
 from boilercv_dev.docs.patch_notebooks import patch_notebooks
 from boilercv_dev.docs.types import IspxMappingValue
-from boilercv_dev.tools.environment import sync_environment_variables
 from boilercv_dev.tools.warnings import filter_boilercv_warnings
 from pydantic import BaseModel, Field
 from ruamel.yaml import YAML
@@ -21,7 +20,6 @@ from sphinx.application import Sphinx
 def init_docs_build() -> Path:
     """Initialize shell, ensure we are in `docs`, patch notebooks, return root."""
     filter_boilercv_warnings()
-    sync_environment_variables()
     patch_notebooks()
     return rooted_paths.root
 
