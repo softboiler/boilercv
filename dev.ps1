@@ -142,8 +142,9 @@ function Invoke-Uv {
                     Set-Content "$PWD/requirements/requirements_dev.txt"
                 Enter-Venv
 
-                # ? Set up contributor environment
-                if (!$_CI) {
+                # ? Set up CI and contributor environments
+                if ($CI) { Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts") }
+                else {
                     # ? Install pre-commit hooks
                     $Hooks = '.git/hooks'
                     if ( !(Test-Path "$Hooks/pre-commit") -or !(Test-Path "$Hooks/post-checkout") ) {
