@@ -25,7 +25,7 @@ if ($IsWindows) {
 function Enter-Venv {
     <#.SYNOPSIS
     Enter a local Python virtual environment.#>
-    if ($IsWindows) { .venv/scripts/activate } else { .venv/bin/activate }
+    if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
 }
 
 function Initialize-Shell {
