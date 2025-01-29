@@ -33,4 +33,4 @@ Begin {
         PylanceVersion = $PylanceVersion
     }
 }
-Process { Invoke-Uv @InvokeUvArgs @Run }
+Process { Invoke-Uv @InvokeUvArgs $Run }

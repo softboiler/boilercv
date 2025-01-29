@@ -216,7 +216,7 @@ function Invoke-Uv {
             }
         }
     }
-    Process { if ($Run) { uv run --no-sync --python $PythonVersion @Run } }
+    Process { if ($Run) { uv run --no-sync --python $PythonVersion $Run } }
 }
 
 function Invoke-Just {
@@ -254,7 +254,7 @@ function Invoke-Just {
         }
         if (!(Get-Command 'just' -ErrorAction 'Ignore')) { Initialize-Shell }
     }
-    Process { if ($Run) { Invoke-Uv @InvokeUvArgs -- just @Run } else { Invoke-Uv @InvokeUvArgs -- just } }
+    Process { if ($Run) { Invoke-Uv @InvokeUvArgs -- just $Run } else { Invoke-Uv @InvokeUvArgs -- just } }
 }
 
 function Sync-Template {
