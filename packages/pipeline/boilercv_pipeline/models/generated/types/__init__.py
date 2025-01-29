@@ -58,6 +58,7 @@ def sync_stages():
                 "-Command",
                 f"& {quote(executable)} -m ruff format {quote(stages_literals.as_posix())}",
             ],
+            capture_output=True,
         )
 
 

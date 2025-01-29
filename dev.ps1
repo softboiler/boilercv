@@ -56,7 +56,7 @@ function Install-Uv {
         [switch]$Update,
         [string]$UvVersion = (Get-Content '.uv-version')
     )
-    $Env:PATH = "$HOME/.cargo/bin$([System.IO.Path]::PathSeparator)$Env:PATH"
+    $Env:PATH = "$HOME/.local/bin$([System.IO.Path]::PathSeparator)$Env:PATH"
     if ($Update) {
         if (Get-Command 'uv' -ErrorAction 'Ignore') {
             try { return uv self update $UvVersion }
@@ -223,7 +223,7 @@ function Invoke-Uv {
             }
         }
     }
-    Process { if ($Run) { uv run $Run } }
+    Process { if ($Run) { uv run --no-sync --python $PythonVersion $Run } }
 }
 
 function Invoke-Just {
@@ -373,7 +373,9 @@ function Initialize-Machine {
         }
     }
     # ? Log in to GitHub API
-    if ($Force -or !(gh auth status)) { gh auth login -Done }
+    try { $FoundGhLogin = gh auth status }
+    catch [System.Management.Automation.NativeCommandExitException] {}
+    if ($Force -or !$FoundGhLogin) { gh auth login }
 }
 
 function Initialize-Windows {
