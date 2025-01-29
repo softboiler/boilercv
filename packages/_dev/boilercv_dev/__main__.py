@@ -5,10 +5,7 @@ from dataclasses import dataclass
 from cappa.base import command, invoke
 from cappa.subcommand import Subcommands
 
-
-@command(invoke="boilercv_dev.tools.environment.sync_environment_variables")
-class SyncEnvironmentVariables:
-    """Sync `.env` with `pyproject.toml`."""
+from boilercv_dev import SyncEnvironmentVariables
 
 
 @command(invoke="boilercv_dev.tools.add_change")

@@ -15,6 +15,7 @@ from pydantic_settings import (
 )
 
 import boilercv_dev
+from boilercv_dev import SyncEnvironmentVariables
 from boilercv_dev.docs.models.paths import rooted_paths
 from boilercv_dev.modules import get_module_name
 
@@ -45,13 +46,14 @@ class Constants(BaseModel):
 const = Constants()
 
 
-def sync_environment_variables(
-    pylance_version: str = const.pylance_version, setenv: bool = True
-):
+def sync_environment_variables(args: SyncEnvironmentVariables):
     """Sync `.env` with `pyproject.toml`, optionally setting environment variables."""
     config_env = Config().env
-    if pylance_version:
-        config_env["PYRIGHT_PYTHON_PYLANCE_VERSION"] = pylance_version
+    if const.pylance_version:
+        config_env["PYRIGHT_PYTHON_PYLANCE_VERSION"] = const.pylance_version
+    config_env = dict(sorted(config_env.items()))
+    if args.config_only:
+        return print("\n".join(f"{k}={v}" for k, v in config_env.items()))  # noqa: T201
     dotenv = dotenv_values(const.env)
     keys_set: list[str] = []
     for key in dotenv:
@@ -61,11 +63,9 @@ def sync_environment_variables(
     for k, v in config_env.items():
         if k not in keys_set:
             dotenv[k] = v
-    if setenv:
-        load_dotenv(stream=StringIO("\n".join(f"{k}={v}" for k, v in dotenv.items())))
-    const.env.write_text(
-        encoding="utf-8", data="\n".join(f"{k}={v}" for k, v in dotenv.items())
-    )
+    formatted_dotenv = "\n".join(f"{k}={v}" for k, v in dotenv.items())
+    load_dotenv(stream=StringIO(formatted_dotenv))
+    print(formatted_dotenv)  # noqa: T201
 
 
 def run(*args: str, check: bool = True, **kwds):

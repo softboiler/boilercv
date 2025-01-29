@@ -39,11 +39,11 @@ function Find-Pattern {
     <#.SYNOPSIS
     Find the first match to a pattern in a string.#>
     Param(
-        [Parameter(Mandatory)][string]$Pattern,
+        [Parameter(Mandatory)][string]$Pat,
         [Parameter(Mandatory, ValueFromPipeline)][string]$String
     )
     process {
-        if ($Groups = ($String | Select-String -Pattern $Pattern).Matches.Groups) {
+        if ($Groups = ($String | Select-String -Pattern $Pat).Matches.Groups) {
             return $Groups[1].value
         }
     }
@@ -71,7 +71,6 @@ function New-Switch {
     Param($Cond = $False, $Alt = $False)
     return [switch]($Cond ? $True : $Alt)
 }
-
 function Invoke-Uv {
     <#.SYNOPSIS
     Invoke `uv`.#>
@@ -83,15 +82,16 @@ function Invoke-Uv {
         [switch]$High,
         [switch]$Build,
         [switch]$Force,
-        [switch]$CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI)),
-        [switch]$Locked = $CI,
+        # Mangled to avoid its alias shadowing common Python flag `-c`
+        [switch]$_CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI)),
+        [switch]$Locked = $_CI,
         [switch]$Devcontainer = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER)),
         [string]$PythonVersion = (Get-Content '.python-version'),
         [string]$PylanceVersion = (Get-Content '.pylance-version'),
         [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
     )
     Begin {
-        if (!$CI) {
+        if (!$_CI) {
             # ? Install or update `uv`
             if ($Update -or !(Get-Command 'uv' -ErrorAction 'Ignore')) { Install-Uv -Update }
             else { Install-Uv }
@@ -100,7 +100,7 @@ function Invoke-Uv {
                 Remove-Item
             git submodule update --init --merge
         }
-        if ($CI -or $Sync) {
+        if ($_CI -or $Sync) {
             # ? Sync the environment
             if (!(Test-Path 'requirements')) {
                 New-Item 'requirements' -ItemType 'Directory'
@@ -131,46 +131,33 @@ function Invoke-Uv {
                 $Env:ENV_SYNCED = $null
                 Enter-Venv
             }
-            elseif ($CI -or $Force -or !$Env:ENV_SYNCED) {
+            elseif ($_CI -or $Force -or !$Env:ENV_SYNCED) {
+
+                # ? Avoid reentry
+                $Env:ENV_SYNCED = $True
+
                 # ? Sync the environment
                 uv sync $LockedArg --python $PythonVersion
                 uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
                     Set-Content "$PWD/requirements/requirements_dev.txt"
-                if ($CI) {
-                    Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts")
-                }
-                $Env:ENV_SYNCED = $True
                 Enter-Venv
 
-                # ? Sync `.env` and set environment variables from `pyproject.toml`
-                dev 'sync-environment-variables'
-                Get-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env") |
-                    Select-String -Pattern '^(.+?)=(.+)$' |
-                    ForEach-Object {
-                        $Key, $Value = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
-                        Set-Item "Env:$Key" $Value
-                    }
-
-                # ? Environment-specific setup
-                if ($CI) { dev 'elevate-pyright-warnings' }
-                elseif ($Devcontainer) {
-                    $Repo = Get-ChildItem '/workspaces'
-                    $Packages = Get-ChildItem "$Repo/packages"
-                    $SafeDirs = @($Repo) + $Packages
-                    foreach ($Dir in $SafeDirs) {
-                        if (!($SafeDirs -contains $Dir)) {
-                            git config --global --add safe.directory $Dir
+                # ? Set up CI and contributor environments
+                if ($_CI) {
+                    $GithubPath = Get-Content $Env:GITHUB_PATH
+                    foreach ($Path in @("$PWD/.venv/bin", "$PWD/.venv/scripts")) {
+                        if (!($GithubPath | Select-String -Pattern [regex]::Escape($Path))) {
+                            Add-Content $Env:GITHUB_PATH $Path
                         }
                     }
                 }
-
-                # ? Install pre-commit hooks
                 else {
+                    # ? Install pre-commit hooks
                     $Hooks = '.git/hooks'
-                    if (
-                        !(Test-Path "$Hooks/pre-commit") -or
-                        !(Test-Path "$Hooks/post-checkout")
-                    ) { uv run --no-sync --python $PythonVersion pre-commit install --install-hooks }
+                    if ( !(Test-Path "$Hooks/pre-commit") -or !(Test-Path "$Hooks/post-checkout") ) {
+                        Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'install' '--install-hooks'
+                    }
+                    # ? Install Pylance extension
                     if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
                         $LocalExtensions = '.vscode/extensions'
                         $Pylance = 'ms-python.vscode-pylance'
@@ -196,10 +183,47 @@ function Invoke-Uv {
                         }
                     }
                 }
+
+                # ? Sync `.env` and set environment variables from `pyproject.toml`
+                $EnvVars = dev 'sync-environment-variables'
+                $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
+                $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
+                    $K, $V = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
+                    Set-Item "Env:$K" $V
+                }
+                $ProjEnvJson = '{'
+                (dev 'sync-environment-variables' --config-only) |
+                    Select-String -Pattern '^(.+?)=(.+)$' |
+                    ForEach-Object {
+                        $K, $V = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
+                        $ProjEnvJson += "`n    `"$K`": `"$V`","
+                    }
+                $ProjEnvJson = "$($ProjEnvJson.TrimEnd(','))`n  }"
+                $Settings = '.vscode/settings.json'
+                $SettingsContent = Get-Content $Settings -Raw
+                foreach ($Plat in ('linux', 'osx', 'windows')) {
+                    $Pat = "(?m)`"terminal\.integrated\.env\.$Plat`"\s*:\s*\{[^}]*\}"
+                    $Repl = "`"terminal.integrated.env.$Plat`": $ProjEnvJson"
+                    $SettingsContent = $SettingsContent -Replace $Pat, $Repl
+                }
+                Set-Content $Settings $SettingsContent -NoNewline
+
+                # ? Environment-specific setup
+                if ($_CI) { dev 'elevate-pyright-warnings' }
+                elseif ($Devcontainer) {
+                    $Repo = Get-ChildItem '/workspaces'
+                    $Packages = Get-ChildItem "$Repo/packages"
+                    $SafeDirs = @($Repo) + $Packages
+                    foreach ($Dir in $SafeDirs) {
+                        if (!($SafeDirs -contains $Dir)) {
+                            git config --global --add safe.directory $Dir
+                        }
+                    }
+                }
             }
         }
     }
-    Process { if ($Run) { uv run --no-sync --python $PythonVersion $Run } }
+    Process { if ($Run) { uv run $Run } }
 }
 
 function Invoke-Just {
@@ -213,7 +237,7 @@ function Invoke-Just {
         [switch]$High,
         [switch]$Build,
         [switch]$Force,
-        [switch]$CI,
+        [switch]$_CI,
         [switch]$Locked,
         [switch]$Devcontainer,
         [string]$PythonVersion = (Get-Content '.python-version'),
@@ -221,7 +245,7 @@ function Invoke-Just {
         [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
     )
     Begin {
-        $CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI))
+        $_CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI))
         $InvokeUvArgs = @{
             Sync           = $Sync
             Update         = $Update
@@ -229,8 +253,8 @@ function Invoke-Just {
             High           = $High
             Build          = $Build
             Force          = $Force
-            CI             = $CI
-            Locked         = $CI
+            _CI            = $_CI
+            Locked         = $_CI
             Devcontainer   = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER))
             PythonVersion  = $PythonVersion
             PylanceVersion = $PylanceVersion

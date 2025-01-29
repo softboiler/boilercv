@@ -8,7 +8,7 @@ Param(
     [switch]$High,
     [switch]$Build,
     [switch]$Force,
-    [switch]$CI,
+    [switch]$_CI,
     [switch]$Locked,
     [switch]$Devcontainer,
     [string]$PythonVersion = (Get-Content '.python-version'),
@@ -18,7 +18,7 @@ Param(
 Begin {
     . ./dev.ps1
 
-    $CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI))
+    $_CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI))
     $InvokeUvArgs = @{
         Sync           = $Sync
         Update         = $Update
@@ -26,8 +26,8 @@ Begin {
         High           = $High
         Build          = $Build
         Force          = $Force
-        CI             = $CI
-        Locked         = $CI
+        _CI            = $_CI
+        Locked         = $_CI
         Devcontainer   = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER))
         PythonVersion  = $PythonVersion
         PylanceVersion = $PylanceVersion

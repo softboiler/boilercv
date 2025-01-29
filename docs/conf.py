@@ -162,7 +162,7 @@ def add_version_to_css(app: Sphinx, _pagename, _templatename, ctx, _doctree):
 
 
 project = const.ans.package
-copyright = f"{date.today().year}, {const.authors}"  # noqa: A001
+copyright = f"{date.today().year}, {const.authors}"
 version = const.ans.version
 master_doc = "index"
 language = "en"

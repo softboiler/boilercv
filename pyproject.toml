@@ -71,7 +71,7 @@ dev = [
   "pipx>=1.6.0",
   "pre-commit>=4.0.1",
   "pyright>=1.1.371",
-  "ruff>=0.5.1",
+  "ruff>=0.9.3",
   "rust-just>=1.36.0",
   "snakeviz>=2.2.0",
   "sourcery>=1.21.0",
@@ -124,7 +124,7 @@ context-models = { path = "packages/context_models", editable = true }
 branch = true
 source = ["boilercv_dev", "boilercv_pipeline", "boilercv", "tests"]
 
-[tool.dev.env]
+[tool.boilercv_dev.env]
 COVERAGE_CORE = "sysmon"
 JUPYTER_PLATFORM_DIRS = "1"
 PYDEVD_DISABLE_FILE_VALIDATION = "1"
@@ -325,6 +325,16 @@ extend-safe-fixes = [
   "F401", # Allow autofix for unused imports even in `__init__.py`
 ]
 ignore = [
+  "A0",      # TODO: Decide whether to unsuppress and fix
+  "B909",    # TODO: Decide whether to unsuppress and fix
+  "BLE001",  # TODO: Decide whether to unsuppress and fix
+  "DOC2",    # TODO: Decide whether to unsuppress and fix
+  "DOC4",    # TODO: Decide whether to unsuppress and fix
+  "DOC5",    # TODO: Decide whether to unsuppress and fix
+  "LOG015",  # TODO: Decide whether to unsuppress and fix
+  "PLE1206", # TODO: Decide whether to unsuppress and fix
+  "RUF039",  # TODO: Decide whether to unsuppress and fix
+  "RUF052",  # TODO: Decide whether to unsuppress and fix
   "ANN",     # Don't require type annotations
   "ARG005",  # Allow unused lambda argument. For consistency across df pipelines.
   "C408",    # Allow dict calls
@@ -369,7 +379,7 @@ ignore = [
   "S301",    # Don't warn about pickling.
   "S403",    # Don't warn about pickle-like modules.
   "S404",    # Don't warn about subprocess.
-  "TCH",     # Type checking linter doesn't play nicely with pydantic
+  "TC",      # Type checking linter doesn't play nicely with pydantic
   "TD",      # Disable to-do validation. Too pedantic for now.
   "TRY003",  # Allow long exception messages
   "W2",      # Allow whitespace issues. Fixed automatically by black.

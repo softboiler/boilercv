@@ -103,7 +103,7 @@ class Caser:
     def __call__(
         self,
         stage: str,
-        id: str = "_",  # noqa: A002
+        id: str = "_",
         params: dict[str, Any] | None = None,
         results: list[str] | None = None,
         marks: Sequence[pytest.Mark] | None = None,

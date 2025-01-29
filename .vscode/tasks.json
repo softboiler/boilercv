@@ -1,8 +1,7 @@
-// Run tasks like `pwsh -Command "./Invoke-Uv.ps1 && {task}` to run profile-like
-// commands without requiring users to modify global profile.
-
 {
   "version": "2.0.0",
+  "type": "shell",
+  "problemMatcher": ["$python"],
   "inputs": [
     {
       "id": "stage",
@@ -75,101 +74,73 @@
   "tasks": [
     {
       "label": "just: generate correlations",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 generate-correlations ${file} ${input:correlations}",
-      "icon": { "id": "file-code" },
-      "problemMatcher": []
+      "icon": { "id": "file-code" }
     },
     {
       "label": "just: generate correlation docs",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 generate-correlation-docs",
-      "icon": { "id": "file-code" },
-      "problemMatcher": []
+      "icon": { "id": "file-code" }
     },
     {
       "label": "just: update binder",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 update-binder",
-      "icon": { "id": "git-commit" },
-      "problemMatcher": []
+      "icon": { "id": "git-commit" }
     },
     {
       "label": "just: sync local dev configs",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 sync-local-dev-configs",
-      "icon": { "id": "file-code" },
-      "problemMatcher": []
+      "icon": { "id": "file-code" }
     },
     {
       "label": "just: remove empty data folders",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 remove-empty-data-folders",
-      "icon": { "id": "terminal-powershell" },
-      "problemMatcher": []
+      "icon": { "id": "terminal-powershell" }
     },
     {
       "label": "just: patch notebooks",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 patch-notebooks",
-      "icon": { "id": "graph" },
-      "problemMatcher": []
+      "icon": { "id": "graph" }
     },
     {
       "label": "just: boilercv preview write",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 boilercv-preview-write ${file}",
-      "icon": { "id": "repo" },
-      "problemMatcher": []
+      "icon": { "id": "repo" }
     },
     {
       "label": "just: boilercv debug preview write",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 boilercv-debug-preview-write ${file}",
-      "icon": { "id": "repo" },
-      "problemMatcher": []
+      "icon": { "id": "repo" }
     },
     {
       "label": "just: boilercv write",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 boilercv-write ${file}",
-      "icon": { "id": "repo" },
-      "problemMatcher": []
+      "icon": { "id": "repo" }
     },
     {
       "label": "just: boilercv preview",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 boilercv-preview ${input:preview}",
-      "icon": { "id": "graph" },
-      "problemMatcher": []
+      "icon": { "id": "graph" }
     },
     {
       "label": "dvc: repro",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 dvc repro ${input:stage}",
-      "icon": { "id": "graph" },
-      "problemMatcher": []
+      "icon": { "id": "graph" }
     },
     {
       "label": "dvc: repro force",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 dvc repro --force ${input:stage}",
-      "icon": { "id": "graph" },
-      "problemMatcher": []
+      "icon": { "id": "graph" }
     },
     {
       "label": "just: dvc dag",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 dvc-dag",
-      "icon": { "id": "graph" },
-      "problemMatcher": []
+      "icon": { "id": "graph" }
     },
     {
       "label": "just: sync dvc",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 pipeline-sync-dvc",
-      "icon": { "id": "graph" },
-      "problemMatcher": []
+      "icon": { "id": "graph" }
     },
 
     // * -------------------------------------------------------------------------- * //
@@ -177,8 +148,8 @@
 
     {
       "label": "wsl: Copy PID of Python Debugger",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 && ps aux | grep python | grep --max-count 1 -- --adapter-access-token | grep --only-matching --perl-regexp 'user\\s+\\d+' | grep --only-matching --perl-regexp '\\d+' | clip.exe",
+      "icon": { "id": "terminal-linux" },
       "group": {
         "kind": "test",
         "isDefault": true
@@ -187,9 +158,7 @@
         "close": false,
         "focus": true,
         "reveal": "always"
-      },
-      "icon": { "id": "terminal-linux" },
-      "problemMatcher": []
+      }
     },
 
     // * -------------------------------------------------------------------------- * //
@@ -197,21 +166,16 @@
 
     {
       "label": "setup: Sync with template",
-      "type": "shell",
       "command": ". ./dev.ps1 && Sync-Template ${input:templateOptions}",
-      "icon": { "id": "file-symlink-directory" },
-      "problemMatcher": []
+      "icon": { "id": "file-symlink-directory" }
     },
     {
       "label": "setup: Sync with specific template ref",
-      "type": "shell",
       "command": ". ./dev.ps1 && Sync-Template ${input:ref} ${input:templateOptions}",
-      "icon": { "id": "file-symlink-directory" },
-      "problemMatcher": []
+      "icon": { "id": "file-symlink-directory" }
     },
     {
       "label": "setup: just: sync contrib",
-      "type": "shell",
       "command": "if (!$Env:DEVCONTAINER) {./Invoke-Just.ps1 sync-contrib}",
       "icon": { "id": "file-symlink-directory" },
       "problemMatcher": [],
@@ -221,40 +185,30 @@
     },
     {
       "label": "setup: Initialize repository",
-      "type": "shell",
       "command": ". ./dev.ps1 && Initialize-Repo",
-      "icon": { "id": "file-symlink-directory" },
-      "problemMatcher": []
+      "icon": { "id": "file-symlink-directory" }
     },
     {
       "label": "setup: Remove *.rej",
-      "type": "shell",
       "command": "Get-ChildItem -Recurse -Filter *.rej | Remove-Item",
-      "icon": { "id": "file-symlink-directory" },
-      "problemMatcher": []
+      "icon": { "id": "file-symlink-directory" }
     },
     {
       "label": "setup: Initialize Windows machine",
-      "type": "shell",
       "options": { "shell": { "executable": "powershell" } },
       "command": ". ./dev.ps1 && Initialize-Windows",
-      "icon": { "id": "file-symlink-directory" },
-      "problemMatcher": []
+      "icon": { "id": "file-symlink-directory" }
     },
     {
       "label": "setup: Initialize Linux/MacOS machine",
-      "type": "shell",
       "options": { "shell": { "executable": "bash" } },
       "command": "scripts/Initialize-LinuxMacOS.sh",
-      "icon": { "id": "file-symlink-directory" },
-      "problemMatcher": []
+      "icon": { "id": "file-symlink-directory" }
     },
     {
       "label": "setup: Finish initializing machine (cross-platform)",
-      "type": "shell",
       "command": ". ./dev.ps1 && Initialize-Machine",
-      "icon": { "id": "file-symlink-directory" },
-      "problemMatcher": []
+      "icon": { "id": "file-symlink-directory" }
     },
 
     // * -------------------------------------------------------------------------- * //
@@ -262,115 +216,83 @@
 
     {
       "label": "task: pre-commit",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 pre-commit run --verbose",
-      "icon": { "id": "git-commit" },
-      "problemMatcher": []
+      "icon": { "id": "git-commit" }
     },
     {
       "label": "task: pre-commit (all)",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 pre-commit run --all-files --verbose",
-      "icon": { "id": "git-commit" },
-      "problemMatcher": []
+      "icon": { "id": "git-commit" }
     },
     {
       "label": "task: pre-commit (clean notebooks)",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 pre-commit run --all-files nb-clean --verbose",
-      "icon": { "id": "git-commit" },
-      "problemMatcher": []
+      "icon": { "id": "git-commit" }
     },
     {
       "label": "task: pre-commit (clean and format notebooks)",
-      "type": "shell",
       "command": "./Dev.ps1 && iuv pre-commit run --all-files patch-notebooks --verbose && iuv pre-commit run --all-files nb-clean --verbose && iuv pre-commit run --all-files ruff --verbose && iuv pre-commit run --all-files ruff-format --verbose",
-      "icon": { "id": "git-commit" },
-      "problemMatcher": []
+      "icon": { "id": "git-commit" }
     },
     {
       "label": "task: Rebase back to fork",
-      "type": "shell",
       "command": "git rebase -i --fork-point main",
-      "icon": { "id": "git-branch" },
-      "problemMatcher": []
+      "icon": { "id": "git-branch" }
     },
     {
       "label": "task: Show tree of packages requesting a dependency",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 pipdeptree --reverse --packages ${input:dependency}",
-      "icon": { "id": "versions" },
-      "problemMatcher": []
+      "icon": { "id": "versions" }
     },
     {
       "label": "task: Run pytest with coverage",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 pytest --cov  --cov-config pyproject.toml --cov-report xml",
-      "icon": { "id": "check" },
-      "problemMatcher": []
+      "icon": { "id": "check" }
     },
     {
       "label": "task: Run ruff",
-      "type": "shell",
       "command": ". ./dev.ps1 && iuv ruff check . && iuv ruff format .",
-      "icon": { "id": "check" },
-      "problemMatcher": []
+      "icon": { "id": "check" }
     },
     {
       "label": "task: Run pyright",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 pyright",
-      "icon": { "id": "check" },
-      "problemMatcher": []
+      "icon": { "id": "check" }
     },
     {
       "label": "task: Build docs",
-      "type": "shell",
       "command": "./Invoke-Just.ps1 build-docs",
-      "icon": { "id": "book" },
-      "problemMatcher": []
+      "icon": { "id": "book" }
     },
     {
       "label": "task: Profile this file",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 cProfile -o .prof ${file}",
-      "icon": { "id": "graph-line" },
-      "problemMatcher": []
+      "icon": { "id": "graph-line" }
     },
     {
       "label": "task: View profile results with snakeviz",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 snakeviz .prof",
-      "icon": { "id": "graph-line" },
-      "problemMatcher": []
+      "icon": { "id": "graph-line" }
     },
     {
       "label": "task: Bump version",
-      "type": "shell",
       "command": ". ./dev.ps1 && uvx copier@9.2.0 update --vcs-ref=HEAD --defaults --data project_version='${input:version}' && iuv towncrier build --yes --version '${input:version}' && git add . && git commit -m '${input:version}'",
-      "icon": { "id": "tag" },
-      "problemMatcher": []
+      "icon": { "id": "tag" }
     },
     {
       "label": "task: Release version",
-      "type": "shell",
       "command": ". ./dev.ps1 && Invoke-Uv && ($Version = (Get-Content '.copier-answers.yml' | Find-Pattern '^project_version:\\s(.+)$')) && git tag --sign -m $Version $Version && git push",
-      "icon": { "id": "tag" },
-      "problemMatcher": []
+      "icon": { "id": "tag" }
     },
     {
       "label": "task: Update changelog",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 -m dev add-change ${input:changeType}",
-      "icon": { "id": "tag" },
-      "problemMatcher": []
+      "icon": { "id": "tag" }
     },
     {
       "label": "task: Update changelog with the latest commit's message",
-      "type": "shell",
       "command": "./Invoke-Uv.ps1 towncrier create +$((Get-Date).ToUniversalTime().ToString('o').Replace(':','-')).change.md --content $($(git log -1 --format='%s') + ' ([' + $(git rev-parse --short HEAD) + '](https://github.com/softboiler/boilercv/commit/' + $(git rev-parse HEAD) + '))\n')",
-      "icon": { "id": "tag" },
-      "problemMatcher": []
+      "icon": { "id": "tag" }
     }
   ]
 }

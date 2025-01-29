@@ -1,5 +1,5 @@
 {
-  // * ----------------------------------------------------------------------------- * #
+  //* ------------------------------------------------------------------------------ *//
   //! Schema
   "yaml.schemas": {
     // ? `boilercv`
@@ -15,7 +15,7 @@
     "pipeline/boilercv_pipeline/settings_schema.json": "packages/pipeline/boilercv_pipeline/settings.yaml",
     "pipeline/boilercv_pipeline/settings_plugin_schema.json": "packages/pipeline/boilercv_pipeline/settings_plugin.yaml"
   },
-  // * ----------------------------------------------------------------------------- * #
+  //* ------------------------------------------------------------------------------ *//
   //! Terminal
   //? Use PowerShell on all platforms, facilitates running template scripts
   "terminal.integrated.defaultProfile.windows": "PowerShell",
@@ -100,8 +100,6 @@
     "source.organizeImports": "explicit"
   },
   //! Extensions
-  //* autoDocstring
-  "autoDocstring.docstringFormat": "numpy-notypes",
   //* Better Comments
   "better-comments.tags": [
     {
@@ -228,7 +226,11 @@
   "[markdown]": {
     "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
   },
-  //* Prettier (JSON, JSONC, YAML)
+  //* Prettier
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.wordWrap": "off"
+  },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -240,10 +242,6 @@
     "editor.wordWrap": "off"
   },
   "[yaml]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.wordWrap": "off"
-  },
-  "[github-actions-workflow]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.wordWrap": "off"
   },
@@ -269,6 +267,38 @@
     "editor.wordWrap": "off"
   },
   "evenBetterToml.taplo.configFile.path": ".taplo.toml",
+  //* Automatically synchronized environment variables
+  //! PLEASE MODIFY `pyproject.toml:tool.boilercv_dev.env` AND RUN `./Invoke-Uv -Sync`
+  "terminal.integrated.env.linux": {
+    "COVERAGE_CORE": "sysmon",
+    "JUPYTER_PLATFORM_DIRS": "1",
+    "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+    "PYRIGHT_PYTHON_PYLANCE_VERSION": "2024.6.1",
+    "PYTHONIOENCODING": "utf-8:strict",
+    "PYTHONUTF8": "1",
+    "PYTHONWARNDEFAULTENCODING": "1",
+    "PYTHONWARNINGS": "ignore"
+  },
+  "terminal.integrated.env.osx": {
+    "COVERAGE_CORE": "sysmon",
+    "JUPYTER_PLATFORM_DIRS": "1",
+    "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+    "PYRIGHT_PYTHON_PYLANCE_VERSION": "2024.6.1",
+    "PYTHONIOENCODING": "utf-8:strict",
+    "PYTHONUTF8": "1",
+    "PYTHONWARNDEFAULTENCODING": "1",
+    "PYTHONWARNINGS": "ignore"
+  },
+  "terminal.integrated.env.windows": {
+    "COVERAGE_CORE": "sysmon",
+    "JUPYTER_PLATFORM_DIRS": "1",
+    "PYDEVD_DISABLE_FILE_VALIDATION": "1",
+    "PYRIGHT_PYTHON_PYLANCE_VERSION": "2024.6.1",
+    "PYTHONIOENCODING": "utf-8:strict",
+    "PYTHONUTF8": "1",
+    "PYTHONWARNDEFAULTENCODING": "1",
+    "PYTHONWARNINGS": "ignore"
+  },
   //! Other
   //? Other automatically added settings below
   "": ""

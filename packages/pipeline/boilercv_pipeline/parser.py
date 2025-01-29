@@ -32,7 +32,7 @@ def invoke(
     backend: Callable[..., Any] | None = None,
     color: bool = True,
     version: str | Arg[Any] | None = None,
-    help: bool | Arg[Any] = True,  # noqa: A002
+    help: bool | Arg[Any] = True,
     completion: bool | Arg[Any] = True,
     theme: Any | None = None,
     output: Output | None = None,

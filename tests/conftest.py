@@ -254,9 +254,9 @@ def pytest_harvest_xdist_worker_dump(worker_id, session_items, fixture_store):
     with (RESULTS_PATH / f"{worker_id}.pkl").open("wb") as f:
         try:
             pickle.dump((session_items, fixture_store), f)
-        except Exception as e:  # noqa: BLE001
-            warning(  # noqa: PLE1206
-                "Error while pickling worker %s's harvested results: " "[%s] %s",
+        except Exception as e:
+            warning(
+                "Error while pickling worker %s's harvested results: [%s] %s",
                 (worker_id, e.__class__, e),
             )
     return True
