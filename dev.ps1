@@ -1,19 +1,6 @@
 <#.SYNOPSIS
 Common utilities.#>
 
-# ? Error-handling
-$ErrorActionPreference = 'Stop'
-$PSNativeCommandUseErrorActionPreference = $True
-$ErrorView = 'NormalView'
-
-# ? Fix leaky UTF-8 encoding settings on Windows
-if ($IsWindows) {
-    # ? Now PowerShell pipes will be UTF-8. Note that fixing it from Control Panel and
-    # ? system-wide has buggy downsides.
-    # ? See: https://github.com/PowerShell/PowerShell/issues/7233#issuecomment-640243647
-    [console]::InputEncoding = [console]::OutputEncoding = [System.Text.UTF8Encoding]::new()
-}
-
 # ? Set aliases
 @{
     'iuv'      = 'Invoke-Uv'
@@ -26,13 +13,6 @@ function Enter-Venv {
     <#.SYNOPSIS
     Enter a local Python virtual environment.#>
     if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
-}
-
-function Initialize-Shell {
-    <#.SYNOPSIS
-    Initialize shell.#>
-    if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Update -Force }
-    Enter-Venv
 }
 
 function Find-Pattern {
@@ -91,6 +71,20 @@ function Invoke-Uv {
         [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
     )
     Begin {
+        # ? Error-handling
+        $ErrorActionPreference = 'Stop'
+        $PSNativeCommandUseErrorActionPreference = $True
+        $ErrorView = 'NormalView'
+
+        # ? Fix leaky UTF-8 encoding settings on Windows
+        if ($IsWindows) {
+            # ? Now PowerShell pipes will be UTF-8. Note that fixing it from Control Panel and
+            # ? system-wide has buggy downsides.
+            # ? See: https://github.com/PowerShell/PowerShell/issues/7233#issuecomment-640243647
+            $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = [System.Text.Encoding]::UTF8
+        }
+
+        # ? Initialize shell
         if (!$_CI) {
             # ? Install or update `uv`
             if ($Update -or !(Get-Command 'uv' -ErrorAction 'Ignore')) { Install-Uv -Update }
@@ -148,7 +142,7 @@ function Invoke-Uv {
                     # ? Install pre-commit hooks
                     $Hooks = '.git/hooks'
                     if ( !(Test-Path "$Hooks/pre-commit") -or !(Test-Path "$Hooks/post-checkout") ) {
-                        Invoke-Uv 'pre-commit' 'install' '--install-hooks'
+                        Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'install' '--install-hooks'
                     }
                     # ? Install Pylance extension
                     if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
@@ -252,7 +246,9 @@ function Invoke-Just {
             PythonVersion  = $PythonVersion
             PylanceVersion = $PylanceVersion
         }
-        if (!(Get-Command 'just' -ErrorAction 'Ignore')) { Initialize-Shell }
+        if (!(Test-Path '.venv')) {
+            Invoke-Uv -Sync -Update -Force
+        }
     }
     Process { if ($Run) { Invoke-Uv @InvokeUvArgs -- just $Run } else { Invoke-Uv @InvokeUvArgs -- just } }
 }

@@ -1,7 +1,7 @@
-set shell := ['pwsh', '-Command']
+set shell := ['pwsh', '-NonInteractive', '-NoProfile', '-Command']
 set dotenv-load
 
-dev := '. ./dev; Initialize-Shell; '
+dev := '. ./dev'
 devpy := dev + 'dev'
 
 sync-contrib:
