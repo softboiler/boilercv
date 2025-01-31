@@ -183,8 +183,9 @@
   //* MyST
   "myst.preview.extensions": ["colon_fence", "dollarmath"],
   // * Python
-  "python.terminal.activateEnvInCurrentTerminal": true,
-  "python.terminal.activateEnvironment": true,
+  //! Flaky for now
+  "python.terminal.activateEnvInCurrentTerminal": false,
+  "python.terminal.activateEnvironment": false,
   //* Pylance
   "python.languageServer": "Pylance",
   "python.analysis.diagnosticMode": "openFilesOnly",
