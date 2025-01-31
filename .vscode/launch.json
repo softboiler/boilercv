@@ -36,6 +36,7 @@
     {
       "name": "Python: Current file",
       "type": "debugpy",
+      "purpose": ["debug-in-terminal", "debug-test"],
       "request": "launch",
       "program": "${file}",
       "console": "internalConsole",
@@ -204,25 +205,6 @@
       "request": "launch",
       "script": "${file}",
       "cwd": "${cwd}"
-    },
-    {
-      //? https://github.com/microsoft/vscode-python-debugger/issues/335
-      "name": "pytest",
-      //! Uncomment below to disable "justMyCode" when debugging. Comment out after.
-      // "purpose": ["debug-test"],
-      //!
-      "presentation": {
-        "hidden": true
-      },
-      "type": "debugpy",
-      "request": "launch",
-      "program": "${file}",
-      "console": "internalConsole",
-      "justMyCode": false,
-      "env": {
-        "BOILERCV_DEBUG": "True",
-        "BOILERCV_PREVIEW": "True"
-      }
     }
   ]
 }

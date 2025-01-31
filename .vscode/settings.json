@@ -183,8 +183,8 @@
   //* MyST
   "myst.preview.extensions": ["colon_fence", "dollarmath"],
   // * Python
-  "python.terminal.activateEnvInCurrentTerminal": false,
-  "python.terminal.activateEnvironment": false,
+  "python.terminal.activateEnvInCurrentTerminal": true,
+  "python.terminal.activateEnvironment": true,
   //* Pylance
   "python.languageServer": "Pylance",
   "python.analysis.diagnosticMode": "openFilesOnly",
