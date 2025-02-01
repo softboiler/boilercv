@@ -51,10 +51,10 @@ function New-Switch {
     Param($Cond = $False, $Alt = $False)
     return [switch]($Cond ? $True : $Alt)
 }
-function Invoke-Uv {
+
+function Initialize-Shell {
     <#.SYNOPSIS
-    Invoke `uv`.#>
-    [CmdletBinding(PositionalBinding = $False)]
+    Initialize shell.#>
     Param(
         [switch]$Sync,
         [switch]$Update,
@@ -67,8 +67,7 @@ function Invoke-Uv {
         [switch]$Locked = $_CI,
         [switch]$Devcontainer = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER)),
         [string]$PythonVersion = (Get-Content '.python-version'),
-        [string]$PylanceVersion = (Get-Content '.pylance-version'),
-        [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
+        [string]$PylanceVersion = (Get-Content '.pylance-version')
     )
     Begin {
         # ? Error-handling
@@ -209,6 +208,29 @@ function Invoke-Uv {
                 }
             }
         }
+    }
+}
+
+function Invoke-Uv {
+    <#.SYNOPSIS
+    Invoke `uv`.#>
+    [CmdletBinding(PositionalBinding = $False)]
+    Param(
+        [switch]$Sync,
+        [switch]$Update,
+        [switch]$Low,
+        [switch]$High,
+        [switch]$Build,
+        [switch]$Force,
+        [switch]$_CI,
+        [switch]$Locked,
+        [switch]$Devcontainer,
+        [string]$PythonVersion = (Get-Content '.python-version'),
+        [string]$PylanceVersion = (Get-Content '.pylance-version'),
+        [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
+    )
+    Begin {
+        Initialize-Shell -Sync $Sync -Update $Update -Low $Low -High $High -Build $Build -Force $Force -_CI $_CI -Locked $Locked -Devcontainer $Devcontainer -PythonVersion $PythonVersion -PylanceVersion $PylanceVersion
     }
     Process { if ($Run) { uv run --no-sync --python $PythonVersion $Run } }
 }

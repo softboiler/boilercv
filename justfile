@@ -48,3 +48,6 @@ remove-empty-data-folders:
 
 sync-local-dev-configs:
   {{devpy}} sync-local-dev-configs
+
+run *args:
+  {{dev}} Initialize-Shell; {{args}}
