@@ -144,6 +144,12 @@ function Invoke-Uv {
                     if ( !(Test-Path "$Hooks/pre-commit") -or !(Test-Path "$Hooks/post-checkout") ) {
                         Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'install' '--install-hooks'
                     }
+                    # ? Normalize line endings of changed files
+                    try {
+                        Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'run' 'mixed-line-ending' '--all-files' |
+                            Out-Null
+                    }
+                    catch [System.Management.Automation.NativeCommandExitException] {}
                     # ? Install Pylance extension
                     if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
                         $LocalExtensions = '.vscode/extensions'
