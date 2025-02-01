@@ -14,7 +14,7 @@ from boilercv_pipeline.examples.large import example_dataset
     preview=DEBUG,
     encoding={VIDEO: {"zlib": True}},
 )
-def main():  # noqa: D103
+def main():
     pass
 
 

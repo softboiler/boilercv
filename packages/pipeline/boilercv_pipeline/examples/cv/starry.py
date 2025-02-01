@@ -8,7 +8,7 @@ from boilercv_pipeline import PREVIEW
 from boilercv_pipeline.captivate.previews import view_images
 
 
-def main(preview=PREVIEW) -> ImgLike:  # noqa: D103
+def main(preview=PREVIEW) -> ImgLike:
     img = cvtColor(imread(findFile("starry_night.jpg")), COLOR_BGR2RGB)
     if preview:
         view_images(img)

@@ -13,7 +13,7 @@ _NUM_FRAMES = 10
 SHORTER_FRAME_LIST = EXAMPLE_FRAME_LIST[:_NUM_FRAMES]
 
 
-def main():  # noqa: D103
+def main():
     roi = edit_roi(SHORTER_FRAME_LIST[0], EXAMPLE_ROI)
     # results_log: list[ArrInt] = []
     # results_dog: list[ArrInt] = []

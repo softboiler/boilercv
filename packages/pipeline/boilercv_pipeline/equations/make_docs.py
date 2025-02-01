@@ -38,7 +38,7 @@ SEP = " "
 """Line separator."""
 
 
-async def main():  # noqa: D103
+async def main():
     logger.info("Generating docs.")
     make_docs()
     logger.success("Generated docs.")

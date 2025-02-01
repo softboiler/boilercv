@@ -37,42 +37,38 @@ TypeOfModel = TypeVar("TypeOfModel", bound=type[BaseModel])
 """Type of model type."""
 
 
-class TypeType(Protocol[P, R, Ps]):  # noqa: D101
-    def __call__(self, i: P, /, *args: Ps.args, **kwds: Ps.kwargs) -> R: ...  # noqa: D102
+class TypeType(Protocol[P, R, Ps]):
+    def __call__(self, i: P, /, *args: Ps.args, **kwds: Ps.kwargs) -> R: ...
 
 
-class TypeMap(Protocol[P, K, V, Ps]):  # noqa: D101
-    def __call__(  # noqa: D102
+class TypeMap(Protocol[P, K, V, Ps]):
+    def __call__(
         self, i: P, /, *args: Ps.args, **kwds: Ps.kwargs
     ) -> MutableMapping[K, V]: ...
 
 
-class TypeDict(Protocol[P, K, V, Ps]):  # noqa: D101
-    def __call__(  # noqa: D102
-        self, i: P, /, *args: Ps.args, **kwds: Ps.kwargs
-    ) -> dict[K, V]: ...
+class TypeDict(Protocol[P, K, V, Ps]):
+    def __call__(self, i: P, /, *args: Ps.args, **kwds: Ps.kwargs) -> dict[K, V]: ...
 
 
-class MapType(Protocol[K, V, R, Ps]):  # noqa: D101
-    def __call__(  # noqa: D102
+class MapType(Protocol[K, V, R, Ps]):
+    def __call__(
         self, i: MutableMapping[K, V], /, *args: Ps.args, **kwds: Ps.kwargs
     ) -> R: ...
 
 
-class DictType(Protocol[K, V, R, Ps]):  # noqa: D101
-    def __call__(  # noqa: D102
-        self, i: dict[K, V], /, *args: Ps.args, **kwds: Ps.kwargs
-    ) -> R: ...
+class DictType(Protocol[K, V, R, Ps]):
+    def __call__(self, i: dict[K, V], /, *args: Ps.args, **kwds: Ps.kwargs) -> R: ...
 
 
-class MapMap(Protocol[K, V, RK, RV, Ps]):  # noqa: D101
-    def __call__(  # noqa: D102
+class MapMap(Protocol[K, V, RK, RV, Ps]):
+    def __call__(
         self, i: MutableMapping[K, V], /, *args: Ps.args, **kwds: Ps.kwargs
     ) -> MutableMapping[RK, RV]: ...
 
 
-class DictDict(Protocol[K, V, RK, RV, Ps]):  # noqa: D101
-    def __call__(  # noqa: D102
+class DictDict(Protocol[K, V, RK, RV, Ps]):
+    def __call__(
         self, i: dict[K, V], /, *args: Ps.args, **kwds: Ps.kwargs
     ) -> dict[RK, RV]: ...
 

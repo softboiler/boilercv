@@ -76,8 +76,8 @@ CVL = TypeVar("CVL", bound="DataclassInstance | Mapping[Any, Any]", contravarian
 # * MARK: Protocols
 
 
-class Transform(Protocol[P, Ps, R]):  # noqa: D101
-    def __call__(self, i: P, /, *args: Ps.args, **kwds: Ps.kwargs) -> R: ...  # noqa: D102
+class Transform(Protocol[P, Ps, R]):
+    def __call__(self, i: P, /, *args: Ps.args, **kwds: Ps.kwargs) -> R: ...
 
 
 # * MARK: Validator

@@ -20,12 +20,12 @@ APP = App()
 """CLI."""
 
 
-def main():  # noqa: D103
+def main():
     APP()
 
 
 @APP.default
-def default(corr: Corr = "beta"):  # noqa: D103
+def default(corr: Corr = "beta"):
     logger.warning("")
     equations_path = EQUATIONS[corr]
     content: str = (

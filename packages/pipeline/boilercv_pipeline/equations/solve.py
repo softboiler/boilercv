@@ -27,12 +27,12 @@ APP = App()
 """CLI."""
 
 
-def main():  # noqa: D103
+def main():
     APP()
 
 
 @APP.default
-def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
+def default(corr: Corr = "beta", overwrite: bool = False):
     logger.info("Start generating symbolic equations.")
     equations = EQUATIONS[corr]
     solutions = SOLUTIONS[corr]

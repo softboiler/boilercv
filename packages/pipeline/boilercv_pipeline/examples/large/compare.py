@@ -16,7 +16,7 @@ class KW(TypedDict):
 kw = KW(preview=DEBUG, save=False)
 
 
-def main():  # noqa: D103
+def main():
     with ex_ds("binarized", **kw) as original, ex_ds("unpacked", **kw) as unpacked:
         assert unpacked.identical(original)  # noqa: S101
 

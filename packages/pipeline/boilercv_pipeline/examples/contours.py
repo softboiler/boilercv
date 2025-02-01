@@ -19,7 +19,7 @@ from boilercv_pipeline.sets import get_dataset
 from boilercv_pipeline.stages.find_contours.__main__ import get_all_contours
 
 
-def main():  # noqa: D103
+def main():
     ds = get_dataset(EXAMPLE_VIDEO_NAME, EXAMPLE_NUM_FRAMES)
     video = ds[VIDEO]
     df = get_all_contours(

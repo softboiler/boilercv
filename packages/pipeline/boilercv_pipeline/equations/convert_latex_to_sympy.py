@@ -34,12 +34,12 @@ APP = App()
 """CLI."""
 
 
-def main():  # noqa: D103
+def main():
     APP()
 
 
 @APP.default
-def default(corr: Corr | Range = "beta", overwrite: bool = False):  # noqa: D103
+def default(corr: Corr | Range = "beta", overwrite: bool = False):
     equations_path = EQUATIONS[corr]
     logger.info("Start converting LaTeX expressions to SymPy expressions.")
     content = equations_path.read_text("utf-8") if equations_path.exists() else ""

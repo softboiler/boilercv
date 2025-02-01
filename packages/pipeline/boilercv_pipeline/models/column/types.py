@@ -17,7 +17,7 @@ Ps = ParamSpec("Ps")
 """Parameter type specification."""
 
 
-class Transform(Protocol[P, R, Ps]):  # noqa: D101
-    def __call__(  # noqa: D102
+class Transform(Protocol[P, R, Ps]):
+    def __call__(
         self, v: P, src: "Col", dst: "Col", /, *args: Ps.args, **kwds: Ps.kwargs
     ) -> R: ...

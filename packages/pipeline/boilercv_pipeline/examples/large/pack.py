@@ -5,7 +5,7 @@ from boilercv.data.packing import pack
 from boilercv_pipeline.examples.large import example_dataset
 
 
-def main():  # noqa: D103
+def main():
     with example_dataset(source="binarized", destination="packed") as ds:
         ds[VIDEO] = pack(ds[VIDEO])
 

@@ -16,7 +16,7 @@ from boilercv_pipeline.sets import get_contours_df, get_dataset
 TRY_EMPTY = False
 
 
-def main():  # noqa: D103
+def main():
     if TRY_EMPTY:
         all_contours = empty((0, 4))
         df = DataFrame(

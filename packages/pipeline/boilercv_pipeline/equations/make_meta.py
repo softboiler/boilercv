@@ -12,7 +12,7 @@ APP = App()
 """CLI."""
 
 
-def main():  # noqa: D103
+def main():
     META_TOML.write_text(
         encoding="utf-8",
         data=sync(

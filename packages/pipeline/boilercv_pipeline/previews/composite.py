@@ -11,7 +11,7 @@ from boilercv_pipeline.previews import compose_da, draw_text_da, get_preview
 from boilercv_pipeline.sets import ROOTED_PATHS
 
 
-def main(preview: bool = PREVIEW) -> DA:  # noqa: D103
+def main(preview: bool = PREVIEW) -> DA:
     gray = get_preview(ROOTED_PATHS.gray_preview)
     filled = get_preview(ROOTED_PATHS.filled_preview)
     composed = draw_text_da(

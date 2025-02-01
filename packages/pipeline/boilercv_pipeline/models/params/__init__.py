@@ -95,7 +95,7 @@ def display_markdown(df: DataFrame, floatfmt: str = "#.3g"):
     display(Markdown(df.to_markdown(floatfmt=floatfmt)))
 
 
-def head(df: DataFrame) -> DataFrame:  # noqa: D103
+def head(df: DataFrame) -> DataFrame:
     return df.head()
 
 

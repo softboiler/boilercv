@@ -13,7 +13,7 @@ from boilercv_pipeline.examples import EXAMPLE_ROI, EXAMPLE_VIDEO_NAME
 from boilercv_pipeline.sets import get_dataset
 
 
-def main():  # noqa: D103
+def main():
     ds = get_dataset(EXAMPLE_VIDEO_NAME)
     roi = ds[ROI]
     wall: DA = apply_to_img_da(get_wall, scale_bool(roi), name="wall")

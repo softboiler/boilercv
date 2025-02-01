@@ -1,8 +1,8 @@
 set shell := ['pwsh', '-NonInteractive', '-NoProfile', '-Command']
 set dotenv-load
 
-dev := '. ./dev'
-devpy := dev + 'dev'
+dev := '. ./dev; '
+devpy := dev + 'boilercv-dev'
 
 sync-contrib:
   {{dev}} iuv -Sync -Update

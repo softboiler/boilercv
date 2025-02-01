@@ -37,7 +37,7 @@ def main():
 
 
 @APP.default
-def convert_png_to_latex(img: Path):  # noqa: D103
+def convert_png_to_latex(img: Path):
     print(LatexOCR()(Image.open(img)))  # noqa: T201
 
 

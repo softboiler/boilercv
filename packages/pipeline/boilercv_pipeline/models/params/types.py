@@ -24,7 +24,7 @@ AnyParams: TypeAlias = "Params[Deps, Outs]"
 """Any parameters."""
 
 
-class Preview(Protocol[Ps]):  # noqa: D101
-    def __call__(  # noqa: D102
+class Preview(Protocol[Ps]):
+    def __call__(
         self, df: DataFrame, /, *args: Ps.args, **kwds: Ps.kwargs
     ) -> DataFrame: ...

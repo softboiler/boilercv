@@ -11,7 +11,7 @@ from boilercv_pipeline.previews import draw_text_da
 from boilercv_pipeline.sets import ROOTED_PATHS
 
 
-def main(preview: bool = PREVIEW) -> DA:  # noqa: D103
+def main(preview: bool = PREVIEW) -> DA:
     with open_dataset(ROOTED_PATHS.gray_preview) as ds:
         da = draw_text_da(ds[VIDEO])
     if preview:

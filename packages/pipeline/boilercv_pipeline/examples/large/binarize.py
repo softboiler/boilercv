@@ -5,7 +5,7 @@ from boilercv.images.cv import binarize
 from boilercv_pipeline.examples.large import example_dataset
 
 
-def main():  # noqa: D103
+def main():
     with example_dataset(destination="binarized") as ds:
         ds[VIDEO] = apply_to_img_da(binarize, ds[VIDEO], vectorize=True)
 

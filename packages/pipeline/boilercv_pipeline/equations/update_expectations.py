@@ -25,12 +25,12 @@ APP = App()
 """CLI."""
 
 
-def main():  # noqa: D103
+def main():
     APP()
 
 
 @APP.default
-def default(corr: Corr = "beta", overwrite: bool = False):  # noqa: D103
+def default(corr: Corr = "beta", overwrite: bool = False):
     expectations = EXPECTATIONS[corr]
     substitutions = SUBSTITUTIONS[corr]
 

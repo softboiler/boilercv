@@ -12,7 +12,7 @@ from boilercv_pipeline.previews import compose_da
 from boilercv_pipeline.sets import get_dataset
 
 
-def main():  # noqa: D103
+def main():
     source = get_dataset(_EXAMPLE, _NUM_FRAMES, stage="sources")[VIDEO]
     bubbles = get_dataset(_EXAMPLE, _NUM_FRAMES, stage="filled")[VIDEO]
     highlighted_bubbles = compose_da(source, scale_bool(bubbles)).transpose(

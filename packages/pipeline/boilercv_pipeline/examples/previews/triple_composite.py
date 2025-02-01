@@ -14,7 +14,7 @@ from boilercv_pipeline.models.paths import paths
 from boilercv_pipeline.sets import get_dataset
 
 
-def main():  # noqa: D103
+def main():
     ds = get_dataset(_EXAMPLE)
     gray = open_dataset(paths.gray_preview)[VIDEO].sel(video_name=_EXAMPLE).values
     roi = ds[ROI].values
