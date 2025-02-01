@@ -12,18 +12,25 @@ Common utilities.#>
 function Enter-Venv {
     <#.SYNOPSIS
     Enter a local Python virtual environment.#>
-    if ($IsWindows) { .venv/scripts/activate.ps1 } else { .venv/bin/activate.ps1 }
+    if ($IsWindows) { '.venv/scripts/activate.ps1' } else { '.venv/bin/activate.ps1' }
+}
+
+function Initialize-Shell {
+    <#.SYNOPSIS
+    Initialize shell.#>
+    if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Update -Force }
+    Enter-Venv
 }
 
 function Find-Pattern {
     <#.SYNOPSIS
     Find the first match to a pattern in a string.#>
     Param(
-        [Parameter(Mandatory)][string]$Pat,
+        [Parameter(Mandatory)][string]$Pattern,
         [Parameter(Mandatory, ValueFromPipeline)][string]$String
     )
     process {
-        if ($Groups = ($String | Select-String -Pattern $Pat).Matches.Groups) {
+        if ($Groups = ($String | Select-String -Pattern $Pattern).Matches.Groups) {
             return $Groups[1].value
         }
     }
@@ -51,6 +58,7 @@ function New-Switch {
     Param($Cond = $False, $Alt = $False)
     return [switch]($Cond ? $True : $Alt)
 }
+
 function Invoke-Uv {
     <#.SYNOPSIS
     Invoke `uv`.#>
@@ -71,6 +79,7 @@ function Invoke-Uv {
         [Parameter(ValueFromPipeline, ValueFromRemainingArguments)][string[]]$Run
     )
     Begin {
+
         # ? Error-handling
         $ErrorActionPreference = 'Stop'
         $PSNativeCommandUseErrorActionPreference = $True
@@ -83,6 +92,10 @@ function Invoke-Uv {
             # ? See: https://github.com/PowerShell/PowerShell/issues/7233#issuecomment-640243647
             $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = [System.Text.Encoding]::UTF8
         }
+
+        # ? Environment file
+        $EnvFile = '.env'
+        if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
 
         # ? Initialize shell
         if (!$_CI) {
@@ -104,14 +117,14 @@ function Invoke-Uv {
             if ($Low) {
                 uv sync $LockedArg --resolution lowest-direct --python $PythonVersion
                 uv export $LockedArg $FrozenArg --resolution lowest-direct --no-hashes --python $PythonVersion |
-                    Set-Content "$PWD/requirements/requirements_dev_low.txt"
+                    Set-Content 'requirements/requirements_dev_low.txt'
                 $Env:ENV_SYNCED = $null
                 Enter-Venv
             }
             elseif ($High) {
                 uv sync $LockedArg --upgrade --python $PythonVersion
                 uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
-                    Set-Content "$PWD/requirements/requirements_dev_high.txt"
+                    Set-Content 'requirements/requirements_dev_high.txt'
                 $Env:ENV_SYNCED = $null
                 Enter-Venv
             }
@@ -120,7 +133,7 @@ function Invoke-Uv {
                 $FrozenArg = '--frozen'
                 uv sync $LockedArg --no-sources --no-dev --python $PythonVersion
                 uv export $LockedArg $FrozenArg --no-dev --no-hashes --python $PythonVersion |
-                    Set-Content "$PWD/requirements/requirements_prod.txt"
+                    Set-Content 'requirements/requirements_prod.txt'
                 uv build --python $PythonVersion
                 $Env:ENV_SYNCED = $null
                 Enter-Venv
@@ -133,23 +146,29 @@ function Invoke-Uv {
                 # ? Sync the environment
                 uv sync $LockedArg --python $PythonVersion
                 uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
-                    Set-Content "$PWD/requirements/requirements_dev.txt"
+                    Set-Content 'requirements/requirements_dev.txt'
                 Enter-Venv
 
+
                 # ? Set up CI and contributor environments
-                if ($_CI) { Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts") }
+                if ($_CI) { Add-Content $Env:GITHUB_PATH ("$PWD.venv/bin", "$PWD/.venv/scripts") }
+
                 else {
+
                     # ? Install pre-commit hooks
                     $Hooks = '.git/hooks'
-                    if ( !(Test-Path "$Hooks/pre-commit") -or !(Test-Path "$Hooks/post-checkout") ) {
-                        Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'install' '--install-hooks'
-                    }
+                    if (
+                        !(Test-Path "$Hooks/pre-commit") -or
+                        !(Test-Path "$Hooks/post-checkout")
+                    ) { Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'install' '--install-hooks' }
+
                     # ? Normalize line endings of changed files
                     try {
                         Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'run' 'mixed-line-ending' '--all-files' |
                             Out-Null
                     }
                     catch [System.Management.Automation.NativeCommandExitException] {}
+
                     # ? Install Pylance extension
                     if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
                         $LocalExtensions = '.vscode/extensions'
@@ -179,7 +198,7 @@ function Invoke-Uv {
 
                 # ? Sync `.env` and set environment variables from `pyproject.toml`
                 $EnvVars = dev 'sync-environment-variables'
-                $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
+                $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD.env")
                 $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
                     $K, $V = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
                     Set-Item "Env:$K" $V
@@ -239,6 +258,7 @@ function Invoke-Just {
     )
     Begin {
         $_CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI))
+        $Locked = New-Switch $_CI $Locked
         $InvokeUvArgs = @{
             Sync           = $Sync
             Update         = $Update
@@ -247,7 +267,7 @@ function Invoke-Just {
             Build          = $Build
             Force          = $Force
             _CI            = $_CI
-            Locked         = $_CI
+            Locked         = $Locked
             Devcontainer   = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER))
             PythonVersion  = $PythonVersion
             PylanceVersion = $PylanceVersion
@@ -319,7 +339,7 @@ function Initialize-Repo {
 
     # ? Modify GitHub repo if there were not already commits in this repo
     if ($Fresh) {
-        if (!(git remote)) {
+        if ( !(git remote) ) {
             git remote add origin 'https://github.com/softboiler/boilercv.git'
             git branch --move --force main
         }
@@ -432,5 +452,5 @@ EnableFSMonitor=Enabled
     $ErrorActionPreference = $origPreference
 
     # ? Finish machine setup
-    Initialize-Machine
-}
+        Initialize-Machine
+    }

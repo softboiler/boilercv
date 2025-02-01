@@ -69,7 +69,6 @@
       "request": "launch",
       "program": "${file}",
       "console": "internalConsole",
-      "justMyCode": true,
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_WRITE": "True"
@@ -81,7 +80,6 @@
       "request": "launch",
       "program": "${file}",
       "console": "internalConsole",
-      "justMyCode": true,
       "env": {
         "BOILERCV_DEBUG": "True",
         "BOILERCV_PREVIEW": "True"
@@ -174,7 +172,6 @@
       "program": "${file}",
       "console": "integratedTerminal",
       "stopOnEntry": true,
-      "justMyCode": true,
       "env": {
         "OPENCV_LOG_LEVEL": "DEBUG"
       }

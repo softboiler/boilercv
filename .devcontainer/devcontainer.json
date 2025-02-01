@@ -85,7 +85,6 @@
         "ms-toolsai.jupyter@2024.4.0",
         "ms-vscode-remote.remote-containers@0.369.0",
         "ms-vscode.powershell@2024.2.2",
-        "njpwerner.autodocstring@0.6.1",
         "redhat.vscode-yaml@1.15.0",
         "rodolphebarbanneau.python-docstring-highlighter@0.2.3",
         "sourcery.sourcery@1.19.0",

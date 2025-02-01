@@ -19,6 +19,7 @@ Begin {
     . ./dev
 
     $_CI = (New-Switch $Env:SYNC_ENV_DISABLE_CI (New-Switch $Env:CI))
+    $Locked = New-Switch $_CI $Locked
     $InvokeUvArgs = @{
         Sync           = $Sync
         Update         = $Update
@@ -27,7 +28,7 @@ Begin {
         Build          = $Build
         Force          = $Force
         _CI            = $_CI
-        Locked         = $_CI
+        Locked         = $Locked
         Devcontainer   = (New-Switch $Env:SYNC_ENV_DISABLE_DEVCONTAINER (New-Switch $Env:DEVCONTAINER))
         PythonVersion  = $PythonVersion
         PylanceVersion = $PylanceVersion
