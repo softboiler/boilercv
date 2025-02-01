@@ -1,5 +1,6 @@
 """Tools."""
 
+from base64 import b64encode
 from json import dumps
 from pathlib import Path
 from re import finditer, sub
@@ -73,3 +74,8 @@ def elevate_pyright_warnings():
     Path("pyrightconfig.json").write_text(
         encoding="utf-8", data=dumps(pyright, indent=2)
     )
+
+
+def encode_powershell_script(script: str) -> bytes:
+    """Encode a PowerShell script to Base64 for passing to `-EncodedCommand`."""
+    return b64encode(bytearray(script, "utf-16-le"))

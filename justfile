@@ -1,5 +1,7 @@
-set shell := ['pwsh', '-NonInteractive', '-NoProfile', '-Command']
+set unstable
 set dotenv-load
+set shell := ['pwsh', '-NonInteractive', '-NoProfile', '-Command']
+set script-interpreter := ['pwsh', '-NonInteractive', '-NoProfile']
 
 dev := '. ./dev; '
 devpy := dev + 'boilercv-dev'
