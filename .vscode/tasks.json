@@ -215,6 +215,11 @@
     // * OTHER TASKS * //
 
     {
+      "label": "task: pre-commit (fix mixed line endings)",
+      "command": "./Invoke-Uv pre-commit run mixed-line-ending --all-files",
+      "icon": { "id": "git-commit" }
+    },
+    {
       "label": "task: pre-commit",
       "command": "./Invoke-Uv pre-commit run --verbose",
       "icon": { "id": "git-commit" }
