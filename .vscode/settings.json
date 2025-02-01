@@ -12,8 +12,8 @@
     "packages/_dev/boilercv_dev/tests/settings_schema.json": "packages/_dev/boilercv_dev/tests/settings.yaml",
     "packages/_dev/boilercv_dev/tests/settings_plugin_schema.json": "packages/_dev/boilercv_dev/tests/settings_plugin.yaml",
     // ? `boilercv_pipeline`
-    "pipeline/boilercv_pipeline/settings_schema.json": "packages/pipeline/boilercv_pipeline/settings.yaml",
-    "pipeline/boilercv_pipeline/settings_plugin_schema.json": "packages/pipeline/boilercv_pipeline/settings_plugin.yaml"
+    "packages/pipeline/boilercv_pipeline/settings_schema.json": "packages/pipeline/boilercv_pipeline/settings.yaml",
+    "packages/pipeline/boilercv_pipeline/settings_plugin_schema.json": "packages/pipeline/boilercv_pipeline/settings_plugin.yaml"
   },
   //* ------------------------------------------------------------------------------ *//
   //! Terminal
