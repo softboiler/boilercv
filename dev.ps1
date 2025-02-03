@@ -20,6 +20,159 @@ function Initialize-Shell {
     Initialize shell.#>
     if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Update -Force }
     Enter-Venv
+
+    # ? Error-handling
+    $ErrorActionPreference = 'Stop'
+    $PSNativeCommandUseErrorActionPreference = $True
+    $ErrorView = 'NormalView'
+
+    # ? Fix leaky UTF-8 encoding settings on Windows
+    if ($IsWindows) {
+        # ? Now PowerShell pipes will be UTF-8. Note that fixing it from Control Panel and
+        # ? system-wide has buggy downsides.
+        # ? See: https://github.com/PowerShell/PowerShell/issues/7233#issuecomment-640243647
+        $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = [System.Text.Encoding]::UTF8
+    }
+
+    # ? Environment file
+    $EnvFile = '.env'
+    if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
+
+    # ? Install or update `uv`
+    if ($Update -or !(Get-Command 'uv' -ErrorAction 'Ignore')) { Install-Uv -Update }
+    else { Install-Uv }
+    # ? Sync submodules
+    Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 |
+        Remove-Item
+    git submodule update --init --merge
+
+    if ($_CI -or $Sync) {
+        # ? Sync the environment
+        if (!(Test-Path 'requirements')) {
+            New-Item 'requirements' -ItemType 'Directory'
+        }
+        $LockedArg = $Locked ? '--locked' : $null
+        $FrozenArg = $Locked ? $null : '--frozen'
+        if ($Low) {
+            uv sync $LockedArg --resolution lowest-direct --python $PythonVersion
+            uv export $LockedArg $FrozenArg --resolution lowest-direct --no-hashes --python $PythonVersion |
+                Set-Content 'requirements/requirements_dev_low.txt'
+            $Env:ENV_SYNCED = $null
+            Enter-Venv
+        }
+        elseif ($High) {
+            uv sync $LockedArg --upgrade --python $PythonVersion
+            uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
+                Set-Content 'requirements/requirements_dev_high.txt'
+            $Env:ENV_SYNCED = $null
+            Enter-Venv
+        }
+        elseif ($Build) {
+            $LockedArg = $null
+            $FrozenArg = '--frozen'
+            uv sync $LockedArg --no-sources --no-dev --python $PythonVersion
+            uv export $LockedArg $FrozenArg --no-dev --no-hashes --python $PythonVersion |
+                Set-Content 'requirements/requirements_prod.txt'
+            uv build --python $PythonVersion
+            $Env:ENV_SYNCED = $null
+            Enter-Venv
+        }
+        elseif ($_CI -or $Force -or !$Env:ENV_SYNCED) {
+
+            # ? Avoid reentry
+            $Env:ENV_SYNCED = $True
+
+            # ? Sync the environment
+            uv sync $LockedArg --python $PythonVersion
+            uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
+                Set-Content 'requirements/requirements_dev.txt'
+            Enter-Venv
+
+
+            # ? Set up CI and contributor environments
+            if ($_CI) { Add-Content $Env:GITHUB_PATH ("$PWD.venv/bin", "$PWD/.venv/scripts") }
+
+            else {
+
+                # ? Install pre-commit hooks
+                $Hooks = '.git/hooks'
+                if (
+                    !(Test-Path "$Hooks/pre-commit") -or
+                    !(Test-Path "$Hooks/post-checkout")
+                ) { Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'install' '--install-hooks' }
+
+                # ? Normalize line endings of changed files
+                try {
+                    Invoke-Uv -PythonVersion $PythonVersion 'pre-commit' 'run' 'mixed-line-ending' '--all-files' |
+                        Out-Null
+                }
+                catch [System.Management.Automation.NativeCommandExitException] {}
+
+                # ? Install Pylance extension
+                if (!$Devcontainer -and (Get-Command -Name 'code' -ErrorAction 'Ignore')) {
+                    $LocalExtensions = '.vscode/extensions'
+                    $Pylance = 'ms-python.vscode-pylance'
+                    if (!(Test-Path "$LocalExtensions/$Pylance-$PylanceVersion")) {
+                        $Install = @(
+                            "--extensions-dir=$LocalExtensions",
+                            "--install-extension=$Pylance@$PylanceVersion"
+                        )
+                        code @Install
+                        if (Test-Path $LocalExtensions) {
+                            $PylanceExtension = (
+                                Get-ChildItem -Path $LocalExtensions -Filter "$Pylance-*"
+                            )
+                            # ? Remove other files
+                            Get-ChildItem -Path $LocalExtensions |
+                                Where-Object { Compare-Object $_ $PylanceExtension } |
+                                Remove-Item -Recurse
+                            # ? Remove local Pylance bundled stubs
+                            $PylanceExtension | ForEach-Object {
+                                Get-ChildItem "$_/dist/bundled" -Filter '*stubs'
+                            } | Remove-Item -Recurse
+                        }
+                    }
+                }
+            }
+
+            # ? Sync `.env` and set environment variables from `pyproject.toml`
+            $EnvVars = dev 'sync-environment-variables'
+            $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD.env")
+            $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
+                $K, $V = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
+                Set-Item "Env:$K" $V
+            }
+            $ProjEnvJson = '{'
+            (dev 'sync-environment-variables' --config-only) |
+                Select-String -Pattern '^(.+?)=(.+)$' |
+                ForEach-Object {
+                    $K, $V = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
+                    $ProjEnvJson += "`n    `"$K`": `"$V`","
+                }
+            $ProjEnvJson = "$($ProjEnvJson.TrimEnd(','))`n  }"
+            $Settings = '.vscode/settings.json'
+            $SettingsContent = Get-Content $Settings -Raw
+            foreach ($Plat in ('linux', 'osx', 'windows')) {
+                $Pat = "(?m)`"terminal\.integrated\.env\.$Plat`"\s*:\s*\{[^}]*\}"
+                $Repl = "`"terminal.integrated.env.$Plat`": $ProjEnvJson"
+                $SettingsContent = $SettingsContent -Replace $Pat, $Repl
+            }
+            Set-Content $Settings $SettingsContent -NoNewline
+
+            # ? Environment-specific setup
+            if ($_CI) { dev 'elevate-pyright-warnings' }
+            elseif ($Devcontainer) {
+                $Repo = Get-ChildItem '/workspaces'
+                $Packages = Get-ChildItem "$Repo/packages"
+                $SafeDirs = @($Repo) + $Packages
+                foreach ($Dir in $SafeDirs) {
+                    if (!($SafeDirs -contains $Dir)) {
+                        git config --global --add safe.directory $Dir
+                    }
+                }
+            }
+        }
+    }
 }
 
 function Find-Pattern {
@@ -80,33 +233,9 @@ function Invoke-Uv {
     )
     Begin {
 
-        # ? Error-handling
-        $ErrorActionPreference = 'Stop'
-        $PSNativeCommandUseErrorActionPreference = $True
-        $ErrorView = 'NormalView'
-
-        # ? Fix leaky UTF-8 encoding settings on Windows
-        if ($IsWindows) {
-            # ? Now PowerShell pipes will be UTF-8. Note that fixing it from Control Panel and
-            # ? system-wide has buggy downsides.
-            # ? See: https://github.com/PowerShell/PowerShell/issues/7233#issuecomment-640243647
-            $OutputEncoding = [console]::InputEncoding = [console]::OutputEncoding = [System.Text.Encoding]::UTF8
-        }
-
-        # ? Environment file
-        $EnvFile = '.env'
-        if (!(Test-Path $EnvFile)) { New-Item $EnvFile }
-
         # ? Initialize shell
-        if (!$_CI) {
-            # ? Install or update `uv`
-            if ($Update -or !(Get-Command 'uv' -ErrorAction 'Ignore')) { Install-Uv -Update }
-            else { Install-Uv }
-            # ? Sync submodules
-            Get-ChildItem '.git/modules' -Filter 'config.lock' -Recurse -Depth 1 |
-                Remove-Item
-            git submodule update --init --merge
-        }
+        Initialize-Shell
+
         if ($_CI -or $Sync) {
             # ? Sync the environment
             if (!(Test-Path 'requirements')) {
