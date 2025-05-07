@@ -4,9 +4,16 @@
   "extends": ["config:best-practices"],
   "dependencyDashboardApproval": true,
   "separateMajorMinor": false,
-  "git-submodules": { "enabled": true },
-  "pep621": { "cloneSubmodules": true, "rangeStrategy": "update-lockfile" },
-  "pre-commit": { "enabled": true },
+  "git-submodules": {
+    "enabled": true
+  },
+  "pep621": {
+    "cloneSubmodules": true,
+    "rangeStrategy": "update-lockfile"
+  },
+  "pre-commit": {
+    "enabled": true
+  },
   "enabledManagers": [
     "custom.regex",
     "devcontainer",
@@ -19,7 +26,7 @@
     {
       "description": "uv",
       "customType": "regex",
-      "fileMatch": ["(^|/)\\.uv-version[^/]*$"],
+      "managerFilePatterns": ["/(^|/)\\.uv-version[^/]*$/"],
       "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "astral-sh/uv"
@@ -27,7 +34,7 @@
     {
       "description": "uv-gha",
       "customType": "regex",
-      "fileMatch": ["(^|/)\\.github/workflows/[^/]*$"],
+      "managerFilePatterns": ["/(^|/)\\.github/workflows/[^/]*$/"],
       "matchStrings": [
         "- uses: \"astral-sh/setup-uv@.+\\n\\s+with:\\n\\s+version:\\s\"(?<currentValue>.+)\""
       ],
@@ -37,7 +44,7 @@
     {
       "description": "pylance",
       "customType": "regex",
-      "fileMatch": ["(^|/)\\.pylance-version[^/]*$"],
+      "managerFilePatterns": ["/(^|/)\\.pylance-version[^/]*$/"],
       "matchStrings": ["(?<currentValue>[^\\n]+)"],
       "datasourceTemplate": "github-releases",
       "depNameTemplate": "microsoft/pylance-release"
