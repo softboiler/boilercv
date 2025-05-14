@@ -12,12 +12,7 @@ dependencies = [
   "pydantic-settings>=2.5.2",
   "pydantic>=2.9.1",
   "python-dotenv>=1.0.1",
-]
-[project.scripts]
-"boilercv-dev" = "boilercv_dev.__main__:main"
-"boilercv_dev" = "boilercv_dev.__main__:main"
-[project.optional-dependencies]
-docs = [
+  #? Docs
   "devtools>=0.12.2",
   "docutils>=0.21.2",
   "geopandas>=0.14.3",
@@ -35,9 +30,13 @@ docs = [
   "sphinx>=7.3.7",
   "sympy>=1.12",
   "trackpy>=0.6.2",
+  #? Tests
+  "pytest-harvest>=1.10.5",
+  "pytest>=8.2.2",
 ]
-tests = ["pytest-harvest>=1.10.5", "pytest>=8.2.2"]
-
+[project.scripts]
+"boilercv-dev" = "boilercv_dev.__main__:main"
+"boilercv_dev" = "boilercv_dev.__main__:main"
 [tool.fawltydeps]
 deps = ["packages/_dev/pyproject.toml"]
 code = ["packages/_dev", "docs", "tests"]

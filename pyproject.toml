@@ -55,7 +55,7 @@ packages = [
   "boilercine",
   "boilercore",
   "boilercv-pipeline",
-  "boilercv-dev[docs,tests]",
+  "boilercv-dev",
   "cachier",
   "context-models",
 ]
