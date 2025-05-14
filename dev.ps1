@@ -18,7 +18,7 @@ function Enter-Venv {
 function Initialize-Shell {
     <#.SYNOPSIS
     Initialize shell.#>
-    if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Update -Force }
+    if (!(Test-Path '.venv')) { Invoke-Uv -Sync -Force }
     Enter-Venv
 }
 
@@ -116,14 +116,14 @@ function Invoke-Uv {
             $FrozenArg = $Locked ? $null : '--frozen'
             if ($Low) {
                 uv sync $LockedArg --resolution lowest-direct --python $PythonVersion
-                uv export $LockedArg $FrozenArg --resolution lowest-direct --no-hashes --python $PythonVersion |
+                uv export $LockedArg $FrozenArg --no-annotate --resolution lowest-direct --no-hashes --python $PythonVersion |
                     Set-Content 'requirements/requirements_dev_low.txt'
                 $Env:ENV_SYNCED = $null
                 Enter-Venv
             }
             elseif ($High) {
                 uv sync $LockedArg --upgrade --python $PythonVersion
-                uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
+                uv export $LockedArg $FrozenArg --no-annotate --no-hashes --python $PythonVersion |
                     Set-Content 'requirements/requirements_dev_high.txt'
                 $Env:ENV_SYNCED = $null
                 Enter-Venv
@@ -132,7 +132,7 @@ function Invoke-Uv {
                 $LockedArg = $null
                 $FrozenArg = '--frozen'
                 uv sync $LockedArg --no-sources --no-dev --python $PythonVersion
-                uv export $LockedArg $FrozenArg --no-dev --no-hashes --python $PythonVersion |
+                uv export $LockedArg $FrozenArg --no-annotate --no-dev --no-hashes --python $PythonVersion |
                     Set-Content 'requirements/requirements_prod.txt'
                 uv build --python $PythonVersion
                 $Env:ENV_SYNCED = $null
@@ -145,7 +145,7 @@ function Invoke-Uv {
 
                 # ? Sync the environment
                 uv sync $LockedArg --python $PythonVersion
-                uv export $LockedArg $FrozenArg --no-hashes --python $PythonVersion |
+                uv export $LockedArg $FrozenArg --no-annotate --no-hashes --python $PythonVersion |
                     Set-Content 'requirements/requirements_dev.txt'
                 Enter-Venv
 
@@ -273,7 +273,7 @@ function Invoke-Just {
             PylanceVersion = $PylanceVersion
         }
         if (!(Test-Path '.venv')) {
-            Invoke-Uv -Sync -Update -Force
+            Invoke-Uv -Sync -Force
         }
     }
     Process { if ($Run) { Invoke-Uv @InvokeUvArgs -- just $Run } else { Invoke-Uv @InvokeUvArgs -- just } }

@@ -271,7 +271,7 @@
     },
     {
       "label": "task: Profile this file",
-      "command": "./Invoke-Uv cProfile -o .prof ${file}",
+      "command": "./Invoke-Uv python -m cProfile -o .prof ${file}",
       "icon": { "id": "graph-line" }
     },
     {

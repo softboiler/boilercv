@@ -183,24 +183,7 @@ showcontent = true
 
 [tool.pyright]
 stubPath = "typings/stubs"
-exclude = [
-  "**/node_modules",
-  "**/__pycache__",
-  "**/.*",
-  ".cache",
-  "typings",
-  "packages/boilercine",
-  "packages/boilercore",
-  "packages/cachier",
-]
-ignore = [
-  "**/node_modules",
-  "**/__pycache__",
-  "**/.*",
-  ".cache",
-  "typings",
-  "packages/context_models",
-]
+include = ["docs", "packages/_dev", "packages/pipeline", "scripts", "src", "tests"]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true

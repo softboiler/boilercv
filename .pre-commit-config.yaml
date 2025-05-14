@@ -35,7 +35,7 @@ repos:
         pass_filenames: false
         language: "system"
         entry: |
-          pwsh -Command "./Invoke-Uv -Sync -Update"
+          pwsh -Command "./Invoke-Uv -Sync"
       - id: "fawltydeps-src"
         name: "fawltydeps-src"
         pass_filenames: false

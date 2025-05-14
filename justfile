@@ -7,7 +7,7 @@ dev := '. ./dev; '
 devpy := dev + 'boilercv-dev'
 
 sync-contrib:
-  {{dev}} iuv -Sync -Update
+  {{dev}} iuv -Sync
 build-docs:
   {{dev}} Build-Docs
 
