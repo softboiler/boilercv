@@ -151,7 +151,7 @@ function Invoke-Uv {
 
 
                 # ? Set up CI and contributor environments
-                if ($_CI) { Add-Content $Env:GITHUB_PATH ("$PWD.venv/bin", "$PWD/.venv/scripts") }
+                if ($_CI) { Add-Content $Env:GITHUB_PATH ("$PWD/.venv/bin", "$PWD/.venv/scripts") }
 
                 else {
 
@@ -198,7 +198,7 @@ function Invoke-Uv {
 
                 # ? Sync `.env` and set environment variables from `pyproject.toml`
                 $EnvVars = uv run boilercv-dev 'sync-environment-variables'
-                $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD.env")
+                $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD/.env")
                 $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
                     $K, $V = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
                     Set-Item "Env:$K" $V
