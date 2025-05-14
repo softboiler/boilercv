@@ -197,7 +197,7 @@ function Invoke-Uv {
                 }
 
                 # ? Sync `.env` and set environment variables from `pyproject.toml`
-                $EnvVars = dev 'sync-environment-variables'
+                $EnvVars = uv run boilercv-dev 'sync-environment-variables'
                 $EnvVars | Set-Content ($Env:GITHUB_ENV ? $Env:GITHUB_ENV : "$PWD.env")
                 $EnvVars | Select-String -Pattern '^(.+?)=(.+)$' | ForEach-Object {
                     $K, $V = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
@@ -221,7 +221,7 @@ function Invoke-Uv {
                 Set-Content $Settings $SettingsContent -NoNewline
 
                 # ? Environment-specific setup
-                if ($_CI) { dev 'elevate-pyright-warnings' }
+                if ($_CI) { uv run boilercv-dev 'elevate-pyright-warnings' }
                 elseif ($Devcontainer) {
                     $Repo = Get-ChildItem '/workspaces'
                     $Packages = Get-ChildItem "$Repo/packages"
