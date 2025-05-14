@@ -204,7 +204,7 @@ function Invoke-Uv {
                     Set-Item "Env:$K" $V
                 }
                 $ProjEnvJson = '{'
-                (dev 'sync-environment-variables' --config-only) |
+                (uv run boilercv-dev 'sync-environment-variables' --config-only) |
                     Select-String -Pattern '^(.+?)=(.+)$' |
                     ForEach-Object {
                         $K, $V = $_.Matches.Groups[1].Value, $_.Matches.Groups[2].Value
