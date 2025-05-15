@@ -157,6 +157,9 @@ function Invoke-Uv {
 
                     # ? Install pre-commit hooks
                     $Hooks = '.git/hooks'
+                    if ($WorkingTree = git rev-parse '--show-superproject-working-tree') {
+                        $Hooks = "$WorkingTree/$Hooks"
+                    }
                     if (
                         !(Test-Path "$Hooks/pre-commit") -or
                         !(Test-Path "$Hooks/post-checkout")

@@ -251,8 +251,7 @@
   "[just]": { "editor.tabSize": 2, "editor.wordWrap": "off" },
   //* ruff (PY, IPYNB)
   "ruff.importStrategy": "fromEnvironment",
-  "ruff.lint.args": ["--config", "pyproject.toml"],
-  "ruff.format.args": ["--config", "pyproject.toml"],
+  "ruff.configuration": "pyproject.toml",
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.wordWrap": "off"

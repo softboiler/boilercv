@@ -17,6 +17,7 @@ import pytest
 import pytest_harvest
 from _pytest.python import Function
 from boilercore.notebooks.namespaces import get_nb_ns, get_ns_attrs
+from boilercore.warnings import WarningFilter
 from boilercv_dev.tests import Case, get_cached_nb_ns
 from boilercv_dev.tests.config import const
 from boilercv_dev.tests.types import FixtureStore
@@ -38,7 +39,7 @@ CASER = "C"
 @pytest.fixture(autouse=True, scope="session")
 def _filter_certain_warnings():
     """Filter certain warnings."""
-    filter_boilercv_warnings()
+    filter_boilercv_warnings(other_warnings_before=[WarningFilter(action="error")])
 
 
 @pytest.fixture(scope="module", autouse=True)

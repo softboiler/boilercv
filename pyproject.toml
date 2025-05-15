@@ -183,7 +183,25 @@ showcontent = true
 
 [tool.pyright]
 stubPath = "typings/stubs"
-include = ["docs", "packages/_dev", "packages/pipeline", "scripts", "src", "tests"]
+include = [
+  "docs",
+  "packages/_dev",
+  "packages/boilercine",
+  "packages/boilercore",
+  "packages/context_models",
+  "packages/pipeline",
+  "scripts",
+  "src",
+  "tests",
+]
+ignore = [
+  "**/.*",
+  "*:/**/.*",
+  "*:/**/appdata",
+  "packages/boilercine",
+  "packages/boilercore",
+  "packages/context_models",
+]
 typeCheckingMode = "strict"
 # Default "true" in strict
 analyzeUnannotatedFunctions = true

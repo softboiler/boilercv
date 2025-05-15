@@ -1,12 +1,18 @@
 """Warnings."""
 
-from boilercore.warnings import filter_boiler_warnings
+from collections.abc import Iterable
 
-
-def filter_boilercv_warnings():
-    """Filter certain warnings for `boilercv`."""
-    filter_boiler_warnings(other_warnings=WARNING_FILTERS)
-
+from boilercore.warnings import WarningFilter, filter_boiler_warnings
 
 WARNING_FILTERS = []
 """Warning filters."""
+
+
+def filter_boilercv_warnings(
+    other_warnings: Iterable[WarningFilter] | None = WARNING_FILTERS,
+    other_warnings_before: Iterable[WarningFilter] | None = None,
+):
+    """Filter certain warnings for `boilercv`."""
+    filter_boiler_warnings(
+        other_warnings=other_warnings, other_warnings_before=other_warnings_before
+    )
