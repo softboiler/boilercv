@@ -289,9 +289,9 @@ AnyExpr: TypeAlias = Ann[
     ),
     # ? SymPy equations sometimes evaluate to `bool` on copy
     WrapSerializer(
-        lambda v, nxt: ""
-        if isinstance(v, BooleanAtom) or v == trivial_expr
-        else nxt(v),
+        lambda v, nxt: (
+            "" if isinstance(v, BooleanAtom) or v == trivial_expr else nxt(v)
+        ),
         when_used="json",
     ),
 ]

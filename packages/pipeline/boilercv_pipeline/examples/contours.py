@@ -30,7 +30,8 @@ def main():
     result: list[Img] = []
     for frame_num, frame in enumerate(video):
         contours: list[ArrInt] = list(  # pyright: ignore[reportAssignmentType]
-            df.loc[islice[frame_num], :]  # pyright: ignore[reportArgumentType]
+            df
+            .loc[islice[frame_num], :]  # pyright: ignore[reportArgumentType]
             .groupby("contour")
             .apply(lambda grp: grp.values)  # pyright: ignore[reportAttributeAccessIssue]
         )
