@@ -28,7 +28,8 @@ def main(params: Fill):
             if not df.empty:
                 for frame_num, frame in enumerate(video):
                     contours: list[ArrInt] = list(  # pyright: ignore[reportAssignmentType]
-                        df.loc[frame_num, :]
+                        df
+                        .loc[frame_num, :]
                         .groupby("contour")
                         .apply(lambda grp: grp.values)
                     )

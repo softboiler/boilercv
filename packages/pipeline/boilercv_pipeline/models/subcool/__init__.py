@@ -159,24 +159,26 @@ class FilledParams(
         list[Slicers],
         Arg(hidden=True),
         AfterValidator(
-            lambda slicers, info: slicers
-            or [
-                get_slicers(
-                    path,
-                    slicer_patterns=(
-                        info.data["slicer_patterns"]
-                        or {
-                            r".+": {
-                                FRAME: first_slicer(
-                                    n=info.data["frame_count"],
-                                    step=info.data["frame_step"],
-                                )
+            lambda slicers, info: (
+                slicers
+                or [
+                    get_slicers(
+                        path,
+                        slicer_patterns=(
+                            info.data["slicer_patterns"]
+                            or {
+                                r".+": {
+                                    FRAME: first_slicer(
+                                        n=info.data["frame_count"],
+                                        step=info.data["frame_step"],
+                                    )
+                                }
                             }
-                        }
-                    ),
-                )
-                for path in info.data["filled"]
-            ]
+                        ),
+                    )
+                    for path in info.data["filled"]
+                ]
+            )
         ),
     ] = Field(default_factory=list)
     """Slicers for filled video datasets."""
@@ -184,8 +186,9 @@ class FilledParams(
         list[str],
         Arg(hidden=True),
         AfterValidator(
-            lambda times, info: times
-            or [get_time(path) for path in info.data["filled"]]
+            lambda times, info: (
+                times or [get_time(path) for path in info.data["filled"]]
+            )
         ),
         ContextAfterValidator(dvc_extend_with_timestamp_suffixed_plots),
     ] = Field(default_factory=list)
